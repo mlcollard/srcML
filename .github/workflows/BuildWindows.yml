@@ -17,7 +17,11 @@ jobs:
 
       - name: Create build directory
         shell: bash
-        run: mkdir build
+        run:
+          mkdir build
+          which vcpkg
+          which cmake
+          vcpkg --help
 
       - name: CMake Setup on Windows
         shell: bash
