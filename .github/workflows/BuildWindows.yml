@@ -31,8 +31,6 @@ jobs:
         working-directory: build
         run: |
           rm -fR D:/a/srcML/srcML/build/deps/tools/
-          rm -fR D:/a/srcML/srcML/build/deps/release/bin/libxml2.{dll,pdb}
-          rm -fR D:/a/srcML/srcML/build/deps/release/lib/libxml2.lib
           export UseMultiToolTask=true
           cmake --build . --config Release
 
