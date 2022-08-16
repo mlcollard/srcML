@@ -60,6 +60,9 @@ set(CMAKE_GENERATED_SOURCE_DIR ${CMAKE_BINARY_DIR}/parser)
 # External code directory
 set(CMAKE_EXTERNAL_SOURCE_DIR ${CMAKE_BINARY_DIR}/external)
 
+# For Windows, install redist exe
+include(InstallRequiredSystemLibraries)
+
 if(MSVC)
 
     set(WINDOWS_DEP_PATH ${PROJECT_BINARY_DIR}/deps)
