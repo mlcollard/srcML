@@ -21,14 +21,14 @@ jobs:
           mkdir build
           which vcpkg
           which cmake
-          vcpkg --help
+          ls -lh /c/vcpkg/vcpkg/scripts/buildsystems/vcpkg.cmake
 
       - name: CMake Setup on Windows
         shell: bash
         working-directory: build
         run: |
           export UseMultiToolTask=true
-          cmake ..
+          cmake .. -DCMAKE_TOOLCHAIN_FILE=/c/vcpkg/vcpkg/scripts/buildsystems/vcpkg.cmake
 
       - name: Build
         shell: bash
