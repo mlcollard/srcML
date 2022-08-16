@@ -1,5 +1,5 @@
 ---
-name: Build Windows
+name: Build
 
 on: workflow_dispatch
 
@@ -9,27 +9,49 @@ jobs:
     timeout-minutes: 10
     steps:
 
-      - uses: actions/checkout@v2
+      - name: Checkout Repository
+        uses: actions/checkout@v2
 
-      - uses: microsoft/setup-msbuild@v1
+      - name: Setup Windows
+        uses: microsoft/setup-msbuild@v1
+        if: ${{ matrix.os == 'windows-latest' }}
 
-      - name: Cache Build
-        id: cache
-        uses: actions/cache@v2
-        with:
-          path: build
-          key: windows-package
-
-      - shell: bash
-        if: ${{ !steps.cache.outputs.cache-hit }}
+      - name: Create build directory
+        shell: bash
         run: mkdir build
+
+      - name: CMake Setup on Windows
+        shell: bash
+        if: ${{ matrix.os == 'windows-latest' }}
+        working-directory: build
+        run: |
+          export UseMultiToolTask=true
+          cmake ..
 
       - name: Build
         shell: bash
         working-directory: build
-        continue-on-error: true
         run: |
-          export EXTERNAL_INCLUDE="C:\Program Files (x86)\Windows Kits\10\Include;C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30037\include"
           export UseMultiToolTask=true
-          cmake .. -DBUILD_LIBSRCML_TESTS=OFF
-          cmake --build . --verbose --config Release
+          cmake --build . --config Release
+
+      - name: Install on Windows
+        shell: bash
+        if: ${{ matrix.os == 'windows-latest' }}
+        working-directory: build
+        run: |
+          cmake --build . --config Release --target install
+
+      - name: Set PATH for Windows
+        shell: bash
+        if: ${{ matrix.os == 'windows-latest' }}
+        working-directory: build
+        run: |
+          echo "/c/Program Files (x86)/srcML/bin" >> $GITHUB_PATH
+
+      - name: Run Installed srcml
+        shell: bash
+        working-directory: build
+        run: |
+          srcml --version
+          srcml --text="int a;" -l C++
