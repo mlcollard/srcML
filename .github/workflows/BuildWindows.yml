@@ -30,6 +30,8 @@ jobs:
         shell: bash
         working-directory: build
         run: |
+          ls -lh D:/a/srcML/srcML/build/deps/VC_redist.x64.exe
+          rm -fR D:/a/srcML/srcML/build/deps/VC_redist.x64.exe
           export UseMultiToolTask=true
           cmake --build . --config Release
 
