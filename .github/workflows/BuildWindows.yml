@@ -17,7 +17,7 @@ jobs:
 
       - name: Create build directory
         shell: bash
-        run:
+        run: |
           mkdir build
           which vcpkg
           which cmake
