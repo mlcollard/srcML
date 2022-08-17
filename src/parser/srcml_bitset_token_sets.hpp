@@ -60,7 +60,7 @@ token_set(srcMLParser, macro_call_token_set,
     srcMLParser::YIELD, srcMLParser::ADD, srcMLParser::DESCENDING, srcMLParser::PRAGMA, srcMLParser::ENDIF, srcMLParser::ASYNC,
     srcMLParser::INCLUDE, srcMLParser::WHERE, srcMLParser::NAME, srcMLParser::ON, srcMLParser::FROM, srcMLParser::ERRORPREC,
     srcMLParser::ENDREGION, srcMLParser::THIS, srcMLParser::SIGNAL, srcMLParser::REMOVE, srcMLParser::LET, srcMLParser::IFDEF,
-    srcMLParser::IFNDEF, srcMLParser::SUPER, srcMLParser::UNCHECKED, srcMLParser::VOID, srcMLParser::CRESTRICT, srcMLParser::ASM,
+    srcMLParser::IFNDEF, srcMLParser::SUPER, srcMLParser::UNCHECKED, /* srcMLParser::VOID, */ srcMLParser::CRESTRICT, srcMLParser::ASM,
     srcMLParser::MUTABLE, srcMLParser::CXX_CATCH, srcMLParser::CXX_TRY, srcMLParser::CXX_CLASS
 )
 
@@ -76,11 +76,11 @@ token_set(srcMLParser, argument_token_set,
     srcMLParser::EXTERN, srcMLParser::NEW, srcMLParser::REF, srcMLParser::NATIVE, srcMLParser::SET, srcMLParser::ASCENDING,
     srcMLParser::STRICTFP, srcMLParser::FRIEND, srcMLParser::OUT, srcMLParser::ADD, srcMLParser::DESCENDING, srcMLParser::ASYNC,
     srcMLParser::JOIN, srcMLParser::NAME, srcMLParser::QMARK, srcMLParser::INTERNAL, srcMLParser::PARAMS, srcMLParser::INLINE,
-    srcMLParser::EVENT, srcMLParser::ELIF, srcMLParser::CONST, srcMLParser::ABSTRACT, srcMLParser::REFOPS, srcMLParser::MULTOPS,
+    srcMLParser::EVENT, srcMLParser::ELIF, /* srcMLParser::CONST, srcMLParser::ABSTRACT, srcMLParser::REFOPS, srcMLParser::MULTOPS, */
     srcMLParser::PRIVATE, srcMLParser::OVERRIDE, srcMLParser::ATSIGN, srcMLParser::CLASS, srcMLParser::INTO, srcMLParser::YIELD,
     srcMLParser::TEMPOPS, srcMLParser::PRAGMA, srcMLParser::IN, srcMLParser::IMPLICIT, srcMLParser::FROM, srcMLParser::STRUCT,
     srcMLParser::SIGNAL, srcMLParser::CONSTEXPR, srcMLParser::SEALED, srcMLParser::IFDEF, srcMLParser::SUPER, srcMLParser::RESTRICT,
-    srcMLParser::ALIGNAS, srcMLParser::VOID, srcMLParser::DECLTYPE, srcMLParser::TYPENAME, srcMLParser::MACRO_TYPE_NAME,
+    srcMLParser::ALIGNAS, /* srcMLParser::VOID, */ srcMLParser::DECLTYPE, srcMLParser::TYPENAME, srcMLParser::MACRO_TYPE_NAME,
     srcMLParser::MACRO_SPECIFIER, srcMLParser::TEMPLATE, srcMLParser::CRESTRICT, srcMLParser::COMPLEX, srcMLParser::ATOMIC,
     srcMLParser::NORETURN, srcMLParser::IMAGINARY, srcMLParser::GENERIC_SELECTION, srcMLParser::ASM, srcMLParser::CXX_TRY, srcMLParser::CXX_CATCH,
     srcMLParser::CXX_CLASS, srcMLParser::ATREQUIRED, srcMLParser::ATOPTIONAL, srcMLParser::BLOCK, srcMLParser::WEAK, srcMLParser::STRONG
@@ -89,7 +89,7 @@ token_set(srcMLParser, argument_token_set,
 token_set(srcMLParser, enum_preprocessing_token_set,
     srcMLParser::EXTERN, srcMLParser::RESTRICT, srcMLParser::CONSTEXPR, srcMLParser::THREAD_LOCAL, srcMLParser::ALIGNAS,
     srcMLParser::INLINE, srcMLParser::MACRO_SPECIFIER, srcMLParser::PUBLIC, srcMLParser::PRIVATE, srcMLParser::PROTECTED,
-    srcMLParser::VIRTUAL, srcMLParser::FRIEND, srcMLParser::EXPLICIT, srcMLParser::NEW, srcMLParser::STATIC, srcMLParser::CONST,
+    srcMLParser::VIRTUAL, srcMLParser::FRIEND, srcMLParser::EXPLICIT, srcMLParser::NEW, srcMLParser::STATIC, /* srcMLParser::CONST, */
     srcMLParser::MUTABLE, srcMLParser::VOLATILE, srcMLParser::REGISTER, srcMLParser::TRANSIENT, srcMLParser::FINAL, srcMLParser::ABSTRACT, srcMLParser::SYNCHRONIZED,
     srcMLParser::NATIVE, srcMLParser::STRICTFP, srcMLParser::REF, srcMLParser::OUT, srcMLParser::IN, srcMLParser::INTERNAL, srcMLParser::SEALED,
     srcMLParser::OVERRIDE, srcMLParser::IMPLICIT, srcMLParser::DELEGATE, srcMLParser::UNSAFE, srcMLParser::READONLY, srcMLParser::PARTIAL,
@@ -132,7 +132,7 @@ token_set(srcMLParser, identifier_list_tokens_set,
 
     srcMLParser::NAME, srcMLParser::INCLUDE, srcMLParser::DEFINE, srcMLParser::ELIF, srcMLParser::ENDIF, srcMLParser::ERRORPREC, srcMLParser::IFDEF, srcMLParser::IFNDEF, srcMLParser::LINE, srcMLParser::PRAGMA, srcMLParser::UNDEF |
     srcMLParser::WARNING, srcMLParser::SUPER, srcMLParser::REGION, srcMLParser::ENDREGION, srcMLParser::GET, srcMLParser::SET, srcMLParser::ADD, srcMLParser::REMOVE, srcMLParser::ASYNC, srcMLParser::YIELD |
-    srcMLParser::SIGNAL, srcMLParser::FINAL, srcMLParser::OVERRIDE, srcMLParser::VOID, srcMLParser::ASM,
+    srcMLParser::SIGNAL, srcMLParser::FINAL, srcMLParser::OVERRIDE, /* srcMLParser::VOID, */ srcMLParser::ASM,
 
     // C# linq
     srcMLParser::FROM, srcMLParser::WHERE, srcMLParser::SELECT, srcMLParser::LET, srcMLParser::ORDERBY, srcMLParser::ASCENDING, srcMLParser::DESCENDING, srcMLParser::GROUP, srcMLParser::BY, srcMLParser::JOIN, srcMLParser::ON, srcMLParser::EQUALS,
