@@ -19,7 +19,7 @@ jobs:
         shell: bash
         run: |
           mkdir build
-          ls -lh [vcpkg root]/scripts/buildsystems/vcpkg.cmake
+          ls -lh /c/vcpkg/scripts/buildsystems/vcpkg.cmake
 
       - name: Restore artifacts, or run vcpkg, build (and cache artifacts as post step)
         uses: lukka/run-vcpkg@v10.3
@@ -33,7 +33,7 @@ jobs:
         working-directory: build
         run: |
           export UseMultiToolTask=true
-          cmake .. -DCMAKE_TOOLCHAIN_FILE=[vcpkg root]/scripts/buildsystems/vcpkg.cmake
+          cmake .. -DCMAKE_TOOLCHAIN_FILE=/c/vcpkg/scripts/buildsystems/vcpkg.cmake
 
       - name: Build
         shell: bash
