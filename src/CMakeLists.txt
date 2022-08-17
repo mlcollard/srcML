@@ -65,46 +65,28 @@ include(InstallRequiredSystemLibraries)
 
 if(MSVC)
 
-    set(WINDOWS_DEP_PATH ${PROJECT_BINARY_DIR}/deps)
+    # set(WINDOWS_DEP_PATH ${PROJECT_BINARY_DIR}/deps)
 
-    # Download project dependencies
-    set(WINDOWS_DEP_FILENAME VS2021_Dependencies-05-26-21.zip)
-    # set(WINDOWS_DEP_FILENAME VS2017_Dependencies-06_20_18.zip)
-    set(WINDOWS_DEP_URL http://www.sdml.cs.kent.edu/build/${WINDOWS_DEP_FILENAME})
-    if (NOT EXISTS ${WINDOWS_DEP_PATH}/tools) 
-        message("-- Download ${WINDOWS_DEP_URL}")
-        file(DOWNLOAD ${WINDOWS_DEP_URL} ${WINDOWS_DEP_FILENAME})
-        message("-- Unzip ${WINDOWS_DEP_URL} into ${WINDOWS_DEP_PATH}")
-        file(ARCHIVE_EXTRACT INPUT ${WINDOWS_DEP_FILENAME} DESTINATION ${PROJECT_BINARY_DIR})
-        file(REMOVE_RECURSE ${WINDOWS_DEP_PATH}/release/)
-        file(REMOVE_RECURSE ${WINDOWS_DEP_PATH}/debug/)
+    # # Download project dependencies
+    # set(WINDOWS_DEP_FILENAME VS2021_Dependencies-05-26-21.zip)
+    # # set(WINDOWS_DEP_FILENAME VS2017_Dependencies-06_20_18.zip)
+    # set(WINDOWS_DEP_URL http://www.sdml.cs.kent.edu/build/${WINDOWS_DEP_FILENAME})
+    # if (NOT EXISTS ${WINDOWS_DEP_PATH}/tools)
+    #     message("-- Download ${WINDOWS_DEP_URL}")
+    #     file(DOWNLOAD ${WINDOWS_DEP_URL} ${WINDOWS_DEP_FILENAME})
+    #     message("-- Unzip ${WINDOWS_DEP_URL} into ${WINDOWS_DEP_PATH}")
+    #     file(ARCHIVE_EXTRACT INPUT ${WINDOWS_DEP_FILENAME} DESTINATION ${PROJECT_BINARY_DIR})
+    #     file(REMOVE_RECURSE ${WINDOWS_DEP_PATH}/release/)
+    #     file(REMOVE_RECURSE ${WINDOWS_DEP_PATH}/debug/)
+    #     file(REMOVE_RECURSE ${WINDOWS_DEP_PATH}/tools/)
+    #     file(REMOVE_RECURSE ${WINDOWS_DEP_PATH}/include/)
+    # endif()
 
-        # file(REMOVE ${WINDOWS_DEP_PATH}/release/bin/libxml2.dll)
-        # file(REMOVE ${WINDOWS_DEP_PATH}/release/bin/libxml2.dll)
-        # file(REMOVE ${WINDOWS_DEP_PATH}/release/bin/libxml2.pub)
-        # file(REMOVE ${WINDOWS_DEP_PATH}/release/lib/libxml2.lib)
-        # file(REMOVE ${WINDOWS_DEP_PATH}/debug/bin/libxml2.dll)
-        # file(REMOVE ${WINDOWS_DEP_PATH}/debug/bin/libxml2.pub)
-        # file(REMOVE ${WINDOWS_DEP_PATH}/debug/lib/libxml2.lib)
-        # file(REMOVE ${WINDOWS_DEP_PATH}/release/lib/libcurl.lib)
-        # file(REMOVE ${WINDOWS_DEP_PATH}/release/bin/libcurl.dll)
-        # file(REMOVE ${WINDOWS_DEP_PATH}/release/bin/libcurl.pdb)
-        # file(REMOVE ${WINDOWS_DEP_PATH}/debug/lib/libcurl-d.lib)
-        # file(REMOVE ${WINDOWS_DEP_PATH}/debug/bin/libcurl-d.dll)
-        # file(REMOVE ${WINDOWS_DEP_PATH}/debug/bin/libcurl-d.pdb)
-        # file(REMOVE ${WINDOWS_DEP_PATH}/release/bin/archive.dll)
-        # file(REMOVE ${WINDOWS_DEP_PATH}/release/bin/archive.pub)
-        # file(REMOVE ${WINDOWS_DEP_PATH}/release/lib/archive.lib)
-        # file(REMOVE ${WINDOWS_DEP_PATH}/debug/bin/archive.dll)
-        # file(REMOVE ${WINDOWS_DEP_PATH}/debug/bin/archive.pub)
-        # file(REMOVE ${WINDOWS_DEP_PATH}/debug/lib/archive.lib)
-    endif()
-
-    # Use installed dependencies for find_*()
-    list(APPEND CMAKE_PREFIX_PATH ${WINDOWS_DEP_PATH}/release
-                                  ${WINDOWS_DEP_PATH}/release/lib
-                                  ${WINDOWS_DEP_PATH}/release/bin
-                                  ${WINDOWS_DEP_PATH}/include)
+    # # Use installed dependencies for find_*()
+    # list(APPEND CMAKE_PREFIX_PATH ${WINDOWS_DEP_PATH}/release
+    #                               ${WINDOWS_DEP_PATH}/release/lib
+    #                               ${WINDOWS_DEP_PATH}/release/bin
+    #                               ${WINDOWS_DEP_PATH}/include)
 
 elseif(APPLE)
 
