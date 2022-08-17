@@ -32,15 +32,12 @@ jobs:
         shell: bash
         working-directory: build
         run: |
-          export UseMultiToolTask=true
           cmake .. -DCMAKE_TOOLCHAIN_FILE=/c/vcpkg/scripts/buildsystems/vcpkg.cmake
 
       - name: Build
         shell: bash
         working-directory: build
         run: |
-          rm -fR D:/a/srcML/srcML/build/deps/tools/
-          export UseMultiToolTask=true
           cmake --build . --config Release
 
       - name: Install on Windows
