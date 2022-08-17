@@ -6,6 +6,7 @@
     "libxml2",
     "libxslt",
     "libarchive",
-    "curl"
+    "curl",
+    "boost-optional"
   ]
 }
