@@ -3,6 +3,8 @@
   "name": "srcml",
   "version": "1.0.1",
   "dependencies": [
-    "libxml2"
+    "libxml2",
+    "libarchive",
+    "curl"
   ]
 }
