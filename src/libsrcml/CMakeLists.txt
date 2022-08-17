@@ -81,7 +81,7 @@ endif()
 
 # which types of libraries
 if(MSVC)
-    install(TARGETS libsrcml_shared COMPONENT SRCML)
+    install(TARGETS libsrcml_shared RUNTIME_DEPENDENCIES COMPONENT SRCML)
 else()
     install(TARGETS libsrcml_shared LIBRARY COMPONENT SRCML NAMELINK_COMPONENT DEVLIBS)
 endif()

@@ -6,7 +6,7 @@ on: workflow_dispatch
 jobs:
   build:
     runs-on: windows-latest
-    timeout-minutes: 10
+    timeout-minutes: 30
     steps:
 
       - name: Checkout Repository
@@ -19,16 +19,21 @@ jobs:
         shell: bash
         run: |
           mkdir build
-          which vcpkg
-          which cmake
-          ls -lh /c/vcpkg/scripts/buildsystems/vcpkg.cmake
+          ls -lh [vcpkg root]/scripts/buildsystems/vcpkg.cmake
+
+      - name: Restore artifacts, or run vcpkg, build (and cache artifacts as post step)
+        uses: lukka/run-vcpkg@v10.3
+        id: runvcpkg
+        with:
+          vcpkgGitCommitId: 'acc3bcf76b84ae5041c86ab55fe138ae7b8255c7'
+          runVcpkgInstall: true
 
       - name: CMake Setup on Windows
         shell: bash
         working-directory: build
         run: |
           export UseMultiToolTask=true
-          cmake .. -DCMAKE_TOOLCHAIN_FILE=/c/vcpkg/scripts/buildsystems/vcpkg.cmake
+          cmake .. -DCMAKE_TOOLCHAIN_FILE=[vcpkg root]/scripts/buildsystems/vcpkg.cmake
 
       - name: Build
         shell: bash
