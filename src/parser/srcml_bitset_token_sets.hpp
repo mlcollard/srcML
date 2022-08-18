@@ -59,8 +59,8 @@ token_set(srcMLParser, macro_call_token_set,
     srcMLParser::DEFINE, srcMLParser::ORDERBY, srcMLParser::UNDEF, srcMLParser::CHECKED, srcMLParser::INTO, srcMLParser::EQUALS,
     srcMLParser::YIELD, srcMLParser::ADD /* LAST */, srcMLParser::DESCENDING, srcMLParser::PRAGMA, srcMLParser::ENDIF, srcMLParser::ASYNC,
     srcMLParser::INCLUDE, srcMLParser::WHERE, srcMLParser::NAME /* START */,srcMLParser::ON, srcMLParser::FROM, srcMLParser::ERRORPREC,
-    srcMLParser::ENDREGION/*, srcMLParser::THIS*//*, srcMLParser::SIGNAL, srcMLParser::REMOVE, srcMLParser::LET, srcMLParser::IFDEF,
-    srcMLParser::IFNDEF, srcMLParser::SUPER, srcMLParser::UNCHECKED*/ /***, PROBLEM srcMLParser::VOID, */ /*srcMLParser::CRESTRICT, srcMLParser::ASM,
+    srcMLParser::ENDREGION/*, srcMLParser::THIS*/, srcMLParser::SIGNAL, srcMLParser::REMOVE, srcMLParser::LET, srcMLParser::IFDEF,
+    srcMLParser::IFNDEF, srcMLParser::SUPER, srcMLParser::UNCHECKED /***, PROBLEM srcMLParser::VOID, */ /*srcMLParser::CRESTRICT, srcMLParser::ASM,
     srcMLParser::MUTABLE, srcMLParser::CXX_CATCH, srcMLParser::CXX_TRY, srcMLParser::CXX_CLASS */
 )
 
@@ -136,7 +136,7 @@ token_set(srcMLParser, identifier_list_tokens_set,
 
     // C# linq
     srcMLParser::FROM, srcMLParser::WHERE, srcMLParser::SELECT, srcMLParser::LET, srcMLParser::ORDERBY, srcMLParser::ASCENDING, srcMLParser::DESCENDING, srcMLParser::GROUP, srcMLParser::BY, srcMLParser::JOIN, srcMLParser::ON, srcMLParser::EQUALS,
-        srcMLParser::INTO, srcMLParser::THIS, srcMLParser::ALIAS,
+        srcMLParser::INTO, /* srcMLParser::THIS, */srcMLParser::ALIAS,
 
     // Objective-C
     srcMLParser::IMPORT, srcMLParser::ATPROTOCOL,
