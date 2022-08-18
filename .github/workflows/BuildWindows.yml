@@ -31,6 +31,7 @@ jobs:
         shell: bash
         working-directory: build
         run: |
+          export UseMultiToolTask=true
           cmake .. -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake
 
       - name: Build
@@ -38,6 +39,7 @@ jobs:
         working-directory: build
         # continue-on-error: true
         run: |
+          export UseMultiToolTask=true
           cmake --build . --config Release
 
       # - uses: actions/upload-artifact@v3
