@@ -169,26 +169,18 @@ if(NOT ENABLE_ANTLR_BUILD_WARNINGS)
         $<$<CXX_COMPILER_ID:MSVC>:/wd4365> # 'argument': conversion from 'size_t' to 'const __int64', signed/unsigned mismatch
         $<$<CXX_COMPILER_ID:MSVC>:/wd4477> # 'sprintf' : format string '%u' requires an argument of type 'unsigned int', but variadic argument 1 has type 'size_t'
         $<$<CXX_COMPILER_ID:MSVC>:/wd5031> # #pragma warning(pop): likely mismatch, popping warning state pushed in different file
-
-        # $<$<CXX_COMPILER_ID:MSVC>:/wd4068> # unknown pragma
-        # # $<$<CXX_COMPILER_ID:MSVC>:/wd4101> # unreferenced local variable
-        # # $<$<CXX_COMPILER_ID:MSVC>:/wd4519> # unmarked inlining notification warning
-        # $<$<CXX_COMPILER_ID:MSVC>:/wd4514> # removed inline function not called (in one context)
-        #     # $<$<CXX_COMPILER_ID:MSVC>:/wd4668> # preprocessor symbol not defined but used in an #if
-        # $<$<CXX_COMPILER_ID:MSVC>:/wd4710> # unmarked inlining notification warning
-        # $<$<CXX_COMPILER_ID:MSVC>:/wd4820> # byte padding
-        # $<$<CXX_COMPILER_ID:MSVC>:/wd5039> # pointer or reference to potentially throwing function passed to 'extern "C"' function under -EHc
-        # $<$<CXX_COMPILER_ID:MSVC>:/wd4711> # selected for automatic inline expansion
-        # $<$<CXX_COMPILER_ID:MSVC>:/wd4706> # assigment within conditional expression
-
-        # $<$<CXX_COMPILER_ID:MSVC>:/wd4625> # copy constructor was implicitly defined as deleted
-        # $<$<CXX_COMPILER_ID:MSVC>:/wd4626> # assignment operator was implicitly defined as deleted
-        # $<$<CXX_COMPILER_ID:MSVC>:/wd5026> # move constructor was implicitly defined as deleted
-        # $<$<CXX_COMPILER_ID:MSVC>:/wd5027> # move assignment operator was implicitly defined as deleted
-        # $<$<CXX_COMPILER_ID:MSVC>:/wd4668> # is not defined as a preprocessor macro, replacing with '0' for '#if/#elif'
-        # $<$<CXX_COMPILER_ID:MSVC>:/wd4868> # compiler may not enforce left-to-right evaluation order in braced initializer list
-        # $<$<CXX_COMPILER_ID:MSVC>:/wd4371> # layout of class may have changed from a previous version of the compiler due to better packing of member
-        # $<$<CXX_COMPILER_ID:MSVC>:/wd4623> # default constructor was implicitly defined as deleted
-        # $<$<CXX_COMPILER_ID:MSVC>:/wd5045> # Compiler will insert Spectre mitigation for memory load if /Qspectre switch specified
+    )
+    target_compile_options(parser PRIVATE
+        $<$<CXX_COMPILER_ID:MSVC>:/wd4365> # conversion from 'int' to 'unsigned int',
+        $<$<CXX_COMPILER_ID:MSVC>:/wd4267> # 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
+        $<$<CXX_COMPILER_ID:MSVC>:/wd4244> # 'argument': conversion from 'unsigned int' to '_Elem', possible loss of data
+        $<$<CXX_COMPILER_ID:MSVC>:/wd4458> # declaration of 'index' hides class member
+        $<$<CXX_COMPILER_ID:MSVC>:/wd4242> # 'argument': conversion from 'T' to '_Elem', possible loss of data
+        $<$<CXX_COMPILER_ID:MSVC>:/wd4244> # 'argument': conversion from 'T' to '_Elem', possible loss of data
+        $<$<CXX_COMPILER_ID:MSVC>:/wd4100> # unreferenced formal parameter
+        $<$<CXX_COMPILER_ID:MSVC>:/wd4355> # this': used in base member initializer list
+        $<$<CXX_COMPILER_ID:MSVC>:/wd4365> # 'argument': conversion from 'size_t' to 'const __int64', signed/unsigned mismatch
+        $<$<CXX_COMPILER_ID:MSVC>:/wd4477> # 'sprintf' : format string '%u' requires an argument of type 'unsigned int', but variadic argument 1 has type 'size_t'
+        $<$<CXX_COMPILER_ID:MSVC>:/wd5031> # #pragma warning(pop): likely mismatch, popping warning state pushed in different file
     )
 endif()
