@@ -59,7 +59,7 @@ token_set(srcMLParser, macro_call_token_set,
     srcMLParser::DEFINE, srcMLParser::ORDERBY, srcMLParser::UNDEF, srcMLParser::CHECKED, srcMLParser::INTO, srcMLParser::EQUALS,
     srcMLParser::YIELD, srcMLParser::ADD /* LAST */, srcMLParser::DESCENDING, srcMLParser::PRAGMA, srcMLParser::ENDIF, srcMLParser::ASYNC,
     srcMLParser::INCLUDE, srcMLParser::WHERE, srcMLParser::NAME /* START */,srcMLParser::ON, srcMLParser::FROM, srcMLParser::ERRORPREC,
-    srcMLParser::ENDREGION, srcMLParser::THIS/*, srcMLParser::SIGNAL, srcMLParser::REMOVE, srcMLParser::LET, srcMLParser::IFDEF,
+    srcMLParser::ENDREGION/*, srcMLParser::THIS*//*, srcMLParser::SIGNAL, srcMLParser::REMOVE, srcMLParser::LET, srcMLParser::IFDEF,
     srcMLParser::IFNDEF, srcMLParser::SUPER, srcMLParser::UNCHECKED*/ /***, PROBLEM srcMLParser::VOID, */ /*srcMLParser::CRESTRICT, srcMLParser::ASM,
     srcMLParser::MUTABLE, srcMLParser::CXX_CATCH, srcMLParser::CXX_TRY, srcMLParser::CXX_CLASS */
 )
