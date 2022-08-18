@@ -175,11 +175,11 @@ set(ANTLR_INCLUDE_DIR "${ANTLR_EXTERNAL}/lib/cpp/")
 
 set(LIBXML2_LIBRARIES ${LIBXML2_LIBRARIES} ${Iconv_LIBRARIES})
 
-if(NOT WIN32)
+# if(NOT WIN32)
     include_directories(SYSTEM ${LibArchive_INCLUDE_DIRS} ${LIBXML2_INCLUDE_DIRS} ${CURL_INCLUDE_DIRS}
                     ${Boost_INCLUDE_DIRS} ${Iconv_INCLUDE_DIRS} ${LibArchive_INCLUDE_DIR}
                     ${LIBXML2_INCLUDE_DIR} ${CURL_INCLUDE_DIR} ${Boost_INCLUDE_DIR} ${ANTLR_INCLUDE_DIR})
-endif()
+# endif()
 
 get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
 foreach(dir ${dirs})
