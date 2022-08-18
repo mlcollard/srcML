@@ -52,6 +52,9 @@ file(GLOB CLIENT_SOURCE *.cpp)
 message("CLIENT_SOURCE: ${CLIENT_SOURCE}")
 
 add_executable(srcml ${CLIENT_SOURCE})
+get_target_property(MY_PROJECT_SOURCES srcml SOURCES)
+message("TARGET_CLIENT_SOURCES: ${MY_PROJECT_SOURCES}")
+
 if(MSVC)
     target_compile_options(srcml PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${CMAKE_EXTERNAL_SOURCE_DIR})
     target_compile_options(srcml PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${LibArchive_INCLUDE_DIRS})
