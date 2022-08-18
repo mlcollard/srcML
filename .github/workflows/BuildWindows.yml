@@ -36,14 +36,14 @@ jobs:
       - name: Build
         shell: bash
         working-directory: build
-        continue-on-error: true
+        # continue-on-error: true
         run: |
           cmake --build . --config Release
 
-      - uses: actions/upload-artifact@v2
-        with:
-          name: Parser
-          path: build/parser/
+      # - uses: actions/upload-artifact@v2
+      #   with:
+      #     name: Parser
+      #     path: build/parser/
 
       - name: Install on Windows
         shell: bash
