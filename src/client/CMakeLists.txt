@@ -47,11 +47,13 @@ else()
     list(APPEND SRCML_LIBRARIES ws2_32)
 endif()
 
-file(GLOB CLIENT_SOURCE *.cpp)
+# file(GLOB CLIENT_SOURCE *.cpp)
 
-message("CLIENT_SOURCE: ${CLIENT_SOURCE}")
+set(CLIENT_SOURCE "OpenFileLimiter.cpp ParserTest.cpp SRCMLStatus.cpp TraceLog.cpp WriteQueue.cpp XCPUCount.cpp compress_srcml.cpp create_src.cpp create_srcml.cpp decompress_srcml.cpp input_archive.cpp input_curl.cpp input_file.cpp mkDir.cpp src_archive.cpp src_input_file.cpp src_input_filelist.cpp src_input_filesystem.cpp src_input_libarchive.cpp src_input_text.cpp src_output_filesystem.cpp src_output_libarchive.cpp src_prefix.cpp srcml.cpp srcml_cli.cpp srcml_consume.cpp srcml_display_metadata.cpp srcml_execute.cpp srcml_input_src.cpp srcml_input_srcml.cpp srcml_options.cpp srcml_pipe.cpp srcml_pretty.cpp srcml_write.cpp transform_srcml.cpp unarchive_srcml.cpp")
 
-list(REMOVE_ITEM CLIENT_SOURCE "AAA.cpp")
+message("BEFORE CLIENT_SOURCE: ${CLIENT_SOURCE}")
+
+message("AFTER CLIENT_SOURCE: ${CLIENT_SOURCE}")
 
 add_executable(srcml ${CLIENT_SOURCE})
 get_target_property(MY_PROJECT_SOURCES srcml SOURCES)
