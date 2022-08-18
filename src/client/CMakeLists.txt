@@ -51,6 +51,8 @@ file(GLOB CLIENT_SOURCE *.cpp)
 
 message("CLIENT_SOURCE: ${CLIENT_SOURCE}")
 
+list(PREPEND CLIENT_SOURCE "fake.cpp")
+
 add_executable(srcml ${CLIENT_SOURCE})
 get_target_property(MY_PROJECT_SOURCES srcml SOURCES)
 message("TARGET_CLIENT_SOURCES: ${MY_PROJECT_SOURCES}")
