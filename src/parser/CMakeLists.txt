@@ -162,6 +162,14 @@ if(NOT ENABLE_ANTLR_BUILD_WARNINGS)
         $<$<CXX_COMPILER_ID:MSVC>:/wd4267> # 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
         $<$<CXX_COMPILER_ID:MSVC>:/wd4244> # 'argument': conversion from 'unsigned int' to '_Elem', possible loss of data
         $<$<CXX_COMPILER_ID:MSVC>:/wd4458> # declaration of 'index' hides class member
+        $<$<CXX_COMPILER_ID:MSVC>:/wd4242> # 'argument': conversion from 'T' to '_Elem', possible loss of data
+        $<$<CXX_COMPILER_ID:MSVC>:/wd4244> # 'argument': conversion from 'T' to '_Elem', possible loss of data
+        $<$<CXX_COMPILER_ID:MSVC>:/wd4100> # unreferenced formal parameter
+        $<$<CXX_COMPILER_ID:MSVC>:/wd4355> # this': used in base member initializer list
+        $<$<CXX_COMPILER_ID:MSVC>:/wd4365> # 'argument': conversion from 'size_t' to 'const __int64', signed/unsigned mismatch
+        $<$<CXX_COMPILER_ID:MSVC>:/wd4477> # 'sprintf' : format string '%u' requires an argument of type 'unsigned int', but variadic argument 1 has type 'size_t'
+        $<$<CXX_COMPILER_ID:MSVC>:/wd5031> # #pragma warning(pop): likely mismatch, popping warning state pushed in different file
+
         # $<$<CXX_COMPILER_ID:MSVC>:/wd4068> # unknown pragma
         # # $<$<CXX_COMPILER_ID:MSVC>:/wd4101> # unreferenced local variable
         # # $<$<CXX_COMPILER_ID:MSVC>:/wd4519> # unmarked inlining notification warning
