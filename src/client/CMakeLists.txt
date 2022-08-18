@@ -47,7 +47,7 @@ else()
     list(APPEND SRCML_LIBRARIES ws2_32)
 endif()
 
-file(GLOB CLIENT_SOURCE *.hpp *.cpp)
+file(GLOB CLIENT_SOURCE *.cpp)
 
 add_executable(srcml ${CLIENT_SOURCE})
 if(MSVC)
