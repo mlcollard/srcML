@@ -49,6 +49,8 @@ endif()
 
 file(GLOB CLIENT_SOURCE *.cpp)
 
+message("CLIENT_SOURCE: ${CLIENT_SOURCE}")
+
 add_executable(srcml ${CLIENT_SOURCE})
 if(MSVC)
     target_compile_options(srcml PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${CMAKE_EXTERNAL_SOURCE_DIR})
