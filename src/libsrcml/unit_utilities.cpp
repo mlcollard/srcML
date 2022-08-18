@@ -68,7 +68,11 @@ void unit_update_attributes(srcml_unit* unit, int num_attributes, const xmlChar*
     }
 }
 
-enum { INSERT, DELETE, INCOMMON };
+#define INSERT 0
+#define DELETE 1
+#define INCOMMON 2
+
+// enum { INSERT, DELETE, INCOMMON };
 
 std::string extract_revision(const char* srcml, int size, int revision, bool text_only) {
 
