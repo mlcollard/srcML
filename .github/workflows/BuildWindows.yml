@@ -39,6 +39,11 @@ jobs:
         run: |
           cmake --build . --config Release
 
+      - uses: actions/upload-artifact@v2
+        with:
+          name: Parser
+          path: build/parser/
+
       - name: Install on Windows
         shell: bash
         working-directory: build
