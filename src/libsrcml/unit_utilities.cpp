@@ -68,25 +68,23 @@ void unit_update_attributes(srcml_unit* unit, int num_attributes, const xmlChar*
     }
 }
 
-#define INSERT 0
-#define DELETE 1
-#define INCOMMON 2
+#undef DELETE
 
-// enum { INSERT, DELETE, INCOMMON };
+enum { INSERT, DELETE, COMMON };
 
 std::string extract_revision(const char* srcml, int size, int revision, bool text_only) {
 
     const char* DIFF_PREFIX = "diff:";
 
     std::stack<int> mode;
-    mode.push(INCOMMON);
+    mode.push(COMMON);
 
     std::string news;
     const char* p = srcml;
     const char* lp = p;
     while ((p = (const char*) memchr(p, '<', static_cast<size_t>(size - (p - srcml))))) {
 
-        bool inmode = mode.top() == INCOMMON || (revision == 0 && mode.top() == DELETE) || (revision == 1 && mode.top() == INSERT);
+        bool inmode = mode.top() == COMMON || (revision == 0 && mode.top() == DELETE) || (revision == 1 && mode.top() == INSERT);
 
         // output previous non-tag text
         if (inmode)
@@ -107,7 +105,7 @@ std::string extract_revision(const char* srcml, int size, int revision, bool tex
             } else if (strncmp(tstart, "insert", 6) == 0) {
                 mode.push(INSERT);
             } else {
-                mode.push(INCOMMON);
+                mode.push(COMMON);
             }
         }
         else if (*(sp + 1) == '/' && strncmp(sp + 2, DIFF_PREFIX, strlen(DIFF_PREFIX)) == 0) {
@@ -135,7 +133,7 @@ std::string extract_src(const std::string& srcml, boost::optional<int> revision)
 
     extract_context scontext;
     scontext.revision = revision;
-    scontext.mode.push(INCOMMON);
+    scontext.mode.push(COMMON);
 
     // parse the srcml collecting the (now needed) src
     xmlSAXHandler charactersax;
@@ -180,7 +178,7 @@ std::string extract_src(const std::string& srcml, boost::optional<int> revision)
             else if (std::string((const char*) localname) == "DELETE")
                 scontext->mode.push(DELETE);
             else
-                scontext->mode.push(INCOMMON);
+                scontext->mode.push(COMMON);
         }
     };
 
