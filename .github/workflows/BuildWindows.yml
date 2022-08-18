@@ -36,6 +36,7 @@ jobs:
       - name: Build
         shell: bash
         working-directory: build
+        continue-on-error: true
         run: |
           cmake --build . --config Release
 
