@@ -31,8 +31,14 @@
     #include <sched.h>
 #endif
 
+void foo() {
+
+}
+
 // Number of CPU cores
 int CPUCount() {
+
+    foo();
 
 #ifdef _WIN64
     SYSTEM_INFO sysinfo;
