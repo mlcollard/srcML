@@ -31,7 +31,6 @@ jobs:
         shell: bash
         working-directory: build
         run: |
-          printenv
           cmake .. -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake
 
       - name: Build
