@@ -36,7 +36,6 @@ jobs:
         shell: bash
         working-directory: build
         run: |
-          ninja --help
           export UseMultiToolTask=true
           cmake .. -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake -DCMAKE_CXX_COMPILER=cl -DCMAKE_C_COMPILER=cl -DDYNAMIC_LOAD_ENABLED=OFF -G Ninja
 
