@@ -97,3 +97,7 @@ if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif()
 
 install(TARGETS srcml COMPONENT SRCML)
+
+message("BEFORE")
+message($<TARGET_RUNTIME_DLLS:srcml>)
+message("AFTER")
