@@ -33,9 +33,7 @@ jobs:
         working-directory: build
         run: |
           export UseMultiToolTask=true
-          export CMAKE_CXX_COMPILER=cl
-          export CMAKE_C_COMPILER=cl
-          cmake .. -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake -G Ninja
+          cmake .. -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake -DCMAKE_CXX_COMPILER=cl -DCMAKE_C_COMPILER=cl -G Ninja
 
       - name: Build
         shell: bash
@@ -43,9 +41,7 @@ jobs:
         # continue-on-error: true
         run: |
           export UseMultiToolTask=true
-          export CMAKE_CXX_COMPILER=cl
-          export CMAKE_C_COMPILER=cl
-          cmake --build . --config Release
+          cmake -DCMAKE_CXX_COMPILER=cl -DCMAKE_C_COMPILER=cl --build . --config Release
 
       # - uses: actions/upload-artifact@v3
       #   with:
