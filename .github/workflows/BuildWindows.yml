@@ -45,7 +45,7 @@ jobs:
         # continue-on-error: true
         run: |
           export UseMultiToolTask=true
-          cmake -DDYNAMIC_LOAD_ENABLED=OFF --build . --config Release
+          cmake --build . --config Release -DDYNAMIC_LOAD_ENABLED=OFF
 
       # - uses: actions/upload-artifact@v3
       #   with:
