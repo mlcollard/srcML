@@ -28,6 +28,10 @@ jobs:
           vcpkgGitCommitId: 'acc3bcf76b84ae5041c86ab55fe138ae7b8255c7'
           runVcpkgInstall: true
 
+      # NOTE: this is necessary to correctly find and use cl.exe
+      - name: setup devcmd
+        uses: ilammy/msvc-dev-cmd@v1.3.0
+
       - name: CMake Setup on Windows
         shell: bash
         working-directory: build
