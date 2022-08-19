@@ -41,17 +41,18 @@ jobs:
         continue-on-error: true
         run: |
           export UseMultiToolTask=true
-          cmake --build . --config Release
+          cmake --build . --config Release -G Ninja
 
-      - uses: actions/upload-artifact@v3
-        with:
-          name: Build
-          path: build
+      # - uses: actions/upload-artifact@v3
+      #   with:
+      #     name: Build
+      #     path: build
 
       - name: Install on Windows
         shell: bash
         working-directory: build
         run: |
+          ls -lhR
           cmake --build . --config Release --target install
 
       - name: Set PATH for Windows
