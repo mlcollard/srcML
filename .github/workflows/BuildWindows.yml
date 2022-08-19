@@ -56,7 +56,6 @@ jobs:
         shell: bash
         working-directory: build
         run: |
-          ls -lhR
           export CC=cl
           cmake --build . --config Release --target install
 
