@@ -33,7 +33,8 @@ jobs:
         working-directory: build
         run: |
           export UseMultiToolTask=true
-          export CC="C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Tools/MSVC/14.32.31326/bin/HostX64/x64/cl.exe"
+          export CMAKE_CXX_COMPILER=cl
+          export CMAKE_C_COMPILER=cl
           cmake .. -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake -G Ninja
 
       - name: Build
@@ -42,7 +43,8 @@ jobs:
         # continue-on-error: true
         run: |
           export UseMultiToolTask=true
-          export CC="C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Tools/MSVC/14.32.31326/bin/HostX64/x64/cl.exe"
+          export CMAKE_CXX_COMPILER=cl
+          export CMAKE_C_COMPILER=cl
           cmake --build . --config Release
 
       # - uses: actions/upload-artifact@v3
