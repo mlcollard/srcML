@@ -33,14 +33,16 @@ jobs:
         working-directory: build
         run: |
           export UseMultiToolTask=true
+          export CC=cl
           cmake .. -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake -G Ninja
 
       - name: Build
         shell: bash
         working-directory: build
-        continue-on-error: true
+        # continue-on-error: true
         run: |
           export UseMultiToolTask=true
+          export CC=cl
           cmake --build . --config Release
 
       # - uses: actions/upload-artifact@v3
@@ -53,6 +55,7 @@ jobs:
         working-directory: build
         run: |
           ls -lhR
+          export CC=cl
           cmake --build . --config Release --target install
 
       - name: Set PATH for Windows
