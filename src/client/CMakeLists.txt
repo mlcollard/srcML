@@ -98,6 +98,6 @@ endif()
 
 install(TARGETS srcml COMPONENT SRCML)
 
-add_custom_command(TARGET client POST_BUILD
+add_custom_command(TARGET srcml POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E echo
   "target dir = $<TARGET_RUNTIME_DLLS:srcml>")
