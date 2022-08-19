@@ -45,7 +45,7 @@ jobs:
         # continue-on-error: true
         run: |
           export UseMultiToolTask=true
-          cmake -DCMAKE_CXX_COMPILER=cl -DCMAKE_C_COMPILER=cl --build . --config Release
+          cmake --build . --config Release
 
       # - uses: actions/upload-artifact@v3
       #   with:
