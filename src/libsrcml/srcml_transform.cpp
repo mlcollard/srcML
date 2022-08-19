@@ -181,7 +181,7 @@ int srcml_append_transform_xpath_element(struct srcml_archive* archive, const ch
     return srcml_append_transform_xpath_internal(archive, xpath_string, prefix, namespace_uri, element, 0, 0, 0, 0);
 }
 
-#ifdef WITH_LIBXSLT
+// #ifdef WITH_LIBXSLT
 /**
  * srcml_append_transform_xslt_internal
  * @param archive a srcml_archive
@@ -291,7 +291,7 @@ int srcml_append_transform_xslt_fd(srcml_archive* archive, int xslt_fd) {
 
     return srcml_append_transform_xslt_internal(archive, std::move(doc));
 }
-#endif
+// #endif
 
 /**
  * srcml_append_transform_internal
