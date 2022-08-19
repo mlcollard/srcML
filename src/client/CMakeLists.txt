@@ -73,10 +73,10 @@ endif()
 
 if(MSVC)
     set_target_properties(srcml PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-    add_custom_command(TARGET srcml POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-    "${PROJECT_BINARY_DIR}/deps/$<CONFIGURATION>/bin"
-    $<TARGET_FILE_DIR:srcml>)
+    # add_custom_command(TARGET srcml POST_BUILD
+    # COMMAND ${CMAKE_COMMAND} -E copy_directory
+    # "${PROJECT_BINARY_DIR}/deps/$<CONFIGURATION>/bin"
+    # $<TARGET_FILE_DIR:srcml>)
 elseif(APPLE)
     # Making the exported_symbols_list an empty file reduces size of executable, as strip does not work
     set_target_properties(srcml PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin LINK_FLAGS "-exported_symbols_list /dev/null")
