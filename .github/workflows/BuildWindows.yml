@@ -22,7 +22,7 @@ jobs:
           cmake --help
 
       - name: Restore artifacts, or run vcpkg, build (and cache artifacts as post step)
-        uses: lukka/run-vcpkg@v10.3
+        uses: lukka/run-vcpkg@v1.10.0
         id: runvcpkg
         with:
           vcpkgGitCommitId: 'acc3bcf76b84ae5041c86ab55fe138ae7b8255c7'
@@ -30,7 +30,7 @@ jobs:
 
       # NOTE: this is necessary to correctly find and use cl.exe
       - name: setup devcmd
-        uses: ilammy/msvc-dev-cmd@v1.3.0
+        uses: ilammy/msvc-dev-cmd@v1.10.0
 
       - name: CMake Setup on Windows
         shell: bash
