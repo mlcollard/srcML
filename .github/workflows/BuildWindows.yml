@@ -33,7 +33,7 @@ jobs:
         working-directory: build
         run: |
           export UseMultiToolTask=true
-          cmake .. -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake
+          cmake .. -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake -G Ninja
 
       - name: Build
         shell: bash
@@ -41,7 +41,7 @@ jobs:
         continue-on-error: true
         run: |
           export UseMultiToolTask=true
-          cmake --build . --config Release -G Ninja
+          cmake --build . --config Release
 
       # - uses: actions/upload-artifact@v3
       #   with:
