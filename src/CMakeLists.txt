@@ -60,10 +60,6 @@ set(CMAKE_GENERATED_SOURCE_DIR ${CMAKE_BINARY_DIR}/parser)
 # External code directory
 set(CMAKE_EXTERNAL_SOURCE_DIR ${CMAKE_BINARY_DIR}/external)
 
-# For Windows, install redist exe
-set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_NO_WARNINGS TRUE)
-include(InstallRequiredSystemLibraries)
-
 if(MSVC)
 
     # set(WINDOWS_DEP_PATH ${PROJECT_BINARY_DIR}/deps)
@@ -128,6 +124,10 @@ elseif(APPLE)
     endif()
 
 endif()
+
+# For Windows, install redist exe
+set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_NO_WARNINGS ON)
+include(InstallRequiredSystemLibraries)
 
 # Locate packages
 find_package(LibArchive 3 REQUIRED)
