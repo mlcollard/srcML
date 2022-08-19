@@ -56,7 +56,6 @@ jobs:
         shell: bash
         working-directory: build
         run: |
-          export CC=cl
           cmake --build . --config Release --target install
 
       - name: Set PATH for Windows
