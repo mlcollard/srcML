@@ -144,7 +144,7 @@ find_package(Boost REQUIRED)
 if(LIBXSLT_FOUND)
     message("LIBXSLT FOUND")
     include_directories(SYSTEM ${LIBXSLT_INCLUDE_DIR})
-    add_definitions(-DWITH_LIBXSLT)
+    add_compile_definitions(WITH_LIBXSLT)
 endif()
 
 # Setup ANTLR 2.7 library
