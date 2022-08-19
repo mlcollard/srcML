@@ -19,6 +19,7 @@ jobs:
         shell: bash
         run: |
           mkdir build
+          cmake --help
 
       - name: Restore artifacts, or run vcpkg, build (and cache artifacts as post step)
         uses: lukka/run-vcpkg@v10.3
@@ -37,15 +38,15 @@ jobs:
       - name: Build
         shell: bash
         working-directory: build
-        # continue-on-error: true
+        continue-on-error: true
         run: |
           export UseMultiToolTask=true
           cmake --build . --config Release
 
-      # - uses: actions/upload-artifact@v3
-      #   with:
-      #     name: Parser
-      #     path: build/parser/
+      - uses: actions/upload-artifact@v3
+        with:
+          name: Build
+          path: build
 
       - name: Install on Windows
         shell: bash

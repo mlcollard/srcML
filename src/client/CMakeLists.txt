@@ -51,9 +51,9 @@ file(GLOB CLIENT_SOURCE *.hpp *.cpp)
 
 # set(CLIENT_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/OpenFileLimiter.cpp;${CMAKE_CURRENT_SOURCE_DIR}/ParserTest.cpp;${CMAKE_CURRENT_SOURCE_DIR}/SRCMLStatus.cpp;${CMAKE_CURRENT_SOURCE_DIR}/TraceLog.cpp;${CMAKE_CURRENT_SOURCE_DIR}/WriteQueue.cpp;${CMAKE_CURRENT_SOURCE_DIR}/XCPUCount.cpp;${CMAKE_CURRENT_SOURCE_DIR}/compress_srcml.cpp;${CMAKE_CURRENT_SOURCE_DIR}/create_src.cpp;${CMAKE_CURRENT_SOURCE_DIR}/create_srcml.cpp;${CMAKE_CURRENT_SOURCE_DIR}/decompress_srcml.cpp;${CMAKE_CURRENT_SOURCE_DIR}/input_archive.cpp;${CMAKE_CURRENT_SOURCE_DIR}/input_curl.cpp;${CMAKE_CURRENT_SOURCE_DIR}/input_file.cpp;${CMAKE_CURRENT_SOURCE_DIR}/mkDir.cpp;${CMAKE_CURRENT_SOURCE_DIR}/src_archive.cpp;${CMAKE_CURRENT_SOURCE_DIR}/src_input_file.cpp;${CMAKE_CURRENT_SOURCE_DIR}/src_input_filelist.cpp;${CMAKE_CURRENT_SOURCE_DIR}/src_input_filesystem.cpp;${CMAKE_CURRENT_SOURCE_DIR}/src_input_libarchive.cpp;${CMAKE_CURRENT_SOURCE_DIR}/src_input_text.cpp;${CMAKE_CURRENT_SOURCE_DIR}/src_output_filesystem.cpp;${CMAKE_CURRENT_SOURCE_DIR}/src_output_libarchive.cpp;${CMAKE_CURRENT_SOURCE_DIR}/src_prefix.cpp;${CMAKE_CURRENT_SOURCE_DIR}/srcml.cpp;${CMAKE_CURRENT_SOURCE_DIR}/srcml_cli.cpp;${CMAKE_CURRENT_SOURCE_DIR}/srcml_consume.cpp;${CMAKE_CURRENT_SOURCE_DIR}/srcml_display_metadata.cpp;${CMAKE_CURRENT_SOURCE_DIR}/srcml_execute.cpp;${CMAKE_CURRENT_SOURCE_DIR}/srcml_input_src.cpp;${CMAKE_CURRENT_SOURCE_DIR}/srcml_input_srcml.cpp;${CMAKE_CURRENT_SOURCE_DIR}/srcml_options.cpp;${CMAKE_CURRENT_SOURCE_DIR}/srcml_pipe.cpp;${CMAKE_CURRENT_SOURCE_DIR}/srcml_pretty.cpp;${CMAKE_CURRENT_SOURCE_DIR}/srcml_write.cpp;${CMAKE_CURRENT_SOURCE_DIR}/transform_srcml.cpp;${CMAKE_CURRENT_SOURCE_DIR}/unarchive_srcml.cpp")
 
-message("BEFORE CLIENT_SOURCE: ${CLIENT_SOURCE}")
+# message("BEFORE CLIENT_SOURCE: ${CLIENT_SOURCE}")
 
-message("AFTER CLIENT_SOURCE: ${CLIENT_SOURCE}")
+# message("AFTER CLIENT_SOURCE: ${CLIENT_SOURCE}")
 
 add_executable(srcml ${CLIENT_SOURCE})
 get_target_property(MY_PROJECT_SOURCES srcml SOURCES)
