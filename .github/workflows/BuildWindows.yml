@@ -21,6 +21,8 @@ jobs:
           mkdir build
           cmake --help
 
+      - uses: lukka/get-cmake@latest
+
       - name: Restore artifacts, or run vcpkg, build (and cache artifacts as post step)
         uses: lukka/run-vcpkg@v10.3
         id: runvcpkg

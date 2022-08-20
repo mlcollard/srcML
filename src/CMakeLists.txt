@@ -126,8 +126,8 @@ elseif(APPLE)
 endif()
 
 # For Windows, install redist exe
-set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_NO_WARNINGS ON)
-set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP ON)
+set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_NO_WARNINGS TRUE)
+set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
 include(InstallRequiredSystemLibraries)
 
 # Locate packages
