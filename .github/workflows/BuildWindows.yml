@@ -37,16 +37,16 @@ jobs:
       - name: CMake Setup on Windows
         # shell: bash
         working-directory: build
+        # export UseMultiToolTask=true
         run: |
-          export UseMultiToolTask=true
           cmake .. -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake -DCMAKE_CXX_COMPILER=cl -DCMAKE_C_COMPILER=cl -DDYNAMIC_LOAD_ENABLED=OFF -G Ninja
 
       - name: Build
         # shell: bash
         working-directory: build
         # continue-on-error: true
+        # export UseMultiToolTask=true
         run: |
-          export UseMultiToolTask=true
           cmake --build . --config Release
 
       # - uses: actions/upload-artifact@v3
