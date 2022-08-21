@@ -19,7 +19,6 @@ jobs:
         shell: bash
         run: |
           mkdir build
-          cmake --help
 
       - uses: lukka/get-cmake@latest
 
@@ -49,16 +48,29 @@ jobs:
           export UseMultiToolTask=true
           cmake --build . --config Release
 
-      - uses: actions/upload-artifact@v3
-        with:
-          name: CMake
-          path: build/src/libsrcml/cmake_install.cmake
-
-      - name: Install on Windows
-        shell: bash
+      - name: Package
         working-directory: build
+        continue-on-error: true
         run: |
-          cmake --build . --config Release --target install
+          cpack -G WIX -V
+
+      # - uses: actions/upload-artifact@v3
+      #   with:
+      #     name: CMake
+      #     path: build/src/libsrcml/cmake_install.cmake
+
+      - working-directory: build/dist
+        run: msiexec /i D:\a\srcML\srcML\build\dist\srcML-Win.msi /quiet /norestart /L*V .\msi.log
+      - uses: actions/upload-artifact@v2
+        with:
+          name: msi.log
+          path: build/dist/msi.log
+
+      # - name: Install on Windows
+      #   shell: bash
+      #   working-directory: build
+      #   run: |
+      #     cmake --build . --config Release --target install
 
       - name: Set PATH for Windows
         shell: bash
