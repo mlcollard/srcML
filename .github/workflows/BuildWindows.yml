@@ -44,15 +44,15 @@ jobs:
       - name: Build
         shell: bash
         working-directory: build
-        # continue-on-error: true
+        continue-on-error: true
         run: |
           export UseMultiToolTask=true
           cmake --build . --config Release
 
-      # - uses: actions/upload-artifact@v3
-      #   with:
-      #     name: Build
-      #     path: build
+      - uses: actions/upload-artifact@v3
+        with:
+          name: CMake
+          path: src/libsrcml/cmake_install.cmake
 
       - name: Install on Windows
         shell: bash
