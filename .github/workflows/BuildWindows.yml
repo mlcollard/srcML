@@ -52,7 +52,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: CMake
-          path: src/libsrcml/cmake_install.cmake
+          path: build/src/libsrcml/cmake_install.cmake
 
       - name: Install on Windows
         shell: bash
