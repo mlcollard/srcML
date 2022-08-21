@@ -139,17 +139,17 @@ if(DISTRO AND DISTRO MATCHES "Ubuntu")
     install(CODE "execute_process(COMMAND ldconfig)")
 endif()
 
-install(CODE [[
-  file(GET_RUNTIME_DEPENDENCIES
-    LIBRARIES $<TARGET_FILE:libsrcml_link>
-    RESOLVED_DEPENDENCIES_VAR _r_deps
-    UNRESOLVED_DEPENDENCIES_VAR _u_deps
-  )
-  message("START")
-  foreach(_file ${_r_deps})
-    message("LIBSRCML DEPENDENCY:" + ${_file})
-  endforeach()
-  if("${_u_length}" GREATER 0)
-    message(WARNING "Unresolved dependencies detected!")
-  endif()
-]])
+# install(CODE [[
+#   file(GET_RUNTIME_DEPENDENCIES
+#     LIBRARIES $<TARGET_FILE:libsrcml_link>
+#     RESOLVED_DEPENDENCIES_VAR _r_deps
+#     UNRESOLVED_DEPENDENCIES_VAR _u_deps
+#   )
+#   message("START")
+#   foreach(_file ${_r_deps})
+#     message("LIBSRCML DEPENDENCY:" + ${_file})
+#   endforeach()
+#   if("${_u_length}" GREATER 0)
+#     message(WARNING "Unresolved dependencies detected!")
+#   endif()
+# ]])
