@@ -53,7 +53,10 @@ jobs:
         continue-on-error: true
         run: |
           cpack -G WIX -V
-
+      - uses: actions/upload-artifact@v2
+        with:
+          name: srcML-Win
+          path: build/dist/srcML-Win.msi
       # - uses: actions/upload-artifact@v3
       #   with:
       #     name: CMake
@@ -76,6 +79,7 @@ jobs:
         shell: bash
         working-directory: build
         run: |
+          ls -lhR "/c/Program Files (x86)/srcML"
           echo "/c/Program Files (x86)/srcML/bin" >> $GITHUB_PATH
 
       - name: Run Installed srcml
