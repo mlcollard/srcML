@@ -96,8 +96,6 @@ if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
     endif()
 endif()
 
-install(TARGETS srcml COMPONENT SRCML)
-
 install(CODE [[
   file(GET_RUNTIME_DEPENDENCIES
     EXECUTABLES $<TARGET_FILE:srcml>
@@ -113,3 +111,5 @@ install(CODE [[
     message(WARNING "Unresolved dependencies detected!")
   endif()
 ]])
+
+install(TARGETS srcml COMPONENT SRCML)
