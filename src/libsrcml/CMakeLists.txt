@@ -128,6 +128,12 @@ endif()
 
 add_dependencies(libsrcml parser)
 
+add_custom_command(TARGET libsrcml_shared POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E echo "START:"
+    COMMAND ${CMAKE_COMMAND} -E echo $<TARGET_RUNTIME_DLLS:libsrcml_shared>
+    COMMAND ${CMAKE_COMMAND} -E echo "END:"
+)
+
 # install the libsrcml include file
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/srcml.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT DEVLIBS)
 
