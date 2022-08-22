@@ -45,11 +45,15 @@ jobs:
         working-directory: build
         continue-on-error: true
         run: |
-          ls -lhR "/c/Program Files/Microsoft Visual Studio/2022/"
-          ls -lhR "/c/Program Files (x86)/Microsoft SDKs/"
+          ls -lhR "/c/Program Files/Microsoft Visual Studio/2022/" > ls.txt
+          ls -lhR "/c/Program Files (x86)/Microsoft SDKs/" >> ls.txt
           export UseMultiToolTask=true
           cmake --build . --config Release
-          ls -lhR .
+          ls -lhR . >> ls.txt
+      - uses: actions/upload-artifact@v2
+        with:
+          name: ls
+          path: build/ls.txt
 
       - name: Package
         working-directory: build
