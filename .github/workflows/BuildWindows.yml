@@ -52,7 +52,7 @@ jobs:
         working-directory: build
         continue-on-error: true
         run: |
-          cpack -G WIX -V
+          cpack -G WIX -V --config Release
 
       # - uses: actions/upload-artifact@v3
       #   with:
@@ -82,5 +82,5 @@ jobs:
         shell: bash
         working-directory: build
         run: |
-          srcml --version
-          srcml --text="int a;" -l C++
+          srcml.exe --version
+          srcml.exe --text="int a;" -l C++
