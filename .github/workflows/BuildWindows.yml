@@ -38,7 +38,7 @@ jobs:
         working-directory: build
         run: |
           export UseMultiToolTask=true
-          cmake .. -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake -DCMAKE_CXX_COMPILER=cl -DCMAKE_C_COMPILER=cl -DDYNAMIC_LOAD_ENABLED=OFF -G Ninja
+          cmake .. --config Release -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake -DCMAKE_CXX_COMPILER=cl -DCMAKE_C_COMPILER=cl -DDYNAMIC_LOAD_ENABLED=OFF -G Ninja
 
       - name: Build
         shell: bash
@@ -52,7 +52,7 @@ jobs:
         working-directory: build
         continue-on-error: true
         run: |
-          cpack -G WIX -V --config Release
+          cpack -G WIX -V
 
       # - uses: actions/upload-artifact@v3
       #   with:
