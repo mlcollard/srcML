@@ -79,21 +79,21 @@ else()
     set_target_properties(libsrcml_shared libsrcml_static PROPERTIES OUTPUT_NAME srcml)
 endif()
 
-install(CODE [[
-  file(GET_RUNTIME_DEPENDENCIES
-    LIBRARIES $<TARGET_FILE:libsrcml_link>
-    RESOLVED_DEPENDENCIES_VAR _r_deps
-    UNRESOLVED_DEPENDENCIES_VAR _u_deps
-  )
-  message("LIBSRCML DEPENDENCY START")
-  foreach(_file ${_r_deps})
-    message("LIBSRCML DEPENDENCY:" + ${_file})
-  endforeach()
-  message("LIBSRCML DEPENDENCY END")
-  if("${_u_length}" GREATER 0)
-    message(WARNING "Unresolved dependencies detected!")
-  endif()
-]])
+# install(CODE [[
+#   file(GET_RUNTIME_DEPENDENCIES
+#     LIBRARIES $<TARGET_FILE:libsrcml_link>
+#     RESOLVED_DEPENDENCIES_VAR _r_deps
+#     UNRESOLVED_DEPENDENCIES_VAR _u_deps
+#   )
+#   message("FOOLIBSRCML DEPENDENCY START")
+#   foreach(_file ${_r_deps})
+#     message("LIBSRCML DEPENDENCY:" + ${_file})
+#   endforeach()
+#   message("LIBSRCML DEPENDENCY END")
+#   if("${_u_length}" GREATER 0)
+#     message(WARNING "Unresolved dependencies detected!")
+#   endif()
+# ]])
 
 # which types of libraries
 if(MSVC)
