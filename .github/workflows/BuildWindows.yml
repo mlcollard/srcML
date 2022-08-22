@@ -45,6 +45,7 @@ jobs:
         working-directory: build
         continue-on-error: true
         run: |
+          ls -lhR "/c/Program Files (x86)/Microsoft Visual Studio/2022/"
           export UseMultiToolTask=true
           cmake --build . --config Release
 
@@ -63,7 +64,7 @@ jobs:
       #     path: build/src/libsrcml/cmake_install.cmake
 
       - working-directory: build/dist
-        run: msiexec /i D:\a\srcML\srcML\build\dist\srcML-Win.msi /quiet /norestart /L*V .\msi.log
+        run: msiexec /i D:\a\srcML\srcML\build\dist\srcML-Win.msi /quiet /norestart /L*vx .\msi.log
       - uses: actions/upload-artifact@v2
         with:
           name: msi.log
