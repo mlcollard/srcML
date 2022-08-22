@@ -48,6 +48,7 @@ jobs:
           ls -lhR "/c/Program Files (x86)/Microsoft Visual Studio/2022/"
           export UseMultiToolTask=true
           cmake --build . --config Release
+          ls -lhR .
 
       - name: Package
         working-directory: build
