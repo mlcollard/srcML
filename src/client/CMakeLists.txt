@@ -98,16 +98,18 @@ endif()
 
 install(TARGETS srcml COMPONENT SRCML)
 
-# install(CODE [[
-#   file(GET_RUNTIME_DEPENDENCIES
-#     EXECUTABLES $<TARGET_FILE:srcml>
-#     RESOLVED_DEPENDENCIES_VAR _r_deps
-#     UNRESOLVED_DEPENDENCIES_VAR _u_deps
-#   )
-#   foreach(_file ${_r_deps})
-#     message("SRCML DEPENDENCY: " + ${_file})
-#   endforeach()
-#   if("${_u_length}" GREATER 0)
-#     message(WARNING "Unresolved dependencies detected!")
-#   endif()
-# ]])
+install(CODE [[
+  file(GET_RUNTIME_DEPENDENCIES
+    EXECUTABLES $<TARGET_FILE:srcml>
+    RESOLVED_DEPENDENCIES_VAR _r_deps
+    UNRESOLVED_DEPENDENCIES_VAR _u_deps
+  )
+  message("SRCML LIST BEGIN:")
+  foreach(_file ${_r_deps})
+    message("SRCML DEPENDENCY: " + ${_file})
+  endforeach()
+  message("SRCML LIST END:")
+  if("${_u_length}" GREATER 0)
+    message(WARNING "Unresolved dependencies detected!")
+  endif()
+]])
