@@ -237,7 +237,6 @@ if(MSVC)
         add_compile_options("/MDd")
     else()
         add_compile_options("/O2")
-        # add_compile_options("/MDd")
     endif()
 
 endif()
