@@ -117,4 +117,5 @@ add_subdirectory(doc)
 add_subdirectory(examples)
 
 # packaging
+set(CPACK_NSIS_MODIFY_PATH ON)
 add_subdirectory(package)

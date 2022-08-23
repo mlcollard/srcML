@@ -84,7 +84,7 @@ endif()
 # which types of libraries
 if(MSVC)
     install(TARGETS libsrcml_shared RUNTIME_DEPENDENCIES PRE_EXCLUDE_REGEXES "api-ms-.*" "ext-ms-.*" COMPONENT SRCML)
-    install(FILES $<TARGET_PDB_FILE:libsrcml_shared> DESTINATION bin COMPONENT DEVLIBS)
+    # install(FILES $<TARGET_PDB_FILE:libsrcml_shared> DESTINATION bin COMPONENT DEVLIBS)
 else()
     install(TARGETS libsrcml_shared LIBRARY COMPONENT SRCML NAMELINK_COMPONENT DEVLIBS)
 endif()
