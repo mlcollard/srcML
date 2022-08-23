@@ -25,7 +25,6 @@ message("-- ANTLR: ${ANTLR_EXE}")
 
 # Assume all C++ source files are parser
 file(GLOB PARSER_SOURCE *.hpp *.cpp)
-message("PARSER_SOURCE: ${PARSER_SOURCE}")
 
 # 
 # RunAntlr
@@ -136,7 +135,6 @@ target_include_directories(parser PUBLIC . ${CMAKE_SOURCE_DIR}/src/libsrcml)
 
 file(GLOB ANTLR_SOURCE ${ANTLR_EXTERNAL}/lib/cpp/src/*.cpp)
 list(REMOVE_ITEM ANTLR_SOURCE "${ANTLR_EXTERNAL}/lib/cpp/src/dll.cpp")
-message("ANTLR_SOURCE: ${ANTLR_SOURCE}")
 add_library(antlr OBJECT ${ANTLR_SOURCE})
 
 add_dependencies(parser antlr)
