@@ -91,7 +91,11 @@ else()
 endif()
 
 if (BUILD_LIBSRCML_STATIC)
-    install(TARGETS libsrcml_static COMPONENT SRCML)
+    if(MSVC)
+        install(TARGETS libsrcml_static COMPONENT DEVLIBS)
+    else()
+        install(TARGETS libsrcml_static COMPONENT SRCML)
+    endif()
 endif()
 
 if(LINK_LIBSRCML_STATIC AND BUILD_LIBSRCML_STATIC)
@@ -155,7 +159,7 @@ if(MSVC OR VCPKG)
     message("EXFILENAME: ${EXFILENAME}")
     file(GLOB EXSOURCES "${EXFILENAME}")
     message("EXSOURCES: ${EXSOURCES}")
-    # install(FILES ${EXSOURCES} DESTINATION bin COMPONENT SRCML)
+    install(FILES ${EXSOURCES} DESTINATION bin COMPONENT SRCML)
 endif()
 
 add_custom_command(TARGET libsrcml_shared POST_BUILD
