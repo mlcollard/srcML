@@ -43,7 +43,7 @@ elseif(NOT WIN32)
 # elseif(NOT CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 #     list(APPEND SRCML_LIBRARIES ws2_32 crypto)
 else()
-    list(APPEND SRCML_LIBRARIES ws2_32)
+    # list(APPEND SRCML_LIBRARIES ws2_32)
 endif()
 
 file(GLOB CLIENT_SOURCE *.hpp *.cpp)
