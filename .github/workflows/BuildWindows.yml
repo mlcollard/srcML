@@ -37,6 +37,8 @@ jobs:
         shell: bash
         working-directory: build
         run: |
+          echo $VCPKG_INSTALLED_DIR
+          ls -lh $VCPKG_INSTALLED_DIR
           export UseMultiToolTask=true
           cmake .. -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake -DCMAKE_CXX_COMPILER=cl -DCMAKE_C_COMPILER=cl -DDYNAMIC_LOAD_ENABLED=OFF -G "Ninja Multi-Config"
 
@@ -75,8 +77,8 @@ jobs:
         shell: bash
         working-directory: build
         run: |
-          ls -lhR vcpkg_installed/x64-windows
-          ls -lhR "/c/Program Files (x86)/srcML"
+          # ls -lhR vcpkg_installed/x64-windows
+          # ls -lhR "/c/Program Files (x86)/srcML"
           echo "/c/Program Files (x86)/srcML/bin" >> $GITHUB_PATH
 
       - name: Run Installed srcml
