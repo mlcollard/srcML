@@ -76,6 +76,8 @@ jobs:
         working-directory: build
         run: |
           cmake --build . --config Release --target install
+          DUMPBIN "C:/Program Files (x86)/srcML/bin/srcml.exe"
+          DUMPBIN /DEPENDENTS "C:/Program Files (x86)/srcML/bin/srcml.exe"
 
       - name: Set PATH for Windows
         shell: bash
