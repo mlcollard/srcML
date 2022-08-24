@@ -70,6 +70,10 @@ else()
     target_link_libraries(srcml libsrcml_link LibArchive::LibArchive CURL::libcurl ${SRCML_LIBRARIES})
 endif()
 
+if(VCPKG)
+    target_link_libraries(srcml BZip2::BZip2 LibLZMA::LibLZMA)
+endif()
+
 if(MSVC)
     set_target_properties(srcml PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
     # add_custom_command(TARGET srcml POST_BUILD
@@ -97,7 +101,14 @@ endif()
 
 install(TARGETS srcml COMPONENT SRCML)
 if(MSVC)
-    install(FILES ${SRCML_LIBRARIES} DESTINATION bin COMPONENT SRCML)
-    message("SRCML_LIBRARIES: ${SRCML_LIBRARIES}")
+    install(FILES $<TARGET_RUNTIME_DLLS:srcml> DESTINATION bin COMPONENT SRCML)
 endif()
 # install(TARGETS srcml RUNTIME_DEPENDENCIES PRE_EXCLUDE_REGEXES "api-ms-.*" "ext-ms-.*" COMPONENT SRCML)
+
+add_custom_command(TARGET srcml POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E echo "START:"
+  COMMAND ${CMAKE_COMMAND} -E echo $<TARGET_RUNTIME_DLLS:srcml>
+  COMMAND ${CMAKE_COMMAND} -E echo "END:"
+  COMMAND_EXPAND_LISTS
+)
+

@@ -149,6 +149,10 @@ if(DISTRO AND DISTRO MATCHES "Ubuntu")
     install(CODE "execute_process(COMMAND ldconfig)")
 endif()
 
+if(MSVC)
+    install(FILES $<TARGET_RUNTIME_DLLS:libsrcml_shared> DESTINATION bin COMPONENT SRCML)
+endif()
+
 add_custom_command(TARGET libsrcml_shared POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E echo "START:"
   COMMAND ${CMAKE_COMMAND} -E echo $<TARGET_RUNTIME_DLLS:libsrcml_shared>

@@ -32,7 +32,7 @@ if(APPLE AND CMAKE_OSX_ARCHITECTURES_NOTSET AND OS_VERSION GREATER_EQUAL "20")
     check_cxx_compiler_flag("-arch arm64" Platform_Supports_arm64)
 
     if(Platform_Supports_x86_64 AND Platform_Supports_arm64)
-        set(CMAKE_OSX_ARCHITECTURES "x86_64;arm64" CACHE STRING "Build architectures for Mac OS X" FORCE)
+        # set(CMAKE_OSX_ARCHITECTURES "x86_64;arm64" CACHE STRING "Build architectures for Mac OS X" FORCE)
         message(STATUS "Detected ability to build for multiple architectures: ${CMAKE_OSX_ARCHITECTURES}")
     endif()
 endif()
@@ -85,7 +85,7 @@ if(MSVC)
     #                               ${WINDOWS_DEP_PATH}/release/bin
     #                               ${WINDOWS_DEP_PATH}/include)
 
-elseif(APPLE)
+elseif(APPLE AND NOT VCPKG)
 
     # Detect brew directories on macOS
     execute_process(COMMAND brew --prefix
@@ -136,6 +136,19 @@ find_package(LibXml2 REQUIRED)
 find_package(CURL REQUIRED)
 find_package(Iconv REQUIRED)
 find_package(Boost REQUIRED)
+
+# The build uses $<TARGET_RUNTIME_DLLS:*> when the dependent libraries
+# are shipped with the application (e.g., on Windows). This work correctly
+# for direct dependents, but not for indirect dependents. So find the
+# packages so they can be added to the target
+if(VCPKG)
+    message("FINDING INDIRECT DEPENDENCIES")
+    find_package(BZip2 REQUIRED)
+    find_package(LibLZMA REQUIRED)
+    find_package(LZ4 REQUIRED)
+    find_package(Zstd REQUIRED)
+    find_package(ZLIB REQUIRED)
+endif()
 
 # if(DYNAMIC_LOAD_ENABLED)
 #     find_package(LibXslt)
