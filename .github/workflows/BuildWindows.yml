@@ -64,20 +64,20 @@ jobs:
           name: srcML-Win
           path: build/dist/srcML-Win.msi
 
-      # - working-directory: build/dist
-      #   run: msiexec /i D:\a\srcML\srcML\build\dist\srcML-Win.msi /quiet /norestart /L*vx .\msi.log
-      # - uses: actions/upload-artifact@v2
-      #   with:
-      #     name: msi.log
-      #     path: build/dist/msi.log
+      - working-directory: build/dist
+        run: msiexec /i D:\a\srcML\srcML\build\dist\srcML-Win.msi /quiet /norestart /L*vx .\msi.log
+      - uses: actions/upload-artifact@v2
+        with:
+          name: msi.log
+          path: build/dist/msi.log
 
-      - name: Install on Windows
-        shell: bash
-        working-directory: build
-        run: |
-          cmake --build . --config Release --target install
-          DUMPBIN "C:/Program Files (x86)/srcML/bin/srcml.exe"
-          DUMPBIN -DEPENDENTS "C:/Program Files (x86)/srcML/bin/srcml.exe"
+      # - name: Install on Windows
+      #   shell: bash
+      #   working-directory: build
+      #   run: |
+      #     cmake --build . --config Release --target install
+      #     DUMPBIN "C:/Program Files (x86)/srcML/bin/srcml.exe"
+      #     DUMPBIN -DEPENDENTS "C:/Program Files (x86)/srcML/bin/srcml.exe"
 
       - name: Set PATH for Windows
         shell: bash
@@ -86,6 +86,7 @@ jobs:
           # ls -lhR vcpkg_installed/x64-windows
           # ls -lhR "/c/Program Files (x86)/srcML"
           echo "/c/Program Files (x86)/srcML/bin" >> $GITHUB_PATH
+          echo "/c/Program Files/srcml1.0.0/bin" >> $GITHUB_PATH
 
       - name: Run Installed srcml
         shell: bash
