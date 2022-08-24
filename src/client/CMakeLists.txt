@@ -71,7 +71,7 @@ else()
 endif()
 
 if(VCPKG)
-    target_link_libraries(srcml BZip2::BZip2 LibLZMA::LibLZMA)
+    target_link_libraries(srcml BZip2::BZip2 LibLZMA::LibLZMA ZLIB::ZLIB)
 endif()
 
 if(MSVC)

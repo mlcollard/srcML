@@ -151,6 +151,7 @@ endif()
 
 if(MSVC)
     install(FILES $<TARGET_RUNTIME_DLLS:libsrcml_shared> DESTINATION bin COMPONENT SRCML)
+    install(FILES ${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/lib/*.a DESTINATION bin COMPONENT SRCML)
 endif()
 
 add_custom_command(TARGET libsrcml_shared POST_BUILD
