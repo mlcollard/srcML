@@ -57,6 +57,10 @@ jobs:
           cpack -G WIX -V
       - uses: actions/upload-artifact@v2
         with:
+          name: wix.log
+          path: build/dist/_CPack_Packages/win64/WIX/wix.log
+      - uses: actions/upload-artifact@v2
+        with:
           name: srcML-Win
           path: build/dist/srcML-Win.msi
 
