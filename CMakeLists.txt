@@ -110,6 +110,11 @@ if(DISTRO AND DISTRO MATCHES "CentOS|Fedora")
     set(CMAKE_INSTALL_PREFIX /usr)
 endif()
 
+# Detect if a vcpkg build
+if(CMAKE_TOOLCHAIN_FILE AND CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg.cmake")
+    set(VCPKG ON)
+endif()
+
 # used as defaults for installation and packaging
 include(GNUInstallDirs)
 
