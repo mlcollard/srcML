@@ -128,6 +128,7 @@ endif()
 # For Windows, install redist exe
 # set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_NO_WARNINGS TRUE)
 # set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
+set(CMAKE_INSTALL_SYSTEM_RUNTIME_COMPONENT SRCML)
 include(InstallRequiredSystemLibraries)
 
 # Locate packages
