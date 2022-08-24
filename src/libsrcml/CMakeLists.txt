@@ -125,12 +125,12 @@ add_custom_command(TARGET libsrcml_shared POST_BUILD
 # install the libsrcml include file
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/srcml.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT DEVLIBS)
 
-if(MSVC)
-    file(GLOB SRCML_DLLS ${WINDOWS_DEP_PATH}/release/bin/*.dll)
-    install(FILES ${SRCML_DLLS} DESTINATION bin COMPONENT SRCML)
-    file(GLOB SRCML_DLLS ${WINDOWS_DEP_PATH}/release/lib/*.lib)
-    install(FILES ${SRCML_DLLS} DESTINATION lib COMPONENT DEVLIB)
-endif()
+# if(MSVC)
+#     file(GLOB SRCML_DLLS ${WINDOWS_DEP_PATH}/release/bin/*.dll)
+#     install(FILES ${SRCML_DLLS} DESTINATION bin COMPONENT SRCML)
+#     file(GLOB SRCML_DLLS ${WINDOWS_DEP_PATH}/release/lib/*.lib)
+#     install(FILES ${SRCML_DLLS} DESTINATION lib COMPONENT DEVLIB)
+# endif()
 
 # strip libraries
 if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -149,10 +149,13 @@ if(DISTRO AND DISTRO MATCHES "Ubuntu")
     install(CODE "execute_process(COMMAND ldconfig)")
 endif()
 
-if(MSVC)
-    install(FILES $<TARGET_RUNTIME_DLLS:libsrcml_shared> DESTINATION bin COMPONENT SRCML)
-    file(GLOB EXSOURCES "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/lib/*.dll")
-    install(FILES ${EXSOURCES}   DESTINATION bin COMPONENT SRCML)
+if(MSVC OR VCPKG)
+    # install(FILES $<TARGET_RUNTIME_DLLS:libsrcml_shared> DESTINATION bin COMPONENT SRCML)
+    set(EXFILENAME "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/lib/*${CMAKE_SHARED_LIBRARY_SUFFIX}")
+    message("EXFILENAME: ${EXFILENAME}")
+    file(GLOB EXSOURCES "${EXFILENAME}")
+    message("EXSOURCES: ${EXSOURCES}")
+    # install(FILES ${EXSOURCES} DESTINATION bin COMPONENT SRCML)
 endif()
 
 add_custom_command(TARGET libsrcml_shared POST_BUILD
