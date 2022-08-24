@@ -33,8 +33,7 @@ if(NOT EXISTS ${CTPL_EXTERNAL})
     file(DOWNLOAD https://raw.githubusercontent.com/vit-vit/CTPL/ctpl_v.0.0.2/ctpl_stl.h ${CTPL_EXTERNAL})
 endif()
 
-set(SRCML_LIBRARIES ${LibArchive_LIBRARIES} ${CURL_LIBRARIES}
-                CACHE INTERNAL "Libraries needed to build srcml")
+set(SRCML_LIBRARIES CACHE INTERNAL "Libraries needed to build srcml")
 
 if(APPLE)
     # list(APPEND SRCML_LIBRARIES pthread)
@@ -51,11 +50,11 @@ file(GLOB CLIENT_SOURCE *.hpp *.cpp)
 
 add_executable(srcml ${CLIENT_SOURCE})
 if(MSVC)
-    target_compile_options(srcml PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${CMAKE_EXTERNAL_SOURCE_DIR})
-    target_compile_options(srcml PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${LibArchive_INCLUDE_DIRS})
-    target_compile_options(srcml PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${LibArchive_INCLUDE_DIR})
-    target_compile_options(srcml PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${CURL_INCLUDE_DIR})
-    target_compile_options(srcml PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${Boost_INCLUDE_DIR})
+    # target_compile_options(srcml PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${CMAKE_EXTERNAL_SOURCE_DIR})
+    # target_compile_options(srcml PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${LibArchive_INCLUDE_DIRS})
+    # target_compile_options(srcml PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${LibArchive_INCLUDE_DIR})
+    # target_compile_options(srcml PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${CURL_INCLUDE_DIR})
+    # target_compile_options(srcml PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${Boost_INCLUDE_DIR})
 else()
     target_include_directories(srcml SYSTEM PRIVATE ${CMAKE_EXTERNAL_SOURCE_DIR})
 endif()
@@ -66,9 +65,9 @@ endif()
 
 # Add coverage to default part of Debug
 if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND CMAKE_COMPILER_IS_GNUCXX)
-    target_link_libraries(srcml libsrcml_link ${SRCML_LIBRARIES} gcov)
+    target_link_libraries(srcml libsrcml_link LibArchive::LibArchive CURL::libcurl ${SRCML_LIBRARIES} gcov)
 else()
-    target_link_libraries(srcml libsrcml_link ${SRCML_LIBRARIES})
+    target_link_libraries(srcml libsrcml_link LibArchive::LibArchive CURL::libcurl ${SRCML_LIBRARIES})
 endif()
 
 if(MSVC)

@@ -24,18 +24,14 @@
 set(CPACK_STRIP_FILES ON)
 
 if(DYNAMIC_LOAD_ENABLED)
-    set(LIBSRCML_LIBRARIES ${LIBXML2_LIBRARIES} ${Iconv_LIBRARIES} dl pthread
+    set(LIBSRCML_LIBRARIES dl pthread
                 CACHE INTERNAL "Libraries needed to build libsrcml")
 elseif(NOT CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    set(LIBSRCML_LIBRARIES ${LIBXML2_LIBRARIES} ${Iconv_LIBRARIES} ${LIBXSLT_LIBRARIES} ${LIBXSLT_EXSLT_LIBRARY} pthread
+    set(LIBSRCML_LIBRARIES pthread
                 CACHE INTERNAL "Libraries needed to build libsrcml")
 else()
-    set(LIBSRCML_LIBRARIES ${LIBXML2_LIBRARIES} ${LIBXSLT_LIBRARIES} ${LIBXSLT_EXSLT_LIBRARY}
+    set(LIBSRCML_LIBRARIES
                 CACHE INTERNAL "Libraries needed to build libsrcml")
-    message("LIBSRCML_LIBRARIES: ${LIBSRCML_LIBRARIES}")
-    message("LIBXML2_LIBRARIES: ${LIBXML2_LIBRARIES}")
-    message("LIBXSLT_LIBRARIES: ${LIBXSLT_LIBRARIES}")
-    message("LIBXSLT_EXSLT_LIBRARY: ${LIBXSLT_EXSLT_LIBRARY}")
 endif()
 
 if(NOT WIN32 AND NOT APPLE)
@@ -55,7 +51,7 @@ endif()
 add_library(libsrcml_static STATIC $<TARGET_OBJECTS:parser> $<TARGET_OBJECTS:antlr> $<TARGET_OBJECTS:libsrcml>)
 set_target_properties(libsrcml_static PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 target_include_directories(libsrcml_static BEFORE PRIVATE . ${CMAKE_SOURCE_DIR}/src/parser)
-target_link_libraries(libsrcml_static PRIVATE ${LIBSRCML_LIBRARIES})
+target_link_libraries(libsrcml_static PRIVATE LibXml2::LibXml2 Iconv::Iconv LibXslt::LibXslt LibXslt::LibExslt ${LIBSRCML_LIBRARIES})
 if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND CMAKE_COMPILER_IS_GNUCXX)
     target_link_libraries(libsrcml_static PRIVATE gcov)
 endif()
@@ -63,12 +59,12 @@ endif()
 add_library(libsrcml_shared SHARED $<TARGET_OBJECTS:parser> $<TARGET_OBJECTS:antlr> $<TARGET_OBJECTS:libsrcml>)
 set_target_properties(libsrcml_shared PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 if(WIN32)
-    target_compile_options(libsrcml_shared PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${LIBXML2_INCLUDE_DIRS})
-    target_compile_options(libsrcml_shared PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${LIBXML2_INCLUDE_DIR})
-    target_compile_options(libsrcml_shared PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${Boost_INCLUDE_DIR})
+    # target_compile_options(libsrcml_shared PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${LIBXML2_INCLUDE_DIRS})
+    # target_compile_options(libsrcml_shared PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${LIBXML2_INCLUDE_DIR})
+    # target_compile_options(libsrcml_shared PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${Boost_INCLUDE_DIR})
     target_compile_options(parser PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${ANTLR_INCLUDE_DIR})
 endif()
-target_link_libraries(libsrcml_shared PUBLIC ${LIBSRCML_LIBRARIES})
+target_link_libraries(libsrcml_shared PUBLIC LibXml2::LibXml2 Iconv::Iconv LibXslt::LibXslt LibXslt::LibExslt ${LIBSRCML_LIBRARIES})
 if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND CMAKE_COMPILER_IS_GNUCXX)
     target_link_libraries(libsrcml_shared PRIVATE gcov)
 endif()
@@ -152,3 +148,10 @@ if(DISTRO AND DISTRO MATCHES "Ubuntu")
     install(CODE "message(STATUS \"Running: ldconfig\")")
     install(CODE "execute_process(COMMAND ldconfig)")
 endif()
+
+add_custom_command(TARGET libsrcml_shared POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E echo "START:"
+  COMMAND ${CMAKE_COMMAND} -E echo $<TARGET_RUNTIME_DLLS:libsrcml_shared>
+  COMMAND ${CMAKE_COMMAND} -E echo "END:"
+  COMMAND_EXPAND_LISTS
+)

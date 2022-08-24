@@ -145,7 +145,7 @@ find_package(Boost REQUIRED)
 
 if(LIBXSLT_FOUND)
     message("LIBXSLT FOUND")
-    include_directories(SYSTEM ${LIBXSLT_INCLUDE_DIR})
+    # include_directories(SYSTEM ${LIBXSLT_INCLUDE_DIR})
     add_compile_definitions(WITH_LIBXSLT)
 endif()
 
@@ -176,12 +176,10 @@ endif()
 set(ANTLR_EXTERNAL ${CMAKE_EXTERNAL_SOURCE_DIR}/antlr-2.7.7)
 set(ANTLR_INCLUDE_DIR "${ANTLR_EXTERNAL}/lib/cpp/")
 
-set(LIBXML2_LIBRARIES ${LIBXML2_LIBRARIES} ${Iconv_LIBRARIES})
+set(LIBXML2_LIBRARIES LibXml2::LibXml2 Iconv::Iconv)
 
 # if(NOT WIN32)
-    include_directories(SYSTEM ${LibArchive_INCLUDE_DIRS} ${LIBXML2_INCLUDE_DIRS} ${CURL_INCLUDE_DIRS}
-                    ${Boost_INCLUDE_DIRS} ${Iconv_INCLUDE_DIRS} ${LibArchive_INCLUDE_DIR}
-                    ${LIBXML2_INCLUDE_DIR} ${CURL_INCLUDE_DIR} ${Boost_INCLUDE_DIR} ${ANTLR_INCLUDE_DIR})
+    include_directories(SYSTEM ${Boost_INCLUDE_DIR} ${ANTLR_INCLUDE_DIR})
 # endif()
 
 get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
