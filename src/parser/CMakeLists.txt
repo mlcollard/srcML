@@ -138,14 +138,15 @@ list(REMOVE_ITEM ANTLR_SOURCE "${ANTLR_EXTERNAL}/lib/cpp/src/dll.cpp")
 add_library(antlr OBJECT ${ANTLR_SOURCE})
 
 add_dependencies(parser antlr)
-target_link_libraries(parser OBJECT antlr)
+target_link_libraries(parser PRIVATE LibXml2::LibXml2 Iconv::Iconv LibXslt::LibXslt LibXslt::LibExslt Boost::boost)
 
 target_include_directories(antlr PUBLIC ${ANTLR_INCLUDE_DIR})
 target_include_directories(parser PUBLIC . ${CMAKE_SOURCE_DIR}/src/libsrcml ${ANTLR_INCLUDE_DIR})
 
 if(MSVC)
-    target_include_directories(parser PUBLIC ${LIBXML2_INCLUDE_DIRS} ${LIBXML2_INCLUDE_DIR} ${Boost_INCLUDE_DIR} ${CMAKE_EXTERNAL_SOURCE_DIR})
-    # target_compile_options(parser PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${LIBXML2_INCLUDE_DIRS})
+    target_include_directories(parser PUBLIC ${CMAKE_EXTERNAL_SOURCE_DIR})
+    # target_include_directories(parser PUBLIC ${LIBXML2_INCLUDE_DIRS} ${LIBXML2_INCLUDE_DIR} ${Boost_INCLUDE_DIR} ${CMAKE_EXTERNAL_SOURCE_DIR})
+
     # target_compile_options(parser PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${LIBXML2_INCLUDE_DIR})
     # target_compile_options(parser PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${Boost_INCLUDE_DIR})
     # target_compile_options(parser PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${ANTLR_INCLUDE_DIR})

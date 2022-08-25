@@ -159,7 +159,6 @@ else()
 endif()
 
 if(LIBXSLT_FOUND)
-    # include_directories(SYSTEM ${LIBXSLT_INCLUDE_DIR})
     add_compile_definitions(WITH_LIBXSLT)
 endif()
 
@@ -190,9 +189,8 @@ endif()
 set(ANTLR_EXTERNAL ${CMAKE_EXTERNAL_SOURCE_DIR}/antlr-2.7.7)
 set(ANTLR_INCLUDE_DIR "${ANTLR_EXTERNAL}/lib/cpp/")
 
-set(LIBXML2_LIBRARIES LibXml2::LibXml2 Iconv::Iconv)
-
-include_directories(SYSTEM ${Boost_INCLUDE_DIR} ${ANTLR_INCLUDE_DIR})
+link_libraries(Boost::boost)
+include_directories(SYSTEM ${ANTLR_INCLUDE_DIR})
 
 # standard compile options
 add_compile_options(

@@ -59,12 +59,13 @@ endif()
 add_library(libsrcml_shared SHARED $<TARGET_OBJECTS:parser> $<TARGET_OBJECTS:antlr> $<TARGET_OBJECTS:libsrcml>)
 set_target_properties(libsrcml_shared PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 if(WIN32)
-    target_compile_options(libsrcml_shared PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${LIBXML2_INCLUDE_DIRS})
     target_compile_options(libsrcml_shared PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${LIBXML2_INCLUDE_DIR})
     target_compile_options(libsrcml_shared PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${Boost_INCLUDE_DIR})
     target_compile_options(parser PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${ANTLR_INCLUDE_DIR})
 endif()
+
 target_link_libraries(libsrcml_shared PUBLIC LibXml2::LibXml2 Iconv::Iconv LibXslt::LibXslt LibXslt::LibExslt ${LIBSRCML_LIBRARIES})
+
 if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND CMAKE_COMPILER_IS_GNUCXX)
     target_link_libraries(libsrcml_shared PRIVATE gcov)
 endif()
@@ -123,6 +124,8 @@ target_include_directories(libsrcml BEFORE PRIVATE . ${CMAKE_SOURCE_DIR}/src/par
 
 # external source directories
 target_include_directories(libsrcml PRIVATE ${CMAKE_EXTERNAL_SOURCE_DIR})
+
+target_link_libraries(libsrcml PRIVATE LibXml2::LibXml2 Iconv::Iconv LibXslt::LibXslt LibXslt::LibExslt)
 
 # precompiled header list of most commonly used
 if(SRCML_BUILD_USEPCH)
