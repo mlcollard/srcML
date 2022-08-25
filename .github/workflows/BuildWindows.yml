@@ -83,8 +83,6 @@ jobs:
         shell: bash
         working-directory: build
         run: |
-          # ls -lhR vcpkg_installed/x64-windows
-          # ls -lhR "/c/Program Files (x86)/srcML"
           echo "/c/Program Files (x86)/srcML/bin" >> $GITHUB_PATH
           echo "/c/Program Files/srcML/bin" >> $GITHUB_PATH
 
