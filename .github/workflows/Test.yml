@@ -85,19 +85,19 @@ jobs:
           EOL="\r\n"
           export PATH=$PATH:"/c/Program Files/srcML/bin/"
           SRCML_HOME="/c/Program Files/srcML/bin/"
-          ls -lh $SRCML_HOME
+          ls -lh "$SRCML_HOME"
           SRCML="$SRCML_HOME/srcml.exe"
-          ls -lh $SRCML
+          ls -lh "$SRCML"
           export MSYS2_ARG_CONV_EXCL="*"
           diff='diff -Z '
-          $SRCML --version
-          $SRCML --text="int a;" -l C++
+          "$SRCML" --version
+          "$SRCML" --text="int a;" -l C++
           touch "a.cpp"
-          $SRCML a.cpp
+          "$SRCML" a.cpp
           echo "a;" >> a.cpp
-          $SRCML a.cpp
+          "$SRCML" a.cpp
           echo "b;" >> b.cpp
-          $SRCML a.cpp b.cpp
+          "$SRCML" a.cpp b.cpp
 
       - name: Setup msys2 with additional client-test packages for Windows
         uses: msys2/setup-msys2@v2
