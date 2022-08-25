@@ -15,81 +15,81 @@ jobs:
       - name: Setup Windows
         uses: microsoft/setup-msbuild@v1.1
 
-      - name: Create build directory
-        shell: bash
-        run: |
-          mkdir build
+      # - name: Create build directory
+      #   shell: bash
+      #   run: |
+      #     mkdir build
 
-      - uses: lukka/get-cmake@latest
+      # - uses: lukka/get-cmake@latest
 
-      - name: Restore artifacts, or run vcpkg, build (and cache artifacts as post step)
-        uses: lukka/run-vcpkg@v10.3
-        id: runvcpkg
-        with:
-          vcpkgGitCommitId: 'acc3bcf76b84ae5041c86ab55fe138ae7b8255c7'
-          runVcpkgInstall: true
+      # - name: Restore artifacts, or run vcpkg, build (and cache artifacts as post step)
+      #   uses: lukka/run-vcpkg@v10.3
+      #   id: runvcpkg
+      #   with:
+      #     vcpkgGitCommitId: 'acc3bcf76b84ae5041c86ab55fe138ae7b8255c7'
+      #     runVcpkgInstall: true
 
-      # NOTE: this is necessary to correctly find and use cl.exe
-      - name: setup devcmd
-        uses: ilammy/msvc-dev-cmd@v1
+      # # NOTE: this is necessary to correctly find and use cl.exe
+      # - name: setup devcmd
+      #   uses: ilammy/msvc-dev-cmd@v1
 
-      - name: CMake Setup on Windows
-        shell: bash
-        working-directory: build
-        run: |
-          echo "HERE: " $VCPKG_INSTALLED_DIR
-          ls -lh $VCPKG_INSTALLED_DIR
-          export UseMultiToolTask=true
-          cmake .. -DCMAKE_UNITY_BUILD=ON -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake -DCMAKE_CXX_COMPILER=cl -DCMAKE_C_COMPILER=cl -DDYNAMIC_LOAD_ENABLED=OFF -G "Ninja Multi-Config"
+      # - name: CMake Setup on Windows
+      #   shell: bash
+      #   working-directory: build
+      #   run: |
+      #     echo "HERE: " $VCPKG_INSTALLED_DIR
+      #     ls -lh $VCPKG_INSTALLED_DIR
+      #     export UseMultiToolTask=true
+      #     cmake .. -DCMAKE_UNITY_BUILD=ON -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake -DCMAKE_CXX_COMPILER=cl -DCMAKE_C_COMPILER=cl -DDYNAMIC_LOAD_ENABLED=OFF -G "Ninja Multi-Config"
 
-      - name: Build
-        shell: bash
-        working-directory: build
-        continue-on-error: true
-        run: |
-          export UseMultiToolTask=true
-          cmake --build . --config Release
+      # - name: Build
+      #   shell: bash
+      #   working-directory: build
+      #   continue-on-error: true
+      #   run: |
+      #     export UseMultiToolTask=true
+      #     cmake --build . --config Release
 
-      - name: Package
-        working-directory: build
-        continue-on-error: true
-        run: |
-          cpack -G WIX -V
-      - uses: actions/upload-artifact@v2
-        with:
-          name: wix.log
-          path: build/dist/_CPack_Packages/win64/WIX/wix.log
-      - uses: actions/upload-artifact@v2
-        with:
-          name: srcML-Win
-          path: build/dist/srcML-Win.msi
+      # - name: Package
+      #   working-directory: build
+      #   continue-on-error: true
+      #   run: |
+      #     cpack -G WIX -V
+      # - uses: actions/upload-artifact@v2
+      #   with:
+      #     name: wix.log
+      #     path: build/dist/_CPack_Packages/win64/WIX/wix.log
+      # - uses: actions/upload-artifact@v2
+      #   with:
+      #     name: srcML-Win
+      #     path: build/dist/srcML-Win.msi
 
-      - working-directory: build/dist
-        run: msiexec /i D:\a\srcML\srcML\build\dist\srcML-Win.msi /quiet /norestart /L*vx .\msi.log
-      - uses: actions/upload-artifact@v2
-        with:
-          name: msi.log
-          path: build/dist/msi.log
+      # - working-directory: build/dist
+      #   run: msiexec /i D:\a\srcML\srcML\build\dist\srcML-Win.msi /quiet /norestart /L*vx .\msi.log
+      # - uses: actions/upload-artifact@v2
+      #   with:
+      #     name: msi.log
+      #     path: build/dist/msi.log
 
-      - name: Set PATH for Windows
-        shell: bash
-        working-directory: build
-        run: |
-          echo "/c/Program Files (x86)/srcML/bin" >> $GITHUB_PATH
-          echo "/c/Program Files/srcML/bin" >> $GITHUB_PATH
+      # - name: Set PATH for Windows
+      #   shell: bash
+      #   working-directory: build
+      #   run: |
+      #     echo "/c/Program Files (x86)/srcML/bin" >> $GITHUB_PATH
+      #     echo "/c/Program Files/srcML/bin" >> $GITHUB_PATH
 
-      - name: Run Installed srcml
-        shell: bash
-        working-directory: build
-        run: |
-          srcml --version
-          srcml --text="int a;" -l C++
-          touch "a.cpp"
-          srcml a.cpp
-          echo "a;" >> a.cpp
-          srcml a.cpp
-          echo "b;" >> b.cpp
-          srcml a.cpp b.cpp
+      # - name: Run Installed srcml
+      #   shell: bash
+      #   working-directory: build
+      #   run: |
+      #     srcml --version
+      #     srcml --text="int a;" -l C++
+      #     touch "a.cpp"
+      #     srcml a.cpp
+      #     echo "a;" >> a.cpp
+      #     srcml a.cpp
+      #     echo "b;" >> b.cpp
+      #     srcml a.cpp b.cpp
 
       - name: Setup msys2 with additional client-test packages for Windows
         uses: msys2/setup-msys2@v2
@@ -108,21 +108,22 @@ jobs:
         timeout-minutes: 5
         continue-on-error: true
         run: |
-          srcml --version
-          srcml --text="int a;" -l C++
-          touch "a.cpp"
-          srcml a.cpp
-          echo "a;" >> a.cpp
-          srcml a.cpp
-          echo "b;" >> b.cpp
-          srcml a.cpp b.cpp
-          ctest -C Release -VV -R ^archive.sh
-          ctest -C Release -VV
+          echo "|$OSTYPE|"
+          # srcml --version
+          # srcml --text="int a;" -l C++
+          # touch "a.cpp"
+          # srcml a.cpp
+          # echo "a;" >> a.cpp
+          # srcml a.cpp
+          # echo "b;" >> b.cpp
+          # srcml a.cpp b.cpp
+          # ctest -C Release -VV -R ^archive.sh
+          # ctest -C Release -VV
 
-      - uses: actions/upload-artifact@v2
-        with:
-          name: ClientTest.windows-latest.log
-          path: build/Testing/Temporary/LastTest.log
+      # - uses: actions/upload-artifact@v2
+      #   with:
+      #     name: ClientTest.windows-latest.log
+      #     path: build/Testing/Temporary/LastTest.log
 
       # - name: Build libsrcml Tests
       #   shell: bash
