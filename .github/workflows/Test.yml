@@ -84,6 +84,8 @@ jobs:
         run: |
           srcml --version
           srcml --text="int a;" -l C++
+          touch "a.cpp"
+          srcml a.cpp
 
       - name: Setup msys2 with additional client-test packages for Windows
         uses: msys2/setup-msys2@v2
