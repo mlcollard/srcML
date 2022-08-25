@@ -3,10 +3,12 @@
   "name": "srcml",
   "version": "1.0.1",
   "dependencies": [
-    "libxml2",
-    "libxslt",
     "libarchive",
     "curl",
+    "libiconv",
+    "lz4",
+    "libxml2",
+    "libxslt",
     "boost-optional"
   ]
 }
