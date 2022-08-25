@@ -90,7 +90,6 @@ jobs:
           srcml a.cpp
           echo "b;" >> b.cpp
           srcml a.cpp b.cpp
-          ctest -C Release -VV -R ^archive.sh
 
       - name: Setup msys2 with additional client-test packages for Windows
         uses: msys2/setup-msys2@v2
@@ -101,6 +100,7 @@ jobs:
             diffutils
             cmake
             util-linux
+            libxml2
 
       - name: Windows Client Tests on Installed srcml
         shell: msys2 {0}
@@ -117,6 +117,7 @@ jobs:
           echo "b;" >> b.cpp
           srcml a.cpp b.cpp
           ctest -C Release -VV -R ^archive.sh
+          ctest -C Release -VV
 
       - uses: actions/upload-artifact@v2
         with:
