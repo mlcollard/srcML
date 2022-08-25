@@ -116,17 +116,18 @@ jobs:
         timeout-minutes: 5
         continue-on-error: true
         run: |
-          echo "|$OSTYPE|"
-          srcml --version
-          srcml --text="int a;" -l C++
-          touch "a.cpp"
-          srcml a.cpp
-          echo "a;" >> a.cpp
-          srcml a.cpp
-          echo "b;" >> b.cpp
-          srcml a.cpp b.cpp
+          export SRCML_HOME="/c/Program Files/srcML/bin/"
           ctest -C Release -VV -R ^archive.sh
           ctest -C Release -VV
+
+      # srcml --version
+      # srcml --text="int a;" -l C++
+      # touch "a.cpp"
+      # srcml a.cpp
+      # echo "a;" >> a.cpp
+      # srcml a.cpp
+      # echo "b;" >> b.cpp
+      # srcml a.cpp b.cpp
 
       - uses: actions/upload-artifact@v2
         with:
