@@ -82,9 +82,11 @@ endif()
 
 # which types of libraries
 if(MSVC)
+
+    # libsrcml shared
     install(TARGETS libsrcml_shared COMPONENT SRCML)
-    install(FILES ${LIBSRCML_LIBRARIES} DESTINATION bin COMPONENT SRCML)
-    # install(TARGETS libsrcml_shared RUNTIME_DEPENDENCIES PRE_EXCLUDE_REGEXES "api-ms-.*" "ext-ms-.*" COMPONENT SRCML)
+
+    # pdb file for the MSVC shared version
     install(FILES $<TARGET_PDB_FILE:libsrcml_shared> DESTINATION bin COMPONENT DEVLIBS)
 else()
     install(TARGETS libsrcml_shared LIBRARY COMPONENT SRCML NAMELINK_COMPONENT DEVLIBS)
@@ -92,6 +94,7 @@ endif()
 
 if (BUILD_LIBSRCML_STATIC)
     if(MSVC)
+        # do not use static library for MSVC
         install(TARGETS libsrcml_static COMPONENT DEVLIBS)
     else()
         install(TARGETS libsrcml_static COMPONENT SRCML)
@@ -108,33 +111,37 @@ if(APPLE)
 #    add_custom_command(TARGET libsrcml_shared POST_BUILD COMMAND /usr/bin/install_name_tool -id /usr/local/lib/libsrcml.dylib /usr/local/lib/libsrcml.dylib)
 endif()
 
+# libsrcml library
 file(GLOB LIBSRCML_SOURCE *.h *.hpp *.cpp)
-
 add_library(libsrcml OBJECT ${LIBSRCML_SOURCE})
+
+# generated source include files
 target_include_directories(libsrcml SYSTEM PRIVATE ${CMAKE_GENERATED_SOURCE_DIR})
+
+# libsrcml directory and parser
 target_include_directories(libsrcml BEFORE PRIVATE . ${CMAKE_SOURCE_DIR}/src/parser)
+
+# external source directories
 target_include_directories(libsrcml PRIVATE ${CMAKE_EXTERNAL_SOURCE_DIR})
+
+# precompiled header list of most commonly used
 if(SRCML_BUILD_USEPCH)
     target_precompile_headers(libsrcml PRIVATE <srcmlns.hpp> <srcml_types.hpp> <srcml_sax2_utilities.hpp> <srcml_translator.hpp> <srcml_sax2_reader.hpp>)
 endif()
 
+# libsrcml depends on the parser
 add_dependencies(libsrcml parser)
-
-add_custom_command(TARGET libsrcml_shared POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E echo "START:"
-    COMMAND ${CMAKE_COMMAND} -E echo $<TARGET_RUNTIME_DLLS:libsrcml_shared>
-    COMMAND ${CMAKE_COMMAND} -E echo "END:"
-)
 
 # install the libsrcml include file
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/srcml.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT DEVLIBS)
 
-# if(MSVC)
-#     file(GLOB SRCML_DLLS ${WINDOWS_DEP_PATH}/release/bin/*.dll)
-#     install(FILES ${SRCML_DLLS} DESTINATION bin COMPONENT SRCML)
-#     file(GLOB SRCML_DLLS ${WINDOWS_DEP_PATH}/release/lib/*.lib)
-#     install(FILES ${SRCML_DLLS} DESTINATION lib COMPONENT DEVLIB)
-# endif()
+# on Windows with vcpkg, install all the dlls that the vcpkg installed
+# NOTE: Would be better to use $<TARGET_RUNTIME_DLLS:libsrcml_shared>, but that does not include
+# indirect dependencies, e.g., bzip2 for libarchive
+if(MSVC AND VCPKG)
+    file(GLOB VCPKG_SRCML_DEPENDENCIES "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/bin/*${CMAKE_SHARED_LIBRARY_SUFFIX}")
+    install(FILES ${VCPKG_SRCML_DEPENDENCIES} DESTINATION bin COMPONENT SRCML)
+endif()
 
 # strip libraries
 if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -152,19 +159,3 @@ if(DISTRO AND DISTRO MATCHES "Ubuntu")
     install(CODE "message(STATUS \"Running: ldconfig\")")
     install(CODE "execute_process(COMMAND ldconfig)")
 endif()
-
-if(MSVC OR VCPKG)
-    # install(FILES $<TARGET_RUNTIME_DLLS:libsrcml_shared> DESTINATION bin COMPONENT SRCML)
-    set(EXFILENAME "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/bin/*${CMAKE_SHARED_LIBRARY_SUFFIX}")
-    message("EXFILENAME: ${EXFILENAME}")
-    file(GLOB EXSOURCES "${EXFILENAME}")
-    message("EXSOURCES: ${EXSOURCES}")
-    install(FILES ${EXSOURCES} DESTINATION bin COMPONENT SRCML)
-endif()
-
-add_custom_command(TARGET libsrcml_shared POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E echo "START:"
-  COMMAND ${CMAKE_COMMAND} -E echo $<TARGET_RUNTIME_DLLS:libsrcml_shared>
-  COMMAND ${CMAKE_COMMAND} -E echo "END:"
-  COMMAND_EXPAND_LISTS
-)
