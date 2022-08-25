@@ -15,10 +15,10 @@ jobs:
       - name: Setup Windows
         uses: microsoft/setup-msbuild@v1.1
 
-      # - name: Create build directory
-      #   shell: bash
-      #   run: |
-      #     mkdir build
+      - name: Create build directory
+        shell: bash
+        run: |
+          mkdir build
 
       # - uses: lukka/get-cmake@latest
 
