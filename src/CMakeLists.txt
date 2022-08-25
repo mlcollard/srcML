@@ -136,6 +136,7 @@ find_package(LibArchive 3 REQUIRED)
 find_package(LibXml2 REQUIRED)
 find_package(CURL REQUIRED)
 find_package(Iconv REQUIRED)
+# find_package(LIBCHARSET REQUIRED)
 find_package(Boost REQUIRED)
 
 # The build uses $<TARGET_RUNTIME_DLLS:*> when the dependent libraries
@@ -143,7 +144,6 @@ find_package(Boost REQUIRED)
 # for direct dependents, but not for indirect dependents. So find the
 # packages so they can be added to the target
 if(VCPKG)
-    message("FINDING INDIRECT DEPENDENCIES")
     find_package(BZip2 REQUIRED)
     find_package(LibLZMA REQUIRED)
     find_package(ZLIB REQUIRED)
@@ -152,15 +152,13 @@ if(VCPKG)
     find_package(Zstd REQUIRED)
 endif()
 
-message("VCPKG_TARGET_TRIPLET: ${VCPKG_TARGET_TRIPLET}" )
-# if(DYNAMIC_LOAD_ENABLED)
-#     find_package(LibXslt)
-# else()
+if(DYNAMIC_LOAD_ENABLED AND NOT VCPKG)
+    find_package(LibXslt)
+else()
     find_package(LibXslt REQUIRED)
-# endif()
+endif()
 
 if(LIBXSLT_FOUND)
-    message("LIBXSLT FOUND")
     # include_directories(SYSTEM ${LIBXSLT_INCLUDE_DIR})
     add_compile_definitions(WITH_LIBXSLT)
 endif()
@@ -194,14 +192,7 @@ set(ANTLR_INCLUDE_DIR "${ANTLR_EXTERNAL}/lib/cpp/")
 
 set(LIBXML2_LIBRARIES LibXml2::LibXml2 Iconv::Iconv)
 
-# if(NOT WIN32)
-    include_directories(SYSTEM ${Boost_INCLUDE_DIR} ${ANTLR_INCLUDE_DIR})
-# endif()
-
-get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
-foreach(dir ${dirs})
-    message(STATUS "dir='${dir}'")
-endforeach()
+include_directories(SYSTEM ${Boost_INCLUDE_DIR} ${ANTLR_INCLUDE_DIR})
 
 # standard compile options
 add_compile_options(
@@ -216,7 +207,7 @@ add_compile_options(
     $<$<CXX_COMPILER_ID:MSVC>:/D_CRT_NONSTDC_NO_WARNINGS> # disable read() warnings
 )
 
-# handle specific warnings
+# specific warnings
 option(ENABLE_BUILD_WARNINGS "Enable disabled build warnings" OFF)
 if(NOT ENABLE_BUILD_WARNINGS)
     add_compile_options(
