@@ -31,3 +31,9 @@ set(CPACK_PACKAGE_INSTALL_DIRECTORY "srcML")
 
 # set contact in add/remove programs
 set(CPACK_NSIS_CONTACT "srcML <srcML.org>")
+
+# which components are disabled
+set(CPACK_COMPONENT_SRCML_DISABLED False)
+set(CPACK_COMPONENT_DEVLIBS_DISABLED False)
+set(CPACK_COMPONENT_SRCMLDEV_DISABLED True)
+set(CPACK_COMPONENT_EXAMPLES_DISABLED True)
