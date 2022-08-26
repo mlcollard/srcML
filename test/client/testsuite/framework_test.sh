@@ -32,6 +32,11 @@
 # current revision number, replaced in expected output strings
 export REVISION=1.0.0
 
+# some platforms do not have xmllint
+if [[ -n $DISABLE_XMLCHECK ]]; then
+    echo "warning: xmlcheck() disabled"
+fi
+
 # construct a temporary directory name based on the test name (without the .sh)
 TEMPDIR=./tmp/$(basename $0 .sh)
 
@@ -338,6 +343,11 @@ check_lines() {
 # Check the validity of the xml
 # Currently only checks for well-formed xml, not DTD validity
 xmlcheck() {
+
+    # some platforms do not have xmllint
+    if [[ -n $DISABLE_XMLCHECK ]]; then
+        return 0
+    fi
 
     set -e
 
