@@ -24,7 +24,8 @@
 set(CPACK_STRIP_FILES ON)
 
 if(DYNAMIC_LOAD_ENABLED)
-    set(LIBSRCML_LIBRARIES dl pthread
+    # set(LIBSRCML_LIBRARIES dl pthread
+    set(LIBSRCML_LIBRARIES pthread
                 CACHE INTERNAL "Libraries needed to build libsrcml")
 elseif(NOT CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     set(LIBSRCML_LIBRARIES pthread
@@ -34,9 +35,9 @@ else()
                 CACHE INTERNAL "Libraries needed to build libsrcml")
 endif()
 
-if(NOT WIN32 AND NOT APPLE)
-    list(APPEND LIBSRCML_LIBRARIES rt crypto)
-endif()
+# if(NOT WIN32 AND NOT APPLE)
+#     list(APPEND LIBSRCML_LIBRARIES rt crypto)
+# endif()
 
 include_directories(BEFORE . ${CMAKE_SOURCE_DIR}/src/parser ${CMAKE_INSTALL_INCLUDEDIR})
 
