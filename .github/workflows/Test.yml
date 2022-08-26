@@ -32,6 +32,7 @@ jobs:
         shell: bash
         run: |
           mkdir build
+          diff --version
 
       - name: CMake Setup on Windows
         shell: bash
