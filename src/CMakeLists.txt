@@ -244,6 +244,17 @@ if(MSVC)
 
 endif()
 
+# TinySHA1 external include
+include(FetchContent)
+FetchContent_Declare(TinySHA1
+  GIT_REPOSITORY https://github.com/mohaps/tinysha1
+  GIT_TAG        2795aa8de91b1797defdfbff61ed93b22b5ced81
+  GIT_SHALLOW    ON
+)
+FetchContent_MakeAvailable(TinySHA1)
+add_library(TinySHA1 INTERFACE IMPORTED)
+target_include_directories(TinySHA1 INTERFACE ${tinysha1_SOURCE_DIR})
+
 add_subdirectory(client)
 add_subdirectory(parser)
 add_subdirectory(libsrcml)

@@ -124,13 +124,6 @@ endif()
 
 # Setup SHA1 include
 set(CMAKE_EXTERNAL_SOURCE_DIR ${CMAKE_BINARY_DIR}/external)
-set(SHA1_EXTERNAL ${CMAKE_EXTERNAL_SOURCE_DIR}/TinySHA1.hpp)
-if(NOT EXISTS ${SHA1_EXTERNAL})
-    set(SHA1_URL https://raw.githubusercontent.com/mohaps/TinySHA1/master/TinySHA1.hpp)
-    message(STATUS "Download ${SHA1_URL}")
-    file(DOWNLOAD ${SHA1_URL} ${SHA1_EXTERNAL})
-endif()
-
 target_include_directories(parser PUBLIC . ${CMAKE_SOURCE_DIR}/src/libsrcml)
 
 file(GLOB ANTLR_SOURCE ${ANTLR_EXTERNAL}/lib/cpp/src/*.cpp)
@@ -138,7 +131,7 @@ list(REMOVE_ITEM ANTLR_SOURCE "${ANTLR_EXTERNAL}/lib/cpp/src/dll.cpp")
 add_library(antlr OBJECT ${ANTLR_SOURCE})
 
 add_dependencies(parser antlr)
-target_link_libraries(parser PRIVATE LibXml2::LibXml2 Iconv::Iconv LibXslt::LibXslt LibXslt::LibExslt Boost::boost)
+target_link_libraries(parser PRIVATE LibXml2::LibXml2 Iconv::Iconv LibXslt::LibXslt LibXslt::LibExslt Boost::boost TinySHA1)
 
 target_include_directories(antlr PUBLIC ${ANTLR_INCLUDE_DIR})
 target_include_directories(parser PUBLIC . ${CMAKE_SOURCE_DIR}/src/libsrcml ${ANTLR_INCLUDE_DIR})

@@ -43,16 +43,12 @@ include_directories(BEFORE . ${CMAKE_SOURCE_DIR}/src/parser ${CMAKE_INSTALL_INCL
 
 # Setup SHA1 include
 set(CMAKE_EXTERNAL_SOURCE_DIR ${CMAKE_BINARY_DIR}/external)
-set(SHA1_EXTERNAL ${CMAKE_EXTERNAL_SOURCE_DIR}/TinySHA1.hpp)
-if(NOT EXISTS ${SHA1_EXTERNAL})
-    file(DOWNLOAD https://raw.githubusercontent.com/mohaps/TinySHA1/master/TinySHA1.hpp ${SHA1_EXTERNAL})
-endif()
 
 # Building static and dynamic libraries for srcML.
 add_library(libsrcml_static STATIC $<TARGET_OBJECTS:parser> $<TARGET_OBJECTS:antlr> $<TARGET_OBJECTS:libsrcml>)
 set_target_properties(libsrcml_static PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 target_include_directories(libsrcml_static BEFORE PRIVATE . ${CMAKE_SOURCE_DIR}/src/parser)
-target_link_libraries(libsrcml_static PRIVATE LibXml2::LibXml2 Iconv::Iconv LibXslt::LibXslt LibXslt::LibExslt ${LIBSRCML_LIBRARIES})
+target_link_libraries(libsrcml_static PRIVATE LibXml2::LibXml2 Iconv::Iconv LibXslt::LibXslt LibXslt::LibExslt ${LIBSRCML_LIBRARIES} TinySHA1)
 if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND CMAKE_COMPILER_IS_GNUCXX)
     target_link_libraries(libsrcml_static PRIVATE gcov)
 endif()
@@ -65,7 +61,7 @@ if(WIN32)
     target_compile_options(parser PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${ANTLR_INCLUDE_DIR})
 endif()
 
-target_link_libraries(libsrcml_shared PUBLIC LibXml2::LibXml2 Iconv::Iconv LibXslt::LibXslt LibXslt::LibExslt ${LIBSRCML_LIBRARIES})
+target_link_libraries(libsrcml_shared PUBLIC LibXml2::LibXml2 Iconv::Iconv LibXslt::LibXslt LibXslt::LibExslt ${LIBSRCML_LIBRARIES} TinySHA1)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND CMAKE_COMPILER_IS_GNUCXX)
     target_link_libraries(libsrcml_shared PRIVATE gcov)
@@ -126,7 +122,7 @@ target_include_directories(libsrcml BEFORE PRIVATE . ${CMAKE_SOURCE_DIR}/src/par
 # external source directories
 target_include_directories(libsrcml PRIVATE ${CMAKE_EXTERNAL_SOURCE_DIR})
 
-target_link_libraries(libsrcml PRIVATE LibXml2::LibXml2 Iconv::Iconv LibXslt::LibXslt LibXslt::LibExslt)
+target_link_libraries(libsrcml PRIVATE LibXml2::LibXml2 Iconv::Iconv LibXslt::LibXslt LibXslt::LibExslt TinySHA1)
 
 # precompiled header list of most commonly used
 if(SRCML_BUILD_USEPCH)
