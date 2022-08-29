@@ -51,7 +51,6 @@ set(ANTLR_INCLUDE_DIR "${ANTLR_EXTERNAL}/lib/cpp/")
 
 include_directories(SYSTEM ${ANTLR_INCLUDE_DIR})
 include_directories(${CMAKE_SOURCE_DIR}/src/libsrcml)
-include_directories(SYSTEM ${ANTLR_INCLUDE_DIR})
 
 # Generated source from antlr and the parser
 set(CMAKE_GENERATED_SOURCE_DIR ${CMAKE_BINARY_DIR}/parser)
