@@ -22,24 +22,6 @@
 # strip executables
 set(CPACK_STRIP_FILES ON)
 
-if(DYNAMIC_LOAD_ENABLED)
-    # set(LIBSRCML_LIBRARIES dl pthread
-    set(LIBSRCML_LIBRARIES pthread
-                CACHE INTERNAL "Libraries needed to build libsrcml")
-elseif(NOT CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    set(LIBSRCML_LIBRARIES pthread
-                CACHE INTERNAL "Libraries needed to build libsrcml")
-else()
-    set(LIBSRCML_LIBRARIES
-                CACHE INTERNAL "Libraries needed to build libsrcml")
-endif()
-
-# if(NOT WIN32 AND NOT APPLE)
-#     list(APPEND LIBSRCML_LIBRARIES rt crypto)
-# endif()
-
-include_directories(BEFORE . ${CMAKE_SOURCE_DIR}/src/parser ${CMAKE_INSTALL_INCLUDEDIR})
-
 # Building static and dynamic libraries for srcML.
 add_library(libsrcml_static STATIC $<TARGET_OBJECTS:parser> $<TARGET_OBJECTS:antlr> $<TARGET_OBJECTS:libsrcml>)
 set_target_properties(libsrcml_static PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -66,17 +48,20 @@ endif()
 set_target_properties(libsrcml_shared PROPERTIES VERSION "${PROJECT_VERSION}" SOVERSION "${PROJECT_VERSION_MAJOR}")
 
 if(MSVC)
+    # On Windows, generate a debug of the release for the PDB file, but use optimization options
     set_target_properties(libsrcml_shared PROPERTIES OUTPUT_NAME libsrcml LINK_FLAGS_DEBUG "/SAFESEH:NO" LINK_FLAGS_RELEASE "/DEBUG /OPT:REF /OPT:ICF")
     set_target_properties(libsrcml_static PROPERTIES OUTPUT_NAME libsrcmls LINK_FLAGS_RELEASE "/LTCG:OFF")
 elseif(APPLE)
+    # Restrict exported symbols to those in the export list
+    # The output name automatically prepends "lib"
     set_target_properties(libsrcml_shared libsrcml_static PROPERTIES OUTPUT_NAME srcml LINK_FLAGS "-Wl,-exported_symbols_list ${CMAKE_SOURCE_DIR}/src/libsrcml/export_list" MACOSX_RPATH OFF)
 else()
+    # The output name automatically prepends "lib"
     set_target_properties(libsrcml_shared libsrcml_static PROPERTIES OUTPUT_NAME srcml)
 endif()
 
 # which types of libraries
 if(MSVC)
-
     # libsrcml shared
     install(TARGETS libsrcml_shared COMPONENT SRCML)
 
@@ -86,7 +71,7 @@ else()
     install(TARGETS libsrcml_shared LIBRARY COMPONENT SRCML NAMELINK_COMPONENT DEVLIBS)
 endif()
 
-if (BUILD_LIBSRCML_STATIC)
+if(BUILD_LIBSRCML_STATIC)
     if(MSVC)
         # do not use static library for MSVC
         install(TARGETS libsrcml_static COMPONENT DEVLIBS)
