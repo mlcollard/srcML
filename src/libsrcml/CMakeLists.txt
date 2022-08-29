@@ -22,24 +22,34 @@
 # strip executables
 set(CPACK_STRIP_FILES ON)
 
-# Building static and dynamic libraries for srcML.
-add_library(libsrcml_static STATIC $<TARGET_OBJECTS:parser> $<TARGET_OBJECTS:antlr> $<TARGET_OBJECTS:libsrcml>)
-set_target_properties(libsrcml_static PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-target_include_directories(libsrcml_static BEFORE PRIVATE . ${CMAKE_SOURCE_DIR}/src/parser)
-target_link_libraries(libsrcml_static PRIVATE LibXml2::LibXml2 Iconv::Iconv LibXslt::LibXslt LibXslt::LibExslt pthread TinySHA1)
-if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND CMAKE_COMPILER_IS_GNUCXX)
-    target_link_libraries(libsrcml_static PRIVATE gcov)
+# libsrcml library
+file(GLOB LIBSRCML_SOURCE *.h *.hpp *.cpp)
+add_library(libsrcml OBJECT ${LIBSRCML_SOURCE})
+
+# Use the libsrcml/srcml.h rather than the /usr/local/include/srcml.h
+target_include_directories(libsrcml BEFORE PRIVATE .)
+
+# libsrcml dependencies
+target_link_libraries(libsrcml PUBLIC LibXml2::LibXml2 Iconv::Iconv LibXslt::LibXslt LibXslt::LibExslt Boost::boost TinySHA1 pthread parser)
+
+# precompiled header list of most commonly used
+if(SRCML_BUILD_USEPCH)
+    target_precompile_headers(libsrcml PRIVATE <srcmlns.hpp> <srcml_types.hpp> <srcml_sax2_utilities.hpp> <srcml_translator.hpp> <srcml_sax2_reader.hpp>)
 endif()
 
-add_library(libsrcml_shared SHARED $<TARGET_OBJECTS:parser> $<TARGET_OBJECTS:antlr> $<TARGET_OBJECTS:libsrcml>)
-set_target_properties(libsrcml_shared PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+# Building static and dynamic libraries for srcML.
+add_library(libsrcml_static STATIC $<TARGET_OBJECTS:libsrcml>)
+set_target_properties(libsrcml_static PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+target_link_libraries(libsrcml_static PUBLIC libsrcml PRIVATE parser antlr)
+
+add_library(libsrcml_shared SHARED $<TARGET_OBJECTS:libsrcml>)
+set_target_properties(libsrcml_shared PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+target_link_libraries(libsrcml_shared PUBLIC libsrcml PRIVATE parser antlr)
+
 if(WIN32)
     target_compile_options(libsrcml_shared PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${LIBXML2_INCLUDE_DIR})
     target_compile_options(libsrcml_shared PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${Boost_INCLUDE_DIR})
-    target_compile_options(parser PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${ANTLR_INCLUDE_DIR})
 endif()
-
-target_link_libraries(libsrcml_shared PUBLIC LibXml2::LibXml2 Iconv::Iconv LibXslt::LibXslt LibXslt::LibExslt pthread TinySHA1)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND CMAKE_COMPILER_IS_GNUCXX)
     target_link_libraries(libsrcml_shared PRIVATE gcov)
@@ -88,21 +98,6 @@ endif()
 
 if(APPLE)
 #    add_custom_command(TARGET libsrcml_shared POST_BUILD COMMAND /usr/bin/install_name_tool -id /usr/local/lib/libsrcml.dylib /usr/local/lib/libsrcml.dylib)
-endif()
-
-# libsrcml library
-file(GLOB LIBSRCML_SOURCE *.h *.hpp *.cpp)
-add_library(libsrcml OBJECT ${LIBSRCML_SOURCE})
-
-# Use the libsrcml/srcml.h rather than the /usr/local/include/srcml.h
-target_include_directories(libsrcml BEFORE PRIVATE .)
-
-# Libsrcml dependencies
-target_link_libraries(libsrcml PRIVATE LibXml2::LibXml2 Iconv::Iconv LibXslt::LibXslt LibXslt::LibExslt TinySHA1 parser)
-
-# precompiled header list of most commonly used
-if(SRCML_BUILD_USEPCH)
-    target_precompile_headers(libsrcml PRIVATE <srcmlns.hpp> <srcml_types.hpp> <srcml_sax2_utilities.hpp> <srcml_translator.hpp> <srcml_sax2_reader.hpp>)
 endif()
 
 # install the libsrcml include file

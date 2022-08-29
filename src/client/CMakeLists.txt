@@ -50,7 +50,7 @@ add_executable(srcml ${CLIENT_SOURCE})
 if(MSVC)
     target_compile_options(srcml PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${cli11_SOURCE_DIR})
 endif()
-target_include_directories(srcml BEFORE PRIVATE . ${CMAKE_SOURCE_DIR}/src/libsrcml)
+target_include_directories(srcml BEFORE PRIVATE . ${CMAKE_SOURCE_DIR}/src/libsrcml ${libarchiveinclude_SOURCE_DIR})
 
 # Largest impace for PCH builds of the client
 if(SRCML_BUILD_USEPCH)
@@ -58,10 +58,7 @@ if(SRCML_BUILD_USEPCH)
 endif()
 
 # Add coverage to default part of Debug
-target_link_libraries(srcml libsrcml_link LibArchive::LibArchive CURL::libcurl cli11 ctpl_stl)
-if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND CMAKE_COMPILER_IS_GNUCXX)
-    target_link_libraries(srcml gcov)
-endif()
+target_link_libraries(srcml libsrcml_link LibArchive::LibArchive CURL::libcurl Boost::boost cli11 ctpl_stl)
 
 set_target_properties(srcml PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 if(APPLE)

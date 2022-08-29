@@ -19,8 +19,6 @@
 # 
 # CMake files for building from source
 
-option(CLANG_TIME_TRACE "Enable clang profiling." OFF)
-
 option(SRCML_BUILD_USEPCH "Use PCH (PreCompiled Headers" OFF)
 
 # Big Sur and later OSX platforms can build for both x86 and arm64, so default to both
@@ -37,8 +35,8 @@ if(APPLE AND CMAKE_OSX_ARCHITECTURES_NOTSET AND OS_VERSION GREATER_EQUAL "20")
     endif()
 endif()
 
-include_directories(${CMAKE_SOURCE_DIR}/src/libsrcml)
-
+# Clang profiling
+option(CLANG_TIME_TRACE "Enable clang profiling." OFF)
 if(CLANG_TIME_TRACE)
     add_compile_options(-ftime-trace)
 endif()
@@ -53,9 +51,6 @@ if(NOT DYNAMIC_LOAD_ENABLED)
 endif()
 
 set(CMAKE_CXX_STANDARD 11)
-
-# Generated source from antlr and the parser
-set(CMAKE_GENERATED_SOURCE_DIR ${CMAKE_BINARY_DIR}/parser)
 
 # External code directory
 set(CMAKE_EXTERNAL_SOURCE_DIR ${CMAKE_BINARY_DIR}/external)
@@ -105,19 +100,29 @@ elseif(APPLE AND NOT VCPKG)
         # install via Apple opensource
         set(LIBARCHIVE_VERSION "libarchive-83.40.4")
         set(LIBARCHIVE_URL "https://opensource.apple.com/source/libarchive/${LIBARCHIVE_VERSION}")
-        if(NOT EXISTS ${CMAKE_EXTERNAL_SOURCE_DIR}/archive.h)
-            message("-- Download libarchive include files")
-            file(DOWNLOAD ${LIBARCHIVE_URL}/libarchive/libarchive/archive.h ${CMAKE_EXTERNAL_SOURCE_DIR}/archive.h)
-            file(DOWNLOAD ${LIBARCHIVE_URL}/libarchive/libarchive/archive_entry.h ${CMAKE_EXTERNAL_SOURCE_DIR}/archive_entry.h)
-        endif()
 
-        list(APPEND CMAKE_PREFIX_PATH "${CMAKE_EXTERNAL_SOURCE_DIR}")
+        include(FetchContent)
+        FetchContent_Declare(libarchiveInclude1
+            URL https://opensource.apple.com/source/libarchive/${LIBARCHIVE_URL}/libarchive/libarchive/archive.h
+            DOWNLOAD_NO_EXTRACT TRUE
+        )
+        FetchContent_MakeAvailable(libarchiveInclude1)
+        add_library(libarchiveInclude1 INTERFACE IMPORTED)
+        target_include_directories(libarchiveInclude1 INTERFACE ${libarchiveinclude1_SOURCE_DIR})
+
+        FetchContent_Declare(libarchiveInclude
+            URL https://opensource.apple.com/source/libarchive/${LIBARCHIVE_URL}/libarchive/libarchive/archive_entry.h
+            SOURCE_DIR ${libarchiveinclude1_SOURCE_DIR}
+            DOWNLOAD_NO_EXTRACT TRUE
+        )
+        FetchContent_MakeAvailable(libarchiveInclude)
+        add_library(libarchiveInclude INTERFACE IMPORTED)
+        target_include_directories(libarchiveInclude INTERFACE ${libarchiveinclude_SOURCE_DIR})
+        target_link_libraries(libarchiveInclude INTERFACE libarchiveInclude1)
 
     # macOS versions before Catalina only have libarchive 2, and require homebrew
     # and use a static library
     elseif(BREW_RESULT EQUAL 0 AND EXISTS "${BREW_PREFIX}/opt/libarchive")
-
-        list(APPEND CMAKE_PREFIX_PATH "${BREW_PREFIX}/opt/libarchive")
 
     else()
         message(FATAL_ERROR "LibArchive >= 3 is required. Install via homebrew\n% brew install libarchive\n")
@@ -189,7 +194,7 @@ endif()
 set(ANTLR_EXTERNAL ${CMAKE_EXTERNAL_SOURCE_DIR}/antlr-2.7.7)
 set(ANTLR_INCLUDE_DIR "${ANTLR_EXTERNAL}/lib/cpp/")
 
-link_libraries(Boost::boost)
+# link_libraries(Boost::boost)
 include_directories(SYSTEM ${ANTLR_INCLUDE_DIR})
 
 # standard compile options

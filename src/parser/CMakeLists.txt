@@ -19,12 +19,15 @@
 # 
 # CMake files for building the parser
 
+include_directories(${CMAKE_SOURCE_DIR}/src/libsrcml)
+include_directories(SYSTEM ${ANTLR_INCLUDE_DIR})
+
+# Generated source from antlr and the parser
+set(CMAKE_GENERATED_SOURCE_DIR ${CMAKE_BINARY_DIR}/parser)
+
 # Find antlr runtime
 set(ANTLR_EXE java -classpath "${ANTLR_EXTERNAL}/antlr.jar" antlr.Tool)
 message("-- ANTLR: ${ANTLR_EXE}")
-
-# Assume all C++ source files are parser
-file(GLOB PARSER_SOURCE *.hpp *.cpp)
 
 # 
 # RunAntlr
@@ -109,13 +112,16 @@ RunAntlr("${srcMLParserOutputFiles}"
     "OperatorLexer.g\;KeywordLexer.g\;TextLexer.g"
 )
 
+# parser library
+file(GLOB PARSER_SOURCE *.hpp *.cpp)
 add_library(parser OBJECT
     ${CMAKE_GENERATED_SOURCE_DIR}/srcMLParser.cpp
     ${CMAKE_GENERATED_SOURCE_DIR}/KeywordLexer.cpp
     ${CMAKE_GENERATED_SOURCE_DIR}/CommentTextLexer.cpp
     ${PARSER_SOURCE}
 )
-target_include_directories(parser INTERFACE ${CMAKE_GENERATED_SOURCE_DIR})
+target_link_libraries(parser PRIVATE LibXml2::LibXml2 Boost::boost TinySHA1 antlr)
+target_include_directories(parser PUBLIC . ${CMAKE_GENERATED_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/src/libsrcml)
 
 if(SRCML_BUILD_USEPCH)
     target_precompile_headers(parser PRIVATE <srcMLParser.hpp> <CommentTextLexer.hpp> <ModeStack.hpp> <Language.hpp>)
@@ -124,32 +130,18 @@ if(SRCML_BUILD_USEPCH)
     endif()
 endif()
 
-# Setup SHA1 include
-set(CMAKE_EXTERNAL_SOURCE_DIR ${CMAKE_BINARY_DIR}/external)
-target_include_directories(parser PUBLIC . ${CMAKE_SOURCE_DIR}/src/libsrcml)
-
+# antlr library
+# Assume all C++ source files are parser
 file(GLOB ANTLR_SOURCE ${ANTLR_EXTERNAL}/lib/cpp/src/*.cpp)
 list(REMOVE_ITEM ANTLR_SOURCE "${ANTLR_EXTERNAL}/lib/cpp/src/dll.cpp")
 add_library(antlr OBJECT ${ANTLR_SOURCE})
 
-add_dependencies(parser antlr)
-target_link_libraries(parser PRIVATE LibXml2::LibXml2 Iconv::Iconv LibXslt::LibXslt LibXslt::LibExslt Boost::boost TinySHA1)
-
-target_include_directories(antlr PUBLIC ${ANTLR_INCLUDE_DIR})
-target_include_directories(parser PUBLIC . ${CMAKE_SOURCE_DIR}/src/libsrcml ${ANTLR_INCLUDE_DIR})
-
 if(MSVC)
-    target_include_directories(parser PUBLIC ${CMAKE_EXTERNAL_SOURCE_DIR})
-    # target_include_directories(parser PUBLIC ${LIBXML2_INCLUDE_DIRS} ${LIBXML2_INCLUDE_DIR} ${Boost_INCLUDE_DIR} ${CMAKE_EXTERNAL_SOURCE_DIR})
-
     # target_compile_options(parser PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${LIBXML2_INCLUDE_DIR})
     # target_compile_options(parser PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${Boost_INCLUDE_DIR})
     # target_compile_options(parser PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${ANTLR_INCLUDE_DIR})
     target_compile_options(parser PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${CMAKE_GENERATED_SOURCE_DIR})
-    # target_compile_options(parser SYSTEM PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${CMAKE_EXTERNAL_SOURCE_DIR})
-else()
-    target_include_directories(parser PRIVATE ${CMAKE_GENERATED_SOURCE_DIR})
-    target_include_directories(parser PRIVATE ${CMAKE_EXTERNAL_SOURCE_DIR})
+    target_compile_options(parser PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${ANTLR_INCLUDE_DIR})
 endif()
 
 option(ENABLE_ANTLR_BUILD_WARNINGS "Enable disabled antlr library build warnings" OFF)
