@@ -19,6 +19,37 @@
 # 
 # CMake files for building the parser
 
+find_package(LibXml2 REQUIRED)
+find_package(Iconv REQUIRED)
+
+# Setup ANTLR 2.7 library
+set(ANTLR_EXTERNAL ${CMAKE_EXTERNAL_SOURCE_DIR}/antlr-2.7.7)
+if(NOT EXISTS ${ANTLR_EXTERNAL})
+    set(ANTLR_URL https://www.antlr2.org/download/antlr-2.7.7.tar.gz)
+    message(STATUS "Download ${ANTLR_URL}")
+    file(DOWNLOAD ${ANTLR_URL} ${CMAKE_EXTERNAL_SOURCE_DIR}/antlr-2.7.7.tar.gz)
+    file(ARCHIVE_EXTRACT INPUT ${CMAKE_EXTERNAL_SOURCE_DIR}/antlr-2.7.7.tar.gz
+        DESTINATION ${CMAKE_EXTERNAL_SOURCE_DIR})
+
+    # Add needed include file for CharScanner.hpp
+    set(CHARSCANNER_HPP "${ANTLR_EXTERNAL}/lib/cpp/antlr/CharScanner.hpp")
+    file(READ ${CHARSCANNER_HPP} FILE_CONTENTS)
+    string(REPLACE "#include <antlr/config.hpp>" "#include <antlr/config.hpp>\n#include <string.h>" FILE_CONTENTS "${FILE_CONTENTS}")
+    file(WRITE ${CHARSCANNER_HPP} "${FILE_CONTENTS}")
+
+    # Remove pragma warning disable that is no longer valie
+    set(CONFIG_HPP "${ANTLR_EXTERNAL}/lib/cpp/antlr/config.hpp")
+    file(READ ${CONFIG_HPP} FILE_CONTENTS)
+    string(REPLACE "# pragma warning( disable : 4786 4231 )" "# pragma warning( disable : 4786 )" FILE_CONTENTS "${FILE_CONTENTS}")
+    file(WRITE ${CONFIG_HPP} "${FILE_CONTENTS}")
+
+    file(REMOVE ${CMAKE_EXTERNAL_SOURCE_DIR}/antlr-2.7.7.tar.gz)
+endif()
+
+set(ANTLR_EXTERNAL ${CMAKE_EXTERNAL_SOURCE_DIR}/antlr-2.7.7)
+set(ANTLR_INCLUDE_DIR "${ANTLR_EXTERNAL}/lib/cpp/")
+
+include_directories(SYSTEM ${ANTLR_INCLUDE_DIR})
 include_directories(${CMAKE_SOURCE_DIR}/src/libsrcml)
 include_directories(SYSTEM ${ANTLR_INCLUDE_DIR})
 
@@ -120,7 +151,7 @@ add_library(parser OBJECT
     ${CMAKE_GENERATED_SOURCE_DIR}/CommentTextLexer.cpp
     ${PARSER_SOURCE}
 )
-target_link_libraries(parser PRIVATE LibXml2::LibXml2 Boost::boost TinySHA1 antlr)
+target_link_libraries(parser PRIVATE LibXml2::LibXml2 Boost::boost TinySHA1 INTERFACE antlr)
 target_include_directories(parser PUBLIC . ${CMAKE_GENERATED_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/src/libsrcml)
 
 if(SRCML_BUILD_USEPCH)

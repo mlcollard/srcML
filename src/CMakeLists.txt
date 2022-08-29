@@ -137,51 +137,16 @@ set(CMAKE_INSTALL_SYSTEM_RUNTIME_COMPONENT SRCML)
 include(InstallRequiredSystemLibraries)
 
 # Locate packages
-find_package(LibArchive 3 REQUIRED)
-find_package(LibXml2 REQUIRED)
-find_package(CURL REQUIRED)
-find_package(Iconv REQUIRED)
+# find_package(LibArchive 3 REQUIRED)
+# find_package(LibXml2 REQUIRED)
+# find_package(CURL REQUIRED)
+# find_package(Iconv REQUIRED)
 # find_package(LIBCHARSET REQUIRED)
 find_package(Boost REQUIRED)
 
-if(DYNAMIC_LOAD_ENABLED AND NOT VCPKG)
-    find_package(LibXslt)
-else()
-    find_package(LibXslt REQUIRED)
-endif()
-
-if(LIBXSLT_FOUND)
-    add_compile_definitions(WITH_LIBXSLT)
-endif()
-
-# Setup ANTLR 2.7 library
-set(ANTLR_EXTERNAL ${CMAKE_EXTERNAL_SOURCE_DIR}/antlr-2.7.7)
-if(NOT EXISTS ${ANTLR_EXTERNAL})
-    set(ANTLR_URL https://www.antlr2.org/download/antlr-2.7.7.tar.gz)
-    message(STATUS "Download ${ANTLR_URL}")
-    file(DOWNLOAD ${ANTLR_URL} ${CMAKE_EXTERNAL_SOURCE_DIR}/antlr-2.7.7.tar.gz)
-    file(ARCHIVE_EXTRACT INPUT ${CMAKE_EXTERNAL_SOURCE_DIR}/antlr-2.7.7.tar.gz
-        DESTINATION ${CMAKE_EXTERNAL_SOURCE_DIR})
-
-    # Add needed include file for CharScanner.hpp
-    set(CHARSCANNER_HPP "${ANTLR_EXTERNAL}/lib/cpp/antlr/CharScanner.hpp")
-    file(READ ${CHARSCANNER_HPP} FILE_CONTENTS)
-    string(REPLACE "#include <antlr/config.hpp>" "#include <antlr/config.hpp>\n#include <string.h>" FILE_CONTENTS "${FILE_CONTENTS}")
-    file(WRITE ${CHARSCANNER_HPP} "${FILE_CONTENTS}")
-
-    # Remove pragma warning disable that is no longer valie
-    set(CONFIG_HPP "${ANTLR_EXTERNAL}/lib/cpp/antlr/config.hpp")
-    file(READ ${CONFIG_HPP} FILE_CONTENTS)
-    string(REPLACE "# pragma warning( disable : 4786 4231 )" "# pragma warning( disable : 4786 )" FILE_CONTENTS "${FILE_CONTENTS}")
-    file(WRITE ${CONFIG_HPP} "${FILE_CONTENTS}")
-
-    file(REMOVE ${CMAKE_EXTERNAL_SOURCE_DIR}/antlr-2.7.7.tar.gz)
-endif()
-
+# Forward declaration of ANTLR 2.7 library
 set(ANTLR_EXTERNAL ${CMAKE_EXTERNAL_SOURCE_DIR}/antlr-2.7.7)
 set(ANTLR_INCLUDE_DIR "${ANTLR_EXTERNAL}/lib/cpp/")
-
-# link_libraries(Boost::boost)
 include_directories(SYSTEM ${ANTLR_INCLUDE_DIR})
 
 # standard compile options
