@@ -19,6 +19,8 @@
 # 
 # CMake files for building from source
 
+set(CMAKE_CXX_STANDARD 11)
+
 option(SRCML_BUILD_USEPCH "Use PCH (PreCompiled Headers" OFF)
 
 # Big Sur and later OSX platforms can build for both x86 and arm64, so default to both
@@ -50,37 +52,7 @@ if(NOT DYNAMIC_LOAD_ENABLED)
     add_definitions(-DNO_DLLOAD)
 endif()
 
-set(CMAKE_CXX_STANDARD 11)
-
-# External code directory
-set(CMAKE_EXTERNAL_SOURCE_DIR ${CMAKE_BINARY_DIR}/external)
-
-if(MSVC)
-
-    # set(WINDOWS_DEP_PATH ${PROJECT_BINARY_DIR}/deps)
-
-    # # Download project dependencies
-    # set(WINDOWS_DEP_FILENAME VS2021_Dependencies-05-26-21.zip)
-    # # set(WINDOWS_DEP_FILENAME VS2017_Dependencies-06_20_18.zip)
-    # set(WINDOWS_DEP_URL http://www.sdml.cs.kent.edu/build/${WINDOWS_DEP_FILENAME})
-    # if (NOT EXISTS ${WINDOWS_DEP_PATH}/tools)
-    #     message("-- Download ${WINDOWS_DEP_URL}")
-    #     file(DOWNLOAD ${WINDOWS_DEP_URL} ${WINDOWS_DEP_FILENAME})
-    #     message("-- Unzip ${WINDOWS_DEP_URL} into ${WINDOWS_DEP_PATH}")
-    #     file(ARCHIVE_EXTRACT INPUT ${WINDOWS_DEP_FILENAME} DESTINATION ${PROJECT_BINARY_DIR})
-    #     file(REMOVE_RECURSE ${WINDOWS_DEP_PATH}/release/)
-    #     file(REMOVE_RECURSE ${WINDOWS_DEP_PATH}/debug/)
-    #     file(REMOVE_RECURSE ${WINDOWS_DEP_PATH}/tools/)
-    #     file(REMOVE_RECURSE ${WINDOWS_DEP_PATH}/include/)
-    # endif()
-
-    # # Use installed dependencies for find_*()
-    # list(APPEND CMAKE_PREFIX_PATH ${WINDOWS_DEP_PATH}/release
-    #                               ${WINDOWS_DEP_PATH}/release/lib
-    #                               ${WINDOWS_DEP_PATH}/release/bin
-    #                               ${WINDOWS_DEP_PATH}/include)
-
-elseif(APPLE AND NOT VCPKG)
+if(APPLE AND NOT VCPKG)
 
     # Detect brew directories on macOS
     execute_process(COMMAND brew --prefix
@@ -136,15 +108,11 @@ endif()
 set(CMAKE_INSTALL_SYSTEM_RUNTIME_COMPONENT SRCML)
 include(InstallRequiredSystemLibraries)
 
-# Locate packages
-# find_package(LibArchive 3 REQUIRED)
-# find_package(LibXml2 REQUIRED)
-# find_package(CURL REQUIRED)
-# find_package(Iconv REQUIRED)
-# find_package(LIBCHARSET REQUIRED)
+# Locate common packages
 find_package(Boost REQUIRED)
 
 # Forward declaration of ANTLR 2.7 library
+set(CMAKE_EXTERNAL_SOURCE_DIR ${CMAKE_BINARY_DIR}/external)
 set(ANTLR_EXTERNAL ${CMAKE_EXTERNAL_SOURCE_DIR}/antlr-2.7.7)
 set(ANTLR_INCLUDE_DIR "${ANTLR_EXTERNAL}/lib/cpp/")
 include_directories(SYSTEM ${ANTLR_INCLUDE_DIR})
