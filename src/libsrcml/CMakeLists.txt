@@ -57,11 +57,11 @@ endif()
 # Building static and dynamic libraries for srcML.
 add_library(libsrcml_static STATIC $<TARGET_OBJECTS:libsrcml>)
 set_target_properties(libsrcml_static PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-target_link_libraries(libsrcml_static PUBLIC libsrcml PRIVATE parser antlr)
+target_link_libraries(libsrcml_static PUBLIC libsrcml parser antlr)
 
 add_library(libsrcml_shared SHARED $<TARGET_OBJECTS:libsrcml>)
 set_target_properties(libsrcml_shared PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-target_link_libraries(libsrcml_shared PUBLIC libsrcml PRIVATE parser antlr)
+target_link_libraries(libsrcml_shared PUBLIC libsrcml parser antlr)
 
 if(WIN32)
     target_compile_options(libsrcml_shared PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${LIBXML2_INCLUDE_DIR})
