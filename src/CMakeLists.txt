@@ -92,6 +92,8 @@ if(APPLE AND NOT VCPKG)
         target_include_directories(libarchiveInclude INTERFACE ${libarchiveinclude_SOURCE_DIR})
         target_link_libraries(libarchiveInclude INTERFACE libarchiveInclude1)
 
+        set(LibArchive_INCLUDE_DIR "${libarchiveinclude_SOURCE_DIR}")
+
     # macOS versions before Catalina only have libarchive 2, and require homebrew
     # and use a static library
     elseif(BREW_RESULT EQUAL 0 AND EXISTS "${BREW_PREFIX}/opt/libarchive")
