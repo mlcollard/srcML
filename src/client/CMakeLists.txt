@@ -22,12 +22,14 @@
 # strip executables
 set(CPACK_STRIP_FILES ON)
  
-set(CMAKE_EXTERNAL_SOURCE_DIR ${CMAKE_BINARY_DIR}/external)
-
-set(CLI11_EXTERNAL ${CMAKE_EXTERNAL_SOURCE_DIR}/CLI11.hpp)
-if(NOT EXISTS ${CLI11_EXTERNAL})
-    file(DOWNLOAD https://github.com/CLIUtils/CLI11/releases/download/v1.8.0/CLI11.hpp ${CLI11_EXTERNAL})
-endif()
+include(FetchContent)
+FetchContent_Declare(cli11
+  URL https://github.com/CLIUtils/CLI11/releases/download/v1.8.0/CLI11.hpp
+  DOWNLOAD_NO_EXTRACT TRUE
+)
+FetchContent_MakeAvailable(cli11)
+add_library(cli11 INTERFACE IMPORTED)
+target_include_directories(cli11 INTERFACE ${cli11_SOURCE_DIR})
 
 # ctpl_stl external include
 include(FetchContent)
@@ -41,27 +43,13 @@ add_library(ctpl_stl INTERFACE IMPORTED)
 target_include_directories(ctpl_stl INTERFACE ${ctpl_stl_SOURCE_DIR})
 
 set(SRCML_LIBRARIES CACHE INTERNAL "Libraries needed to build srcml")
-
-# if(APPLE)
-#     # list(APPEND SRCML_LIBRARIES pthread)
-# elseif(NOT WIN32)
-#     # list(APPEND SRCML_LIBRARIES pthread)
-#     # list(APPEND SRCML_LIBRARIES crypto pthread)
-# # elseif(NOT CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-# #     list(APPEND SRCML_LIBRARIES ws2_32 crypto)
-# else()
-#     # list(APPEND SRCML_LIBRARIES ws2_32)
-# endif()
-
 # srcml executable
 file(GLOB CLIENT_SOURCE *.hpp *.cpp)
 add_executable(srcml ${CLIENT_SOURCE})
 
 # Add include files
 if(MSVC)
-    target_compile_options(srcml PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${CMAKE_EXTERNAL_SOURCE_DIR})
-else()
-    target_include_directories(srcml SYSTEM PRIVATE ${CMAKE_EXTERNAL_SOURCE_DIR})
+    target_compile_options(srcml PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${cli11_SOURCE_DIR})
 endif()
 target_include_directories(srcml BEFORE PRIVATE . ${CMAKE_SOURCE_DIR}/src/libsrcml)
 
@@ -71,7 +59,7 @@ if(SRCML_BUILD_USEPCH)
 endif()
 
 # Add coverage to default part of Debug
-target_link_libraries(srcml libsrcml_link LibArchive::LibArchive CURL::libcurl ctpl_stl ${SRCML_LIBRARIES})
+target_link_libraries(srcml libsrcml_link LibArchive::LibArchive CURL::libcurl cli11 ctpl_stl)
 if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND CMAKE_COMPILER_IS_GNUCXX)
     target_link_libraries(srcml gcov)
 endif()
