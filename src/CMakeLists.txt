@@ -249,7 +249,7 @@ include(FetchContent)
 FetchContent_Declare(TinySHA1
   GIT_REPOSITORY https://github.com/mohaps/tinysha1
   GIT_TAG        2795aa8de91b1797defdfbff61ed93b22b5ced81
-  GIT_SHALLOW    ON
+  GIT_SHALLOW    TRUE
 )
 FetchContent_MakeAvailable(TinySHA1)
 add_library(TinySHA1 INTERFACE IMPORTED)

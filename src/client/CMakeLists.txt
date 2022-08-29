@@ -28,10 +28,17 @@ set(CLI11_EXTERNAL ${CMAKE_EXTERNAL_SOURCE_DIR}/CLI11.hpp)
 if(NOT EXISTS ${CLI11_EXTERNAL})
     file(DOWNLOAD https://github.com/CLIUtils/CLI11/releases/download/v1.8.0/CLI11.hpp ${CLI11_EXTERNAL})
 endif()
-set(CTPL_EXTERNAL ${CMAKE_EXTERNAL_SOURCE_DIR}/ctpl_stl.h)
-if(NOT EXISTS ${CTPL_EXTERNAL})
-    file(DOWNLOAD https://raw.githubusercontent.com/vit-vit/CTPL/ctpl_v.0.0.2/ctpl_stl.h ${CTPL_EXTERNAL})
-endif()
+
+# ctpl_stl external include
+include(FetchContent)
+FetchContent_Declare(ctpl_stl
+  GIT_REPOSITORY https://github.com/vit-vit/CTPL.git
+  GIT_TAG        v.0.0.2
+  GIT_SHALLOW    TRUE
+)
+FetchContent_MakeAvailable(ctpl_stl)
+add_library(ctpl_stl INTERFACE IMPORTED)
+target_include_directories(ctpl_stl INTERFACE ${ctpl_stl_SOURCE_DIR})
 
 set(SRCML_LIBRARIES CACHE INTERNAL "Libraries needed to build srcml")
 
@@ -64,7 +71,7 @@ if(SRCML_BUILD_USEPCH)
 endif()
 
 # Add coverage to default part of Debug
-target_link_libraries(srcml libsrcml_link LibArchive::LibArchive CURL::libcurl ${SRCML_LIBRARIES})
+target_link_libraries(srcml libsrcml_link LibArchive::LibArchive CURL::libcurl ctpl_stl ${SRCML_LIBRARIES})
 if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND CMAKE_COMPILER_IS_GNUCXX)
     target_link_libraries(srcml gcov)
 endif()
