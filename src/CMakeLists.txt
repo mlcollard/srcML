@@ -144,19 +144,6 @@ find_package(Iconv REQUIRED)
 # find_package(LIBCHARSET REQUIRED)
 find_package(Boost REQUIRED)
 
-# The build uses $<TARGET_RUNTIME_DLLS:*> when the dependent libraries
-# are shipped with the application (e.g., on Windows). This work correctly
-# for direct dependents, but not for indirect dependents. So find the
-# packages so they can be added to the target
-if(VCPKG)
-    find_package(BZip2 REQUIRED)
-    find_package(LibLZMA REQUIRED)
-    find_package(ZLIB REQUIRED)
-
-    find_package(LZ4 REQUIRED)
-    find_package(Zstd REQUIRED)
-endif()
-
 if(DYNAMIC_LOAD_ENABLED AND NOT VCPKG)
     find_package(LibXslt)
 else()
