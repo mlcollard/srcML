@@ -43,7 +43,11 @@ add_library(libsrcml OBJECT ${LIBSRCML_SOURCE})
 target_include_directories(libsrcml BEFORE PRIVATE .)
 
 # libsrcml dependencies
-target_link_libraries(libsrcml PUBLIC LibXml2::LibXml2 Iconv::Iconv LibXslt::LibXslt LibXslt::LibExslt Boost::boost TinySHA1 pthread parser)
+if(MSVC)
+    target_link_libraries(libsrcml PUBLIC LibXml2::LibXml2 Iconv::Iconv LibXslt::LibXslt LibXslt::LibExslt Boost::boost TinySHA1 parser)
+else()
+    target_link_libraries(libsrcml PUBLIC LibXml2::LibXml2 Iconv::Iconv LibXslt::LibXslt LibXslt::LibExslt Boost::boost TinySHA1 pthread parser)
+endif()
 
 # precompiled header list of most commonly used
 if(SRCML_BUILD_USEPCH)
