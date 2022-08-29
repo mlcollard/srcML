@@ -20,7 +20,6 @@
 # CMake files for the library libsrcml
 
 # strip executables
-# Note: Does not seem to have an effect, so post-build strip is added
 set(CPACK_STRIP_FILES ON)
 
 if(DYNAMIC_LOAD_ENABLED)
@@ -41,14 +40,11 @@ endif()
 
 include_directories(BEFORE . ${CMAKE_SOURCE_DIR}/src/parser ${CMAKE_INSTALL_INCLUDEDIR})
 
-# Setup SHA1 include
-set(CMAKE_EXTERNAL_SOURCE_DIR ${CMAKE_BINARY_DIR}/external)
-
 # Building static and dynamic libraries for srcML.
 add_library(libsrcml_static STATIC $<TARGET_OBJECTS:parser> $<TARGET_OBJECTS:antlr> $<TARGET_OBJECTS:libsrcml>)
 set_target_properties(libsrcml_static PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 target_include_directories(libsrcml_static BEFORE PRIVATE . ${CMAKE_SOURCE_DIR}/src/parser)
-target_link_libraries(libsrcml_static PRIVATE LibXml2::LibXml2 Iconv::Iconv LibXslt::LibXslt LibXslt::LibExslt ${LIBSRCML_LIBRARIES} TinySHA1)
+target_link_libraries(libsrcml_static PRIVATE LibXml2::LibXml2 Iconv::Iconv LibXslt::LibXslt LibXslt::LibExslt pthread TinySHA1)
 if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND CMAKE_COMPILER_IS_GNUCXX)
     target_link_libraries(libsrcml_static PRIVATE gcov)
 endif()
@@ -61,7 +57,7 @@ if(WIN32)
     target_compile_options(parser PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${ANTLR_INCLUDE_DIR})
 endif()
 
-target_link_libraries(libsrcml_shared PUBLIC LibXml2::LibXml2 Iconv::Iconv LibXslt::LibXslt LibXslt::LibExslt ${LIBSRCML_LIBRARIES} TinySHA1)
+target_link_libraries(libsrcml_shared PUBLIC LibXml2::LibXml2 Iconv::Iconv LibXslt::LibXslt LibXslt::LibExslt pthread TinySHA1)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND CMAKE_COMPILER_IS_GNUCXX)
     target_link_libraries(libsrcml_shared PRIVATE gcov)
@@ -113,39 +109,26 @@ endif()
 file(GLOB LIBSRCML_SOURCE *.h *.hpp *.cpp)
 add_library(libsrcml OBJECT ${LIBSRCML_SOURCE})
 
-# generated source include files
-target_include_directories(libsrcml SYSTEM PRIVATE ${CMAKE_GENERATED_SOURCE_DIR})
+# Use the libsrcml/srcml.h rather than the /usr/local/include/srcml.h
+target_include_directories(libsrcml BEFORE PRIVATE .)
 
-# libsrcml directory and parser
-target_include_directories(libsrcml BEFORE PRIVATE . ${CMAKE_SOURCE_DIR}/src/parser)
-
-# external source directories
-target_include_directories(libsrcml PRIVATE ${CMAKE_EXTERNAL_SOURCE_DIR})
-
-target_link_libraries(libsrcml PRIVATE LibXml2::LibXml2 Iconv::Iconv LibXslt::LibXslt LibXslt::LibExslt TinySHA1)
+# Libsrcml dependencies
+target_link_libraries(libsrcml PRIVATE LibXml2::LibXml2 Iconv::Iconv LibXslt::LibXslt LibXslt::LibExslt TinySHA1 parser)
 
 # precompiled header list of most commonly used
 if(SRCML_BUILD_USEPCH)
     target_precompile_headers(libsrcml PRIVATE <srcmlns.hpp> <srcml_types.hpp> <srcml_sax2_utilities.hpp> <srcml_translator.hpp> <srcml_sax2_reader.hpp>)
 endif()
 
-# libsrcml depends on the parser
-add_dependencies(libsrcml parser)
-
 # install the libsrcml include file
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/srcml.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT DEVLIBS)
 
-# on Windows with vcpkg, install all the dlls that the vcpkg installed
+# On Windows with vcpkg, install all the dlls that the vcpkg installed
 # NOTE: Would be better to use $<TARGET_RUNTIME_DLLS:libsrcml_shared>, but that does not include
-# indirect dependencies, e.g., bzip2 for libarchive
+# indirect dependencies, e.g., bzip2 for libxml
 if(MSVC AND VCPKG)
     file(GLOB VCPKG_SRCML_DEPENDENCIES "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/bin/*${CMAKE_SHARED_LIBRARY_SUFFIX}")
     install(FILES ${VCPKG_SRCML_DEPENDENCIES} DESTINATION bin COMPONENT SRCML)
-endif()
-
-# strip libraries
-if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug" AND NOT APPLE AND NOT WIN32)
-    set_target_properties(libsrcml_shared PROPERTIES LINK_FLAGS_RELEASE -s)
 endif()
 
 # Run ldconfig for install (not cpack) on Ubuntu
