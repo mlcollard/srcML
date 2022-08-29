@@ -99,11 +99,11 @@ elseif(APPLE AND NOT VCPKG)
 
         # install via Apple opensource
         set(LIBARCHIVE_VERSION "libarchive-83.40.4")
-        set(LIBARCHIVE_URL "https://opensource.apple.com/source/libarchive/${LIBARCHIVE_VERSION}")
+        set(LIBARCHIVE_URL "https://opensource.apple.com/source/libarchive/${LIBARCHIVE_VERSION}/libarchive/libarchive")
 
         include(FetchContent)
         FetchContent_Declare(libarchiveInclude1
-            URL https://opensource.apple.com/source/libarchive/${LIBARCHIVE_URL}/libarchive/libarchive/archive.h
+            URL ${LIBARCHIVE_URL}/archive.h
             DOWNLOAD_NO_EXTRACT TRUE
         )
         FetchContent_MakeAvailable(libarchiveInclude1)
@@ -111,7 +111,7 @@ elseif(APPLE AND NOT VCPKG)
         target_include_directories(libarchiveInclude1 INTERFACE ${libarchiveinclude1_SOURCE_DIR})
 
         FetchContent_Declare(libarchiveInclude
-            URL https://opensource.apple.com/source/libarchive/${LIBARCHIVE_URL}/libarchive/libarchive/archive_entry.h
+            URL ${LIBARCHIVE_URL}/archive_entry.h
             SOURCE_DIR ${libarchiveinclude1_SOURCE_DIR}
             DOWNLOAD_NO_EXTRACT TRUE
         )
