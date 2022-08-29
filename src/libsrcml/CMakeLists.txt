@@ -144,14 +144,8 @@ if(MSVC AND VCPKG)
 endif()
 
 # strip libraries
-if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
-    if(APPLE)
-        add_custom_command(TARGET libsrcml_shared POST_BUILD
-            COMMAND /usr/bin/strip -x $<TARGET_FILE:libsrcml_shared>
-            COMMAND ${CMAKE_COMMAND} -E echo "-- Stripping $<TARGET_FILE:libsrcml_shared>")
-    elseif(NOT WIN32)
-        set_target_properties(libsrcml_shared PROPERTIES LINK_FLAGS_RELEASE -s)
-    endif()
+if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug" AND NOT APPLE AND NOT WIN32)
+    set_target_properties(libsrcml_shared PROPERTIES LINK_FLAGS_RELEASE -s)
 endif()
 
 # Run ldconfig for install (not cpack) on Ubuntu

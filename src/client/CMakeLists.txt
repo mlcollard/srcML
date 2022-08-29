@@ -42,7 +42,6 @@ FetchContent_MakeAvailable(ctpl_stl)
 add_library(ctpl_stl INTERFACE IMPORTED)
 target_include_directories(ctpl_stl INTERFACE ${ctpl_stl_SOURCE_DIR})
 
-set(SRCML_LIBRARIES CACHE INTERNAL "Libraries needed to build srcml")
 # srcml executable
 file(GLOB CLIENT_SOURCE *.hpp *.cpp)
 add_executable(srcml ${CLIENT_SOURCE})
@@ -64,24 +63,12 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND CMAKE_COMPILER_IS_GNUCXX)
     target_link_libraries(srcml gcov)
 endif()
 
-if(VCPKG)
-    target_link_libraries(srcml BZip2::BZip2 LibLZMA::LibLZMA ZLIB::ZLIB)
-endif()
-
 set_target_properties(srcml PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 if(APPLE)
     # Making the exported_symbols_list an empty file reduces size of executable, as strip does not work
     set_target_properties(srcml PROPERTIES LINK_FLAGS "-exported_symbols_list /dev/null")
 elseif(WIN32)
-    # @BUILD Why this when there is a MSVC case above?
     set_target_properties(srcml PROPERTIES LINK_FLAGS "-Wl,--allow-multiple-definition")
-endif()
-
-# strip macOS for release
-if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug" AND APPLE)
-    add_custom_command(TARGET srcml POST_BUILD
-        COMMAND /usr/bin/strip -x $<TARGET_FILE:srcml>
-        COMMAND ${CMAKE_COMMAND} -E echo "-- Stripping $<TARGET_FILE:srcml>")
 endif()
 
 # Dependencies are installed via libsrcml
