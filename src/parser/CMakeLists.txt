@@ -31,7 +31,22 @@ FetchContent_Declare(antlrsrc
     DOWNLOAD_EXTRACT_TIMESTAMP False
 )
 message("HERE3")
-FetchContent_MakeAvailable(antlrsrc)
+# FetchContent_MakeAvailable(antlrsrc)
+
+FetchContent_GetProperties(antlrsrc)
+
+message("HERE3b")
+if(NOT antlrsrc_POPULATED)
+  # Fetch the content using previously declared details
+  FetchContent_Populate(antlrsrc)
+
+message("HERE3c")
+  # Set custom variables, policies, etc.
+  # ...
+
+  # Bring the populated content into the build
+  # add_subdirectory(${antlrsrc_SOURCE_DIR} ${antlrsrc_BINARY_DIR})
+endif()
 
 message("HERE4")
 # Add needed include file for CharScanner.hpp
