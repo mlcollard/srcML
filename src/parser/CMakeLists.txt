@@ -26,38 +26,38 @@ message("HERE1")
 # Setup ANTLR 2.7 library
 include(FetchContent)
 message("HERE2")
-FetchContent_Declare(antlr
+FetchContent_Declare(antlrsrc
     URL "https://www.antlr2.org/download/antlr-2.7.7.tar.gz"
     DOWNLOAD_EXTRACT_TIMESTAMP False
 )
 message("HERE3")
-FetchContent_MakeAvailable(antlr)
+FetchContent_MakeAvailable(antlrsrc)
 
 message("HERE4")
 # Add needed include file for CharScanner.hpp
-set(CHARSCANNER_HPP "${antlr_SOURCE_DIR}/lib/cpp/antlr/CharScanner.hpp")
+set(CHARSCANNER_HPP "${antlrsrc_SOURCE_DIR}/lib/cpp/antlr/CharScanner.hpp")
 file(READ ${CHARSCANNER_HPP} FILE_CONTENTS)
 string(REPLACE "#include <antlr/config.hpp>" "#include <antlr/config.hpp>\n#include <string.h>" FILE_CONTENTS "${FILE_CONTENTS}")
 file(WRITE ${CHARSCANNER_HPP} "${FILE_CONTENTS}")
 
 # Remove pragma warning disable that is no longer valid
-set(CONFIG_HPP "${antlr_SOURCE_DIR}/lib/cpp/antlr/config.hpp")
+set(CONFIG_HPP "${antlrsrc_SOURCE_DIR}/lib/cpp/antlr/config.hpp")
 file(READ ${CONFIG_HPP} FILE_CONTENTS)
 string(REPLACE "# pragma warning( disable : 4786 4231 )" "# pragma warning( disable : 4786 )" FILE_CONTENTS "${FILE_CONTENTS}")
 file(WRITE ${CONFIG_HPP} "${FILE_CONTENTS}")
 
 # antlr library
-file(GLOB ANTLR_SOURCE ${antlr_SOURCE_DIR}/lib/cpp/src/*.cpp)
-list(REMOVE_ITEM ANTLR_SOURCE "${antlr_SOURCE_DIR}/lib/cpp/src/dll.cpp")
+file(GLOB ANTLR_SOURCE ${antlrsrc_SOURCE_DIR}/lib/cpp/src/*.cpp)
+list(REMOVE_ITEM ANTLR_SOURCE "${antlrsrc_SOURCE_DIR}/lib/cpp/src/dll.cpp")
 message("ANTLR_SOURCE: ${ANTLR_SOURCE}")
 add_library(antlr OBJECT "${ANTLR_SOURCE}")
-target_include_directories(antlr PUBLIC "${antlr_SOURCE_DIR}/lib/cpp/" PRIVATE "${antlr_SOURCE_DIR}/lib/cpp/")
+target_include_directories(antlr PUBLIC "${antlrsrc_SOURCE_DIR}/lib/cpp/" PRIVATE "${antlrsrc_SOURCE_DIR}/lib/cpp/")
 
 # Generated source from antlr and the parser
 set(CMAKE_GENERATED_SOURCE_DIR ${CMAKE_BINARY_DIR}/parser)
 
 # Find antlr runtime
-set(ANTLR_EXE java -classpath "${antlr_SOURCE_DIR}/antlr.jar" antlr.Tool)
+set(ANTLR_EXE java -classpath "${antlrsrc_SOURCE_DIR}/antlr.jar" antlr.Tool)
 message("-- ANTLR: ${ANTLR_EXE}")
 
 # parser library
@@ -70,7 +70,7 @@ add_library(parser OBJECT
 )
 target_link_libraries(parser PRIVATE LibXml2::LibXml2 Boost::boost TinySHA1 antlr)
 target_include_directories(parser PRIVATE . ${CMAKE_GENERATED_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/src/libsrcml PUBLIC . ${CMAKE_GENERATED_SOURCE_DIR})
-target_include_directories(parser SYSTEM PUBLIC ${antlr_SOURCE_DIR}/lib/cpp)
+target_include_directories(parser SYSTEM PUBLIC ${antlrsrc_SOURCE_DIR}/lib/cpp)
 
 # 
 # RunAntlr
