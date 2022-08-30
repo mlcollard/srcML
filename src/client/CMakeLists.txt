@@ -51,7 +51,7 @@ add_executable(srcml ${CLIENT_SOURCE})
 
 # Add include files
 if(MSVC)
-    target_compile_options(srcml PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${cli11_SOURCE_DIR})
+    # target_compile_options(srcml PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${cli11_SOURCE_DIR})
 endif()
 target_include_directories(srcml BEFORE PRIVATE . ${CMAKE_SOURCE_DIR}/src/libsrcml)
 
