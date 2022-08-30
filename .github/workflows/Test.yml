@@ -32,14 +32,11 @@ jobs:
         shell: bash
         run: |
           mkdir build
-          diff --version
 
       - name: CMake Setup on Windows
         shell: bash
         working-directory: build
         run: |
-          echo "HERE: " $VCPKG_INSTALLED_DIR
-          ls -lh $VCPKG_INSTALLED_DIR
           export UseMultiToolTask=true
           cmake .. -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake -DCMAKE_CXX_COMPILER=cl -DCMAKE_C_COMPILER=cl -DDYNAMIC_LOAD_ENABLED=OFF -G "Ninja Multi-Config"
 

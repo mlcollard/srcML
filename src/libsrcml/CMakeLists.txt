@@ -60,7 +60,10 @@ set_target_properties(libsrcml_static PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAK
 target_link_libraries(libsrcml_static PUBLIC libsrcml parser antlr)
 
 add_library(libsrcml_shared SHARED $<TARGET_OBJECTS:libsrcml>)
-set_target_properties(libsrcml_shared PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set_target_properties(libsrcml_shared PROPERTIES
+    ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 target_link_libraries(libsrcml_shared PUBLIC libsrcml parser antlr)
 
 if(WIN32)
