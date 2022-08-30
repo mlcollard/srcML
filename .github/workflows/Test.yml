@@ -100,30 +100,30 @@ jobs:
           echo "b;" >> b.cpp
           "$SRCML" a.cpp b.cpp
 
-      - name: Setup msys2 with additional client-test packages for Windows
-        uses: msys2/setup-msys2@v2
-        with:
-          install: >-
-            zip
-            cpio
-            diffutils
-            cmake
-            util-linux
-            libxml2
+      # - name: Setup msys2 with additional client-test packages for Windows
+      #   uses: msys2/setup-msys2@v2
+      #   with:
+      #     install: >-
+      #       zip
+      #       cpio
+      #       diffutils
+      #       cmake
+      #       util-linux
+      #       libxml2
 
-      - name: Windows Client Tests on Installed srcml
-        shell: msys2 {0}
-        working-directory: build
-        timeout-minutes: 10
-        continue-on-error: true
-        run: |
-          export SRCML_HOME="/c/Program Files/srcML/bin/"
-          ctest -C Release -VV
+      # - name: Windows Client Tests on Installed srcml
+      #   shell: msys2 {0}
+      #   working-directory: build
+      #   timeout-minutes: 10
+      #   continue-on-error: true
+      #   run: |
+      #     export SRCML_HOME="/c/Program Files/srcML/bin/"
+      #     ctest -C Release -VV
 
-      - uses: actions/upload-artifact@v3
-        with:
-          name: ClientTest.windows-latest.log
-          path: build/Testing/Temporary/LastTest.log
+      # - uses: actions/upload-artifact@v3
+      #   with:
+      #     name: ClientTest.windows-latest.log
+      #     path: build/Testing/Temporary/LastTest.log
 
       - name: Build libsrcml Tests
         shell: bash
@@ -133,14 +133,16 @@ jobs:
           export UseMultiToolTask=true
           cmake .. -DBUILD_LIBSRCML_TESTS=ON
           cmake --build . --config Release --target build_libsrcml_tests
-          dumpbin /dependents bin\Release\test_srcml_read_unit.exe
 
       - name: Check dependents
         shell: bash
         working-directory: build
         continue-on-error: true
         run: |
-          dumpbin /dependents bin\Release\test_srcml_read_unit.exe
+          dumpbin -dependents bin/Release/srcml.exe
+          dumpbin -dependents bin/Release/libsrcml.dll
+          dumpbin -exports bin/Release/libsrcml.dll
+          dumpbin -dependents bin/Release/test_srcml_read_unit.exe
 
       - name: Run libsrcml Tests on Installed libsrcml
         shell: bash
