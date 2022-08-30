@@ -111,12 +111,6 @@ include(InstallRequiredSystemLibraries)
 # Locate common packages
 find_package(Boost REQUIRED)
 
-# Forward declaration of ANTLR 2.7 library
-set(CMAKE_EXTERNAL_SOURCE_DIR ${CMAKE_BINARY_DIR}/external)
-set(ANTLR_EXTERNAL ${CMAKE_EXTERNAL_SOURCE_DIR}/antlr-2.7.7)
-set(ANTLR_INCLUDE_DIR "${ANTLR_EXTERNAL}/lib/cpp/")
-include_directories(SYSTEM ${ANTLR_INCLUDE_DIR})
-
 # standard compile options
 add_compile_options(
     $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-fPIC>
