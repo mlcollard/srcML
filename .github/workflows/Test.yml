@@ -135,6 +135,13 @@ jobs:
           cmake --build . --config Release --target build_libsrcml_tests
           dumpbin /dependents bin\Release\test_srcml_read_unit.exe
 
+      - name: Check dependents
+        shell: bash
+        working-directory: build
+        continue-on-error: true
+        run: |
+          dumpbin /dependents bin\Release\test_srcml_read_unit.exe
+
       - name: Run libsrcml Tests on Installed libsrcml
         shell: bash
         working-directory: build
