@@ -69,37 +69,40 @@ if(APPLE AND NOT VCPKG)
     string(SUBSTRING ${CMAKE_SYSTEM_VERSION} 0 2 OS_VERSION)
     if(NOT SRCML_BUILD_BREW_LIBARCHIVE AND OS_VERSION GREATER_EQUAL "19")
 
-        # install via Apple opensource
+        message("Apple open-source")
+        # fetch via Apple opensource
         set(LIBARCHIVE_VERSION "libarchive-83.40.4")
         set(LIBARCHIVE_URL "https://opensource.apple.com/source/libarchive/${LIBARCHIVE_VERSION}/libarchive/libarchive")
-
         include(FetchContent)
         FetchContent_Declare(libarchiveInclude1
             URL ${LIBARCHIVE_URL}/archive.h
             DOWNLOAD_NO_EXTRACT TRUE
         )
         FetchContent_MakeAvailable(libarchiveInclude1)
-        add_library(libarchiveInclude1 INTERFACE IMPORTED)
-        target_include_directories(libarchiveInclude1 INTERFACE ${libarchiveinclude1_SOURCE_DIR})
-
         FetchContent_Declare(libarchiveInclude
             URL ${LIBARCHIVE_URL}/archive_entry.h
             SOURCE_DIR ${libarchiveinclude1_SOURCE_DIR}
             DOWNLOAD_NO_EXTRACT TRUE
         )
         FetchContent_MakeAvailable(libarchiveInclude)
-        add_library(libarchiveInclude INTERFACE IMPORTED)
-        target_include_directories(libarchiveInclude INTERFACE ${libarchiveinclude_SOURCE_DIR})
-        target_link_libraries(libarchiveInclude INTERFACE libarchiveInclude1)
 
+        # Record so that LibArchive::LibArchive finds the headers
         set(LibArchive_INCLUDE_DIR "${libarchiveinclude_SOURCE_DIR}")
+        unset(libarchiveInclude1)
+        unset(libarchiveInclude)
+        unset(LIBARCHIVE_VERSION)
+        unset(LIBARCHIVE_URL)
 
     # macOS versions before Catalina only have libarchive 2, and require homebrew
     # and use a static library
     elseif(BREW_RESULT EQUAL 0 AND EXISTS "${BREW_PREFIX}/opt/libarchive")
 
+        list(APPEND CMAKE_PREFIX_PATH "${BREW_PREFIX}/opt/libarchive")
+
     else()
+
         message(FATAL_ERROR "LibArchive >= 3 is required. Install via homebrew\n% brew install libarchive\n")
+
     endif()
 
 endif()
