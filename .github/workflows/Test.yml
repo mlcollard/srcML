@@ -38,7 +38,7 @@ jobs:
         working-directory: build
         run: |
           export UseMultiToolTask=true
-          cmake .. -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake -DCMAKE_CXX_COMPILER=cl -DCMAKE_C_COMPILER=cl -DDYNAMIC_LOAD_ENABLED=OFF -G "Ninja Multi-Config"
+          cmake .. -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake -DCMAKE_CXX_COMPILER=cl -DCMAKE_C_COMPILER=cl -DDYNAMIC_LOAD_ENABLED=OFF -G "Ninja Multi-Config"
 
       - name: Build
         shell: bash
@@ -136,10 +136,10 @@ jobs:
         working-directory: build
         continue-on-error: true
         run: |
-          dumpbin -dependents bin/Release/srcml.exe
-          dumpbin -dependents bin/Release/libsrcml.dll
-          dumpbin -exports bin/Release/libsrcml.dll
-          dumpbin -dependents bin/Release/test_srcml_read_unit.exe
+          dumpbin -dependents bin/Release/srcml.exe || true
+          dumpbin -dependents bin/Release/libsrcml.dll || true
+          dumpbin -exports bin/Release/libsrcml.dll || true
+          dumpbin -dependents bin/Release/test_srcml_read_unit.exe || true
 
       - name: Run libsrcml Tests on Installed libsrcml
         shell: bash
