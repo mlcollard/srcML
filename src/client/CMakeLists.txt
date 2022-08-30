@@ -48,18 +48,15 @@ target_include_directories(ctpl_stl INTERFACE ${ctpl_stl_SOURCE_DIR})
 # srcml executable
 file(GLOB CLIENT_SOURCE *.hpp *.cpp)
 add_executable(srcml ${CLIENT_SOURCE})
-
-# Add include files
 target_include_directories(srcml BEFORE PRIVATE . ${CMAKE_SOURCE_DIR}/src/libsrcml)
+target_link_libraries(srcml libsrcml_link LibArchive::LibArchive CURL::libcurl Boost::boost cli11 ctpl_stl)
+set_target_properties(srcml PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # Largest impace for PCH builds of the client
 if(SRCML_BUILD_USEPCH)
     target_precompile_headers(srcml PRIVATE <srcml_cli.hpp> <srcml_input_src.hpp> <srcml_pipe.hpp> <ParseQueue.hpp> <src_input_libarchive.hpp> <SRCMLStatus.hpp> <WriteQueue.hpp> <ParseRequest.hpp> <TraceLog.hpp> <curl/curl.h>)
 endif()
 
-target_link_libraries(srcml libsrcml_link LibArchive::LibArchive CURL::libcurl Boost::boost cli11 ctpl_stl)
-
-set_target_properties(srcml PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 if(APPLE)
     # Making the exported_symbols_list an empty file reduces size of executable, as strip does not work
     set_target_properties(srcml PROPERTIES LINK_FLAGS "-exported_symbols_list /dev/null")

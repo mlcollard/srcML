@@ -23,17 +23,8 @@
 set(CPACK_STRIP_FILES ON)
 
 find_package(LibXml2 REQUIRED)
+find_package(LibXslt REQUIRED)
 find_package(Iconv REQUIRED)
-
-if(DYNAMIC_LOAD_ENABLED AND NOT VCPKG)
-    find_package(LibXslt)
-else()
-    find_package(LibXslt REQUIRED)
-endif()
-
-if(LIBXSLT_FOUND)
-    add_compile_definitions(WITH_LIBXSLT)
-endif()
 
 # libsrcml library
 file(GLOB LIBSRCML_SOURCE *.h *.hpp *.cpp)

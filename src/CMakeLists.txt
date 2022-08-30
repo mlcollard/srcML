@@ -43,10 +43,6 @@ if(CLANG_TIME_TRACE)
     add_compile_options(-ftime-trace)
 endif()
 
-if(NOT DYNAMIC_LOAD_ENABLED)
-    add_definitions(-DNO_DLLOAD)
-endif()
-
 if(APPLE AND NOT VCPKG)
 
     # Detect brew directories on macOS
@@ -92,6 +88,7 @@ if(APPLE AND NOT VCPKG)
     # and use a static library
     elseif(BREW_RESULT EQUAL 0 AND EXISTS "${BREW_PREFIX}/opt/libarchive")
 
+        # Make sure LibArchive::LibArchive looks a brew first
         list(APPEND CMAKE_PREFIX_PATH "${BREW_PREFIX}/opt/libarchive")
 
     else()
