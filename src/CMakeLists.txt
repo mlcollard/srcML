@@ -157,14 +157,6 @@ if(NOT ENABLE_BUILD_WARNINGS)
     )
 endif()
 
-if(MSVC)
-    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-        add_compile_options("/Od")
-        add_compile_options("/Zi")
-        add_compile_options("/MDd")
-    endif()
-endif()
-
 # TinySHA1 external include
 include(FetchContent)
 FetchContent_Declare(TinySHA1
