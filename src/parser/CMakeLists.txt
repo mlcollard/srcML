@@ -27,8 +27,7 @@ message("HERE1")
 include(FetchContent)
 message("HERE2")
 FetchContent_Declare(antlrsrc
-    URL "https://www.antlr2.org/download/antlr-2.7.7.tar.gz"
-    DOWNLOAD_EXTRACT_TIMESTAMP False
+    URL https://www.antlr2.org/download/antlr-2.7.7.tar.gz
 )
 message("HERE3")
 # FetchContent_MakeAvailable(antlrsrc)
