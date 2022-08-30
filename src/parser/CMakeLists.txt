@@ -23,41 +23,49 @@ find_package(LibXml2 REQUIRED)
 find_package(Iconv REQUIRED)
 
 # Setup ANTLR 2.7 library
-set(ANTLR_EXTERNAL ${CMAKE_EXTERNAL_SOURCE_DIR}/antlr-2.7.7)
-if(NOT EXISTS ${ANTLR_EXTERNAL})
-    set(ANTLR_URL https://www.antlr2.org/download/antlr-2.7.7.tar.gz)
-    message(STATUS "Download ${ANTLR_URL}")
-    file(DOWNLOAD ${ANTLR_URL} ${CMAKE_EXTERNAL_SOURCE_DIR}/antlr-2.7.7.tar.gz)
-    file(ARCHIVE_EXTRACT INPUT ${CMAKE_EXTERNAL_SOURCE_DIR}/antlr-2.7.7.tar.gz
-        DESTINATION ${CMAKE_EXTERNAL_SOURCE_DIR})
+include(FetchContent)
+FetchContent_Declare(antlr
+    URL https://www.antlr2.org/download/antlr-2.7.7.tar.gz
+    DOWNLOAD_EXTRACT_TIMESTAMP False
+)
+FetchContent_MakeAvailable(antlr)
 
-    # Add needed include file for CharScanner.hpp
-    set(CHARSCANNER_HPP "${ANTLR_EXTERNAL}/lib/cpp/antlr/CharScanner.hpp")
-    file(READ ${CHARSCANNER_HPP} FILE_CONTENTS)
-    string(REPLACE "#include <antlr/config.hpp>" "#include <antlr/config.hpp>\n#include <string.h>" FILE_CONTENTS "${FILE_CONTENTS}")
-    file(WRITE ${CHARSCANNER_HPP} "${FILE_CONTENTS}")
+# Add needed include file for CharScanner.hpp
+set(CHARSCANNER_HPP "${antlr_SOURCE_DIR}/lib/cpp/antlr/CharScanner.hpp")
+file(READ ${CHARSCANNER_HPP} FILE_CONTENTS)
+string(REPLACE "#include <antlr/config.hpp>" "#include <antlr/config.hpp>\n#include <string.h>" FILE_CONTENTS "${FILE_CONTENTS}")
+file(WRITE ${CHARSCANNER_HPP} "${FILE_CONTENTS}")
 
-    # Remove pragma warning disable that is no longer valie
-    set(CONFIG_HPP "${ANTLR_EXTERNAL}/lib/cpp/antlr/config.hpp")
-    file(READ ${CONFIG_HPP} FILE_CONTENTS)
-    string(REPLACE "# pragma warning( disable : 4786 4231 )" "# pragma warning( disable : 4786 )" FILE_CONTENTS "${FILE_CONTENTS}")
-    file(WRITE ${CONFIG_HPP} "${FILE_CONTENTS}")
+# Remove pragma warning disable that is no longer valid
+set(CONFIG_HPP "${antlr_SOURCE_DIR}/lib/cpp/antlr/config.hpp")
+file(READ ${CONFIG_HPP} FILE_CONTENTS)
+string(REPLACE "# pragma warning( disable : 4786 4231 )" "# pragma warning( disable : 4786 )" FILE_CONTENTS "${FILE_CONTENTS}")
+file(WRITE ${CONFIG_HPP} "${FILE_CONTENTS}")
 
-    file(REMOVE ${CMAKE_EXTERNAL_SOURCE_DIR}/antlr-2.7.7.tar.gz)
-endif()
-
-set(ANTLR_EXTERNAL ${CMAKE_EXTERNAL_SOURCE_DIR}/antlr-2.7.7)
-set(ANTLR_INCLUDE_DIR "${ANTLR_EXTERNAL}/lib/cpp/")
-
-include_directories(SYSTEM ${ANTLR_INCLUDE_DIR})
-include_directories(${CMAKE_SOURCE_DIR}/src/libsrcml)
+# antlr library
+file(GLOB ANTLR_SOURCE ${antlr_SOURCE_DIR}/lib/cpp/src/*.cpp)
+list(REMOVE_ITEM ANTLR_SOURCE "${antlr_SOURCE_DIR}/lib/cpp/src/dll.cpp")
+add_library(antlr OBJECT "${ANTLR_SOURCE}")
+target_include_directories(antlr PUBLIC "${antlr_SOURCE_DIR}/lib/cpp/" PRIVATE "${antlr_SOURCE_DIR}/lib/cpp/")
 
 # Generated source from antlr and the parser
 set(CMAKE_GENERATED_SOURCE_DIR ${CMAKE_BINARY_DIR}/parser)
 
 # Find antlr runtime
-set(ANTLR_EXE java -classpath "${ANTLR_EXTERNAL}/antlr.jar" antlr.Tool)
+set(ANTLR_EXE java -classpath "${antlr_SOURCE_DIR}/antlr.jar" antlr.Tool)
 message("-- ANTLR: ${ANTLR_EXE}")
+
+# parser library
+file(GLOB PARSER_SOURCE *.hpp *.cpp)
+add_library(parser OBJECT
+    ${CMAKE_GENERATED_SOURCE_DIR}/srcMLParser.cpp
+    ${CMAKE_GENERATED_SOURCE_DIR}/KeywordLexer.cpp
+    ${CMAKE_GENERATED_SOURCE_DIR}/CommentTextLexer.cpp
+    ${PARSER_SOURCE}
+)
+target_link_libraries(parser PRIVATE LibXml2::LibXml2 Boost::boost TinySHA1 antlr)
+target_include_directories(parser PRIVATE . ${CMAKE_GENERATED_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/src/libsrcml PUBLIC . ${CMAKE_GENERATED_SOURCE_DIR})
+target_include_directories(parser SYSTEM PUBLIC ${antlr_SOURCE_DIR}/lib/cpp)
 
 # 
 # RunAntlr
@@ -142,17 +150,6 @@ RunAntlr("${srcMLParserOutputFiles}"
     "OperatorLexer.g\;KeywordLexer.g\;TextLexer.g"
 )
 
-# parser library
-file(GLOB PARSER_SOURCE *.hpp *.cpp)
-add_library(parser OBJECT
-    ${CMAKE_GENERATED_SOURCE_DIR}/srcMLParser.cpp
-    ${CMAKE_GENERATED_SOURCE_DIR}/KeywordLexer.cpp
-    ${CMAKE_GENERATED_SOURCE_DIR}/CommentTextLexer.cpp
-    ${PARSER_SOURCE}
-)
-target_link_libraries(parser PRIVATE LibXml2::LibXml2 Boost::boost TinySHA1 INTERFACE antlr)
-target_include_directories(parser PUBLIC . ${CMAKE_GENERATED_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/src/libsrcml)
-
 if(SRCML_BUILD_USEPCH)
     target_precompile_headers(parser PRIVATE <srcMLParser.hpp> <CommentTextLexer.hpp> <ModeStack.hpp> <Language.hpp>)
     if(NOT MSVC)
@@ -160,18 +157,11 @@ if(SRCML_BUILD_USEPCH)
     endif()
 endif()
 
-# antlr library
-# Assume all C++ source files are parser
-file(GLOB ANTLR_SOURCE ${ANTLR_EXTERNAL}/lib/cpp/src/*.cpp)
-list(REMOVE_ITEM ANTLR_SOURCE "${ANTLR_EXTERNAL}/lib/cpp/src/dll.cpp")
-add_library(antlr OBJECT ${ANTLR_SOURCE})
-
 if(MSVC)
     # target_compile_options(parser PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${LIBXML2_INCLUDE_DIR})
     # target_compile_options(parser PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${Boost_INCLUDE_DIR})
     # target_compile_options(parser PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${ANTLR_INCLUDE_DIR})
-    target_compile_options(parser PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${CMAKE_GENERATED_SOURCE_DIR})
-    target_compile_options(parser PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${ANTLR_INCLUDE_DIR})
+    # target_compile_options(parser PRIVATE ${CMAKE_INCLUDE_SYSTEM_FLAG_CXX}${CMAKE_GENERATED_SOURCE_DIR})
 endif()
 
 option(ENABLE_ANTLR_BUILD_WARNINGS "Enable disabled antlr library build warnings" OFF)
