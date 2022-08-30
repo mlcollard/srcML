@@ -45,6 +45,7 @@ file(WRITE ${CONFIG_HPP} "${FILE_CONTENTS}")
 # antlr library
 file(GLOB ANTLR_SOURCE ${antlr_SOURCE_DIR}/lib/cpp/src/*.cpp)
 list(REMOVE_ITEM ANTLR_SOURCE "${antlr_SOURCE_DIR}/lib/cpp/src/dll.cpp")
+message("ANTLR_SOURCE: ${ANTLR_SOURCE}")
 add_library(antlr OBJECT "${ANTLR_SOURCE}")
 target_include_directories(antlr PUBLIC "${antlr_SOURCE_DIR}/lib/cpp/" PRIVATE "${antlr_SOURCE_DIR}/lib/cpp/")
 
