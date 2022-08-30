@@ -43,11 +43,6 @@ if(CLANG_TIME_TRACE)
     add_compile_options(-ftime-trace)
 endif()
 
-if(NOT CMAKE_INCLUDE_SYSTEM_FLAG_CXX)
-    set(CMAKE_INCLUDE_SYSTEM_FLAG_CXX /external:I)
-    add_compile_options(/external:W0)
-endif()
-
 if(NOT DYNAMIC_LOAD_ENABLED)
     add_definitions(-DNO_DLLOAD)
 endif()
