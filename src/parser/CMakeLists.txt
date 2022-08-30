@@ -22,14 +22,18 @@
 find_package(LibXml2 REQUIRED)
 find_package(Iconv REQUIRED)
 
+message("HERE1")
 # Setup ANTLR 2.7 library
 include(FetchContent)
+message("HERE2")
 FetchContent_Declare(antlr
-    URL https://www.antlr2.org/download/antlr-2.7.7.tar.gz
+    URL "https://www.antlr2.org/download/antlr-2.7.7.tar.gz"
     DOWNLOAD_EXTRACT_TIMESTAMP False
 )
+message("HERE3")
 FetchContent_MakeAvailable(antlr)
 
+message("HERE4")
 # Add needed include file for CharScanner.hpp
 set(CHARSCANNER_HPP "${antlr_SOURCE_DIR}/lib/cpp/antlr/CharScanner.hpp")
 file(READ ${CHARSCANNER_HPP} FILE_CONTENTS)
