@@ -43,6 +43,9 @@ if(CLANG_TIME_TRACE)
     add_compile_options(-ftime-trace)
 endif()
 
+# For macOS Catalina and more recent, the provided libarchive is at least version 3.3
+# and all that is needed is the matching header files.
+# For earlier versions of macOS, brew must be used with a more recent libarchive.a
 if(APPLE AND NOT VCPKG)
 
     # Detect brew directories on macOS
@@ -60,7 +63,6 @@ if(APPLE AND NOT VCPKG)
     string(SUBSTRING ${CMAKE_SYSTEM_VERSION} 0 2 OS_VERSION)
     if(NOT SRCML_BUILD_BREW_LIBARCHIVE AND OS_VERSION GREATER_EQUAL "19")
 
-        message("Apple open-source")
         # fetch via Apple opensource
         set(LIBARCHIVE_VERSION "libarchive-83.40.4")
         set(LIBARCHIVE_URL "https://opensource.apple.com/source/libarchive/${LIBARCHIVE_VERSION}/libarchive/libarchive")
@@ -79,6 +81,7 @@ if(APPLE AND NOT VCPKG)
 
         # Record so that LibArchive::LibArchive finds the headers
         set(LibArchive_INCLUDE_DIR "${libarchiveinclude_SOURCE_DIR}")
+
         unset(libarchiveInclude1)
         unset(libarchiveInclude)
         unset(LIBARCHIVE_VERSION)
@@ -100,12 +103,10 @@ if(APPLE AND NOT VCPKG)
 endif()
 
 # For Windows, install redist exe
-# set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_NO_WARNINGS TRUE)
-# set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
 set(CMAKE_INSTALL_SYSTEM_RUNTIME_COMPONENT SRCML)
 include(InstallRequiredSystemLibraries)
 
-# Locate common packages
+# boost::optional is used throughout the source
 find_package(Boost REQUIRED)
 
 # standard compile options
@@ -122,7 +123,7 @@ add_compile_options(
 )
 
 # specific warnings
-option(ENABLE_BUILD_WARNINGS "Enable disabled build warnings" OFF)
+option(ENABLE_BUILD_WARNINGS "Enable build warnings" OFF)
 if(NOT ENABLE_BUILD_WARNINGS)
     add_compile_options(
         $<$<CXX_COMPILER_ID:MSVC>:/wd4068> # unknown pragma
@@ -147,6 +148,9 @@ if(NOT ENABLE_BUILD_WARNINGS)
         $<$<CXX_COMPILER_ID:MSVC>:/wd5045> # Compiler will insert Spectre mitigation for memory load if /Qspectre switch specified
     )
 endif()
+
+# CMake 3.24 URL download timestamp
+cmake_policy(SET CMP0135 NEW)
 
 # TinySHA1 external include
 include(FetchContent)
