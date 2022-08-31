@@ -150,7 +150,9 @@ if(NOT ENABLE_BUILD_WARNINGS)
 endif()
 
 # CMake 3.24 URL download timestamp
-cmake_policy(SET CMP0135 NEW)
+if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.24")
+    cmake_policy(SET CMP0135 NEW)
+endif()
 
 # TinySHA1 external include
 include(FetchContent)
