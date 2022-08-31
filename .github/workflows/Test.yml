@@ -38,7 +38,7 @@ jobs:
         working-directory: build
         run: |
           export UseMultiToolTask=true
-          cmake .. -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake -DCMAKE_CXX_COMPILER=cl -DCMAKE_C_COMPILER=cl -DDYNAMIC_LOAD_ENABLED=OFF -G "Ninja Multi-Config"
+          cmake .. -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake -DCMAKE_CXX_COMPILER=cl -DCMAKE_C_COMPILER=cl -G "Ninja Multi-Config"
 
       - name: Build
         shell: bash
@@ -62,12 +62,18 @@ jobs:
           name: srcML-Win
           path: build/dist/srcML-Win.msi
 
-      - working-directory: build/dist
+      - name: Install package
+        working-directory: build/dist
         run: msiexec /i D:\a\srcML\srcML\build\dist\srcML-Win.msi /quiet /norestart /L*vx .\msi.log
       - uses: actions/upload-artifact@v3
         with:
           name: msi.log
           path: build/dist/msi.log
+
+      - name: Clean build
+        working-directory: build
+        run: |
+          cmake --build . --config Release clean
 
       - name: Set PATH for Windows
         shell: bash
@@ -97,30 +103,30 @@ jobs:
           echo "b;" >> b.cpp
           "$SRCML" a.cpp b.cpp
 
-      # - name: Setup msys2 with additional client-test packages for Windows
-      #   uses: msys2/setup-msys2@v2
-      #   with:
-      #     install: >-
-      #       zip
-      #       cpio
-      #       diffutils
-      #       cmake
-      #       util-linux
-      #       libxml2
+      - name: Setup msys2 with additional client-test packages for Windows
+        uses: msys2/setup-msys2@v2
+        with:
+          install: >-
+            zip
+            cpio
+            diffutils
+            cmake
+            util-linux
+            libxml2
 
-      # - name: Windows Client Tests on Installed srcml
-      #   shell: msys2 {0}
-      #   working-directory: build
-      #   timeout-minutes: 10
-      #   continue-on-error: true
-      #   run: |
-      #     export SRCML_HOME="/c/Program Files/srcML/bin/"
-      #     ctest -C Release -VV
+      - name: Windows Client Tests on Installed srcml
+        shell: msys2 {0}
+        working-directory: build
+        timeout-minutes: 10
+        continue-on-error: true
+        run: |
+          export SRCML_HOME="/c/Program Files/srcML/bin/"
+          ctest -C Release -VV
 
-      # - uses: actions/upload-artifact@v3
-      #   with:
-      #     name: ClientTest.windows-latest.log
-      #     path: build/Testing/Temporary/LastTest.log
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ClientTest.windows-latest.log
+          path: build/Testing/Temporary/LastTest.log
 
       - name: Build libsrcml Tests
         shell: bash
