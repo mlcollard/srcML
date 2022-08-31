@@ -74,6 +74,7 @@ jobs:
         working-directory: build
         run: |
           cmake --build . --config Release --target clean
+          cmake . -DSRCML_TEST_INSTALLED=ON
 
       - name: Set PATH for Windows
         shell: bash
