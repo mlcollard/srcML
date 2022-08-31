@@ -29,6 +29,8 @@ else()
     include_directories(BEFORE ${CMAKE_SOURCE_DIR}/src/libsrcml)
 endif()
 
+option(SRCML_TEST_INSTALLED "Test using installed version" OFF)
+
 if(BUILD_CLIENT_TESTS)
     add_subdirectory(client)
 endif()

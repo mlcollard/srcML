@@ -26,19 +26,15 @@ if(NOT PROJECT_NAME MATCHES "^srcML")
     enable_testing()
 endif()
 
-if(NOT TARGET libsrcml_link)
-    find_library(LIBSRCML_LINK NAMES libsrcml libsrcml.1 libsrcml.1.dylib libsrcml.so.1 libsrcml.so)
+if(SRCML_TEST_INSTALLED OR NOT TARGET libsrcml_link)
+    find_library(LIBSRCML_LINK NAMES srcml)
 else()
     set(LIBSRCML_LINK libsrcml_link)
 endif()
 
 include_directories(.)
 
-include_directories(/usr/local/include)
-
 set(CMAKE_CXX_STANDARD 11)
-
-add_definitions(-DWITH_LIBXSLT)
 
 # standard compile options
 add_compile_options(
