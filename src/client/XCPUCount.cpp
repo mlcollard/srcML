@@ -43,7 +43,7 @@ int CPUCount() {
 #ifdef _WIN64
     SYSTEM_INFO sysinfo;
     GetSystemInfo(&sysinfo);
-    return sysinfo.dwNumberOfProcessors;
+    return (int) sysinfo.dwNumberOfProcessors;
 #elif __APPLE__
     int count = 0;
     size_t len = sizeof(count);
