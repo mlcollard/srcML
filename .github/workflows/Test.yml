@@ -73,7 +73,7 @@ jobs:
       - name: Clean build
         working-directory: build
         run: |
-          cmake --build . --config Release clean
+          cmake --build . --config Release --target clean
 
       - name: Set PATH for Windows
         shell: bash
