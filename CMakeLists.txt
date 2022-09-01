@@ -122,7 +122,7 @@ include(GNUInstallDirs)
 # but cpack installer puts it in the proper place
 message("CMAKE_SYSTEM_PREFIX_PATH: ${CMAKE_SYSTEM_PREFIX_PATH}")
 message("CMAKE_INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}")
-if(WIN32 AND CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+if(WIN32)
   set(CMAKE_INSTALL_PREFIX "C:/Program Files/srcML")
 endif()
 message("CMAKE_SYSTEM_PREFIX_PATH: ${CMAKE_SYSTEM_PREFIX_PATH}")
