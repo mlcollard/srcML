@@ -163,6 +163,7 @@ jobs:
         shell: bash
         working-directory: build
         run: |
+          export PATH=$PATH:"/c/Program Files/srcML/bin/"
           cmake . -DBUILD_PARSER_TESTS=ON
           cmake --build . --config Release --target gen_parser_tests
 
