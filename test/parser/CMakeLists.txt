@@ -17,6 +17,9 @@
 # along with the srcML Toolkit; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
+message("CMAKE_SYSTEM_PREFIX_PATH: ${CMAKE_SYSTEM_PREFIX_PATH}")
+
+
 # Separate project driver for testing the parser outside of build
 if(NOT PROJECT_NAME MATCHES "^srcML")
     project(srcML-Test-parser NONE)

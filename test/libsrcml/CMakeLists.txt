@@ -19,6 +19,8 @@
 # 
 # CMake files for libsrcml library
 
+message("CMAKE_SYSTEM_PROGRAM_PATH: ${CMAKE_SYSTEM_PROGRAM_PATH}")
+
 # Separate project driver for testing libsrcml outside of build
 if(NOT PROJECT_NAME MATCHES "^srcML")
     project(srcML-Test-libsrcml)
