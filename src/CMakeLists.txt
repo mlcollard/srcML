@@ -19,6 +19,10 @@
 # 
 # CMake files for building from source
 
+message("CMAKE_SYSTEM_PROGRAM_PATH: ${CMAKE_SYSTEM_PROGRAM_PATH}")
+message("CMAKE_SYSTEM_PREFIX_PATH: ${CMAKE_SYSTEM_PREFIX_PATH}")
+
+
 set(CMAKE_CXX_STANDARD 11)
 
 option(SRCML_BUILD_USEPCH "Use PCH (PreCompiled Headers" OFF)
