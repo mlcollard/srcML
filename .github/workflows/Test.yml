@@ -136,7 +136,7 @@ jobs:
           export UseMultiToolTask=true
           export PATH=$PATH:"/c/Program Files/srcML/bin/"
           echo "C:\Program Files\srcML\bin" >> $GITHUB_PATH
-          printenv $GITHUB_PATH
+          SRCML_HOME="/c/Program Files/srcML/bin/"
           cmake . -DBUILD_LIBSRCML_TESTS=ON
           cmake --build . --config Release --target build_libsrcml_tests
 
