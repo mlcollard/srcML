@@ -21,20 +21,7 @@
 
 set(VCPKG_BUILD_TYPE "release")
 
-# CMake seems to want to install in C:/Program Files (x86)/srcML
-# but cpack installer puts it in the proper place
-message("CMAKE_SYSTEM_PREFIX_PATH: ${CMAKE_SYSTEM_PREFIX_PATH}")
-message("CMAKE_INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}")
-if(WIN32)
-  set(CMAKE_INSTALL_PREFIX "C:/Program Files/srcML")
-endif()
-message("CMAKE_SYSTEM_PREFIX_PATH: ${CMAKE_SYSTEM_PREFIX_PATH}")
-message("CMAKE_INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}")
-
 cmake_minimum_required(VERSION 3.15)
-
-message("CMAKE_SYSTEM_PREFIX_PATH: ${CMAKE_SYSTEM_PREFIX_PATH}")
-message("CMAKE_INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}")
 
 # Detect if the user has specified CMAKE_OSX_ARCHITECTURES before the project()
 if(APPLE AND NOT DEFINED CMAKE_OSX_ARCHITECTURES)
@@ -52,6 +39,16 @@ file(STRINGS "${CMAKE_SOURCE_DIR}/src/libsrcml/srcml.h" SRCML_HEADER REGEX "SRCM
 string(REGEX MATCH "\"([0-9.]+)\"" _ "${SRCML_HEADER}")
 
 project(srcML VERSION "${CMAKE_MATCH_1}" HOMEPAGE_URL "https://www.srcML.org")
+
+# CMake seems to want to install in C:/Program Files (x86)/srcML
+# but cpack installer puts it in the proper place
+message("CMAKE_SYSTEM_PREFIX_PATH: ${CMAKE_SYSTEM_PREFIX_PATH}")
+message("CMAKE_INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}")
+if(WIN32)
+  set(CMAKE_INSTALL_PREFIX "C:/Program Files/srcML" CACHE PATH "Set Windows install dir" FORCE)
+endif()
+message("CMAKE_SYSTEM_PREFIX_PATH: ${CMAKE_SYSTEM_PREFIX_PATH}")
+message("CMAKE_INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}")
 
 message(STATUS "Project version: ${PROJECT_VERSION}")
 
