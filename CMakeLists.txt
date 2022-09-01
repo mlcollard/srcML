@@ -118,6 +118,16 @@ endif()
 # used as defaults for installation and packaging
 include(GNUInstallDirs)
 
+# CMake seems to want to install in C:/Program Files (x86)/srcML
+# but cpack installer puts it in the proper place
+message("CMAKE_SYSTEM_PREFIX_PATH: ${CMAKE_SYSTEM_PREFIX_PATH}")
+message("CMAKE_INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}")
+if(WIN32 AND CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+  set(CMAKE_INSTALL_PREFIX "C:/Program Files/srcML")
+endif()
+message("CMAKE_SYSTEM_PREFIX_PATH: ${CMAKE_SYSTEM_PREFIX_PATH}")
+message("CMAKE_INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}")
+
 add_subdirectory(src)
 add_subdirectory(test)
 add_subdirectory(doc)
