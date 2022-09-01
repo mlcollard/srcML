@@ -135,7 +135,8 @@ jobs:
         run: |
           export UseMultiToolTask=true
           export PATH=$PATH:"/c/Program Files/srcML/bin/"
-          printenv $PATH
+          echo "C:\Program Files\srcML\bin\" >> $GITHUB_PATH
+          printenv $GITHUB_PATH
           cmake . -DBUILD_LIBSRCML_TESTS=ON
           cmake --build . --config Release --target build_libsrcml_tests
 
@@ -166,6 +167,7 @@ jobs:
         run: |
           export PATH=$PATH:"/c/Program Files/srcML/bin/"
           ls -lh "/c/Program Files/srcML/bin/"
+          echo "C:\Program Files\srcML\bin\" >> $GITHUB_PATH
           cmake . -DBUILD_PARSER_TESTS=ON
           cmake --build . --config Release --target gen_parser_tests
 
