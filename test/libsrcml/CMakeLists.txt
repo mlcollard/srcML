@@ -27,7 +27,7 @@ if(NOT PROJECT_NAME MATCHES "^srcML")
 endif()
 
 if(SRCML_TEST_INSTALLED OR NOT TARGET libsrcml_link)
-    find_library(LIBSRCML_LINK NAMES srcml)
+    find_library(LIBSRCML_LINK NAMES srcml REQUIRED)
 else()
     set(LIBSRCML_LINK libsrcml_link)
 endif()
