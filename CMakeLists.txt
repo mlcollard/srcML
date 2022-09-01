@@ -42,8 +42,9 @@ string(REGEX MATCH "\"([0-9.]+)\"" _ "${SRCML_HEADER}")
 # and then the installed version of srcML can be found by the tests without building srcml.
 # Note that the default for the install prefix is "C:/Program Files (x86)/srcML", which contradicts
 # the CMake documentation (https://cmake.org/cmake/help/latest/variable/CMAKE_INSTALL_PREFIX.html)
-# Also note that without this, the install target places the files in # "C:/Program Files (x86)/srcML",
+# Also note that without this, the install target places the files in "C:/Program Files (x86)/srcML",
 # while the package installer places it in "C:/Program Files/srcML"
+# Note that this overwrites any changes to the CMAKE_INSTALL_PREFIX from the command line cmake options.
 if(WIN32)
   set(CMAKE_INSTALL_PREFIX "C:/Program Files/srcML" CACHE PATH "Set Windows install dir" FORCE)
 endif()
