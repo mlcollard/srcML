@@ -19,10 +19,6 @@
 # 
 # CMake files for libsrcml library
 
-message("CMAKE_SYSTEM_PREFIX_PATH: A: ${CMAKE_SYSTEM_PREFIX_PATH}")
-set(CMAKE_PREFIX_PATH "C:/Program Files/srcML/")
-message("CMAKE_SYSTEM_PREFIX_PATH: B: ${CMAKE_SYSTEM_PREFIX_PATH}")
-
 # Separate project driver for testing libsrcml outside of build
 if(NOT PROJECT_NAME MATCHES "^srcML")
     project(srcML-Test-libsrcml)
