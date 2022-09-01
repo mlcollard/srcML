@@ -122,7 +122,7 @@ jobs:
         continue-on-error: true
         run: |
           export SRCML_HOME="/c/Program Files/srcML/bin/"
-          ctest -C Release -VV
+          ctest -C Release -VV -R ^archive.sh
 
       - uses: actions/upload-artifact@v3
         with:
@@ -164,6 +164,7 @@ jobs:
         working-directory: build
         run: |
           export PATH=$PATH:"/c/Program Files/srcML/bin/"
+          ls -lh "/c/Program Files/srcML/bin/"
           cmake . -DBUILD_PARSER_TESTS=ON
           cmake --build . --config Release --target gen_parser_tests
 
