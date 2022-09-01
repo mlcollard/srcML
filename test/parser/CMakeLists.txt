@@ -19,7 +19,6 @@
 
 message("CMAKE_SYSTEM_PREFIX_PATH: ${CMAKE_SYSTEM_PREFIX_PATH}")
 
-
 # Separate project driver for testing the parser outside of build
 if(NOT PROJECT_NAME MATCHES "^srcML")
     project(srcML-Test-parser NONE)
@@ -31,7 +30,7 @@ if(NOT PROJECT_NAME MATCHES "^srcML")
         set(SRCML_EXE "srcml.exe")
     endif()
 elseif(SRCML_TEST_INSTALLED)
-    find_program(SRCML_EXE NAMES srcml srcml.exe REQUIRED)
+    find_program(SRCML_EXE NAMES srcml srcML/bin/srcml srcML/bin/srcml.exe REQUIRED)
 else()
     set(SRCML_EXE $<TARGET_FILE:srcml>)
 endif()
