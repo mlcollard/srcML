@@ -38,22 +38,17 @@ endif()
 file(STRINGS "${CMAKE_SOURCE_DIR}/src/libsrcml/srcml.h" SRCML_HEADER REGEX "SRCML_VERSION_STRING")
 string(REGEX MATCH "\"([0-9.]+)\"" _ "${SRCML_HEADER}")
 
+# If performed here, before project(), then this prefix becomes part of the CMAKE_SYSTEM_PREFIX_PATH
+# and then the installed version of srcML can be found by the tests without building srcml.
+# Note that the default for the install prefix is "C:/Program Files (x86)/srcML", which contradicts
+# the CMake documentation (https://cmake.org/cmake/help/latest/variable/CMAKE_INSTALL_PREFIX.html)
+# Also note that without this, the install target places the files in # "C:/Program Files (x86)/srcML",
+# while the package installer places it in "C:/Program Files/srcML"
 if(WIN32)
-  message("SETTNG PREFIX")
   set(CMAKE_INSTALL_PREFIX "C:/Program Files/srcML" CACHE PATH "Set Windows install dir" FORCE)
 endif()
 
 project(srcML VERSION "${CMAKE_MATCH_1}" HOMEPAGE_URL "https://www.srcML.org")
-
-# CMake seems to want to install in C:/Program Files (x86)/srcML
-# but cpack installer puts it in the proper place
-message("CMAKE_SYSTEM_PREFIX_PATH: ${CMAKE_SYSTEM_PREFIX_PATH}")
-message("CMAKE_INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}")
-if(WIN32)
-  set(CMAKE_INSTALL_PREFIX "C:/Program Files/srcML" CACHE PATH "Set Windows install dir" FORCE)
-endif()
-message("CMAKE_SYSTEM_PREFIX_PATH: ${CMAKE_SYSTEM_PREFIX_PATH}")
-message("CMAKE_INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}")
 
 message(STATUS "Project version: ${PROJECT_VERSION}")
 
