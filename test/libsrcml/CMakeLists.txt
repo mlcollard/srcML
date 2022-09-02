@@ -21,21 +21,18 @@
 
 # Separate project driver for testing libsrcml outside of build
 if(NOT PROJECT_NAME MATCHES "^srcML")
-    project(srcML-Test-libsrcml)
     cmake_minimum_required(VERSION 3.14)
+    project(srcML-Test-libsrcml)
     enable_testing()
 endif()
 
 if(SRCML_TEST_INSTALLED OR NOT TARGET libsrcml_link)
-    if(DEFINED ENV{<SRCML_HOME>})
-        find_library(LIBSRCML_LINK NAMES srcml libsrcml PATHS $ENV{SRCML_HOME} REQUIRED)
-    else()
-        find_library(LIBSRCML_LINK NAMES srcml libsrcml REQUIRED)
-    endif()
+    find_library(LIBSRCML_LINK NAMES srcml libsrcml REQUIRED)
 else()
     set(LIBSRCML_LINK libsrcml_link)
 endif()
 
+include_directories(BEFORE ${CMAKE_SOURCE_DIR}/src/libsrcml)
 include_directories(.)
 
 set(CMAKE_CXX_STANDARD 11)
