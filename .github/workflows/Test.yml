@@ -147,7 +147,13 @@ jobs:
         continue-on-error: true
         run: |
           dumpbin -dependents "/c/Program Files/srcML/bin/srcml.exe" || true
+          dumpbin -dependents "/c/Program Files/srcML/bin/archive.dll" || true
+          dumpbin -dependents "/c/Program Files/srcML/bin/libcurl.dll" || true
           dumpbin -dependents "/c/Program Files/srcML/bin/libsrcml.dll" || true
+          dumpbin -dependents "/c/Program Files/srcML/bin/libxml2.dll" || true
+          dumpbin -dependents "/c/Program Files/srcML/bin/libexslt.dll" || true
+          dumpbin -dependents "/c/Program Files/srcML/bin/libxslt.dll" || true
+          dumpbin -dependents "/c/Program Files/srcML/bin/iconv-2.dll" || true
           dumpbin -exports "/c/Program Files/srcML/bin/libsrcml.dll" || true
 
       - name: Run libsrcml Tests on Installed libsrcml
