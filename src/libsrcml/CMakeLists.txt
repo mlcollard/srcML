@@ -83,7 +83,7 @@ endif()
 # which types of libraries
 if(MSVC)
     # libsrcml shared
-    install(TARGETS libsrcml_shared COMPONENT SRCML)
+    install(TARGETS libsrcml_shared RUNTIME COMPONENT SRCML)
 
     # pdb file for the MSVC shared version
     install(FILES $<TARGET_PDB_FILE:libsrcml_shared> DESTINATION bin COMPONENT DEVLIBS)
@@ -112,7 +112,8 @@ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/srcml.h DESTINATION ${CMAKE_INSTALL_IN
 # indirect dependencies, e.g., bzip2 for libxml
 if(MSVC AND VCPKG)
     file(GLOB VCPKG_SRCML_DEPENDENCIES "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/bin/*${CMAKE_SHARED_LIBRARY_SUFFIX}")
-    install(FILES ${VCPKG_SRCML_DEPENDENCIES} DESTINATION bin COMPONENT SRCML)
+    # install(FILES ${VCPKG_SRCML_DEPENDENCIES} DESTINATION bin COMPONENT SRCML)
+    install(IMPORTED_RUNTIME_ARTIFACTS LibXml2::LibXml2 Iconv::Iconv LibXslt::LibXslt LibXslt::LibExslt DESTINATION bin COMPONENT SRCML)
 endif()
 
 # Run ldconfig for install (not cpack) on Ubuntu
