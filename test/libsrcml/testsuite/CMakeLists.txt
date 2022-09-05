@@ -19,17 +19,6 @@
 # 
 # CMake files for libsrcml tests
 
-set(STATIC OFF)
-if(SRCML_TEST_INSTALLED OR NOT TARGET libsrcml_link)
-    if(LINK_LIBSRCML_STATIC)
-        set(STATIC ON)
-        find_library(STATIC_LIBXML2_LIBRARY NAMES libxml2.a)
-        message(STATUS "Found library: ${STATIC_LIBXML2_LIBRARY}")
-        set(LIBXML2_LIBRARY ${STATIC_LIBXML2_LIBRARY})
-        find_package(LibXml2 REQUIRED)
-    endif()
-endif()
-
 # Build and add tests
 add_custom_target(build_libsrcml_tests)
 file(GLOB LIB_TESTS test_*.cpp)
