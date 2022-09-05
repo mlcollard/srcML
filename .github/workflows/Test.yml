@@ -15,8 +15,8 @@ jobs:
       - name: Setup Windows
         uses: microsoft/setup-msbuild@v1.1
 
-      - name: Update CMake
-        uses: lukka/get-cmake@latest
+      # - name: Update CMake
+      #   uses: lukka/get-cmake@latest
 
       - name: Restore artifacts, or run vcpkg, build (and cache artifacts as post step)
         uses: lukka/run-vcpkg@v10.3
@@ -31,6 +31,7 @@ jobs:
       - name: Create build directory
         shell: bash
         run: |
+          cmake --version
           mkdir build
 
       - name: CMake Setup on Windows
