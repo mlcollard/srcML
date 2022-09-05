@@ -28,14 +28,14 @@
 #define SRCMLOUTPUT_HPP
 
 #ifdef _MSC_VER
-#   pragma warning(push, 0)
-#   pragma warning(disable : 4619) // #pragma warning : there is no warning number 'number'
-#   pragma warning(disable : 4365) // conversion from 'int' to 'const unsigned __int64', signed/unsigned mismatch
-#   pragma warning(disable : 4100) // 'ex': unreferenced formal parameter
+// #   pragma warning(push, 0)
+// #   pragma warning(disable : 4619) // #pragma warning : there is no warning number 'number'
+// #   pragma warning(disable : 4365) // conversion from 'int' to 'const unsigned __int64', signed/unsigned mismatch
+// #   pragma warning(disable : 4100) // 'ex': unreferenced formal parameter
 #endif
 #include <antlr/Token.hpp>
 #ifdef _MSC_VER
-#   pragma warning(pop)
+// #   pragma warning(pop)
 #endif
 #include <TokenStream.hpp>
 
