@@ -52,6 +52,8 @@ target_include_directories(srcml BEFORE PRIVATE . ${CMAKE_SOURCE_DIR}/src/libsrc
 target_link_libraries(srcml libsrcml_link LibArchive::LibArchive CURL::libcurl Boost::boost cli11 ctpl_stl)
 set_target_properties(srcml PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+set_target_properties(srcml PROPERTIES INTERPROCEDURAL_OPTIMIZATION ON)
+
 # Largest impace for PCH builds of the client
 if(SRCML_BUILD_USEPCH)
     target_precompile_headers(srcml PRIVATE <srcml_cli.hpp> <srcml_input_src.hpp> <srcml_pipe.hpp> <ParseQueue.hpp> <src_input_libarchive.hpp> <SRCMLStatus.hpp> <WriteQueue.hpp> <ParseRequest.hpp> <TraceLog.hpp> <curl/curl.h>)
