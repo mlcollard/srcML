@@ -66,7 +66,7 @@ set_target_properties(libsrcml_shared PROPERTIES VERSION "${PROJECT_VERSION}" SO
 
 if(MSVC)
     # On Windows, generate a debug of the release for the PDB file, but use optimization options
-    set_target_properties(libsrcml_shared PROPERTIES OUTPUT_NAME libsrcml LINK_FLAGS_DEBUG "/SAFESEH:NO" LINK_FLAGS_RELEASE "/DEBUG /OPT:REF /OPT:ICF")
+    set_target_properties(libsrcml_shared PROPERTIES OUTPUT_NAME libsrcml LINK_FLAGS_RELEASE "/DEBUG /OPT:REF /OPT:ICF")
     set_target_properties(libsrcml_static PROPERTIES OUTPUT_NAME libsrcmls LINK_FLAGS_RELEASE "/LTCG:OFF")
 elseif(APPLE)
     # Restrict exported symbols to those in the export list
