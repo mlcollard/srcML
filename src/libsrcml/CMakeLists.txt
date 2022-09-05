@@ -77,7 +77,7 @@ if(APPLE)
     # Restrict exported symbols to those in the export list
     # The output name automatically prepends "lib"
     # The "-Wl" passes the option to the linker
-    set_target_properties(libsrcml_shared libsrcml_static PROPERTIES LINK_FLAGS "-Wl,-exported_symbols_list ${CMAKE_SOURCE_DIR}/src/libsrcml/export_list" MACOSX_RPATH OFF)
+    set_target_properties(libsrcml_shared libsrcml_static PROPERTIES LINK_FLAGS "-Wl,-exported_symbols_list ${CMAKE_SOURCE_DIR}/src/libsrcml/export_list")
 endif()
 
 # which types of libraries
