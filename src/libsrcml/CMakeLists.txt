@@ -88,14 +88,8 @@ else()
     install(TARGETS libsrcml_shared LIBRARY COMPONENT SRCML NAMELINK_COMPONENT DEVLIBS)
 endif()
 
-if(BUILD_LIBSRCML_STATIC)
-    if(MSVC)
-        # do not use static library for MSVC
-        install(TARGETS libsrcml_static COMPONENT DEVLIBS)
-    else()
-        install(TARGETS libsrcml_static COMPONENT SRCML)
-    endif()
-endif()
+# static library part of development
+install(TARGETS libsrcml_static COMPONENT DEVLIBS)
 
 if(LINK_LIBSRCML_STATIC AND BUILD_LIBSRCML_STATIC)
     add_library(libsrcml_link ALIAS libsrcml_static)
