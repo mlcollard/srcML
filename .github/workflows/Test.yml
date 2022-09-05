@@ -89,8 +89,8 @@ jobs:
         working-directory: build
         run: |
           EOL="\r\n"
-          export PATH=$PATH:"/c/Program Files/srcML/bin/"
-          SRCML_HOME="/c/Program Files/srcML/bin/"
+          export PATH=$PATH:"/c/Program Files/srcML/bin"
+          SRCML_HOME="/c/Program Files/srcML/bin"
           ls -lh "$SRCML_HOME"
           SRCML="$SRCML_HOME/srcml.exe"
           ls -lh "$SRCML"
