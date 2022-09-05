@@ -38,12 +38,12 @@
 #include <srcml.h>
 
 #ifdef _MSC_VER
-#    pragma warning(push,0)
-#    pragma warning(disable : 4619)
+// #    pragma warning(push,0)
+// #    pragma warning(disable : 4619)
 #endif
 #include <boost/optional.hpp>
 #ifdef _MSC_VER
-#    pragma warning(pop)
+// #    pragma warning(pop)
 #endif
 
 /**
