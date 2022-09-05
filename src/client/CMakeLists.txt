@@ -62,9 +62,5 @@ if(APPLE)
     set_target_properties(srcml PROPERTIES LINK_FLAGS "-exported_symbols_list /dev/null")
 endif()
 
-if(MSVC AND VCPKG)
-    install(IMPORTED_RUNTIME_ARTIFACTS LibArchive::LibArchive CURL::libcurl DESTINATION bin COMPONENT SRCML)
-endif()
-
-# Dependencies are installed via libsrcml`
+# Dependencies are installed via libsrcml
 install(TARGETS srcml COMPONENT SRCML)
