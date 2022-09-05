@@ -61,7 +61,7 @@ if(APPLE)
     # Making the exported_symbols_list an empty file reduces size of executable, as strip does not work
     set_target_properties(srcml PROPERTIES LINK_FLAGS "-exported_symbols_list /dev/null")
 elseif(WIN32)
-    set_target_properties(srcml PROPERTIES LINK_FLAGS "-Wl,--allow-multiple-definition")
+    # set_target_properties(srcml PROPERTIES LINK_FLAGS "-Wl,--allow-multiple-definition")
 endif()
 
 # Dependencies are installed via libsrcml
