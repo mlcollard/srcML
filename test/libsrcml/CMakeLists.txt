@@ -27,10 +27,17 @@ if(NOT PROJECT_NAME MATCHES "^srcML")
 endif()
 
 if(SRCML_TEST_INSTALLED OR NOT TARGET libsrcml_link)
-    find_library(LIBSRCML_LINK NAMES srcml libsrcml REQUIRED)
+    if(LINK_LIBSRCML_STATIC)
+        set(CMAKE_FIND_LIBRARY_SUFFIXES .a .lib)
+        find_library(LIBSRCML_LINK NAMES libsrcmls srcml REQUIRED)
+    else()
+        find_library(LIBSRCML_LINK NAMES srcml libsrcml REQUIRED)
+    endif()
 else()
     set(LIBSRCML_LINK libsrcml_link)
 endif()
+
+message("LIBSRCML_LINK: ${LIBSRCML_LINK}")
 
 include_directories(BEFORE ${CMAKE_SOURCE_DIR}/src/libsrcml)
 include_directories(.)

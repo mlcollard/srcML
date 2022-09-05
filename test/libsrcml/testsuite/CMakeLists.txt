@@ -1,4 +1,4 @@
-    ##
+##
 # @file CMakeLists.txt
 # 
 # @copyright Copyright (C) 2013-2019 srcML, LLC. (www.srcML.org)
@@ -19,6 +19,17 @@
 # 
 # CMake files for libsrcml tests
 
+set(STATIC OFF)
+if(SRCML_TEST_INSTALLED OR NOT TARGET libsrcml_link)
+    if(LINK_LIBSRCML_STATIC)
+        set(STATIC ON)
+        find_library(STATIC_LIBXML2_LIBRARY NAMES libxml2.a)
+        message(STATUS "Found library: ${STATIC_LIBXML2_LIBRARY}")
+        set(LIBXML2_LIBRARY ${STATIC_LIBXML2_LIBRARY})
+        find_package(LibXml2 REQUIRED)
+    endif()
+endif()
+
 # Build and add tests
 add_custom_target(build_libsrcml_tests)
 file(GLOB LIB_TESTS test_*.cpp)
@@ -31,6 +42,9 @@ foreach(LIB_TEST ${LIB_TESTS})
 
     # Link to libsrcml
     target_link_libraries(${TEST_NAME} ${LIBSRCML_LINK})
+    if (STATIC)
+        target_link_libraries(${TEST_NAME} LibXml2::LibXml2)
+    endif()
 
     # Create a test with its own test directory
     set(TEST_DIR ${CMAKE_BINARY_DIR}/bin/tmp/${TEST_NAME})
