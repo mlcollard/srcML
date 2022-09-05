@@ -28,14 +28,7 @@
 #include <vector>
 #include <srcml_utilities.hpp>
 #include <memory>
-#ifdef _MSC_VER
-#    pragma warning(push,0)
-#    pragma warning(disable : 4619)
-#endif
 #include <boost/optional.hpp>
-#ifdef _MSC_VER
-#    pragma warning(pop)
-#endif
 
 struct ParseRequest {
     ParseRequest(std::vector<char>::size_type size = 0) : buffer(size) {}

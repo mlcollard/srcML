@@ -42,14 +42,7 @@
 
 #include <algorithm>
 #include <vector>
-#ifdef _MSC_VER
-#    pragma warning(push,0)
-#    pragma warning(disable : 4619)
-#endif
 #include <boost/optional.hpp>
-#ifdef _MSC_VER
-#    pragma warning(pop)
-#endif
 
 /**
  * Transformation result. Passed to srcml_unit_apply_transforms() to collect results of transformation

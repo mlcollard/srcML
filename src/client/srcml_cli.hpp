@@ -26,14 +26,7 @@
 // #include <srcml.h>
 #include <string>
 #include <vector>
-#ifdef _MSC_VER
-#    pragma warning(push,0)
-#    pragma warning(disable : 4619)
-#endif
 #include <boost/optional.hpp>
-#ifdef _MSC_VER
-#    pragma warning(pop)
-#endif
 #include <iostream>
 #include <utility>
 #include <map>
