@@ -81,7 +81,6 @@ jobs:
         shell: bash
         working-directory: build
         run: |
-          echo "/c/Program Files (x86)/srcML/bin" >> $GITHUB_PATH
           echo "/c/Program Files/srcML/bin" >> $GITHUB_PATH
 
       - name: Run Installed srcml
@@ -133,6 +132,7 @@ jobs:
       - name: Build libsrcml Tests
         shell: bash
         working-directory: build
+        continue-on-error: true
         run: |
           export UseMultiToolTask=true
           export PATH=$PATH:"/c/Program Files/srcML/bin/"
@@ -146,10 +146,9 @@ jobs:
         working-directory: build
         continue-on-error: true
         run: |
-          dumpbin -dependents bin/Release/srcml.exe || true
-          dumpbin -dependents bin/Release/libsrcml.dll || true
-          dumpbin -exports bin/Release/libsrcml.dll || true
-          dumpbin -dependents bin/Release/test_srcml_read_unit.exe || true
+          dumpbin -dependents "/c/Program Files/srcML/bin/srcml.exe" || true
+          dumpbin -dependents "/c/Program Files/srcML/bin/libsrcml.dll" || true
+          dumpbin -exports "/c/Program Files/srcML/bin/libsrcml.dll" || true
 
       - name: Run libsrcml Tests on Installed libsrcml
         shell: bash
