@@ -21,7 +21,7 @@
 
 set(VCPKG_BUILD_TYPE "release")
 
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.24)
 
 # Detect if the user has specified CMAKE_OSX_ARCHITECTURES before the project()
 if(APPLE AND NOT DEFINED CMAKE_OSX_ARCHITECTURES)

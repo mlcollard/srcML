@@ -21,7 +21,7 @@
 
 # Separate project driver for testing libsrcml outside of build
 if(NOT PROJECT_NAME MATCHES "^srcML")
-    cmake_minimum_required(VERSION 3.14)
+    cmake_minimum_required(VERSION 3.24)
     project(srcML-Test-libsrcml)
     enable_testing()
 endif()
