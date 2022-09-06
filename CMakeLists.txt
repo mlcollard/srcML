@@ -33,11 +33,6 @@ if(APPLE)
     set(PKG_CONFIG_EXECUTABLE "/usr/bin/true")
 endif()
 
-# Set libsrcml version from src/libsrcml/srcml.h
-# Extract this first because manually setting major, minor, and patch leads to bugs
-file(STRINGS "${CMAKE_SOURCE_DIR}/src/libsrcml/srcml.h" SRCML_HEADER REGEX "SRCML_VERSION_STRING")
-string(REGEX MATCH "\"([0-9.]+)\"" _ "${SRCML_HEADER}")
-
 # If performed here, before project(), then this prefix becomes part of the CMAKE_SYSTEM_PREFIX_PATH
 # and then the installed version of srcML can be found by the tests without building srcml.
 # Note that the default for the install prefix is "C:/Program Files (x86)/srcML", which contradicts
@@ -48,6 +43,11 @@ string(REGEX MATCH "\"([0-9.]+)\"" _ "${SRCML_HEADER}")
 if(WIN32)
   set(CMAKE_INSTALL_PREFIX "C:/Program Files/srcML" CACHE PATH "Set Windows install dir" FORCE)
 endif()
+
+# Set libsrcml version from src/libsrcml/srcml.h
+# Extract this first because manually setting major, minor, and patch leads to bugs
+file(STRINGS "${CMAKE_SOURCE_DIR}/src/libsrcml/srcml.h" SRCML_HEADER REGEX "SRCML_VERSION_STRING")
+string(REGEX MATCH "\"([0-9.]+)\"" _ "${SRCML_HEADER}")
 
 project(srcML VERSION "${CMAKE_MATCH_1}" HOMEPAGE_URL "https://www.srcML.org")
 
