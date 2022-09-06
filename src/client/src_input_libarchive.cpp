@@ -74,7 +74,7 @@ archive* libarchive_input_file(const srcml_input_src& input_file) {
             return 0;
         }
 
-#if false && WIN32
+#if WIN32
         // In Windows, the archive_read_open_fd() does not seem to work. The input is read as an empty archive,
         // or cut short. 
         // So for Windwos, convert to a FILE*. Note sure when to close the FILE*
