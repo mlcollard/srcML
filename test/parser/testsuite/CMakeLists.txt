@@ -255,25 +255,23 @@ endforeach()
 list(TRANSFORM CONTEXT_FILES PREPEND "${CMAKE_CURRENT_BINARY_DIR}/")
 
 # display number of parser testfiles
-file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/.count "echo '-- Total Parser Testfiles: ' | tr -d '\n'; ls *.xml | wc -l | tr -d ' '")
-add_custom_command(
-    COMMAND . ./.count
-    COMMENT ""
+file(WRITE ${CMAKE_BINARY_DIR}/count.cmake "\
+file(GLOB TESTFILES *.xml)
+list(LENGTH TESTFILES SIZE)
+message(\"-- Total Parser Testfiles: \$\{SIZE\}\")
+")
+
+add_custom_target(parser_testfile_count
+    COMMAND cmake -P ${CMAKE_BINARY_DIR}/count.cmake
+    COMMENT "Calculate total parser testfiles"
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     DEPENDS ${CONTEXT_FILES}
-    OUTPUT parser_testfile_count
 )
 
 # generate the parser tests
-if(NOT WIN32)
 add_custom_target(gen_parser_tests DEPENDS parser_testfile_count
                   COMMENT "Generated parser testfile target"
                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-else()
-add_custom_target(gen_parser_tests DEPENDS ${CONTEXT_FILES}
-                  COMMENT "Generated parser testfile target"
-                  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-endif()
 
 # clean all parser tests, original and generated
 add_custom_target(clean_parser_tests
