@@ -15,9 +15,6 @@ jobs:
       - name: Setup Windows
         uses: microsoft/setup-msbuild@v1.1
 
-      # - name: Update CMake
-      #   uses: lukka/get-cmake@latest
-
       - name: Restore artifacts, or run vcpkg, build (and cache artifacts as post step)
         uses: lukka/run-vcpkg@v10.3
         id: runvcpkg
@@ -111,7 +108,6 @@ jobs:
             zip
             cpio
             diffutils
-            cmake
             util-linux
             libxml2
 
