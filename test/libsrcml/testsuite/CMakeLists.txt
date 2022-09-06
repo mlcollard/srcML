@@ -31,9 +31,6 @@ foreach(LIB_TEST ${LIB_TESTS})
 
     # Link to libsrcml
     target_link_libraries(${TEST_NAME} ${LIBSRCML_LINK})
-    if (STATIC)
-        target_link_libraries(${TEST_NAME} LibXml2::LibXml2)
-    endif()
 
     # Create a test with its own test directory
     set(TEST_DIR ${CMAKE_BINARY_DIR}/bin/tmp/${TEST_NAME})
