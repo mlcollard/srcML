@@ -109,6 +109,7 @@ jobs:
             cpio
             diffutils
             util-linux
+            cmake
             libxml2
 
       - name: Windows Client Tests on Installed srcml
@@ -118,6 +119,8 @@ jobs:
         continue-on-error: true
         run: |
           export SRCML_HOME="/c/Program Files/srcML/bin/"
+          cmake --version
+          ctest --version
           ctest -C Release -VV
 
       - uses: actions/upload-artifact@v3
