@@ -102,10 +102,6 @@ else()
     add_library(libsrcml_link ALIAS libsrcml_shared)
 endif()
 
-if(APPLE)
-#    add_custom_command(TARGET libsrcml_shared POST_BUILD COMMAND /usr/bin/install_name_tool -id /usr/local/lib/libsrcml.dylib /usr/local/lib/libsrcml.dylib)
-endif()
-
 # install the libsrcml include file
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/srcml.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT DEVLIBS)
 
