@@ -1,131 +1,180 @@
 # Building srcML
 
-srcML is built using cmake, www.cmake.org, (version 2.8.12 or above) and currently supports builds for
-macOS, Fedora, Ubuntu, CentOS, OpenSUSE, and Windows Visual Studio.
+srcML is built using cmake, www.cmake.org, (version 3.24 or above) and currently supports
+builds for macOS, Fedora, Ubuntu, CentOS, OpenSUSE, and Windows MSVC.
 
-Out of source builds (builds outside the source directory) are required. In source builds are not supported.
+Only out-of-source builds (i.e., shadow builds) are supported. All cmake and build commands are assumed to be entered in the build directory.
 
-## Unix
+While `make` is shown in the following commands, we use and recommend `ninja` as it more easily takes advantage of parallelism.
 
-To generate a makefile in your build directory:
+## macOS & Linux Commands
 
-    cmake <path_to_srcml>
+To generate a Makefile:
 
- The following make commands are supported with their usual meaning
+```console
+cmake <path_to_srcml>
+```
 
-    make  
-    make clean  
-    make test  
-    make install
+The following build commands are supported with their usual meaning:
 
- Client tests are enabled by default, while libsrcml and parser tests are disabled by default.
- These tests can be enabled/disabled via the cmake command, e.g. with a parallel source directory,
+```console
+make
+make clean
+make test
+make install
+```
 
-    cmake -DBUILD_CLIENT_TESTS=OFF -DBUILD_LIBSRCML_TESTS=ON -DBUILD_PARSER_TESTS=ON ../srcML
+Note that the build does not strip the generated executable and libraries by default. To do so when installed:
 
- You may need to run `ldconfig` to get the link to the libsrcml shared library path up to date
+```console
+make install/strip
+```
 
-### macOS
+## macOS Dependencies
+[Homebrew]: https://brew.sh
 
-The main packages required may be installed via brew:
+The main packages required may be installed via [Homebrew]:
 
-    brew install antlr2 boost cmake
+```console
+brew install cmake boost ninja
+```
 
-Libarchive greater than 3.0.0 is required. For macOS previous to Catalina (19.*.*), libarchive.a 3.3.* must be 
-statically included. Use brew to install a more recent version:
+Note that `ninja` is optional.
 
-    `brew install libarchive`
+See the `vcpkg` instructions below if you alternatively want to use `vcpkg` to install and manage any dependencies.
 
-To generate srcML documentation:
+To optionally generate srcML documentation:
 
-    brew install man2html doxygen
+```console
+brew install man2html doxygen
+```
 
-Additional packages that may not needed, but are recommended (for timing etc.):
+Additional packages that are not required but are recommended (for timing, etc.):
 
-    brew install coreutils gnu-sed gnu-time
+```console
+brew install coreutils gnu-sed gnu-time
+```
 
-#### Linux
+* Libarchive greater than 3.0.0 is required. For macOS previous to macOS Catalina (19.*.*), libarchive.a 3.3.* must be statically included. Use `brew install libarchive` to install a more recent version
 
-Linux builds for Ubuntu, Fedora, CentOS and OpenSUSE are supported.
+## Linux Dependencies
 
-To find what is needed, it is recommended to consult these dockerfiles for the particular distribution:
+[Ubuntu]: https://github.com/srcML/Docker/blob/ubuntu_latest/base/Dockerfile
+[Fedora]: https://github.com/srcML/Docker/blob/fedora_latest/base/Dockerfile
+[CentOS]: https://github.com/srcML/Docker/blob/centos_latest/base/Dockerfile
+[OpenSUSE]: https://github.com/srcML/Docker/blob/opensuse_latest/base/Dockerfile
 
-* [Ubuntu](https://github.com/srcML/Docker/blob/ubuntu_latest/base/Dockerfile)
-* [Fedora](https://github.com/srcML/Docker/blob/fedora_latest/base/Dockerfile)
-* [CentOS](https://github.com/srcML/Docker/blob/centos_latest/base/Dockerfile)
-* [OpenSUSE](https://github.com/srcML/Docker/blob/opensuse_latest/base/Dockerfile)
+Linux builds for multiple distributions are supported. To find what is needed, it is recommended to consult these dockerfiles for the particular distribution: [Ubuntu], [Fedora], [CentOS], [OpenSUSE].
 
-Commands to install what is needed can be adapted from these, and they are tested to work. You will also find dockerfiles for older versions of these distributions.
+Commands to install dependencies can be adapted from these, and they are tested to work. You will also find dockerfiles for older versions of these distributions.
 
-## Windows Using MSVC
+In most cases, Linux distributions may not have a recent version of cmake. It is highly recommended to [download a more recent version](https://cmake.org/download/), or if on Ubuntu, use the [Kitware APT Repository](https://apt.kitware.com).
 
-Building in Windows requires that you have MSVC installed. Visual Studio 2017 or newer is known to work, while older versions have not been tested. This build only supports 64-bit binaries.
+Note that you can alternatively use `vcpkg` to install and manage dependencies on Linux.
 
-## Packages
+## Windows Using MSVC and vcpkg
 
-* [Java JRE/JDK](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
-* [CMake](http://www.cmake.org)
-* [Visual Studio 2017 or later](https://www.visualstudio.com/downloads/)
-* Zipped [Visual Studio 2017 Build Dependencies](http://www.sdml.cs.kent.edu/build/VS2017_Dependencies-06_20_18.zip)
+Building in Windows can use MSVC. Visual Studio 2017 or newer for 64-bit binaries.
 
-##### Instructions
-* Install Visual Studio 2017 or newer, CMake
-* Locate the source code for srcML
-* Extract the zipped build dependencies
-    * The extracted folder will be named deps, and its structure will look like the following:
+Building in Windows handles dependencies using `vcpkg`. See the instructions below.
 
-        ```
-            deps/
-                debug/
-                include/
-                release/
-                tools/
-        ```
-    * When copied into the srcML source code directory the result should look like the following:
+## vcpkg
 
-        ```
-            srcML/  
-                    BUILD.md
-                    package/
-                    CMakeLists.txt
-                    COPYING.txt
-                    CTestConfig.cmake
-                    deps/
-                        include/
-                        tools/
-                        x64/
-                    doc/
-                    ...etc...
-        ```
-* NOTES:
-    * Building srcml should be done in a separate directory external to the source code to avoid issues
-* Graphical Interface Build:
-    * Open the CMake GUI program.
-    * Browser for the srcML source code directory and your target build directory
-    * Hit configure and select the appropriate Visual Studio version and x64 architecture as the target system.
-    * Click Generate
-    * Open srcML.sln with Visual Studio located in your the target build directory
-    * Right click Project "ALL_BUILD" and choose "build"
-* Command Line Buid:
-    * Generate the build files in your target build directory.
+[vcpkg Get Started]: https://vcpkg.io/en/getting-started.html
+[vcpkg]: https://vcpkg.io/en/index.html
 
-        ```
-            cmake [path to srcML source directory] -G [target visual studio version and architecture]   
-        ```
-        For example:
+Building with [vcpkg] is a requirement to build on Windows but can also be used on other platforms. The manifest file *vcpk.json* in the main source directory lists the required dependencies. To build with vcpkg:
 
-        ```
-            cmake ..\srcML\ -G "Visual Studio 15 2017 Win64"
-        ```
-    * Execute the build.
+* Clone a copy of the vcpkg repository
 
-        ```
-            cmake --build . --config [build mode]
-        ```
-        For example:
+```console
+git clone https://github.com/Microsoft/vcpkg.git
+```
 
-        ```
-            cmake --build . --config release
-    ```
+* Initialize vcpkg inside the vcpkg clone:
 
-* Once built, locate the build folder. Within that folder there is now a directory named `bin` containing the release or debug versions of srcML executable and library along with all other dependencies.
+```console
+./vcpkg/bootstrap-vcpkg.sh
+```
+
+* Run cmake indicating vcpkg in the build directory:
+
+```console
+cmake ../srcML -DCMAKE_TOOLCHAIN_FILE=../vcpkg/scripts/buildsystems/vcpkg.cmake
+```
+
+The path assumes that vcpkg is a sibling directory of the build directory. If not, adjust the
+path.
+
+This may take a while the first time as it has to download and build the dependencies.
+
+* Run the build:
+
+```console
+cmake --build . --config Release
+```
+
+You can find more detail about the vcpkg instructions at [vcpkg Get Started]. Note that using vcpkg with cmake automatically installs the needed dependencies.
+
+## Build Hints
+
+* With a complete build, unity builds significantly speed up the process, e.g., 25% reduction. Specify `-DCMAKE_UNITY_BUILD=ON` in your cmake command.
+  To turn on in an existing build:
+
+```console
+cmake . -DCMAKE_UNITY_BUILD=ON
+```
+
+## Testing
+
+There are multiple types of tests for srcML:
+
+* Client Tests - test the command line client
+* libsrcml Tests - test the libsrcml API
+* Parser Tests - test the parsing of srcML
+
+### Client Tests
+
+The client unit tests are shell scripts that run the command-line client and check the output and exit value. They are always available (i.e., no setup is needed) and are run via `ctest` in the build directory:
+
+```console
+ctest
+```
+
+The client tests can be run in parallel using the option `-j`, which speeds up the testing as certain tests fetch remote URLs
+
+### libsrcml Tests
+
+The libsrcml tests are standard unit tests that call the libsrcml API and check the results. They are not enabled by default. To enable them:
+
+```console
+cmake . -DBUILD_LIBSRCML_TESTS=ON
+```
+
+Then build accordingly.
+
+The tests are run via `ctest` and can be run as part of the client tests. To run just the libsrcml tests:
+
+```console
+ctest -R ^test_
+```
+
+### Parser Tests
+
+The parser tests are srcml archives, where each individual unit is a unit test. They are disabled by default. To enable the parser tests:
+
+```console
+cmake . -DBUILD_PARSER_TESTS=ON
+```
+
+Once enabled, they must be generated via a target:
+
+```console
+make gen_parser_tests
+```
+
+To run the parser tests:
+
+```console
+make run_parser_tests
+```
