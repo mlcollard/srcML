@@ -1,6 +1,8 @@
 # Building srcML
 
-srcML is built using cmake, www.cmake.org, (version 3.24 or above) and currently supports
+[cmake]: https://cmake.org
+
+srcML is built using [cmake] version 3.24 or above and currently supports
 builds for macOS, Fedora, Ubuntu, CentOS, OpenSUSE, and Windows MSVC.
 
 Only out-of-source builds (i.e., shadow builds) are supported. All cmake and build commands are assumed to be entered in the build directory.
@@ -30,6 +32,21 @@ Note that the build does not strip the generated executable and libraries by def
 make install/strip
 ```
 
+Starting with macOS Big Sur, the build creates a universal build with both architectures, x86 and Apple Silicon
+(m1, m2) by default, unless the variable `CMAKE_OSX_ARCHITECTURES` is set on the cmake command.
+
+To explicitly build on macOS only for x86:
+
+```console
+cmake . -DCMAKE_OSX_ARCHITECTURES="x86_64"
+```
+
+To explicitly build on macOS only for arm64:
+
+```console
+cmake . -DCMAKE_OSX_ARCHITECTURES="arm64"
+```
+
 ## macOS Dependencies
 [Homebrew]: https://brew.sh
 
@@ -55,7 +72,7 @@ Additional packages that are not required but are recommended (for timing, etc.)
 brew install coreutils gnu-sed gnu-time
 ```
 
-* Libarchive greater than 3.0.0 is required. For macOS previous to macOS Catalina (19.*.*), libarchive.a 3.3.* must be statically included. Use `brew install libarchive` to install a more recent version
+* Libarchive greater than 3.0.0 is required. For macOS older than macOS Catalina (19.*.*), libarchive.a 3.3.* must be statically included. Use `brew install libarchive` to install a more recent version
 
 ## Linux Dependencies
 
@@ -118,7 +135,9 @@ You can find more detail about the vcpkg instructions at [vcpkg Get Started]. No
 
 ## Build Hints
 
-* With a complete build, unity builds significantly speed up the process, e.g., 25% reduction. Specify `-DCMAKE_UNITY_BUILD=ON` in your cmake command.
+[unity build]: https://cmake.org/cmake/help/latest/prop_tgt/UNITY_BUILD.html
+
+* With a complete build, a [unity build] significantly speeds up the process, e.g., 25% reduction. Specify `-DCMAKE_UNITY_BUILD=ON` in your cmake command.
   To turn on in an existing build:
 
 ```console
@@ -131,7 +150,7 @@ There are multiple types of tests for srcML:
 
 * Client Tests - test the command line client
 * libsrcml Tests - test the libsrcml API
-* Parser Tests - test the parsing of srcML
+* Parser Tests - test the srcML parser
 
 ### Client Tests
 
