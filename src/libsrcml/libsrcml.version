@@ -1,0 +1,4 @@
+LIBSRCML_1.0 {
+    global: srcml_*;
+    local: *;
+};

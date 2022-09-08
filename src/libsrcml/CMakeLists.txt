@@ -37,8 +37,9 @@ target_include_directories(libsrcml BEFORE PRIVATE .)
 if(MSVC)
     target_link_libraries(libsrcml PUBLIC LibXml2::LibXml2 Iconv::Iconv LibXslt::LibXslt LibXslt::LibExslt Boost::boost TinySHA1 parser)
 else()
-    target_link_libraries(libsrcml PUBLIC LibXml2::LibXml2 Iconv::Iconv LibXslt::LibXslt LibXslt::LibExslt Boost::boost TinySHA1 pthread parser)
+    target_link_libraries(libsrcml PUBLIC LibXml2::LibXml2 Iconv::Iconv LibXslt::LibXslt LibXslt::LibExslt Boost::boost TinySHA1 pthread PRIVATE parser)
 endif()
+# target_compile_options(libsrcml PUBLIC "-fvisibility=hidden")
 
 # precompiled header list of most commonly used
 if(SRCML_BUILD_USEPCH)
@@ -48,7 +49,7 @@ endif()
 # Building static and dynamic libraries for srcML.
 add_library(libsrcml_static STATIC $<TARGET_OBJECTS:libsrcml>)
 set_target_properties(libsrcml_static PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-target_link_libraries(libsrcml_static PUBLIC libsrcml parser antlr)
+target_link_libraries(libsrcml_static PUBLIC libsrcml PRIVATE parser antlr)
 
 add_library(libsrcml_shared SHARED $<TARGET_OBJECTS:libsrcml>)
 set_target_properties(libsrcml_shared PROPERTIES
@@ -56,7 +57,7 @@ set_target_properties(libsrcml_shared PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
     LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-target_link_libraries(libsrcml_shared PUBLIC libsrcml parser antlr)
+target_link_libraries(libsrcml_shared PUBLIC libsrcml PRIVATE parser antlr)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND CMAKE_COMPILER_IS_GNUCXX)
     target_link_libraries(libsrcml_shared PRIVATE gcov)
@@ -73,11 +74,16 @@ else()
     set_target_properties(libsrcml_shared libsrcml_static PROPERTIES OUTPUT_NAME srcml)
 endif()
 
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+set(CMAKE_C_VISIBILITY_PRESET hidden)
+
 if(APPLE)
     # Restrict exported symbols to those in the export list
     # The output name automatically prepends "lib"
     # The "-Wl" passes the option to the linker
     set_target_properties(libsrcml_shared libsrcml_static PROPERTIES LINK_FLAGS "-Wl,-exported_symbols_list ${CMAKE_SOURCE_DIR}/src/libsrcml/export_list")
+elseif(NOT WIN32)
+    set_target_properties(libsrcml_shared libsrcml_static PROPERTIES LINK_FLAGS "-Wl,--version-script=${CMAKE_SOURCE_DIR}/src/libsrcml/libsrcml.version")
 endif()
 
 # which types of libraries
