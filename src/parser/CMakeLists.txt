@@ -31,9 +31,12 @@ FetchContent_Declare(antlrsrc
 FetchContent_MakeAvailable(antlrsrc)
 
 # Add needed include file for CharScanner.hpp
+# Comment out use of std::binary_function, deprecated in C++11 and removed in C++17
 set(CHARSCANNER_HPP "${antlrsrc_SOURCE_DIR}/lib/cpp/antlr/CharScanner.hpp")
 file(READ ${CHARSCANNER_HPP} FILE_CONTENTS)
 string(REPLACE "#include <antlr/config.hpp>" "#include <antlr/config.hpp>\n#include <string.h>" FILE_CONTENTS "${FILE_CONTENTS}")
+string(REPLACE ": public ANTLR_USE_NAMESPACE(std)binary_function<ANTLR_USE_NAMESPACE(std)string,ANTLR_USE_NAMESPACE(std)string,bool>"
+            "/* : public ANTLR_USE_NAMESPACE(std)binary_function<ANTLR_USE_NAMESPACE(std)string,ANTLR_USE_NAMESPACE(std)string,bool> */" FILE_CONTENTS "${FILE_CONTENTS}")
 file(WRITE ${CHARSCANNER_HPP} "${FILE_CONTENTS}")
 
 # Remove pragma warning disable that is no longer valid
