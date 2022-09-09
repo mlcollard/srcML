@@ -33,12 +33,12 @@
 #include <cstring>
 #include <limits.h>
 
-#include <sys/types.h>
-#include <sys/uio.h>
-#include <unistd.h>
-
 #ifdef _MSC_VER
-#include <io.h>
+    #include <io.h>
+#else
+    #include <sys/types.h>
+    #include <sys/uio.h>
+    #include <unistd.h>
 #endif
 
 namespace {
