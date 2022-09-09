@@ -35,9 +35,9 @@ target_include_directories(libsrcml BEFORE PRIVATE .)
 
 # libsrcml dependencies
 if(MSVC)
-    target_link_libraries(libsrcml PUBLIC LibXml2::LibXml2 Iconv::Iconv LibXslt::LibXslt LibXslt::LibExslt Boost::boost TinySHA1 parser)
+    target_link_libraries(libsrcml PUBLIC LibXml2::LibXml2 Iconv::Iconv LibXslt::LibXslt LibXslt::LibExslt TinySHA1 parser)
 else()
-    target_link_libraries(libsrcml PUBLIC LibXml2::LibXml2 Iconv::Iconv LibXslt::LibXslt LibXslt::LibExslt Boost::boost TinySHA1 pthread PRIVATE parser)
+    target_link_libraries(libsrcml PUBLIC LibXml2::LibXml2 Iconv::Iconv LibXslt::LibXslt LibXslt::LibExslt TinySHA1 pthread PRIVATE parser)
 endif()
 # target_compile_options(libsrcml PUBLIC "-fvisibility=hidden")
 
@@ -77,10 +77,9 @@ endif()
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_C_VISIBILITY_PRESET hidden)
 
+# Restrict exported symbols to those in the export list
+# The "-Wl" passes the option to the linker
 if(APPLE)
-    # Restrict exported symbols to those in the export list
-    # The output name automatically prepends "lib"
-    # The "-Wl" passes the option to the linker
     set_target_properties(libsrcml_shared libsrcml_static PROPERTIES LINK_FLAGS "-Wl,-exported_symbols_list ${CMAKE_SOURCE_DIR}/src/libsrcml/export_list")
 elseif(NOT WIN32)
     set_target_properties(libsrcml_shared libsrcml_static PROPERTIES LINK_FLAGS "-Wl,--version-script=${CMAKE_SOURCE_DIR}/src/libsrcml/libsrcml.version")

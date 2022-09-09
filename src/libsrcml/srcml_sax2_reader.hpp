@@ -35,7 +35,7 @@
 #include <string>
 #include <vector>
 #include <thread>
-#include <boost/optional.hpp>
+#include <optional>
 
 /**
  * thread_args

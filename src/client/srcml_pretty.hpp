@@ -26,17 +26,17 @@
 #include <string>
 #include <vector>
 #include <srcml.h>
-#include <boost/optional.hpp>
+#include <optional>
 #include <srcml_cli.hpp>
 
 struct pretty_template_t {
-    boost::optional<std::string> header;
+    std::optional<std::string> header;
     std::vector<std::string> header_args;
-    boost::optional<std::string> body;
+    std::optional<std::string> body;
     std::vector<std::string> body_args;
-    boost::optional<std::string> footer;
+    std::optional<std::string> footer;
     std::vector<std::string> footer_args;
-    boost::optional<size_t> error_location;
+    std::optional<size_t> error_location;
 };
 
 /*

@@ -27,7 +27,7 @@
 #include <srcml_cli.hpp>
 #include <srcml.h>
 #include <string>
-#include <boost/optional.hpp>
+#include <optional>
 #include <srcml_input_src.hpp>
 
 int src_input_filelist(ParseQueue& queue,

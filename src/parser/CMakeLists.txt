@@ -65,7 +65,7 @@ add_library(parser OBJECT
 )
 target_include_directories(parser SYSTEM PUBLIC ${antlrsrc_SOURCE_DIR}/lib/cpp)
 target_include_directories(parser PRIVATE . ${CMAKE_GENERATED_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/src/libsrcml PUBLIC . SYSTEM PUBLIC ${CMAKE_GENERATED_SOURCE_DIR})
-target_link_libraries(parser PRIVATE LibXml2::LibXml2 Boost::boost TinySHA1 antlr)
+target_link_libraries(parser PRIVATE LibXml2::LibXml2 TinySHA1 antlr)
 
 # 
 # RunAntlr

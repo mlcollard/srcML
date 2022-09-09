@@ -19,7 +19,7 @@
 # 
 # CMake files for building from source
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 
 option(SRCML_BUILD_USEPCH "Use PCH (PreCompiled Headers" OFF)
 
@@ -108,9 +108,6 @@ endif()
 # For Windows, install redist exe
 set(CMAKE_INSTALL_SYSTEM_RUNTIME_COMPONENT SRCML)
 include(InstallRequiredSystemLibraries)
-
-# boost::optional is used throughout the source
-find_package(Boost REQUIRED)
 
 # standard compile options
 add_compile_options(

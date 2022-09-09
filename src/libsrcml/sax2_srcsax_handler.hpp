@@ -24,7 +24,7 @@
 #define INCLUDED_SAX2_SRCSAX_HANDLER_HPP
 
 #include <srcsax.hpp>
-#include <boost/optional.hpp>
+#include <optional>
 
 #include <libxml/parser.h>
 
@@ -93,7 +93,7 @@ struct sax2_srcsax_handler {
 
     int loc = 0;
 
-    boost::optional<std::string> cpp_prefix;
+    std::optional<std::string> cpp_prefix;
 
     bool rootcalled = false;
 

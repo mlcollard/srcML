@@ -29,7 +29,7 @@
 #include <vector>
 #include <libxml2_utilities.hpp>
 #include <memory>
-#include <boost/optional.hpp>
+#include <optional>
 #include <srcml.h>
 
 struct TransformationResult {

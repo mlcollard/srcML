@@ -42,7 +42,7 @@
 
 #include <mutex>
 #include <condition_variable>
-#include <boost/optional.hpp>
+#include <optional>
 
 #define ATTR_LOCALNAME(pos) (pos * 5)
 #define ATTR_PREFIX(pos) (pos * 5 + 1)
@@ -60,16 +60,16 @@
 struct attribute_t {
 
     /** attribute name */
-    boost::optional<std::string> localname;
+    std::optional<std::string> localname;
 
     /** attribute namespace prefix */
-    boost::optional<std::string> prefix;
+    std::optional<std::string> prefix;
 
     /** attribute namespace uri */
-    boost::optional<std::string> uri;
+    std::optional<std::string> uri;
 
     /** attribute value */
-    boost::optional<std::string> value;
+    std::optional<std::string> value;
 };
 
 /**
