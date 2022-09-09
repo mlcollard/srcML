@@ -32,7 +32,7 @@ FetchContent_Declare(cli11
 )
 FetchContent_MakeAvailable(cli11)
 add_library(cli11 INTERFACE IMPORTED)
-target_include_directories(cli11 INTERFACE ${cli11_SOURCE_DIR})
+target_include_directories(cli11 SYSTEM INTERFACE ${cli11_SOURCE_DIR})
 
 # ctpl_stl external include
 include(FetchContent)
@@ -43,7 +43,7 @@ FetchContent_Declare(ctpl_stl
 )
 FetchContent_MakeAvailable(ctpl_stl)
 add_library(ctpl_stl INTERFACE IMPORTED)
-target_include_directories(ctpl_stl INTERFACE ${ctpl_stl_SOURCE_DIR})
+target_include_directories(ctpl_stl SYSTEM INTERFACE ${ctpl_stl_SOURCE_DIR})
 
 # srcml executable
 file(GLOB CLIENT_SOURCE *.hpp *.cpp)
