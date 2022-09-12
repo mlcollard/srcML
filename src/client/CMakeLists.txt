@@ -52,7 +52,7 @@ target_include_directories(srcml BEFORE PRIVATE . ${CMAKE_SOURCE_DIR}/src/libsrc
 target_link_libraries(srcml PRIVATE libsrcml_link LibArchive::LibArchive CURL::libcurl cli11 ctpl_stl)
 set_target_properties(srcml PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-set_target_properties(srcml PROPERTIES INTERPROCEDURAL_OPTIMIZATION ON)
+# set_target_properties(srcml PROPERTIES INTERPROCEDURAL_OPTIMIZATION ON)
 
 # Largest impace for PCH builds of the client
 if(SRCML_BUILD_USEPCH)
