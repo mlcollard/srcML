@@ -2,11 +2,6 @@
 name: Test
 
 on: workflow_dispatch
-  inputs:
-    name:
-      type: boolean
-      description: Verbose build output
-      default: false
 
 jobs:
   build:
