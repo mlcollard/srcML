@@ -105,8 +105,6 @@ if(APPLE AND NOT VCPKG)
 
 endif()
 
-set_property(GLOBAL PROPERTY INTERPROCEDURAL_OPTIMIZATION ON)
-
 # For Windows, install redist exe
 set(CMAKE_INSTALL_SYSTEM_RUNTIME_COMPONENT SRCML)
 include(InstallRequiredSystemLibraries)

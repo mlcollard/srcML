@@ -29,7 +29,9 @@ find_package(Iconv REQUIRED)
 # libsrcml library
 file(GLOB LIBSRCML_SOURCE *.h *.hpp *.cpp)
 add_library(libsrcml OBJECT ${LIBSRCML_SOURCE})
-set_target_properties(libsrcml PROPERTIES INTERPROCEDURAL_OPTIMIZATION ON)
+if(NOT MSVC)
+    set_target_properties(libsrcml PROPERTIES INTERPROCEDURAL_OPTIMIZATION ON)
+endif()
 
 # Use the libsrcml/srcml.h rather than the /usr/local/include/srcml.h
 target_include_directories(libsrcml BEFORE PRIVATE .)
@@ -70,10 +72,10 @@ if(MSVC)
     # On Windows, generate a debug of the release for the PDB file, but use optimization options
     set_target_properties(libsrcml_shared PROPERTIES OUTPUT_NAME libsrcml LINK_FLAGS_RELEASE "/DEBUG /OPT:REF /OPT:ICF")
     set_target_properties(libsrcml_static PROPERTIES OUTPUT_NAME libsrcmls LINK_FLAGS_RELEASE "/LTCG:OFF")
-    set_target_properties(libsrcml_static PROPERTIES INTERPROCEDURAL_OPTIMIZATION OFF)
 else()
     # The output name automatically prepends "lib"
     set_target_properties(libsrcml_shared libsrcml_static PROPERTIES OUTPUT_NAME srcml)
+    set_target_properties(libsrcml_static PROPERTIES INTERPROCEDURAL_OPTIMIZATION ON)
 endif()
 
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
