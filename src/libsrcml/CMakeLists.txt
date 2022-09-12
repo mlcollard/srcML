@@ -29,6 +29,7 @@ find_package(Iconv REQUIRED)
 # libsrcml library
 file(GLOB LIBSRCML_SOURCE *.h *.hpp *.cpp)
 add_library(libsrcml OBJECT ${LIBSRCML_SOURCE})
+set_target_properties(libsrcml PROPERTIES INTERPROCEDURAL_OPTIMIZATION ON)
 
 # Use the libsrcml/srcml.h rather than the /usr/local/include/srcml.h
 target_include_directories(libsrcml BEFORE PRIVATE .)
@@ -98,8 +99,6 @@ endif()
 
 # static library part of development
 install(TARGETS libsrcml_static COMPONENT DEVLIBS)
-
-# set_target_properties(libsrcml_shared PROPERTIES INTERPROCEDURAL_OPTIMIZATION ON)
 
 if(LINK_LIBSRCML_STATIC AND BUILD_LIBSRCML_STATIC)
     add_library(libsrcml_link ALIAS libsrcml_static)
