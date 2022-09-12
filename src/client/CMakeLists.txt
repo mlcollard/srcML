@@ -27,7 +27,7 @@ find_package(CURL REQUIRED)
 
 include(FetchContent)
 FetchContent_Declare(cli11
-  URL https://github.com/CLIUtils/CLI11/releases/download/v2.2.0/CLI11.hpp
+  URL https://github.com/CLIUtils/CLI11/releases/download/v1.8.0/CLI11.hpp
   DOWNLOAD_NO_EXTRACT TRUE
 )
 FetchContent_MakeAvailable(cli11)
@@ -71,3 +71,7 @@ target_compile_options(srcml PRIVATE
     $<$<CXX_COMPILER_ID:MSVC>:/wd4355> # this': used in base member initializer list
     $<$<CXX_COMPILER_ID:MSVC>:/wd5204> # class has virtual functions, but its trivial destructor is not virtual
 )
+
+if(MSVC)
+    set_source_files_properties(srcml_cli.cpp PROPERTIES COMPILE_FLAGS /wd4866)
+endif()
