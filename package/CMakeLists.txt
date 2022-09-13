@@ -107,12 +107,8 @@ if(NOT TARGET gen_package)
        VERBATIM)
 endif()
 
-message("CPACK_NSIS_MODIFY_PATH: ${CPACK_NSIS_MODIFY_PATH}")
-
 # needs to be last so not overwritten
 include(CPack)
-
-message("CPACK_NSIS_MODIFY_PATH: ${CPACK_NSIS_MODIFY_PATH}")
 
 # Client component, SRCML, is just one component so it appears as on item
 # for installers that let you pick what to install
