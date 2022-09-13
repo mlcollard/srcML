@@ -20,7 +20,11 @@
 # CMake files for packages
 
 # especially for archives
-set(CPACK_COMPONENTS_GROUPING "ONE_PER_GROUP")
+if(MSVC)
+    set(CPACK_COMPONENTS_GROUPING "ALL_COMPONENTS_IN_ONE")
+else()
+    set(CPACK_COMPONENTS_GROUPING "ONE_PER_GROUP")
+endif()
 
 # Package name
 set(CPACK_PACKAGE_NAME "srcml") 
