@@ -92,7 +92,7 @@ endif()
 # which types of libraries
 if(MSVC)
     # libsrcml shared
-    install(TARGETS libsrcml_shared RUNTIME COMPONENT SRCML)
+    install(TARGETS libsrcml_shared RUNTIME COMPONENT SRCML ARCHIVE COMPONENT DEVLIBS)
 
     # pdb file for the MSVC shared version
     install(FILES $<TARGET_PDB_FILE:libsrcml_shared> DESTINATION bin COMPONENT DEVLIBS)
