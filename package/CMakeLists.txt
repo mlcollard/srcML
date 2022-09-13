@@ -88,13 +88,13 @@ set(CPACK_PACKAGE_DIRECTORY ${CMAKE_BINARY_DIR}/dist)
 set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
 
 # specific configurations
-if (CPACK_GENERATOR MATCHES "RPM")
+if(CPACK_GENERATOR MATCHES "RPM")
     include(rpm.cmake)
-elseif (CPACK_GENERATOR MATCHES "DEB")
+elseif(CPACK_GENERATOR MATCHES "DEB")
     include(debian.cmake)
-elseif (WIN32)
+elseif(CPACK_GENERATOR MATCHES "WIX")
     include(nsis.cmake)
-elseif (APPLE)
+elseif(CPACK_GENERATOR MATCHES "productbuild")
     include(macos.cmake)
 endif()
 
