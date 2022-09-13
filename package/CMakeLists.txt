@@ -38,6 +38,7 @@ set(CPACK_CREATE_DESKTOP_LINKS "${CPACK_PACKAGE_NAME}")
 # Generator settings
 if(WIN32)
     set(CPACK_PACKAGE_FILE_NAME "srcML-Win")
+    set(CPACK_GENERATOR "WIX")
 elseif(APPLE)
     set(CPACK_GENERATOR "productbuild;TGZ;TBZ2")
 elseif(CMAKE_SYSTEM_NAME MATCHES "Darwin")
@@ -102,8 +103,12 @@ if(NOT TARGET gen_package)
        VERBATIM)
 endif()
 
+message("CPACK_NSIS_MODIFY_PATH: ${CPACK_NSIS_MODIFY_PATH}")
+
 # needs to be last so not overwritten
 include(CPack)
+
+message("CPACK_NSIS_MODIFY_PATH: ${CPACK_NSIS_MODIFY_PATH}")
 
 # Client component, SRCML, is just one component so it appears as on item
 # for installers that let you pick what to install

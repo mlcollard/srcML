@@ -50,7 +50,7 @@ jobs:
         working-directory: build
         continue-on-error: true
         run: |
-          cpack -G WIX -V
+          cpack -V
       - uses: actions/upload-artifact@v3
         with:
           name: wix.log

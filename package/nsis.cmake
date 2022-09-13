@@ -24,7 +24,7 @@ set(CPACK_NSIS_MUI_UNIICON ${CMAKE_SOURCE_DIR}/package/srcml_icon.ico)
 set(CPACK_NSIS_INSTALLED_ICON_NAME srcml_icon.ico)
 
 # already set
-set(CPACK_NSIS_MODIFY_PATH "ON")
+set(CPACK_NSIS_MODIFY_PATH ON)
 
 # directory name
 set(CPACK_PACKAGE_INSTALL_DIRECTORY "srcML")
