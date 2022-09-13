@@ -22,7 +22,10 @@
 # add examples
 file(GLOB EXAMPLES "srcml_*.c")
 
-install(FILES ${EXAMPLES} DESTINATION share/srcml/examples COMPONENT EXAMPLES)
+# add one-by-one to avoid problems with long lists
+foreach(EXAMPLE ${EXAMPLES})
+    install(FILES "${EXAMPLE}" DESTINATION share/srcml/examples COMPONENT EXAMPLES)
+endforeach()
 
 if(BUILD_EXAMPLES)
 
