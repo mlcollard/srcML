@@ -30,6 +30,7 @@ jobs:
         run: |
           cmake --version
           mkdir build
+          $VCPKG_ROOT/vcpkg list
 
       - name: CMake Setup on Windows
         shell: bash
@@ -37,6 +38,7 @@ jobs:
         run: |
           export UseMultiToolTask=true
           echo "VCPKG_ROOT" $VCPKG_ROOT
+          $VCPKG_ROOT/vcpkg list
           cmake .. -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake -DCMAKE_CXX_COMPILER=cl -DCMAKE_C_COMPILER=cl -DCMAKE_VERBOSE_MAKEFILE=ON
 
       - name: Build
