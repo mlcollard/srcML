@@ -24,7 +24,11 @@ file(GLOB EXAMPLES "srcml_*.c")
 
 # add one-by-one to avoid problems with long lists
 foreach(EXAMPLE ${EXAMPLES})
+if(NOT MSVC)
     install(FILES "${EXAMPLE}" DESTINATION share/srcml/examples COMPONENT EXAMPLES)
+else()
+    install(FILES "${EXAMPLE}" DESTINATION share/srcml/examples)
+endif()
 endforeach()
 
 if(BUILD_EXAMPLES)

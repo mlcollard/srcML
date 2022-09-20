@@ -20,7 +20,7 @@
 set(CPACK_COMPONENTS_GROUPING ALL_COMPONENTS_IN_ONE)
 
 # set icon
-install(FILES ${CMAKE_SOURCE_DIR}/package/srcml_icon.ico DESTINATION . COMPONENT SRCML)
+install(FILES ${CMAKE_SOURCE_DIR}/package/srcml_icon.ico DESTINATION .)
 set(CPACK_WIX_PRODUCT_ICON ${CMAKE_SOURCE_DIR}/package/srcml_icon.ico)
 
 # already set

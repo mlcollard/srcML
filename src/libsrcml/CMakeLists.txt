@@ -38,9 +38,9 @@ target_include_directories(libsrcml BEFORE PRIVATE .)
 
 # libsrcml dependencies
 if(MSVC)
-    target_link_libraries(libsrcml PUBLIC LibXml2::LibXml2 Iconv::Iconv LibXslt::LibXslt LibXslt::LibExslt TinySHA1 parser)
+    target_link_libraries(libsrcml PRIVATE LibXml2::LibXml2 Iconv::Iconv LibXslt::LibXslt LibXslt::LibExslt TinySHA1 parser)
 else()
-    target_link_libraries(libsrcml PUBLIC LibXml2::LibXml2 Iconv::Iconv LibXslt::LibXslt LibXslt::LibExslt TinySHA1 pthread PRIVATE parser)
+    target_link_libraries(libsrcml PRIVATE LibXml2::LibXml2 Iconv::Iconv LibXslt::LibXslt LibXslt::LibExslt TinySHA1 pthread parser)
 endif()
 # target_compile_options(libsrcml PUBLIC "-fvisibility=hidden")
 
@@ -92,16 +92,17 @@ endif()
 # which types of libraries
 if(MSVC)
     # libsrcml shared
-    install(TARGETS libsrcml_shared RUNTIME COMPONENT SRCML ARCHIVE COMPONENT DEVLIBS)
-
-    # pdb file for the MSVC shared version
-    install(FILES $<TARGET_PDB_FILE:libsrcml_shared> DESTINATION bin COMPONENT DEVLIBS)
-else()
-    install(TARGETS libsrcml_shared LIBRARY COMPONENT SRCML NAMELINK_COMPONENT DEVLIBS)
+    install(TARGETS libsrcml_shared RUNTIME ARCHIVE)
+    install(TARGETS libsrcml_shared LIBRARY)
 endif()
 
 # static library part of development
-install(TARGETS libsrcml_static COMPONENT DEVLIBS)
+if(NOT MSVC)
+    install(TARGETS libsrcml_static COMPONENT DEVLIBS)
+else()
+    install(TARGETS libsrcml_static)
+endif()
+
 
 if(LINK_LIBSRCML_STATIC AND BUILD_LIBSRCML_STATIC)
     add_library(libsrcml_link ALIAS libsrcml_static)
@@ -110,14 +111,19 @@ else()
 endif()
 
 # install the libsrcml include file
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/srcml.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT DEVLIBS)
+if(NOT MSVC)
+    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/srcml.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT DEVLIBS)
+else()
+    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/srcml.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+endif()
+
 
 # On Windows with vcpkg, install all the dlls that the vcpkg installed
 # NOTE: Would be better to use $<TARGET_RUNTIME_DLLS:libsrcml_shared>, but that does not include
 # indirect dependencies, e.g., bzip2 for libxml
 if(MSVC AND VCPKG)
     file(GLOB VCPKG_SRCML_DEPENDENCIES "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/bin/*${CMAKE_SHARED_LIBRARY_SUFFIX}")
-    install(FILES ${VCPKG_SRCML_DEPENDENCIES} DESTINATION bin COMPONENT SRCML)
+    install(FILES ${VCPKG_SRCML_DEPENDENCIES} DESTINATION bin)
 endif()
 
 # Run ldconfig for install (not cpack) on Ubuntu
