@@ -66,11 +66,7 @@ if(APPLE)
 endif()
 
 # Dependencies are installed via libsrcml
-# if(NOT MSVC)
-    install(TARGETS srcml COMPONENT SRCML)
-# else()
-#     install(TARGETS srcml)
-# endif()
+install(TARGETS srcml COMPONENT SRCML)
 
 target_compile_options(srcml PRIVATE
     $<$<CXX_COMPILER_ID:MSVC>:/wd4355> # this': used in base member initializer list
