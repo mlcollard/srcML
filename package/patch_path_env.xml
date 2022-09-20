@@ -1,5 +1,5 @@
 <CPackWiXPatch>
-  <CPackWiXFragment Id="CM_DP_Unspecified.bin">
+  <CPackWiXFragment Id="CM_DP_Unspecified">
     <Component Id="srcMLSystemPathEntryCMP" KeyPath="yes" Guid="0F77E4EA-1D81-4588-ACE1-7476724259F2">
 
       <Condition>ADD_SRCML_TO_PATH = "System"</Condition>
