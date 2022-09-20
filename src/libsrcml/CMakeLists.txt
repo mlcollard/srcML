@@ -97,11 +97,11 @@ if(MSVC)
 endif()
 
 # static library part of development
-if(NOT MSVC)
+# if(NOT MSVC)
     install(TARGETS libsrcml_static COMPONENT DEVLIBS)
-else()
-    install(TARGETS libsrcml_static)
-endif()
+# else()
+#     install(TARGETS libsrcml_static)
+# endif()
 
 
 if(LINK_LIBSRCML_STATIC AND BUILD_LIBSRCML_STATIC)
@@ -111,11 +111,11 @@ else()
 endif()
 
 # install the libsrcml include file
-if(NOT MSVC)
+# if(NOT MSVC)
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/srcml.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} COMPONENT DEVLIBS)
-else()
-    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/srcml.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-endif()
+# else()
+#     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/srcml.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+# endif()
 
 
 # On Windows with vcpkg, install all the dlls that the vcpkg installed
