@@ -110,6 +110,10 @@ endif()
 # needs to be last so not overwritten
 include(CPack)
 
+if(MSVC)
+    return()
+endif()
+
 # Client component, SRCML, is just one component so it appears as on item
 # for installers that let you pick what to install
 # Development group, SRCMLDEV, is composed of multiple components
