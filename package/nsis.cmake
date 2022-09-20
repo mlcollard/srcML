@@ -38,6 +38,7 @@ set(CPACK_WIX_UPGRADE_GUID "278604DF-BD50-410A-9475-993006D98663")
 
 # Background on dialogs
 set(CPACK_WIX_UI_DIALOG "${CMAKE_CURRENT_SOURCE_DIR}/background.png")
+set(CPACK_WIX_UI_BANNER "${CMAKE_CURRENT_SOURCE_DIR}/banner.png")
 
 # ID of custom UI
 set(CPACK_WIX_UI_REF "srcMLUI_InstallDir")
