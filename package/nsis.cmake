@@ -43,7 +43,7 @@ set(CPACK_WIX_UI_DIALOG "${CMAKE_CURRENT_SOURCE_DIR}/background.png")
 set(CPACK_WIX_UI_REF "srcMLUI_InstallDir")
 
 # Add to CMake registry so that other CMake files can use find_program()
-set(CPACK_WIX_CMAKE_PACKAGE_REGISTRY srcML)
+# set(CPACK_WIX_CMAKE_PACKAGE_REGISTRY srcML)
 
 # Extra dialog for adding to path
 set(CPACK_WIX_EXTRA_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/srcml_extra_dialog.wxs" "${CMAKE_CURRENT_SOURCE_DIR}/install_dir.wxs")
