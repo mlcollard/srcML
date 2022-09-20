@@ -93,6 +93,7 @@ endif()
 if(MSVC)
     # libsrcml shared
     install(TARGETS libsrcml_shared RUNTIME COMPONENT SRCML ARCHIVE COMPONENT DEVLIBS)
+else()
     install(TARGETS libsrcml_shared LIBRARY COMPONENT SRCML NAMELINK_COMPONENT DEVLIBS)
 endif()
 
