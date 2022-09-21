@@ -37,8 +37,6 @@ jobs:
         working-directory: build
         run: |
           export UseMultiToolTask=true
-          echo "VCPKG_ROOT" $VCPKG_ROOT
-          $VCPKG_ROOT/vcpkg list
           cmake .. -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake -DCMAKE_CXX_COMPILER=cl -DCMAKE_C_COMPILER=cl -DCMAKE_VERBOSE_MAKEFILE=ON
 
       - name: Build
@@ -131,8 +129,6 @@ jobs:
         continue-on-error: true
         run: |
           export SRCML_HOME="/c/Program Files/srcML/bin/"
-          cmake --version
-          ctest --version
           ctest -C Release -VV
 
       - uses: actions/upload-artifact@v3
