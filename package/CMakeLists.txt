@@ -41,7 +41,6 @@ set(CPACK_CREATE_DESKTOP_LINKS "${CPACK_PACKAGE_NAME}")
 
 # Generator settings
 if(WIN32)
-    set(CPACK_PACKAGE_FILE_NAME "srcML-Win")
     set(CPACK_GENERATOR "WIX;ZIP")
 elseif(APPLE)
     set(CPACK_GENERATOR "productbuild;TGZ;TBZ2")

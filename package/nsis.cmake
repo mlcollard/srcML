@@ -17,6 +17,9 @@
 # along with the srcML Toolkit; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
+# package naming
+set(CPACK_SYSTEM_NAME "windows-x86_64")
+
 # set icon
 install(FILES ${CMAKE_SOURCE_DIR}/package/srcml_icon.ico DESTINATION . COMPONENT SRCML)
 set(CPACK_WIX_PRODUCT_ICON ${CMAKE_SOURCE_DIR}/package/srcml_icon.ico)
