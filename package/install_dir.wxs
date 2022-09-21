@@ -1,9 +1,9 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 	<Fragment>
 		<UI Id="srcMLUI_InstallDir">
-			<TextStyle Id="WixUI_Font_Normal" FaceName="Tahoma" Size="8" />
-			<TextStyle Id="WixUI_Font_Bigger" FaceName="Tahoma" Size="12" />
-			<TextStyle Id="WixUI_Font_Title" FaceName="Tahoma" Size="9" Bold="yes" />
+			<TextStyle Id="WixUI_Font_Normal" FaceName="Segeo" Size="8" />
+			<TextStyle Id="WixUI_Font_Bigger" FaceName="Segeo" Size="12" />
+			<TextStyle Id="WixUI_Font_Title" FaceName="Segeo" Size="9" Bold="yes" />
 
 			<Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
 			<Property Id="WixUI_Mode" Value="InstallDir" />
