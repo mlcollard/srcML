@@ -58,8 +58,8 @@ jobs:
           path: build/dist/_CPack_Packages/win64/WIX/wix.log
       - uses: actions/upload-artifact@v3
         with:
-          name: srcML-Win
-          path: build/dist/srcML-Win.msi
+          name: Installers
+          path: build/dist/*.msi
       - uses: actions/upload-artifact@v3
         with:
           name: CPack
