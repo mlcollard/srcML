@@ -20,6 +20,9 @@
 # package naming
 set(CPACK_SYSTEM_NAME "windows-x86_64")
 
+# Windows is one package
+set(CPACK_ARCHIVE_COMPONENT_INSTALL OFF)
+
 # set icon
 install(FILES ${CMAKE_SOURCE_DIR}/package/srcml_icon.ico DESTINATION . COMPONENT SRCML)
 set(CPACK_WIX_PRODUCT_ICON ${CMAKE_SOURCE_DIR}/package/srcml_icon.ico)
