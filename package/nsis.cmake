@@ -21,14 +21,8 @@
 install(FILES ${CMAKE_SOURCE_DIR}/package/srcml_icon.ico DESTINATION . COMPONENT SRCML)
 set(CPACK_WIX_PRODUCT_ICON ${CMAKE_SOURCE_DIR}/package/srcml_icon.ico)
 
-# already set
-set(CPACK_NSIS_MODIFY_PATH ON)
-
 # directory name
 set(CPACK_PACKAGE_INSTALL_DIRECTORY "srcML")
-
-# set contact in add/remove programs
-set(CPACK_NSIS_CONTACT "srcML <srcML.org>")
 
 # Custom GUID
 set(CPACK_WIX_PRODUCT_GUID "8EB65BD8-DF5B-4DED-A642-80BDBBDEB58C")
@@ -44,7 +38,7 @@ set(CPACK_WIX_UI_BANNER "${CMAKE_CURRENT_SOURCE_DIR}/banner.png")
 set(CPACK_WIX_UI_REF "srcMLUI_InstallDir")
 
 # Add to CMake registry so that other CMake files can use find_program()
-# set(CPACK_WIX_CMAKE_PACKAGE_REGISTRY srcML)
+set(CPACK_WIX_CMAKE_PACKAGE_REGISTRY srcML)
 
 # Extra dialog for adding to path
 set(CPACK_WIX_EXTRA_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/srcml_extra_dialog.wxs" "${CMAKE_CURRENT_SOURCE_DIR}/install_dir.wxs")
