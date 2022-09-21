@@ -19,9 +19,6 @@
 # 
 # CMake files for the srcML client
 
-# strip executables
-set(CPACK_STRIP_FILES ON)
-
 find_package(LibArchive 3 REQUIRED)
 find_package(CURL REQUIRED)
 

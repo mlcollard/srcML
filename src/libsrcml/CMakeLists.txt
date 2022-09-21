@@ -19,9 +19,6 @@
 # 
 # CMake files for the library libsrcml
 
-# strip executables
-set(CPACK_STRIP_FILES ON)
-
 find_package(LibXml2 REQUIRED)
 find_package(LibXslt REQUIRED)
 find_package(Iconv REQUIRED)
