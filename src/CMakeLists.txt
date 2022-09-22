@@ -20,6 +20,7 @@
 # CMake files for building from source
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 option(SRCML_BUILD_USEPCH "Use PCH (PreCompiled Headers" OFF)
 
