@@ -117,6 +117,14 @@ if(NOT MSVC)
                         DESCRIPTION "Include file, srcml.h"
                         DISABLED
                         GROUP SRCMLDEV)
+
+endif()
+
+# Need to call ldconfig for install, but not for package
+# Component HIDE is not to be packaged
+if(DISTRO AND DISTRO MATCHES "Ubuntu")
+    get_cmake_property(CPACK_COMPONENTS_ALL COMPONENTS)
+    list(REMOVE_ITEM CPACK_COMPONENTS_ALL "HIDE")
 endif()
 
 # specific configurations

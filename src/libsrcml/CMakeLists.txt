@@ -115,7 +115,8 @@ if(MSVC AND VCPKG)
 endif()
 
 # Run ldconfig for install (not cpack) on Ubuntu
+# The component is for ignoring in cpack
 if(DISTRO AND DISTRO MATCHES "Ubuntu")
-    install(CODE "message(STATUS \"Running: ldconfig\")")
-    install(CODE "execute_process(COMMAND ldconfig)")
+    install(CODE "message(STATUS \"Running: ldconfig\")" COMPONENT HIDE)
+    install(CODE "execute_process(COMMAND ldconfig)" COMPONENT HIDE)
 endif()
