@@ -34,7 +34,7 @@ if(APPLE AND CMAKE_OSX_ARCHITECTURES_NOTSET AND OS_VERSION GREATER_EQUAL "20")
     if(PLATFORM_SUPPORTS_x86_64 AND PLATFORM_SUPPORTS_arm64)
         set(CMAKE_OSX_ARCHITECTURES "x86_64;arm64" CACHE STRING "Build architectures for Mac OS X" FORCE)
         message(STATUS "Detected ability to build for multiple architectures: ${CMAKE_OSX_ARCHITECTURES}")
-        if(VCPKG)
+        if(DEFINED VCPKG_TARGET_TRIPLET)
             # set(VCPKG_OSX_ARCHITECTURES "x86_64;arm64")
         endif()
     endif()
@@ -49,7 +49,7 @@ endif()
 # For macOS Catalina and more recent, the provided libarchive is at least version 3.3
 # and all that is needed is the matching header files.
 # For earlier versions of macOS, brew must be used with a more recent libarchive.a
-if(APPLE AND NOT VCPKG)
+if(APPLE AND NOT DEFINED VCPKG_TARGET_TRIPLET)
 
     # Detect brew directories on macOS
     execute_process(COMMAND brew --prefix
