@@ -56,9 +56,7 @@ add_library(antlr OBJECT "${ANTLR_SOURCE}")
 target_include_directories(antlr SYSTEM PUBLIC "${antlrsrc_SOURCE_DIR}/lib/cpp/" SYSTEM PRIVATE "${antlrsrc_SOURCE_DIR}/lib/cpp/")
 
 # With MSVC, interprocedural optimization leads to a 10x static library, with only a slight reduction in size for the dynamic library
-if(NOT MSVC)
-    set_target_properties(antlr PROPERTIES INTERPROCEDURAL_OPTIMIZATION ON)
-endif()
+set_target_properties(antlr PROPERTIES INTERPROCEDURAL_OPTIMIZATION $<IF:$<CXX_COMPILER_ID:MSVC>,OFF,ON>)
 
 # Generated source from antlr and the parser
 set(CMAKE_GENERATED_SOURCE_DIR ${CMAKE_BINARY_DIR}/parser)
@@ -167,12 +165,11 @@ RunAntlr("${srcMLParserOutputFiles}"
     "OperatorLexer.g\;KeywordLexer.g\;TextLexer.g"
 )
 
+# set_target_properties(libsrcml PROPERTIES INTERPROCEDURAL_OPTIMIZATION $<NOT:$<CXX_COMPILER_ID:MSVC>,<UTFCharBuffer.hpp>>)
+
 if(SRCML_BUILD_USEPCH)
-    target_precompile_headers(parser PRIVATE <srcMLParser.hpp> <CommentTextLexer.hpp> <ModeStack.hpp> <Language.hpp>)
-    # Not sure why this is here. Perhaps an error when compiled
-    if(NOT MSVC)
-        target_precompile_headers(parser PRIVATE <UTF8CharBuffer.hpp>)
-    endif()
+    # Not sure why <UTF8CharBuffer> is non-MSVC. Perhaps an error when compiled
+    target_precompile_headers(parser PRIVATE <srcMLParser.hpp> <CommentTextLexer.hpp> <ModeStack.hpp> <Language.hpp> $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:<UTF8CharBuffer.hpp$<ANGLE-R>>)
 endif()
 
 option(ENABLE_ANTLR_BUILD_WARNINGS "Enable disabled antlr library build warnings" OFF)

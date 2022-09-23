@@ -50,9 +50,7 @@ target_link_libraries(srcml PRIVATE libsrcml_link LibArchive::LibArchive CURL::l
 set_target_properties(srcml PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # With MSVC, interprocedural optimization leads to a 10x static library, with only a slight reduction in size for the dynamic library
-if(NOT MSVC)
-    set_target_properties(srcml PROPERTIES INTERPROCEDURAL_OPTIMIZATION ON)
-endif()
+set_target_properties(srcml PROPERTIES INTERPROCEDURAL_OPTIMIZATION $<IF:$<CXX_COMPILER_ID:MSVC>,OFF,ON>)
 
 # Largest impace for PCH builds of the client
 if(SRCML_BUILD_USEPCH)

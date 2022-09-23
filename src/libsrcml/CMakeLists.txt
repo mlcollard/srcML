@@ -28,9 +28,7 @@ file(GLOB LIBSRCML_SOURCE *.h *.hpp *.cpp)
 add_library(libsrcml OBJECT ${LIBSRCML_SOURCE})
 
 # With MSVC, interprocedural optimization leads to a 10x static library, with only a slight reduction in size for the dynamic library
-if(NOT MSVC)
-    set_target_properties(libsrcml PROPERTIES INTERPROCEDURAL_OPTIMIZATION ON)
-endif()
+set_target_properties(libsrcml PROPERTIES INTERPROCEDURAL_OPTIMIZATION $<IF:$<CXX_COMPILER_ID:MSVC>,OFF,ON>)
 
 # Use the libsrcml/srcml.h rather than the /usr/local/include/srcml.h
 target_include_directories(libsrcml BEFORE PRIVATE .)
