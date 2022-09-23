@@ -78,9 +78,7 @@ target_include_directories(parser PRIVATE . ${CMAKE_GENERATED_SOURCE_DIR} ${CMAK
 target_link_libraries(parser PRIVATE LibXml2::LibXml2 TinySHA1 antlr)
 
 # With MSVC, interprocedural optimization leads to a 10x static library, with only a slight reduction in size for the dynamic library
-if(NOT MSVC)
-    set_target_properties(parser PROPERTIES INTERPROCEDURAL_OPTIMIZATION ON)
-endif()
+set_target_properties(parser PROPERTIES INTERPROCEDURAL_OPTIMIZATION $<IF:$<CXX_COMPILER_ID:MSVC>,OFF,ON>)
 
 # 
 # RunAntlr
