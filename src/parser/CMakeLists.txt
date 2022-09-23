@@ -175,17 +175,17 @@ if(NOT ENABLE_ANTLR_BUILD_WARNINGS)
     target_compile_options(antlr PRIVATE
         $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wno-format>
         $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wno-misleading-indentation>
-        $<$<CXX_COMPILER_ID:MSVC>:/wd4365> # conversion from 'int' to 'unsigned int',
-        $<$<CXX_COMPILER_ID:MSVC>:/wd4267> # 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
-        $<$<CXX_COMPILER_ID:MSVC>:/wd4244> # 'argument': conversion from 'unsigned int' to '_Elem', possible loss of data
-        $<$<CXX_COMPILER_ID:MSVC>:/wd4458> # declaration of 'index' hides class member
-        $<$<CXX_COMPILER_ID:MSVC>:/wd4242> # 'argument': conversion from 'T' to '_Elem', possible loss of data
-        $<$<CXX_COMPILER_ID:MSVC>:/wd4244> # 'argument': conversion from 'T' to '_Elem', possible loss of data
-        $<$<CXX_COMPILER_ID:MSVC>:/wd4100> # unreferenced formal parameter
-        $<$<CXX_COMPILER_ID:MSVC>:/wd4355> # this': used in base member initializer list
-        $<$<CXX_COMPILER_ID:MSVC>:/wd4365> # 'argument': conversion from 'size_t' to 'const __int64', signed/unsigned mismatch
-        $<$<CXX_COMPILER_ID:MSVC>:/wd4477> # 'sprintf' : format string '%u' requires an argument of type 'unsigned int', but variadic argument 1 has type 'size_t'
-        $<$<CXX_COMPILER_ID:MSVC>:/wd5031> # #pragma warning(pop): likely mismatch, popping warning state pushed in different file
+        # $<$<CXX_COMPILER_ID:MSVC>:/wd4365> # conversion from 'int' to 'unsigned int',
+        # $<$<CXX_COMPILER_ID:MSVC>:/wd4267> # 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
+        # $<$<CXX_COMPILER_ID:MSVC>:/wd4244> # 'argument': conversion from 'unsigned int' to '_Elem', possible loss of data
+        # $<$<CXX_COMPILER_ID:MSVC>:/wd4458> # declaration of 'index' hides class member
+        # $<$<CXX_COMPILER_ID:MSVC>:/wd4242> # 'argument': conversion from 'T' to '_Elem', possible loss of data
+        # $<$<CXX_COMPILER_ID:MSVC>:/wd4244> # 'argument': conversion from 'T' to '_Elem', possible loss of data
+        # $<$<CXX_COMPILER_ID:MSVC>:/wd4100> # unreferenced formal parameter
+        # $<$<CXX_COMPILER_ID:MSVC>:/wd4355> # this': used in base member initializer list
+        # $<$<CXX_COMPILER_ID:MSVC>:/wd4365> # 'argument': conversion from 'size_t' to 'const __int64', signed/unsigned mismatch
+        # $<$<CXX_COMPILER_ID:MSVC>:/wd4477> # 'sprintf' : format string '%u' requires an argument of type 'unsigned int', but variadic argument 1 has type 'size_t'
+        # $<$<CXX_COMPILER_ID:MSVC>:/wd5031> # #pragma warning(pop): likely mismatch, popping warning state pushed in different file
     )
     target_compile_options(parser PRIVATE
         $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wno-unused-but-set-variable>
