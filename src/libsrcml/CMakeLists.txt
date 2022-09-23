@@ -26,6 +26,8 @@ find_package(Iconv REQUIRED)
 # libsrcml library
 file(GLOB LIBSRCML_SOURCE *.h *.hpp *.cpp)
 add_library(libsrcml OBJECT ${LIBSRCML_SOURCE})
+
+# With MSVC, interprocedural optimization leads to a 10x static library, with only a slight reduction in size for the dynamic library
 if(NOT MSVC)
     set_target_properties(libsrcml PROPERTIES INTERPROCEDURAL_OPTIMIZATION ON)
 endif()
@@ -65,7 +67,7 @@ endif()
 
 set_target_properties(libsrcml_shared PROPERTIES VERSION "${PROJECT_VERSION}" SOVERSION "${PROJECT_VERSION_MAJOR}")
 
-if(MSVC)
+if(WIN32)
     # On Windows, generate a debug of the release for the PDB file, but use optimization options
     set_target_properties(libsrcml_shared PROPERTIES OUTPUT_NAME libsrcml LINK_FLAGS_RELEASE "/DEBUG /OPT:REF /OPT:ICF")
     set_target_properties(libsrcml_static PROPERTIES OUTPUT_NAME libsrcmls LINK_FLAGS_RELEASE "/LTCG:OFF")
@@ -87,7 +89,7 @@ elseif(NOT WIN32)
 endif()
 
 # which types of libraries
-if(MSVC)
+if(WIN32)
     # libsrcml shared
     install(TARGETS libsrcml_shared RUNTIME COMPONENT SRCML ARCHIVE COMPONENT DEVLIBS)
 else()
@@ -109,7 +111,7 @@ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/srcml.h DESTINATION ${CMAKE_INSTALL_IN
 # On Windows with vcpkg, install all the dlls that the vcpkg installed
 # NOTE: Would be better to use $<TARGET_RUNTIME_DLLS:libsrcml_shared>, but that does not include
 # indirect dependencies, e.g., bzip2 for libxml
-if(MSVC AND DEFINED VCPKG_TARGET_TRIPLET)
+if(WIN32 AND DEFINED VCPKG_TARGET_TRIPLET)
     file(GLOB VCPKG_SRCML_DEPENDENCIES "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/bin/*${CMAKE_SHARED_LIBRARY_SUFFIX}")
     install(FILES ${VCPKG_SRCML_DEPENDENCIES} DESTINATION bin COMPONENT SRCML)
 endif()

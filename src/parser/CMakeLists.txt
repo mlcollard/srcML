@@ -54,6 +54,8 @@ file(GLOB ANTLR_SOURCE ${antlrsrc_SOURCE_DIR}/lib/cpp/src/*.cpp)
 list(REMOVE_ITEM ANTLR_SOURCE "${antlrsrc_SOURCE_DIR}/lib/cpp/src/dll.cpp")
 add_library(antlr OBJECT "${ANTLR_SOURCE}")
 target_include_directories(antlr SYSTEM PUBLIC "${antlrsrc_SOURCE_DIR}/lib/cpp/" SYSTEM PRIVATE "${antlrsrc_SOURCE_DIR}/lib/cpp/")
+
+# With MSVC, interprocedural optimization leads to a 10x static library, with only a slight reduction in size for the dynamic library
 if(NOT MSVC)
     set_target_properties(antlr PROPERTIES INTERPROCEDURAL_OPTIMIZATION ON)
 endif()
@@ -76,6 +78,8 @@ add_library(parser OBJECT
 target_include_directories(parser SYSTEM PUBLIC ${antlrsrc_SOURCE_DIR}/lib/cpp)
 target_include_directories(parser PRIVATE . ${CMAKE_GENERATED_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/src/libsrcml PUBLIC . SYSTEM PUBLIC ${CMAKE_GENERATED_SOURCE_DIR})
 target_link_libraries(parser PRIVATE LibXml2::LibXml2 TinySHA1 antlr)
+
+# With MSVC, interprocedural optimization leads to a 10x static library, with only a slight reduction in size for the dynamic library
 if(NOT MSVC)
     set_target_properties(parser PROPERTIES INTERPROCEDURAL_OPTIMIZATION ON)
 endif()
@@ -165,6 +169,7 @@ RunAntlr("${srcMLParserOutputFiles}"
 
 if(SRCML_BUILD_USEPCH)
     target_precompile_headers(parser PRIVATE <srcMLParser.hpp> <CommentTextLexer.hpp> <ModeStack.hpp> <Language.hpp>)
+    # Not sure why this is here. Perhaps an error when compiled
     if(NOT MSVC)
         target_precompile_headers(parser PRIVATE <UTF8CharBuffer.hpp>)
     endif()
