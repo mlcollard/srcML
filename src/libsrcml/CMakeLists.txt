@@ -36,11 +36,8 @@ endif()
 target_include_directories(libsrcml BEFORE PRIVATE .)
 
 # libsrcml dependencies
-if(MSVC)
-    target_link_libraries(libsrcml PRIVATE LibXml2::LibXml2 Iconv::Iconv LibXslt::LibXslt LibXslt::LibExslt TinySHA1 parser)
-else()
-    target_link_libraries(libsrcml PRIVATE LibXml2::LibXml2 Iconv::Iconv LibXslt::LibXslt LibXslt::LibExslt TinySHA1 pthread parser)
-endif()
+target_link_libraries(libsrcml PRIVATE LibXml2::LibXml2 Iconv::Iconv LibXslt::LibXslt LibXslt::LibExslt TinySHA1 parser $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:pthread>)
+
 # target_compile_options(libsrcml PUBLIC "-fvisibility=hidden")
 
 # precompiled header list of most commonly used
