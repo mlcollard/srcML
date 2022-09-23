@@ -68,7 +68,7 @@ jobs:
       - name: Install package
         working-directory: build/dist
         continue-on-error: true
-        run: msiexec /i D:\a\srcML\srcML\build\dist\srcML-Win.msi /quiet /norestart /L*vx .\msi.log
+        run: msiexec /i D:\a\srcML\srcML\build\dist\srcml-1.0.0-windows-x86_64.msi /quiet /norestart /L*vx .\msi.log
       - uses: actions/upload-artifact@v3
         with:
           name: msi.log
