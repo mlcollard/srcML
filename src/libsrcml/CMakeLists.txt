@@ -56,10 +56,6 @@ set_target_properties(libsrcml_shared PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 target_link_libraries(libsrcml_shared PUBLIC libsrcml PRIVATE parser antlr)
 
-if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND CMAKE_COMPILER_IS_GNUCXX)
-    target_link_libraries(libsrcml_shared PRIVATE gcov)
-endif()
-
 set_target_properties(libsrcml_shared PROPERTIES VERSION "${PROJECT_VERSION}" SOVERSION "${PROJECT_VERSION_MAJOR}")
 
 if(WIN32)
