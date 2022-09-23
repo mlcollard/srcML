@@ -67,9 +67,20 @@ if(APPLE AND NOT DEFINED VCPKG_TARGET_TRIPLET)
     string(SUBSTRING ${CMAKE_SYSTEM_VERSION} 0 2 OS_VERSION)
     if(NOT SRCML_BUILD_BREW_LIBARCHIVE AND OS_VERSION GREATER_EQUAL "19")
 
+        # Map from macOS version to libarchive number
+        if(OS_VERSION EQUAL 19)
+            # Catalina
+            set(LIBARCHIVE_VERSION "72.11.2")
+        elseif(OS_VERSION EQUAL 20)
+            # Big Sur
+            set(LIBARCHIVE_VERSION "83.40.4")
+        elseif(OS_VERSION EQUAL 21)
+            # Monterey
+            set(LIBARCHIVE_VERSION "83.40.4")
+        endif()
+
         # fetch via Apple opensource
-        set(LIBARCHIVE_VERSION "libarchive-83.40.4")
-        set(LIBARCHIVE_URL "https://opensource.apple.com/source/libarchive/${LIBARCHIVE_VERSION}/libarchive/libarchive")
+        set(LIBARCHIVE_URL "https://opensource.apple.com/source/libarchive/libarchive-${LIBARCHIVE_VERSION}/libarchive/libarchive")
         include(FetchContent)
         FetchContent_Declare(libarchiveInclude1
             URL ${LIBARCHIVE_URL}/archive.h
