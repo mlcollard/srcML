@@ -90,22 +90,13 @@ set_target_properties(parser PROPERTIES INTERPROCEDURAL_OPTIMIZATION $<IF:$<CXX_
 #
 macro(RunAntlr OUTPUT_FILES INPUT_FILES DEPENDENCIES INCLUDE_GRAMMAR)
 
-    if("${INCLUDE_GRAMMAR}" STREQUAL "")
-        # Handling windows relative path problem (Not sure why this is an issue but it's given me a headache).
-        add_custom_command(OUTPUT  ${OUTPUT_FILES}
-            DEPENDS ${INPUT_FILES} ${DEPENDENCIES}
-            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-            COMMAND ${ANTLR_EXE} -o \"${CMAKE_GENERATED_SOURCE_DIR}\" ${INPUT_FILES}
-            COMMAND ${CMAKE_COMMAND} -E touch ${OUTPUT_FILES}
-        )
-    else()
-        add_custom_command(OUTPUT  ${OUTPUT_FILES}
-            DEPENDS ${INPUT_FILES} ${DEPENDENCIES}
-            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-            COMMAND ${ANTLR_EXE} -o \"${CMAKE_GENERATED_SOURCE_DIR}\" -glib \"${INCLUDE_GRAMMAR}\" ${INPUT_FILES}
-            COMMAND ${CMAKE_COMMAND} -E touch ${OUTPUT_FILES}
-        )
-    endif()
+    add_custom_command(OUTPUT  ${OUTPUT_FILES}
+        DEPENDS ${INPUT_FILES} ${DEPENDENCIES}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        COMMAND ${ANTLR_EXE} -o \"${CMAKE_GENERATED_SOURCE_DIR}\" -glib \"${INCLUDE_GRAMMAR}\" ${INPUT_FILES}
+        COMMAND ${CMAKE_COMMAND} -E touch ${OUTPUT_FILES}
+    )
+
 endmacro(RunAntlr)
 
 macro(lexerFiles LEXER)
