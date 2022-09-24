@@ -110,6 +110,11 @@ endif()
 # Run ldconfig for install (not cpack) on Ubuntu
 # The component is for ignoring in cpack
 if(DISTRO AND DISTRO MATCHES "Ubuntu")
-    install(CODE "message(STATUS \"Running: ldconfig\")" COMPONENT HIDE)
-    install(CODE "execute_process(COMMAND ldconfig)" COMPONENT HIDE)
+    find_program(LDCONFIG ldconfig)
+    if(LDCONFIG)
+        install(CODE "message(STATUS \"Running: ldconfig\")" COMPONENT HIDE)
+        install(CODE "execute_process(COMMAND ${LDCONFIG})" COMPONENT HIDE)
+    else()
+        install(CODE "message(STATUS \"Required ldconfig not found\")" COMPONENT HIDE)
+    endif()
 endif()
