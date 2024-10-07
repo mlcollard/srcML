@@ -106,11 +106,6 @@ void number_add_calls(XPathNode* node, int group, std::map<std::string,int>* cou
         int start_quote = node_text.find("\"",start);
         int end_quote = node_text.find("\"",start_quote+1);
         std::string identifier = node_text.substr(start_quote+1, end_quote-start_quote-1);
-        // if(count->find(identifier) == count->end()) {
-        //     (*count)[identifier] = 0;
-        // }
-        // ++((*count)[identifier]);
-        // node_text.replace(end_quote+2,1,std::to_string((*count)[identifier]));
         node_text.replace(end_quote+1,2,"");
         node_text.insert(end_quote,"_"+std::to_string(group));
         node->set_text(node_text);
@@ -118,7 +113,6 @@ void number_add_calls(XPathNode* node, int group, std::map<std::string,int>* cou
     else if(node_text.find("qli:regex-match",0) != std::string::npos) {
         XPathNode* id_child = node->get_children()[0];
         std::string id_text = id_child->get_text();
-        int end_quote = node_text.find("\"",1);
         id_text.insert(id_text.size()-1,"_"+std::to_string(group));
         id_child->set_text(id_text);
     }
