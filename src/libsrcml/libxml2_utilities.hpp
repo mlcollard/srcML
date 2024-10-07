@@ -2,7 +2,7 @@
 /**
  * @file libxml2_utilities.hpp
  *
- * @copyright Copyright (C) 2018-2019 srcML, LLC. (www.srcML.org)
+ * @copyright Copyright (C) 2018-2022 srcML, LLC. (www.srcML.org)
  */
 
 #ifndef INCLUDED_LIBXML2_UTILITIES_HPP
@@ -16,10 +16,13 @@
 #include <algorithm>
 #include <memory>
 
+#include <iostream>
+
 // std::unique_ptr deleter functions for libxml2
 // usage: std::unique<xmlDoc> p(xmlReadMemory);
 // Call p.get() for original pointer
 // Will deallocate automatically at end of std::unique_ptr lifetime
+#define LIBXML2_DEFAULT_DELETE
 namespace std {
     template<>
     struct default_delete<xmlDoc> {

@@ -2,7 +2,7 @@
 /**
  * @file language_extension_registry.hpp
  *
- * @copyright Copyright (C) 2014-2019 srcML, LLC. (www.srcML.org)
+ * @copyright Copyright (C) 2014-2024 srcML, LLC. (www.srcML.org)
  *
  * This file is part of the srcML Toolkit.
  */
@@ -15,7 +15,7 @@
 #include <vector>
 
 /** Declare type language_extension as string/int pair */
-typedef std::pair<std::string_view, int> language_extension;
+typedef std::pair<std::string, int> language_extension;
 
 /** access the extension from language_extension */
 #define get_extension(OBJ) (OBJ).first

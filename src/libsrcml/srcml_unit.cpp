@@ -2,7 +2,7 @@
 /**
  * @file srcml_unit.cpp
  *
- * @copyright Copyright (C) 2013-2019 srcML, LLC. (www.srcML.org)
+ * @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
  */
 
 #include <srcml_types.hpp>
@@ -204,7 +204,7 @@ int srcml_unit_register_namespace(struct srcml_unit* unit, const char* prefix, c
 
     // lookup by uri, if it already exists, update the prefix. If it doesn't exist, add it
     // prefix must be unique
-    addNamespace(*unit->namespaces, uri, prefix);
+    addNamespace(*unit->namespaces, uri, prefix, true);
 
     return SRCML_STATUS_OK;
 }
