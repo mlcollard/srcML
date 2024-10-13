@@ -33,7 +33,7 @@ define output <<- 'OUTPUT'
 	<unit revision="REVISION" language="C++" filename="b.cpp" item="1"><!-- Comment Two --></unit>
 
 	</unit>
-	OUTPUT
+OUTPUT
 
 xmlcheck "$input"
 xmlcheck "$output"
