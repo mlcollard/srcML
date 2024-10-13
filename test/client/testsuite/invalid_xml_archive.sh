@@ -27,7 +27,7 @@ define illformed_archive_mulit <<- 'INPUT'
 	</unit>
 
 	</unit>
-	INPUT
+INPUT
 
 define illformed_archive_single <<- 'INPUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -39,7 +39,7 @@ define illformed_archive_single <<- 'INPUT'
 	</unit>
 
 	</unit>
-	INPUT
+INPUT
 
 # expected output
 define info_archive <<- 'STDOUT'

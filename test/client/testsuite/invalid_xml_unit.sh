@@ -21,7 +21,7 @@ define illformed <<- 'INPUT'
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:cpp="http://www.srcML.org/srcML/cpp" language="C++">
 	<expr_stmt><expr><name>a</name></expr>;</expr_stmt>
 	</unit
-	INPUT
+INPUT
 
 createfile xml_error/illformed.xml "$illformed"
 

@@ -65,7 +65,7 @@ define input <<- 'INPUT'
 	</unit>
 
 	</unit>
-	INPUT
+INPUT
 
 define file1 <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>

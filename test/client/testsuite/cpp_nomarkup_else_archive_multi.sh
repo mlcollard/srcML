@@ -16,7 +16,7 @@ define input <<- 'INPUT'
 	#else
 	return;
 	#endif
-	INPUT
+INPUT
 
 define fmarkup_else <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
