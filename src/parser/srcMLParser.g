@@ -15327,10 +15327,10 @@ arrow_js[bool is_lambda = true] { SingleElement element(this); ENTRY_DEBUG } :
 
             if (in_expression)
                 startNewMode(MODE_EXPRESSION);
-        }
 
-        { LA(1) == LCURLY }?
-        arrow_lambda_block_js
+            if (LA(1) == LCURLY)
+                arrow_lambda_block_js();
+        }
 ;
 
 /*
