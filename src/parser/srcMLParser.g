@@ -704,6 +704,7 @@ tokens {
     SLAMBDA_ARROW_JS;
     SLAMBDA_GENERATOR_JS;
     SNAME_LIST;
+    SOBJECT_JS;
     SRANGE_IN;
     SRANGE_OF;
     SWITH_STATEMENT;
@@ -1104,9 +1105,9 @@ start_javascript[] {
             temp_array[JS_DEBUGGER]           = { SDEBUGGER_STATEMENT, 0, MODE_STATEMENT, 0, nullptr, nullptr };
             temp_array[JS_EXPORT]             = { SEXPORT_STATEMENT, 0, MODE_STATEMENT, 0, nullptr, nullptr };
             temp_array[JS_FUNCTION]           = { SFUNCTION_STATEMENT, 0, MODE_STATEMENT | MODE_NEST, MODE_PARAMETER_LIST_JS | MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, nullptr };
-            temp_array[JS_GET]                = { SFUNCTION_GET_STATEMENT, 0, MODE_STATEMENT | MODE_NEST, MODE_PARAMETER_LIST_JS | MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, nullptr };
+            temp_array[JS_GET]                = { SFUNCTION_GET_STATEMENT, 0, MODE_STATEMENT | MODE_NEST | MODE_GETTER_JS, MODE_PARAMETER_LIST_JS | MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, nullptr };
             temp_array[JS_IMPORT]             = { SIMPORT_STATEMENT, 0, MODE_STATEMENT | MODE_IMPORT_JS, MODE_VARIABLE_NAME | MODE_NAME_LIST_JS, nullptr, nullptr };
-            temp_array[JS_SET]                = { SFUNCTION_SET_STATEMENT, 0, MODE_STATEMENT | MODE_NEST, MODE_PARAMETER_LIST_JS | MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, nullptr };
+            temp_array[JS_SET]                = { SFUNCTION_SET_STATEMENT, 0, MODE_STATEMENT | MODE_NEST | MODE_SETTER_JS, MODE_PARAMETER_LIST_JS | MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, nullptr };
             temp_array[JS_YIELD]              = { SYIELD_STATEMENT, 0, MODE_STATEMENT, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
 
             /* DUPLEX KEYWORDS */
@@ -1130,7 +1131,12 @@ start_javascript[] {
             return temp_array;
         }();
 
-        if (inMode(MODE_STATEMENT)) {
+        // in JavaScript, a lambda is a function keyword followed by a parameter list (no function name)
+        bool is_lambda = false;
+        if (LA(1) == JS_FUNCTION && next_token() == LPAREN)
+            is_lambda = true;
+
+        if ((inMode(MODE_STATEMENT) || inMode(MODE_PROPERTY_JS)) && !is_lambda) {
             auto token = LA(1);
             if (duplex_keyword_set.member((unsigned int) LA(1))) {
                 const auto lookup = duplexKeywords[token + (next_token() << 8)];
@@ -1154,6 +1160,17 @@ start_javascript[] {
         ENTRY_DEBUG_START
         ENTRY_DEBUG
 } :
+        // looking for lcurly (preceded by rparen) to start a block inside the current property
+        { inMode(MODE_PROPERTY_JS) && last_consumed == RPAREN }?
+        {
+            startNewMode(MODE_EXPRESSION_BLOCK | MODE_EXPECT);
+        }
+        pure_expression_block |
+
+        // jump to expression part when in a property
+        { inMode(MODE_PROPERTY_JS) }?
+        expression_part |
+
         // looking for rparen to end the current control expression ("for...in" or "for...of" only)
         { inTransparentMode(MODE_FOR_LOOP_JS) && inTransparentMode(MODE_INIT) }?
         rparen_control_js |
@@ -1199,7 +1216,7 @@ start_javascript[] {
         init_js |
 
         // looking for "," to handle comma-separated declarations (or declarations in parameters)
-        { inTransparentMode(MODE_DECLARATION_JS) }?
+        { inTransparentMode(MODE_DECLARATION_JS) && !inTransparentMode(MODE_OBJECT_JS) }?
         comma_declaration_js |
 
         // looking for a keyword or operator that does not belong to a statement
@@ -4963,6 +4980,27 @@ block_end[] { bool in_issue_empty = inTransparentMode(MODE_ISSUE_EMPTY_AT_POP); 
                 return;
             }
 
+            // ensure JavaScript properties end before a comma or rcurly
+            if (
+                inLanguage(LANGUAGE_JAVASCRIPT)
+                && inTransparentMode(MODE_PROPERTY_JS)
+                && (LA(1) == COMMA || LA(1) == RCURLY)
+            ) {
+                endDownToMode(MODE_PROPERTY_JS);
+                endMode(MODE_PROPERTY_JS);
+
+                return;
+            }
+
+            // ensure a trailing comma is handled after the last property in a JavaScript object
+            if (inLanguage(LANGUAGE_JAVASCRIPT) && inMode(MODE_OBJECT_JS) && LA(1) == TERMINATE) {
+                endDownToMode(MODE_OBJECT_JS);
+                endMode(MODE_OBJECT_JS);
+                endMode(MODE_TOP);
+
+                return;
+            }
+
             // end all the statements this statement is nested in
             // special case when ending then of if statement: end down to either a block or top section, or to an if, whichever is reached first
             // special case for JavaScript lambdas: end down to a declaration, or to the end of an arrow lambda block
@@ -5005,7 +5043,7 @@ block_end[] { bool in_issue_empty = inTransparentMode(MODE_ISSUE_EMPTY_AT_POP); 
 rcurly[] { ENTRY_DEBUG } :
         {
             // end any elements inside of the block; this is basically endDownToMode(MODE_TOP) but checks for class ending
-            if (inTransparentMode(MODE_TOP)) {
+            if (inTransparentMode(MODE_TOP) && !inTransparentMode(MODE_OBJECT_JS)) {
                 while (size() > 1 && !inMode(MODE_TOP)) {
                     if (inMode(MODE_CLASS))
                         if (!class_namestack.empty()) {
@@ -5029,6 +5067,18 @@ rcurly[] { ENTRY_DEBUG } :
             if (inMode(MODE_BLOCK_CONTENT))
                 endMode(MODE_BLOCK_CONTENT);
 
+            // ensure block content ends before rcurly in JavaScript lambda arrow blocks
+            if (inTransparentMode(MODE_ARROW_BLOCK_JS) && inTransparentMode(MODE_BLOCK_CONTENT)) {
+                endDownToMode(MODE_BLOCK_CONTENT);
+                endMode(MODE_BLOCK_CONTENT);
+            }
+
+            // ensure block content ends before rcurly in JavaScript properties that contain a block
+            if (inTransparentMode(MODE_PROPERTY_JS) && inTransparentMode(MODE_BLOCK_CONTENT)) {
+                endDownToMode(MODE_BLOCK_CONTENT);
+                endMode(MODE_BLOCK_CONTENT);
+            }
+
             if (getCurly() != 0)
                 decCurly();
         }
@@ -5037,7 +5087,8 @@ rcurly[] { ENTRY_DEBUG } :
 
         {
             // end the current mode for the block; do not end more than one since they may be nested
-            endMode(MODE_TOP);
+            if (!inMode(MODE_OBJECT_JS))
+                endMode(MODE_TOP);
         }
 ;
 
@@ -5623,9 +5674,15 @@ bar[] { LightweightElement element(this); ENTRY_DEBUG } :
 */
 comma[] { bool markup_comma = true; ENTRY_DEBUG } :
         {
+            // comma ends the current JavaScript property
+            if (inLanguage(LANGUAGE_JAVASCRIPT) && inTransparentMode(MODE_OBJECT_JS) && inTransparentMode(MODE_PROPERTY_JS)) {
+                endMode(MODE_PROPERTY_JS);
+            }
+
             // comma ends the current item in a list or ends the current expression
             if (
                 !inTransparentMode(MODE_PARSE_EOL)
+                && !inMode(MODE_OBJECT_JS)
                 && (
                     inTransparentMode(MODE_LIST)
                     || inTransparentMode(MODE_STATEMENT)
@@ -5644,7 +5701,11 @@ comma[] { bool markup_comma = true; ENTRY_DEBUG } :
             if (inMode(MODE_INIT | MODE_EXPECT | MODE_ENUM))
                 endDownToModeSet(MODE_ENUM | MODE_TOP);
 
-            if (inMode(MODE_INIT | MODE_VARIABLE_NAME | MODE_LIST) || inTransparentMode(MODE_CONTROL_CONDITION | MODE_END_AT_COMMA))
+            if (
+                inMode(MODE_INIT | MODE_VARIABLE_NAME | MODE_LIST)
+                || inTransparentMode(MODE_CONTROL_CONDITION | MODE_END_AT_COMMA)
+                || (inLanguage(LANGUAGE_JAVASCRIPT) && inMode(MODE_OBJECT_JS))
+            )
                 markup_comma = false;
         }
 
@@ -5656,12 +5717,19 @@ comma[] { bool markup_comma = true; ENTRY_DEBUG } :
                 startNoSkipElement(SDECLARATION_RANGE);
             }
 
+            // start detection for a new name in a JavaScript name list
             if (inLanguage(LANGUAGE_JAVASCRIPT) && inTransparentMode(MODE_NAME_LIST_JS)) {
                 startNewMode(MODE_VARIABLE_NAME | MODE_LIST | MODE_ALIAS_COMPOUND_NAME_JS | MODE_LOCAL | MODE_END_AT_COMMA);
 
                 // SALIAS_COMPOUND_NAME encloses a JavaScript name with its respective alias in an extra name tag
                 if (next_token() != COMMA && next_token() != RCURLY)
                     startElement(SALIAS_COMPOUND_NAME);
+            }
+
+            // start detection for a new property in a JavaScript object
+            if (LA(1) != RCURLY && inLanguage(LANGUAGE_JAVASCRIPT) && inTransparentMode(MODE_OBJECT_JS)) {
+                startNewMode(MODE_PROPERTY_JS);
+                startElement(SPROPERTY);
             }
         }
 ;
@@ -5768,6 +5836,9 @@ colon[] { ENTRY_DEBUG } :
         {
             if (inMode(MODE_DETECT_COLON))
                 endMode(MODE_DETECT_COLON);
+
+            if (inMode(MODE_PROPERTY_JS) && last_consumed == COLON)
+                startElement(SEXPRESSION);
         }
 ;
 
@@ -11698,7 +11769,25 @@ expression_part[CALL_TYPE type = NOCALL, int call_count = 1] {
 
         ENTRY_DEBUG
 } :
-        // looking for `[` to start a JavaScript array
+        // looking for lcurly to start a JavaScript object
+        {
+            inLanguage(LANGUAGE_JAVASCRIPT)
+            && !inTransparentMode(MODE_LAMBDA_ARROW_JS)
+            && !inTransparentMode(MODE_GETTER_JS)
+            && !inTransparentMode(MODE_SETTER_JS)
+        }?
+        lcurly_object_js |
+
+        // looking for rcurly to end a JavaScript object
+        {
+            inLanguage(LANGUAGE_JAVASCRIPT)
+            && inTransparentMode(MODE_OBJECT_JS)
+            && !inTransparentMode(MODE_GETTER_JS)
+            && !inTransparentMode(MODE_SETTER_JS)
+        }?
+        rcurly_object_js |
+
+        // looking for lbracket to start a JavaScript array
         { inLanguage(LANGUAGE_JAVASCRIPT) }?
         array_js |
 
@@ -15239,6 +15328,9 @@ arrow_js[bool is_lambda = true] { SingleElement element(this); ENTRY_DEBUG } :
             if (in_expression)
                 startNewMode(MODE_EXPRESSION);
         }
+
+        { LA(1) == LCURLY }?
+        arrow_lambda_block_js
 ;
 
 /*
@@ -15295,6 +15387,30 @@ parameter_list_arrow_js[] { bool is_valid = perform_arrow_lambda_check(); ENTRY_
 
                 startNewMode(MODE_PARAMETER_LIST_JS);
             }
+        }
+;
+
+/*
+  arrow_lambda_block_js
+
+  Handles the start of a JavaScript arrow lambda block. Not used directly, but can be called by arrow_js.
+*/
+arrow_lambda_block_js[] { ENTRY_DEBUG } :
+        {
+            startNewMode(MODE_BLOCK);
+
+            startElement(SBLOCK);
+        }
+
+        LCURLY
+
+        {
+            startNewMode(MODE_BLOCK_CONTENT);
+            startNoSkipElement(SCONTENT);
+
+            incCurly();
+
+            startNewMode(MODE_TOP | MODE_STATEMENT | MODE_NEST | MODE_LIST | MODE_ARROW_BLOCK_JS);
         }
 ;
 
@@ -15392,15 +15508,54 @@ comma_declaration_js[] {
 ;
 
 /*
+  lcurly_object_js
+
+  Handles a left curly brace for JavaScript objects.
+*/
+lcurly_object_js[] { ENTRY_DEBUG } :
+        {
+            startNewMode(MODE_OBJECT_JS);
+            startElement(SOBJECT_JS);
+        }
+
+        LCURLY
+
+        {
+            startNewMode(MODE_PROPERTY_JS);
+            startElement(SPROPERTY);
+        }
+;
+
+/*
+  rcurly_object_js
+
+  Handles a right curly brace for JavaScript objects.
+*/
+rcurly_object_js[] { ENTRY_DEBUG } :
+        {
+            endDownToMode(MODE_OBJECT_JS);
+        }
+
+        RCURLY
+
+        {
+            endMode(MODE_OBJECT_JS);
+        }
+;
+
+/*
   array_js
 
   Handles JavaScript arrays.  Not used directly, but can be called by expression_part.
 */
 array_js[] { CompleteElement element(this); ENTRY_DEBUG } :
         {
-            startNewMode(MODE_LOCAL | MODE_TOP | MODE_LIST);
+            // computed properties are not marked as arrays
+            if (!inMode(MODE_PROPERTY_JS)) {
+                startNewMode(MODE_LOCAL | MODE_TOP | MODE_LIST);
 
-            startElement(SARRAY);
+                startElement(SARRAY);
+            }
         }
 
         LBRACKET

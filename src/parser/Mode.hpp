@@ -292,4 +292,12 @@ const static srcMLState::MODE_TYPE MODE_ARROW_OP_JS;
 
 const static srcMLState::MODE_TYPE MODE_ARROW_BLOCK_JS;
 
+const static srcMLState::MODE_TYPE MODE_OBJECT_JS;
+
+const static srcMLState::MODE_TYPE MODE_PROPERTY_JS;
+
+const static srcMLState::MODE_TYPE MODE_GETTER_JS;
+
+const static srcMLState::MODE_TYPE MODE_SETTER_JS;
+
 #endif
