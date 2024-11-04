@@ -840,8 +840,12 @@ public:
         if (rule.followingMode != 0)
             startNewMode(rule.followingMode);
 
-        if (inMode(MODE_EXPORT_SPECIFIER_JS))
-            export_sp();
+        if (check_valid_specifier_js()) {
+            // handle multiple pre-keyword specifiers in a row
+            while (check_valid_specifier_js()) {
+                specifier_js();
+            }
+        }
 
         consume();
 
@@ -1039,38 +1043,26 @@ start_javascript[] {
         ++start_count;
 
         const int CATCH_LPAREN = 600;
-        const int DEFAULT_COLON = 601;
-        const int ELSE_IF = 602;
+        const int ELSE_IF = 601;
+        const int JS_DEFAULT_COLON = 602;
         const int JS_FUNCTION_MULTOPS = 603;
         const int JS_YIELD_MULTOPS = 604;
         const int JS_STATIC_LCURLY = 605;
-        const int JS_EXPORT_JS_FUNCTION = 606;
-        const int JS_EXPORT_CLASS = 607;
-        const int JS_EXPORT_JS_LET = 608;
-        const int JS_EXPORT_JS_VAR = 609;
-        const int JS_EXPORT_JS_CONST = 610;
-        const int JS_EXPORT_JS_STATIC = 611;
-        const int JS_EXPORT_LCURLY = 612;
-        const int JS_EXPORT_MULTOPS = 613;
-        const int JS_IMPORT_MULTOPS = 614;
-        const int JS_WITH_LPAREN = 615;
+        const int JS_EXPORT_LCURLY = 606;
+        const int JS_EXPORT_MULTOPS = 607;
+        const int JS_IMPORT_MULTOPS = 608;
+        const int JS_WITH_LPAREN = 609;
 
         // A duplex keyword is a pair of adjacent keywords
         static const std::array<int, 500 * 500> duplexKeywords = [this](){
             std::array<int, 500 * 500> temp_array;
 
             temp_array[CATCH + (LPAREN << 8)] = CATCH_LPAREN;
-            temp_array[DEFAULT + (COLON << 8)] = DEFAULT_COLON;
             temp_array[ELSE + (IF << 8)] = ELSE_IF;
+            temp_array[JS_DEFAULT + (COLON << 8)] = JS_DEFAULT_COLON;
             temp_array[JS_FUNCTION + (MULTOPS << 8)] = JS_FUNCTION_MULTOPS;
             temp_array[JS_YIELD + (MULTOPS << 8)] = JS_YIELD_MULTOPS;
             temp_array[JS_STATIC + (LCURLY << 8)] = JS_STATIC_LCURLY;
-            temp_array[JS_EXPORT + (JS_FUNCTION << 8)] = JS_EXPORT_JS_FUNCTION;
-            temp_array[JS_EXPORT + (CLASS << 8)] = JS_EXPORT_CLASS;
-            temp_array[JS_EXPORT + (JS_LET << 8)] = JS_EXPORT_JS_LET;
-            temp_array[JS_EXPORT + (JS_VAR << 8)] = JS_EXPORT_JS_VAR;
-            temp_array[JS_EXPORT + (JS_CONST << 8)] = JS_EXPORT_JS_CONST;
-            temp_array[JS_EXPORT + (JS_STATIC << 8)] = JS_EXPORT_JS_STATIC;
             temp_array[JS_EXPORT + (LCURLY << 8)] = JS_EXPORT_LCURLY;
             temp_array[JS_EXPORT + (MULTOPS << 8)] = JS_EXPORT_MULTOPS;
             temp_array[JS_IMPORT + (MULTOPS << 8)] = JS_IMPORT_MULTOPS;
@@ -1103,7 +1095,6 @@ start_javascript[] {
             /* JAVASCRIPT STATEMENTS */
             temp_array[JS_CONSTRUCTOR]        = { SCONSTRUCTOR_STATEMENT, 0, MODE_STATEMENT | MODE_NEST | MODE_CONSTRUCTOR_JS, MODE_PARAMETER | MODE_LIST | MODE_PARAMETER_LIST_JS, nullptr, nullptr };
             temp_array[JS_DEBUGGER]           = { SDEBUGGER_STATEMENT, 0, MODE_STATEMENT, 0, nullptr, nullptr };
-            temp_array[JS_EXPORT]             = { SEXPORT_STATEMENT, 0, MODE_STATEMENT, 0, nullptr, nullptr };
             temp_array[JS_FUNCTION]           = { SFUNCTION_STATEMENT, 0, MODE_STATEMENT | MODE_NEST, MODE_PARAMETER_LIST_JS | MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, nullptr };
             temp_array[JS_GET]                = { SFUNCTION_GET_STATEMENT, 0, MODE_STATEMENT | MODE_NEST | MODE_GETTER_JS, MODE_PARAMETER_LIST_JS | MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, nullptr };
             temp_array[JS_IMPORT]             = { SIMPORT_STATEMENT, 0, MODE_STATEMENT | MODE_IMPORT_JS, MODE_VARIABLE_NAME | MODE_NAME_LIST_JS, nullptr, nullptr };
@@ -1112,14 +1103,8 @@ start_javascript[] {
 
             /* DUPLEX KEYWORDS */
             temp_array[CATCH_LPAREN]          = { SCATCH_BLOCK, 0, MODE_STATEMENT | MODE_NEST | MODE_CATCH_JS, MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, &srcMLParser::consume };  // extra consume() for `(`
-            temp_array[DEFAULT_COLON]         = { SDEFAULT, 0, MODE_TOP_SECTION | MODE_TOP | MODE_STATEMENT | MODE_NEST | MODE_DETECT_COLON, MODE_STATEMENT, nullptr, nullptr };  // differentiates a `default` specifier from a `default` clause
+            temp_array[JS_DEFAULT_COLON]      = { SDEFAULT, 0, MODE_TOP_SECTION | MODE_TOP | MODE_STATEMENT | MODE_NEST | MODE_DETECT_COLON, MODE_STATEMENT, nullptr, nullptr };  // differentiates a `default` specifier from a `default` clause
             temp_array[ELSE_IF]               = { SELSEIF, 0, MODE_STATEMENT | MODE_NEST | MODE_IF | MODE_ELSE, MODE_CONDITION | MODE_EXPECT, &srcMLParser::if_statement_js, &srcMLParser::consume };  // extra consume() for `if`
-            temp_array[JS_EXPORT_CLASS]       = { SCLASS, 0, MODE_STATEMENT | MODE_NEST, MODE_VARIABLE_NAME | MODE_EXPORT_SPECIFIER_JS, nullptr, nullptr };  // treats `export` as a specifier
-            temp_array[JS_EXPORT_JS_CONST]    = { SDECLARATION_CONST, 0, MODE_STATEMENT | MODE_DECLARATION_JS, MODE_INIT | MODE_VARIABLE_NAME | MODE_EXPECT | MODE_EXPORT_SPECIFIER_JS, &srcMLParser::declaration_statement_js, nullptr };  // treats `export` as a specifier
-            temp_array[JS_EXPORT_JS_FUNCTION] = { SFUNCTION_STATEMENT, 0, MODE_STATEMENT | MODE_NEST, MODE_PARAMETER_LIST_JS | MODE_VARIABLE_NAME | MODE_EXPECT | MODE_EXPORT_SPECIFIER_JS, nullptr, nullptr };  // treats `export` as a specifier
-            temp_array[JS_EXPORT_JS_LET]      = { SDECLARATION_LET, 0, MODE_STATEMENT | MODE_DECLARATION_JS, MODE_INIT | MODE_VARIABLE_NAME | MODE_EXPECT | MODE_EXPORT_SPECIFIER_JS, &srcMLParser::declaration_statement_js, nullptr };  // treats `export` as a specifier
-            temp_array[JS_EXPORT_JS_STATIC]   = { SDECLARATION_STATIC, 0, MODE_STATEMENT | MODE_DECLARATION_JS, MODE_INIT | MODE_VARIABLE_NAME | MODE_EXPECT | MODE_EXPORT_SPECIFIER_JS, &srcMLParser::declaration_statement_js, nullptr };  // treats `export` as a specifier
-            temp_array[JS_EXPORT_JS_VAR]      = { SDECLARATION_VAR, 0, MODE_STATEMENT | MODE_DECLARATION_JS, MODE_INIT | MODE_VARIABLE_NAME | MODE_EXPECT | MODE_EXPORT_SPECIFIER_JS, &srcMLParser::declaration_statement_js, nullptr };  // treats `export` as a specifier
             temp_array[JS_EXPORT_LCURLY]      = { SEXPORT_STATEMENT, 0, MODE_STATEMENT, MODE_NAME_LIST_JS, nullptr, nullptr };  // treats `export` as a statement
             temp_array[JS_EXPORT_MULTOPS]     = { SEXPORT_STATEMENT, 0, MODE_STATEMENT, 0, nullptr, &srcMLParser::multops_as_name };  // treats `*` in `export *` as a name
             temp_array[JS_FUNCTION_MULTOPS]   = { SFUNCTION_GENERATOR_STATEMENT, 0, MODE_STATEMENT | MODE_NEST, MODE_PARAMETER_LIST_JS | MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, &srcMLParser::consume };  // extra consume() for `*`
@@ -1131,11 +1116,39 @@ start_javascript[] {
             return temp_array;
         }();
 
+        // check if the current token is a specifier that occurs before a keyword
+        if (check_valid_specifier_js()) {
+            std::array<int, 2> post_specifier_tokens = perform_post_specifier_check();
+
+            // looking for declarations (e.g., var/let/const/static) separately since they are not in the table
+            if (
+                post_specifier_tokens[0] == JS_LET
+                || post_specifier_tokens[0] == JS_VAR
+                || post_specifier_tokens[0] == JS_CONST
+                || post_specifier_tokens[0] == JS_STATIC
+            ) {
+                declaration_js(true);
+            }
+            // looking for functions or classes
+            else if (post_specifier_tokens[0] != -1) {
+                if (duplex_keyword_set.member((unsigned int) post_specifier_tokens[0])) {
+                    const auto lookup = duplexKeywords[post_specifier_tokens[0] + (post_specifier_tokens[1] << 8)];
+                    if (lookup)
+                        post_specifier_tokens[0] = lookup;
+                }
+                const auto& rule = javascript_rules[post_specifier_tokens[0]];
+                if (rule.elementToken && processRule(rule)) {
+                    return;
+                }
+            }
+        }
+
         // in JavaScript, a lambda is a function keyword followed by a parameter list (no function name)
         bool is_lambda = false;
         if (LA(1) == JS_FUNCTION && next_token() == LPAREN)
             is_lambda = true;
 
+        // invoke the table to handle keywords and duplex keywords
         if ((inMode(MODE_STATEMENT) || inMode(MODE_PROPERTY_JS)) && !is_lambda) {
             auto token = LA(1);
             if (duplex_keyword_set.member((unsigned int) LA(1))) {
@@ -1219,8 +1232,12 @@ start_javascript[] {
         { inTransparentMode(MODE_DECLARATION_JS) && !inTransparentMode(MODE_OBJECT_JS) }?
         comma_declaration_js |
 
+        // looking for "each" after "for" (handles the obselete "for each...in")
+        { last_consumed == FOR }?
+        for_each_specifier_js |
+
         // looking for a keyword or operator that does not belong to a statement
-        extends_js | alias_js | from_js | range_in_js | range_of_js | declaration_js | arrow_js[false] |
+        extends_js | alias_js | from_js | range_in_js | range_of_js | declaration_js[false] | arrow_js[false] |
 
         // invoke start to handle unprocessed tokens (e.g., EOF, literals, operators, etc.)
         start
@@ -8240,7 +8257,10 @@ identifier_list[] { ENTRY_DEBUG } :
         */
 
         // Qt
-        EMIT | FOREACH | SIGNAL | FOREVER
+        EMIT | FOREACH | SIGNAL | FOREVER |
+
+        // JavaScript
+        JS_ASYNC | JS_DEFAULT | JS_EACH | JS_EXPORT
 ;
 
 /*
@@ -15079,11 +15099,18 @@ declaration_statement_js[] { ENTRY_DEBUG } :
   declaration_js
 
   Handles a Javascript declaration.  They start with "let", "var", "const", or "static".
+  If "export" is present, mark it as a specifier.
 */
-declaration_js[] { ENTRY_DEBUG } :
+declaration_js[bool handle_specifiers = false] { ENTRY_DEBUG } :
         declaration_statement_js
 
         {
+            if (handle_specifiers) {
+                while (check_valid_specifier_js()) {
+                    specifier_js();
+                }
+            }
+
             startNewMode(MODE_DECLARATION_JS);
 
             // If the current declaration is not a part of a declaration statement, enclose it in an <init> tag
@@ -15181,11 +15208,102 @@ extends_js[] { ENTRY_DEBUG } :
 ;
 
 /*
-  export_sp
+  for_each_specifier_js
+
+  Used to mark "each" as a specifier (JavaScript).  Always follows the "for" keyword (not before "for").
+*/
+for_each_specifier_js[] { SingleElement element(this); ENTRY_DEBUG } :
+        {
+            startElement(SFUNCTION_SPECIFIER);
+        }
+
+        JS_EACH
+;
+
+/*
+  check_valid_specifier_js
+
+  Checks to see if the current token is a JavaScript specifier.
+*/
+check_valid_specifier_js[] returns [int isspecifier] {
+        isspecifier = false;
+
+        if (
+            LA(1) == JS_ASYNC
+            || (
+                LA(1) == JS_DEFAULT
+                && next_token() != COLON
+            )
+            || (
+                LA(1) == JS_EXPORT
+                && next_token() != LCURLY
+                && next_token() != MULTOPS
+            )
+        )
+            isspecifier = true;
+
+        ENTRY_DEBUG
+} :;
+
+/*
+  perform_post_specifier_check
+
+  Returns the next two tokens that occur after a JavaScript specifier.
+  If there are multiple specifiers in a row, returns the next two tokens after the last specifier.
+*/
+perform_post_specifier_check[] returns [std::array<int, 2> keywords] {
+        keywords[0] = -1;
+        keywords[1] = -1;
+        int start = mark();
+        inputState->guessing++;
+
+        try {
+            while (true) {
+                consume();
+
+                if (!check_valid_specifier_js())
+                    break;
+            }
+
+            if (
+                LA(1) == JS_LET
+                || LA(1) == JS_VAR
+                || LA(1) == JS_CONST
+                || LA(1) == JS_STATIC
+                || LA(1) == JS_FUNCTION
+                || LA(1) == CLASS
+            ) {
+                keywords[0] = LA(1);
+                keywords[1] = next_token();
+            }
+        }
+        catch (...) {}
+
+        inputState->guessing--;
+        rewind(start);
+
+        ENTRY_DEBUG
+} :;
+
+/*
+  specifier_js
+
+  Used to mark "async", "default", and "export" as specifiers (JavaScript).
+*/
+specifier_js[] { SingleElement element(this); ENTRY_DEBUG } :
+        {
+            startElement(SFUNCTION_SPECIFIER);
+        }
+
+        (JS_ASYNC | JS_DEFAULT | JS_EXPORT)
+;
+
+/*
+  export_specifier
 
   Handles an "export" specifier on certain JavaScript statements such as a function or class.
 */
-export_sp[] { SingleElement element(this); ENTRY_DEBUG } :
+export_specifier[] { SingleElement element(this); ENTRY_DEBUG } :
         {
             startElement(SFUNCTION_SPECIFIER);
         }

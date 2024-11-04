@@ -160,7 +160,7 @@ token_set(srcMLParser, whitespace_token_set,
 
 token_set(srcMLParser, duplex_keyword_set,
     srcMLParser::CATCH,
-    srcMLParser::DEFAULT,
+    srcMLParser::JS_DEFAULT,
     srcMLParser::ELSE,
     srcMLParser::JS_EXPORT,
     srcMLParser::JS_FUNCTION,
