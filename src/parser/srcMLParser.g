@@ -11789,6 +11789,10 @@ expression_part[CALL_TYPE type = NOCALL, int call_count = 1] {
 
         ENTRY_DEBUG
 } :
+        // do not mark JavaScript method blocks as objects (e.g., methodName() {})
+        { inLanguage(LANGUAGE_JAVASCRIPT) && last_consumed == RPAREN }?
+        lcurly[true] |
+
         // looking for lcurly to start a JavaScript object
         {
             inLanguage(LANGUAGE_JAVASCRIPT)
