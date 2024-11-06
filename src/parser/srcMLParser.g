@@ -5723,7 +5723,14 @@ comma[] { bool markup_comma = true; ENTRY_DEBUG } :
             if (
                 inMode(MODE_INIT | MODE_VARIABLE_NAME | MODE_LIST)
                 || inTransparentMode(MODE_CONTROL_CONDITION | MODE_END_AT_COMMA)
-                || (inLanguage(LANGUAGE_JAVASCRIPT) && inMode(MODE_OBJECT_JS))
+                || (
+                    inLanguage(LANGUAGE_JAVASCRIPT)
+                    && (
+                        inMode(MODE_OBJECT_JS)
+                        || inMode(MODE_NAME_LIST_JS)
+                        || inMode(MODE_ARRAY_JS)
+                    )
+                )
             )
                 markup_comma = false;
         }
@@ -15678,7 +15685,7 @@ array_js[] { CompleteElement element(this); ENTRY_DEBUG } :
         {
             // computed properties are not marked as arrays
             if (!inMode(MODE_PROPERTY_JS)) {
-                startNewMode(MODE_LOCAL | MODE_TOP | MODE_LIST);
+                startNewMode(MODE_LOCAL | MODE_TOP | MODE_LIST | MODE_ARRAY_JS);
 
                 startElement(SARRAY);
             }
@@ -15687,6 +15694,11 @@ array_js[] { CompleteElement element(this); ENTRY_DEBUG } :
         LBRACKET
         complete_expression
         RBRACKET
+
+        {
+            if (inMode(MODE_ARRAY_JS))
+                endMode(MODE_ARRAY_JS);
+        }
 ;
 
 /*

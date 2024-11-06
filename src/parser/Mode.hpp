@@ -298,4 +298,6 @@ const static srcMLState::MODE_TYPE MODE_GETTER_JS;
 
 const static srcMLState::MODE_TYPE MODE_SETTER_JS;
 
+const static srcMLState::MODE_TYPE MODE_ARRAY_JS;
+
 #endif
