@@ -133,9 +133,12 @@ token_set(srcMLParser, identifier_list_tokens_set,
     // C
     srcMLParser::CRESTRICT, srcMLParser::MUTABLE, srcMLParser::CXX_TRY, srcMLParser::CXX_CATCH,
 
-    //Qt
-    srcMLParser::EMIT
+    // Qt
+    srcMLParser::EMIT,
 
+    // JavaScript
+    srcMLParser::BREAK, srcMLParser::CATCH, srcMLParser::CONTINUE, srcMLParser::DO, srcMLParser::ELSE, srcMLParser::FINALLY, srcMLParser::JS_ASYNC, srcMLParser::JS_DEBUGGER, srcMLParser::JS_DEFAULT, srcMLParser::JS_EACH,
+    srcMLParser::JS_EXPORT, srcMLParser::JS_FUNCTION, srcMLParser::JS_IMPORT, srcMLParser::JS_RANGE_IN, srcMLParser::JS_WITH, srcMLParser::JS_YIELD, srcMLParser::SWITCH, srcMLParser::TRY
 )
 
 token_set(srcMLParser, whitespace_token_set,

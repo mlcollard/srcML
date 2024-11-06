@@ -1096,9 +1096,7 @@ start_javascript[] {
             temp_array[JS_CONSTRUCTOR]        = { SCONSTRUCTOR_STATEMENT, 0, MODE_STATEMENT | MODE_NEST | MODE_CONSTRUCTOR_JS, MODE_PARAMETER | MODE_LIST | MODE_PARAMETER_LIST_JS, nullptr, nullptr };
             temp_array[JS_DEBUGGER]           = { SDEBUGGER_STATEMENT, 0, MODE_STATEMENT, 0, nullptr, nullptr };
             temp_array[JS_FUNCTION]           = { SFUNCTION_STATEMENT, 0, MODE_STATEMENT | MODE_NEST, MODE_PARAMETER_LIST_JS | MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, nullptr };
-            temp_array[JS_GET]                = { SFUNCTION_GET_STATEMENT, 0, MODE_STATEMENT | MODE_NEST | MODE_GETTER_JS, MODE_PARAMETER_LIST_JS | MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, nullptr };
             temp_array[JS_IMPORT]             = { SIMPORT_STATEMENT, 0, MODE_STATEMENT | MODE_IMPORT_JS, MODE_VARIABLE_NAME | MODE_NAME_LIST_JS, nullptr, nullptr };
-            temp_array[JS_SET]                = { SFUNCTION_SET_STATEMENT, 0, MODE_STATEMENT | MODE_NEST | MODE_SETTER_JS, MODE_PARAMETER_LIST_JS | MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, nullptr };
             temp_array[JS_YIELD]              = { SYIELD_STATEMENT, 0, MODE_STATEMENT, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
 
             /* DUPLEX KEYWORDS */
@@ -1149,7 +1147,7 @@ start_javascript[] {
             is_lambda = true;
 
         // invoke the table to handle keywords and duplex keywords
-        if ((inMode(MODE_STATEMENT) || inMode(MODE_PROPERTY_JS)) && !is_lambda) {
+        if ((inMode(MODE_STATEMENT)) && !is_lambda) {
             auto token = LA(1);
             if (duplex_keyword_set.member((unsigned int) LA(1))) {
                 const auto lookup = duplexKeywords[token + (next_token() << 8)];
@@ -1237,7 +1235,11 @@ start_javascript[] {
         for_each_specifier_js |
 
         // looking for a keyword or operator that does not belong to a statement
-        extends_js | alias_js | from_js | range_in_js | range_of_js | declaration_js[false] | arrow_js[false] |
+        extends_js | alias_js | from_js | range_of_js | arrow_js[false] | getter_js | setter_js |
+
+        // redundancy required to suppress warning with start[] overlap
+        { inLanguage(LANGUAGE_JAVASCRIPT) }?
+        (declaration_js[false] | range_in_js ) |
 
         // invoke start to handle unprocessed tokens (e.g., EOF, literals, operators, etc.)
         start
@@ -8260,7 +8262,8 @@ identifier_list[] { ENTRY_DEBUG } :
         EMIT | FOREACH | SIGNAL | FOREVER |
 
         // JavaScript
-        JS_ASYNC | JS_DEFAULT | JS_EACH | JS_EXPORT
+        BREAK | CATCH | CONTINUE | DO | ELSE | FINALLY | JS_ASYNC | JS_DEBUGGER | JS_DEFAULT | JS_EACH |
+        JS_EXPORT | JS_FUNCTION | JS_IMPORT | JS_RANGE_IN | JS_WITH | JS_YIELD | SWITCH | TRY
 ;
 
 /*
@@ -11816,7 +11819,8 @@ expression_part[CALL_TYPE type = NOCALL, int call_count = 1] {
         array_js |
 
         // functions that appear inside an expression
-        { inLanguage(LANGUAGE_JAVASCRIPT) }?
+        // "function:" is a property name, not a lambda
+        { inLanguage(LANGUAGE_JAVASCRIPT) && next_token() != COLON }?
         lambda_js |
 
         // classes that appear inside an expression
@@ -15743,5 +15747,43 @@ class_expression_method_js[] { ENTRY_DEBUG } :
 
         {
             startNewMode(MODE_PARAMETER_LIST_JS);
+        }
+;
+
+/*
+  getter_js
+
+  Handles a "get" keyword in JavaScript for "get" functions.
+*/
+getter_js[] { ENTRY_DEBUG } :
+        {
+            startNewMode(MODE_STATEMENT | MODE_NEST | MODE_GETTER_JS);
+
+            startElement(SFUNCTION_GET_STATEMENT);
+        }
+
+        JS_GET
+
+        {
+            startNewMode(MODE_PARAMETER_LIST_JS | MODE_VARIABLE_NAME | MODE_EXPECT);
+        }
+;
+
+/*
+  setter_js
+
+  Handles a "set" keyword in JavaScript for "set" functions.
+*/
+setter_js[] { ENTRY_DEBUG } :
+        {
+            startNewMode(MODE_STATEMENT | MODE_NEST | MODE_SETTER_JS);
+
+            startElement(SFUNCTION_SET_STATEMENT);
+        }
+
+        JS_SET
+
+        {
+            startNewMode(MODE_PARAMETER_LIST_JS | MODE_VARIABLE_NAME | MODE_EXPECT);
         }
 ;
