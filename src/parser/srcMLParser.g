@@ -1276,9 +1276,44 @@ catch[...] {
 start_python[] {
         ++start_count;
 
+        // Python rules adhere to the following form:
+        // START_TOKEN, MODE_NOT_IN, MODE_TO_START, MODE_FOLLOWING_KEYWORD, pre(), post()
+        static const std::array<Rule, 700> python_rules = [this](){
+            std::array<Rule, 700> temp_array;
+
+            /* GENERIC STATEMENTS */
+            /* ... */
+
+            /* PYTHON STATEMENTS */
+            temp_array[PY_FUNCTION] = { SFUNCTION_STATEMENT, 0, MODE_STATEMENT | MODE_NEST, MODE_PARAMETER_LIST_PY | MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, nullptr };
+
+            /* DUPLEX KEYWORDS */
+            /* ... */
+
+            return temp_array;
+        }();
+
+        // invoke the table to handle keywords and duplex keywords
+        if (inMode(MODE_STATEMENT)) {
+            auto token = LA(1);
+            // if (duplex_keyword_set.member((unsigned int) LA(1))) {
+            //     const auto lookup = duplexKeywords[token + (next_token() << 8)];
+            //     if (lookup)
+            //         token = lookup;
+            // }
+            const auto& rule = python_rules[token];
+            if (rule.elementToken && processRule(rule)) {
+                return;
+            }
+        }
+
         ENTRY_DEBUG_START
         ENTRY_DEBUG
 } :
+        // looking for lparen while expecting a parameter list
+        { inMode(MODE_PARAMETER_LIST_PY) }?
+        parameter_list |
+
         // invoke start to handle unprocessed tokens (e.g., EOF, literals, operators, etc.)
         start
 ;
@@ -12729,7 +12764,7 @@ parameter_type_count[int& type_count, bool output_type = true] {
         CompleteElement element(this);
         bool is_compound = false;
 
-        if (inLanguage(LANGUAGE_JAVASCRIPT))
+        if (inLanguage(LANGUAGE_JAVASCRIPT) || inLanguage(LANGUAGE_PYTHON))
             output_type = false;
 
         ENTRY_DEBUG

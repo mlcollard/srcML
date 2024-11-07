@@ -258,6 +258,7 @@ const static srcMLState::MODE_TYPE MODE_NO_BLOCK_CONTENT;
 
 const static srcMLState::MODE_TYPE MODE_PSEUDOBLOCK;
 
+// JavaScript modes
 const static srcMLState::MODE_TYPE MODE_ARGUMENT_JS;
 
 const static srcMLState::MODE_TYPE MODE_PARAMETER_LIST_JS;
@@ -299,5 +300,8 @@ const static srcMLState::MODE_TYPE MODE_GETTER_JS;
 const static srcMLState::MODE_TYPE MODE_SETTER_JS;
 
 const static srcMLState::MODE_TYPE MODE_ARRAY_JS;
+
+// Python modes
+const static srcMLState::MODE_TYPE MODE_PARAMETER_LIST_PY;
 
 #endif

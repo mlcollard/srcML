@@ -347,6 +347,9 @@ tokens {
     // Offside rule
     INDENT;
     DEDENT;
+
+    // Python
+    PY_FUNCTION;
 }
 
 {
@@ -758,6 +761,9 @@ KeywordLexer(UTF8CharBuffer* pinput, int language, OPTION_TYPE & options,
         // Offside
         { ""             , INDENT            , LANGUAGE_PYTHON },
         { ""             , DEDENT            , LANGUAGE_PYTHON },
+
+        // Python
+        { "def"          , PY_FUNCTION       , LANGUAGE_PYTHON },
    };
 
     // fill up the literals for the language that we are parsing
