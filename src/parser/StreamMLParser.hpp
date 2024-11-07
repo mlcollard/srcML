@@ -171,33 +171,18 @@ private:
             }
 
             // more partial parsing to do
-            srcMLParser::start();
+            switch (getLanguage()) {
+            case LANGUAGE_JAVASCRIPT:
+                srcMLParser::start_javascript();
+                break;
 
-        } catch (const std::exception&) {
+            case LANGUAGE_PYTHON:
+                srcMLParser::start_python();
+                break;
 
-            // when an error occurs just insert an error element
-            emptyElement(srcMLParser::SERROR_PARSE);
-        }
-    }
-
-    /**
-     * fillTokenBufferJS
-     *
-     * Fills the token buffer with new tokens.
-     * Invokes parser.
-     * Only used if the language is JavaScript.
-     */
-    void fillTokenBufferJS() {
-
-        try {
-
-            if (consumeSkippedToken()) {
-                flushSkip();
-                return;
+            default:
+                srcMLParser::start();
             }
-
-            // more partial parsing to do
-            srcMLParser::start_javascript();
 
         } catch (const std::exception&) {
 
@@ -623,26 +608,14 @@ private:
         tb.pop_front();
 
         // fill the token buffer if it is empty
-        if (tb.empty()) {
-            if (strcmp(getLanguageString(), "JavaScript") == 0) {
-                fillTokenBufferJS();
-            }
-            else {
-                fillTokenBuffer();
-            }
-        }
+        if (tb.empty())
+            fillTokenBuffer();
 
         if (tb.empty())
             consume();
 
-        while (paused) {
-            if (strcmp(getLanguageString(), "JavaScript") == 0) {
-                fillTokenBufferJS();
-            }
-            else {
-                fillTokenBuffer();
-            }
-        }
+        while (paused)
+            fillTokenBuffer();
 
         // pop and send back the top token
         const antlr::RefToken& tok = std::move(tb.front());

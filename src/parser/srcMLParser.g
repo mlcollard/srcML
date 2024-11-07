@@ -1257,6 +1257,37 @@ catch[...] {
 }
 
 /*
+  start_python
+
+  Invokes a table-based approach to detecting and handling tokens.
+
+  Whitespace tokens are handled elsewhere and are automagically included
+  in the output stream.
+
+  Order of evaluation is important.
+*/
+start_python[] {
+        ++start_count;
+
+        ENTRY_DEBUG_START
+        ENTRY_DEBUG
+} :
+        // invoke start to handle unprocessed tokens (e.g., EOF, literals, operators, etc.)
+        start
+;
+exception
+catch[...] {
+        CATCH_DEBUG
+
+        // need to consume the token. If we got here because
+        // of an error with EOF token, then call EOF directly
+        if (LA(1) == 1)
+            eof();
+        else
+            consume();
+}
+
+/*
   keyword_statements
 
   Statements that begin with a unique keyword.
@@ -8441,7 +8472,11 @@ compound_name_inner[bool index] { CompleteElement element(this); TokenPosition t
             { inLanguage(LANGUAGE_C) }?
             compound_name_c[iscompound] |
 
-            { inLanguage(LANGUAGE_CXX) || inLanguage(LANGUAGE_JAVASCRIPT) }?
+            {
+                inLanguage(LANGUAGE_CXX)
+                || inLanguage(LANGUAGE_JAVASCRIPT)
+                || inLanguage(LANGUAGE_PYTHON)
+            }?
             compound_name_cpp[iscompound] |
 
             macro_type_name_call
