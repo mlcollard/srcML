@@ -48,6 +48,7 @@ tokens {
     MACRO_NAME;
     COMPLEX_NUMBER;
     HASHBANG_COMMENT_START;
+    HASHTAG_COMMENT_START;
 }
 
 {
@@ -187,7 +188,8 @@ LINE_COMMENT_START options { testLiterals = true; } { int mode = 0; } : '/'
     }
 ;
 
-// Hashbang comments (JavaScript)
+// Hashbang comments (`#!`; JavaScript)
+// Also handles Hashtag comments (`#`; Python)
 HASHBANG_COMMENT_START :
     {
         if (!inLanguage(LANGUAGE_JAVASCRIPT) && startline) {
@@ -203,7 +205,10 @@ HASHBANG_COMMENT_START :
 
     '#' (
         { inLanguage(LANGUAGE_JAVASCRIPT) && LA(1) != '!' }?
-            NAME { $setType(NAME); }
+            NAME { $setType(NAME); } |
+
+        { inLanguage(LANGUAGE_PYTHON) }?
+            { $setType(HASHTAG_COMMENT_START); changetotextlexer(HASHTAG_COMMENT_END); }
     )?
 
     ('!'

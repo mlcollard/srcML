@@ -710,6 +710,9 @@ tokens {
     SWITH_STATEMENT;
     SYIELD_STATEMENT;
     SYIELD_GENERATOR_STATEMENT;
+
+    // Python
+    SHASHTAG_COMMENT;
 }
 
 /*
