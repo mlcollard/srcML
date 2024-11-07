@@ -343,6 +343,10 @@ tokens {
     JS_VOID;
     JS_WITH;
     JS_YIELD;
+
+    // Offside rule
+    INDENT;
+    DEDENT;
 }
 
 {
@@ -750,6 +754,10 @@ KeywordLexer(UTF8CharBuffer* pinput, int language, OPTION_TYPE & options,
         { "void"         , JS_VOID           , LANGUAGE_JAVASCRIPT },
         { "with"         , JS_WITH           , LANGUAGE_JAVASCRIPT },
         { "yield"        , JS_YIELD          , LANGUAGE_JAVASCRIPT },
+
+        // Offside
+        { ""             , INDENT            , LANGUAGE_PYTHON },
+        { ""             , DEDENT            , LANGUAGE_PYTHON },
    };
 
     // fill up the literals for the language that we are parsing

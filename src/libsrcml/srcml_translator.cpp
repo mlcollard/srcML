@@ -30,6 +30,7 @@
 #include <srcml_types.hpp>
 #include <unit_utilities.hpp>
 #include <srcMLOutput.hpp>
+#include <OffSideRule.hpp>
 
 using namespace ::std::literals::string_view_literals;
 
@@ -139,14 +140,30 @@ void srcml_translator::translate(UTF8CharBuffer* parser_input) {
         selector.addInputStream(&textlexer, "text");
         selector.select(&lexer);
 
-        // base stream parser srcML connected to lexical analyzer
-        StreamMLParser parser(selector, getLanguage(), options);
+        if (getLanguage() == LANGUAGE_PYTHON) {
+            // intermediate token stage
+            OffSideRule offside(selector);
+            offside.setBlockStartToken(srcMLParser::COLON);
 
-        // connect local parser to attribute for output
-        out.setTokenStream(parser);
+            // base stream parser srcML connected to lexical analyzer
+            StreamMLParser parser(offside, getLanguage(), options);
 
-        // parse and form srcML output with unit attributes
-        out.consume(getLanguageString(), revision, url, filename, version, timestamp, hash, encoding);
+            // connect local parser to attribute for output
+            out.setTokenStream(parser);
+
+            // parse and form srcML output with unit attributes
+            out.consume(getLanguageString(), revision, url, filename, version, timestamp, hash, encoding);
+        }
+        else {
+            // base stream parser srcML connected to lexical analyzer
+            StreamMLParser parser(selector, getLanguage(), options);
+
+            // connect local parser to attribute for output
+            out.setTokenStream(parser);
+
+            // parse and form srcML output with unit attributes
+            out.consume(getLanguageString(), revision, url, filename, version, timestamp, hash, encoding);
+        }
 
     } catch (const std::exception& e) {
         fprintf(stderr, "SRCML Exception: %s\n", e.what());

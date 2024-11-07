@@ -886,6 +886,8 @@ start[] { ++start_count; ENTRY_DEBUG_START ENTRY_DEBUG } :
         { !inTransparentMode(MODE_INTERNAL_END_PAREN) || inPrevMode(MODE_CONDITION) }?
         rparen[false] |
 
+        offside_dedent |
+
         // characters with special actions that usually end currently open elements
         { !inTransparentMode(MODE_INTERNAL_END_CURLY) }?
         block_end |
@@ -894,6 +896,8 @@ start[] { ++start_count; ENTRY_DEBUG_START ENTRY_DEBUG } :
 
         { inMode(MODE_ENUM) }?
         enum_block |
+
+        offside_indent |
 
         // namespace block does not have block content element
         { inMode(MODE_NAMESPACE) }?
@@ -11551,7 +11555,7 @@ rparen[bool markup = true, bool end_control_incr = false] { bool isempty = getPa
                     // start the then element
                     // startNoSkipElement(STHEN);
 
-                    if (LA(1) != LCURLY) {
+                    if (LA(1) != LCURLY && LA(1) != INDENT) {
                         startNoSkipElement(SPSEUDO_BLOCK);
                         startNoSkipElement(SCONTENT);
                     }
@@ -11562,7 +11566,7 @@ rparen[bool markup = true, bool end_control_incr = false] { bool isempty = getPa
                         // Commented-out code
                         // open_elements.push(STHEN);
 
-                        if (LA(1) != LCURLY)
+                        if (LA(1) != LCURLY && LA(1) != INDENT)
                             open_elements.push(SPSEUDO_BLOCK);
 
                         dupMode(open_elements);
@@ -11575,7 +11579,7 @@ rparen[bool markup = true, bool end_control_incr = false] { bool isempty = getPa
                 if (inMode(MODE_LIST | MODE_CONDITION) && inPrevMode(MODE_STATEMENT | MODE_NEST)) {
                     endMode(MODE_LIST);
 
-                    if (LA(1) != LCURLY) {
+                    if (LA(1) != LCURLY && LA(1) != INDENT) {
                         startNoSkipElement(SPSEUDO_BLOCK);
                         startNoSkipElement(SCONTENT);
                     }
@@ -11583,7 +11587,7 @@ rparen[bool markup = true, bool end_control_incr = false] { bool isempty = getPa
                     if (cppif_duplicate) {
                         std::stack<int> open_elements;
 
-                        if (LA(1) != LCURLY)
+                        if (LA(1) != LCURLY && LA(1) != INDENT)
                             open_elements.push(SPSEUDO_BLOCK);
 
                         dupMode(open_elements);
@@ -11595,7 +11599,7 @@ rparen[bool markup = true, bool end_control_incr = false] { bool isempty = getPa
                     if (inMode(MODE_LIST))
                         endMode(MODE_LIST);
 
-                    if (LA(1) != LCURLY) {
+                    if (LA(1) != LCURLY && LA(1) != INDENT) {
                         startNoSkipElement(SPSEUDO_BLOCK);
                         startNoSkipElement(SCONTENT);
                     }
@@ -11603,7 +11607,7 @@ rparen[bool markup = true, bool end_control_incr = false] { bool isempty = getPa
                     if (cppif_duplicate) {
                         std::stack<int> open_elements;
 
-                        if (LA(1) != LCURLY)
+                        if (LA(1) != LCURLY && LA(1) != INDENT)
                             open_elements.push(SPSEUDO_BLOCK);
 
                         dupMode(open_elements);
@@ -11613,7 +11617,7 @@ rparen[bool markup = true, bool end_control_incr = false] { bool isempty = getPa
                 } else if (inMode(MODE_LIST | MODE_CONTROL_CONDITION)) {
                     endMode(MODE_CONTROL_CONDITION);
 
-                    if (LA(1) != LCURLY) {
+                    if (LA(1) != LCURLY && LA(1) != INDENT) {
                         startNoSkipElement(SPSEUDO_BLOCK);
                         startNoSkipElement(SCONTENT);
                     }
@@ -11621,7 +11625,7 @@ rparen[bool markup = true, bool end_control_incr = false] { bool isempty = getPa
                     if (cppif_duplicate) {
                         std::stack<int> open_elements;
 
-                        if (LA(1) != LCURLY)
+                        if (LA(1) != LCURLY && LA(1) != INDENT)
                             open_elements.push(SPSEUDO_BLOCK);
 
                         dupMode(open_elements);
@@ -15832,5 +15836,126 @@ setter_js[] { ENTRY_DEBUG } :
 
         {
             startNewMode(MODE_PARAMETER_LIST_JS | MODE_VARIABLE_NAME | MODE_EXPECT);
+        }
+;
+
+/*
+  offside_indent
+
+  Handles block starts for languages that do not use curly braces for blocks (e.g., Python).
+  Uses lcurly and lcurly_base logic.
+*/
+offside_indent[bool content = true] { ENTRY_DEBUG } :
+        {
+            if (inMode(MODE_NO_BLOCK_CONTENT))
+                content = false;
+
+            // special end for conditions
+            if (inTransparentMode(MODE_CONDITION) && !inMode(MODE_ANONYMOUS)) {
+                endDownToMode(MODE_CONDITION);
+                endMode(MODE_CONDITION);
+            }
+
+            if (inTransparentMode(MODE_TRAILING_RETURN)) {
+                endDownToMode(MODE_TRAILING_RETURN);
+                endMode(MODE_TRAILING_RETURN);
+            }
+
+            // special end for constructor member initialization list
+            if (inMode(MODE_LIST | MODE_CALL)) {
+                // flush any whitespace tokens since sections should end at the last possible place
+                flushSkip();
+
+                endMode();
+            }
+
+            startNewMode(MODE_BLOCK);
+
+            startElement(SBLOCK);
+        }
+
+        INDENT
+
+        {
+            if (content) {
+                startNewMode(MODE_BLOCK_CONTENT);
+                startNoSkipElement(SCONTENT);
+            }
+        }
+
+        set_bool[skip_ternary, false]
+
+        {
+            setMode(MODE_TOP | MODE_STATEMENT | MODE_NEST | MODE_LIST);
+        }
+;
+
+/*
+  offside_dedent
+
+  Handles block ends for languages that do not use curly braces for blocks (e.g., Python).
+  Uses rcurly and block_end logic.
+*/
+offside_dedent[] { ENTRY_DEBUG } :
+        {
+            // end any elements inside of the block; this is basically endDownToMode(MODE_TOP) but checks for class ending
+            if (inTransparentMode(MODE_TOP)) {
+                while (size() > 1 && !inMode(MODE_TOP)) {
+                    if (inMode(MODE_CLASS))
+                        if (!class_namestack.empty()) {
+                            class_namestack.pop();
+                        }
+
+                    endMode();
+                }
+            }
+
+            // flush any whitespace tokens since sections should end at the last possible place
+            flushSkip();
+
+            if (isPaused()) {
+                nopStreamStart();
+            }
+
+            // end any sections inside the mode
+            endWhileMode(MODE_TOP_SECTION);
+
+            if (inMode(MODE_BLOCK_CONTENT))
+                endMode(MODE_BLOCK_CONTENT);
+        }
+
+        DEDENT
+
+        {
+            // end the current mode for the block; do not end more than one since they may be nested
+            endMode(MODE_TOP);
+
+            // end all the statements this statement is nested in
+            // special case when ending then of if statement: end down to either a block or top section, or to an if, whichever is reached first
+            endDownToModeSet(MODE_BLOCK | MODE_TOP | MODE_IF | MODE_ELSE | MODE_TRY | MODE_ANONYMOUS);
+
+            bool endstatement = inMode(MODE_END_AT_BLOCK);
+            bool anonymous_class = (inMode(MODE_CLASS) || inMode(MODE_ENUM)) && inMode(MODE_END_AT_BLOCK);
+
+            // some statements end with the block
+            if (inMode(MODE_END_AT_BLOCK)) {
+                endMode();
+
+                if (inTransparentMode(MODE_TEMPLATE))
+                    endMode();
+            }
+
+            // looking for a terminate character (';'); some statements end with the block if there is no terminate
+            if (inMode(MODE_END_AT_BLOCK_NO_TERMINATE) && LA(1) != TERMINATE) {
+                endstatement = true;
+                endMode();
+            }
+
+            if (!(anonymous_class) && (!(inMode(MODE_CLASS) || inMode(MODE_ENUM)) || endstatement))
+                else_handling();
+
+            // if true, we need to markup the (abbreviated) variable declaration
+            if (inMode(MODE_DECL) && LA(1) != TERMINATE)
+                short_variable_declaration();
         }
 ;
