@@ -340,5 +340,6 @@ const std::unordered_map<int, Element> srcMLOutput::process = {
     { TOKEN::SYIELD_GENERATOR_STATEMENT,    { "yield",             SRC, "type", "generator",     0,      0 }},
 
     // Python
+    { TOKEN::SDELETE,                       { "delete",            SRC,      0,           0,     0,      0 }},
     { TOKEN::SHASHTAG_COMMENT,              { "comment",           SRC, "type",      "line",     0,      0 }},
 };
