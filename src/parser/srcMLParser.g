@@ -1282,7 +1282,9 @@ start_python[] {
             std::array<Rule, 700> temp_array;
 
             /* GENERIC STATEMENTS */
-            /* ... */
+            temp_array[ASSERT]      = { SASSERT_STATEMENT, 0, MODE_STATEMENT | MODE_EXPRESSION | MODE_EXPECT | MODE_ASSERT_PY, MODE_CONDITION | MODE_EXPECT, nullptr, nullptr };
+            temp_array[BREAK]       = { SBREAK_STATEMENT, 0, MODE_STATEMENT, MODE_VARIABLE_NAME, nullptr, nullptr };
+            temp_array[RETURN]      = { SRETURN_STATEMENT, 0, MODE_STATEMENT, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
 
             /* PYTHON STATEMENTS */
             temp_array[PY_FUNCTION] = { SFUNCTION_STATEMENT, 0, MODE_STATEMENT | MODE_NEST, MODE_PARAMETER_LIST_PY | MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, nullptr };
@@ -1313,6 +1315,14 @@ start_python[] {
         // looking for lparen while expecting a parameter list
         { inMode(MODE_PARAMETER_LIST_PY) }?
         parameter_list |
+
+        // looking for a comma to start the message half of an "assert"
+        { inMode(MODE_ASSERT_PY) }?
+        (COMMA expression) |
+
+        // looking for an expression to mark as a condition
+        { inMode(MODE_CONDITION | MODE_EXPECT) }?
+        condition_py |
 
         // invoke start to handle unprocessed tokens (e.g., EOF, literals, operators, etc.)
         start
@@ -5769,6 +5779,12 @@ comma[] { bool markup_comma = true; ENTRY_DEBUG } :
             // comma ends the current JavaScript property
             if (inLanguage(LANGUAGE_JAVASCRIPT) && inTransparentMode(MODE_OBJECT_JS) && inTransparentMode(MODE_PROPERTY_JS)) {
                 endMode(MODE_PROPERTY_JS);
+            }
+
+            // comma ends the current condition in a Python assert
+            if (inLanguage(LANGUAGE_PYTHON) && inTransparentMode(MODE_ASSERT_PY) && inTransparentMode(MODE_CONDITION)) {
+                endDownToMode(MODE_CONDITION);
+                endMode(MODE_CONDITION);
             }
 
             // comma ends the current item in a list or ends the current expression
@@ -15996,4 +16012,19 @@ offside_dedent[] { ENTRY_DEBUG } :
             if (inMode(MODE_DECL) && LA(1) != TERMINATE)
                 short_variable_declaration();
         }
+;
+
+/*
+  condition_py
+
+  Handles conditions in Python "assert"/"if"/"match"/"while" statements.
+*/
+condition_py[] { ENTRY_DEBUG } :
+        {
+            startElement(SCONDITION);
+
+            setMode(MODE_LIST | MODE_EXPRESSION | MODE_EXPECT);
+        }
+
+        expression
 ;

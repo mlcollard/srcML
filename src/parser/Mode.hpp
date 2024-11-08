@@ -304,4 +304,6 @@ const static srcMLState::MODE_TYPE MODE_ARRAY_JS;
 // Python modes
 const static srcMLState::MODE_TYPE MODE_PARAMETER_LIST_PY;
 
+const static srcMLState::MODE_TYPE MODE_ASSERT_PY;
+
 #endif

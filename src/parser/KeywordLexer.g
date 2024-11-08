@@ -763,6 +763,7 @@ KeywordLexer(UTF8CharBuffer* pinput, int language, OPTION_TYPE & options,
         { ""             , DEDENT            , LANGUAGE_PYTHON },
 
         // Python
+        { "assert"       , ASSERT            , LANGUAGE_PYTHON }, 
         { "def"          , PY_FUNCTION       , LANGUAGE_PYTHON },
    };
 
