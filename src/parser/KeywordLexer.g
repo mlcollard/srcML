@@ -350,7 +350,9 @@ tokens {
 
     // Python
     PY_DELETE;
+    PY_ELIF;
     PY_FUNCTION;
+    PY_GLOBAL;
 }
 
 {
@@ -767,6 +769,8 @@ KeywordLexer(UTF8CharBuffer* pinput, int language, OPTION_TYPE & options,
         { "assert"       , ASSERT            , LANGUAGE_PYTHON },
         { "def"          , PY_FUNCTION       , LANGUAGE_PYTHON },
         { "del"          , PY_DELETE         , LANGUAGE_PYTHON },
+        { "elif"         , PY_ELIF           , LANGUAGE_PYTHON },
+        { "global"       , PY_GLOBAL         , LANGUAGE_PYTHON },
    };
 
     // fill up the literals for the language that we are parsing
