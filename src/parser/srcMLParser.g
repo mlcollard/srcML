@@ -1304,6 +1304,7 @@ start_python[] {
             temp_array[PY_MATCH]    = { SSWITCH, 0, MODE_STATEMENT | MODE_NEST, MODE_CONDITION | MODE_EXPECT, nullptr, nullptr };
             temp_array[PY_NONLOCAL] = { SNONLOCAL, 0, MODE_STATEMENT, MODE_VARIABLE_NAME | MODE_LIST, nullptr, nullptr };
             temp_array[PY_PASS]     = { SPASS, 0, MODE_STATEMENT, 0, nullptr, nullptr };
+            temp_array[PY_RAISE]    = { STHROW_STATEMENT, 0, MODE_STATEMENT | MODE_RAISE_PY, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
 
             /* DUPLEX KEYWORDS */
             /* ... */
@@ -1318,12 +1319,10 @@ start_python[] {
             startNewMode(MODE_CONDITION | MODE_EXPECT);
         }
 
-        // check if "from" is used with an "import" statement; mark as a name otherwise
+        // special markup for a "from" that appears before an "import" statement
         if (LA(1) == PY_FROM) {
             if (perform_from_import_check())
-                from_py();
-            else
-                from_as_name();
+                from_import_py();
         }
 
         // invoke the table to handle keywords and duplex keywords
@@ -1358,6 +1357,9 @@ start_python[] {
         // looking for a name followed by "as"
         { next_token() == PY_ALIAS }?
         alias_py |
+
+        // looking for "from" that was not a part of "from..import"
+        from_py |
 
         // invoke start to handle unprocessed tokens (e.g., EOF, literals, operators, etc.)
         start
@@ -16113,12 +16115,12 @@ alias_py[] { SingleElement element(this); ENTRY_DEBUG } :
 ;
 
 /*
-  from_py
+  from_import_py
 
   Handles a Python "from" used with an "import" keyword.
   Use perform_from_import_check to ensure an "import" appears after "from" at some point.
 */
-from_py[] { ENTRY_DEBUG } :
+from_import_py[] { ENTRY_DEBUG } :
         {
             startNewMode(MODE_STATEMENT);
             startElement(SIMPORT_STATEMENT);
@@ -16149,6 +16151,29 @@ from_py[] { ENTRY_DEBUG } :
         }
 
         PY_IMPORT
+;
+
+/*
+  from_py
+
+  Handles all other cases where "from" appears in Python.
+  See from_import_py for the "from..import" case.
+*/
+from_py[] { ENTRY_DEBUG } :
+        // mark "from" as a name
+        { !inTransparentMode(MODE_RAISE_PY) }?
+        from_as_name |
+
+        // enclose "from" in tags since it is part of a "raise" statement
+        {
+            endDownToMode(MODE_RAISE_PY);
+
+            startNewMode(MODE_FROM_PY);
+            startElement(SFROM);
+        }
+
+        PY_FROM
+        compound_name
 ;
 
 /*

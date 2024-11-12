@@ -359,6 +359,7 @@ tokens {
     PY_MATCH;
     PY_NONLOCAL;
     PY_PASS;
+    PY_RAISE;
 }
 
 {
@@ -783,6 +784,7 @@ KeywordLexer(UTF8CharBuffer* pinput, int language, OPTION_TYPE & options,
         { "match"        , PY_MATCH          , LANGUAGE_PYTHON },
         { "nonlocal"     , PY_NONLOCAL       , LANGUAGE_PYTHON },
         { "pass"         , PY_PASS           , LANGUAGE_PYTHON },
+        { "raise"        , PY_RAISE          , LANGUAGE_PYTHON },
    };
 
     // fill up the literals for the language that we are parsing
