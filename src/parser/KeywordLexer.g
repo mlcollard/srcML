@@ -349,10 +349,13 @@ tokens {
     DEDENT;
 
     // Python
+    PY_ALIAS;
     PY_DELETE;
     PY_ELIF;
+    PY_FROM;
     PY_FUNCTION;
     PY_GLOBAL;
+    PY_IMPORT;
 }
 
 {
@@ -766,11 +769,14 @@ KeywordLexer(UTF8CharBuffer* pinput, int language, OPTION_TYPE & options,
         { ""             , DEDENT            , LANGUAGE_PYTHON },
 
         // Python
+        { "as"           , PY_ALIAS          , LANGUAGE_PYTHON },
         { "assert"       , ASSERT            , LANGUAGE_PYTHON },
         { "def"          , PY_FUNCTION       , LANGUAGE_PYTHON },
         { "del"          , PY_DELETE         , LANGUAGE_PYTHON },
         { "elif"         , PY_ELIF           , LANGUAGE_PYTHON },
+        { "from"         , PY_FROM           , LANGUAGE_PYTHON },
         { "global"       , PY_GLOBAL         , LANGUAGE_PYTHON },
+        { "import"       , PY_IMPORT         , LANGUAGE_PYTHON },
    };
 
     // fill up the literals for the language that we are parsing

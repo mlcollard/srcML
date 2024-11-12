@@ -1091,10 +1091,10 @@ start_javascript[] {
             temp_array[CLASS]                 = { SCLASS, 0, MODE_STATEMENT | MODE_NEST, MODE_VARIABLE_NAME, nullptr, nullptr };
             temp_array[CONTINUE]              = { SCONTINUE_STATEMENT, 0, MODE_STATEMENT, MODE_VARIABLE_NAME, nullptr, nullptr };
             temp_array[DO]                    = { SDO_STATEMENT, 0, MODE_STATEMENT | MODE_TOP | MODE_DO_STATEMENT, MODE_STATEMENT | MODE_NEST, nullptr, &srcMLParser::pseudoblock };
-            temp_array[ELSE]                  = { SELSE, 0, MODE_STATEMENT | MODE_NEST | MODE_ELSE, MODE_STATEMENT | MODE_NEST, &srcMLParser::if_statement_js, &srcMLParser::pseudoblock };
+            temp_array[ELSE]                  = { SELSE, 0, MODE_STATEMENT | MODE_NEST | MODE_ELSE, MODE_STATEMENT | MODE_NEST, &srcMLParser::if_statement_start, &srcMLParser::pseudoblock };
             temp_array[FINALLY]               = { SFINALLY_BLOCK, 0, MODE_STATEMENT | MODE_NEST, 0, nullptr, nullptr };
             temp_array[FOR]                   = { SFOR_STATEMENT, 0, MODE_STATEMENT | MODE_NEST, MODE_CONTROL | MODE_EXPECT | MODE_FOR_LOOP_JS, nullptr, nullptr };
-            temp_array[IF]                    = { SIF, 0, MODE_STATEMENT | MODE_NEST | MODE_IF | MODE_ELSE, MODE_CONDITION | MODE_EXPECT, &srcMLParser::if_statement_js, nullptr };
+            temp_array[IF]                    = { SIF, 0, MODE_STATEMENT | MODE_NEST | MODE_IF | MODE_ELSE, MODE_CONDITION | MODE_EXPECT, &srcMLParser::if_statement_start, nullptr };
             temp_array[RETURN]                = { SRETURN_STATEMENT, 0, MODE_STATEMENT, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
             temp_array[SWITCH]                = { SSWITCH, 0, MODE_STATEMENT | MODE_NEST, MODE_CONDITION | MODE_EXPECT, nullptr, nullptr };
             temp_array[THROW]                 = { STHROW_STATEMENT, 0, MODE_STATEMENT, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
@@ -1111,7 +1111,7 @@ start_javascript[] {
             /* DUPLEX KEYWORDS */
             temp_array[CATCH_LPAREN]          = { SCATCH_BLOCK, 0, MODE_STATEMENT | MODE_NEST | MODE_CATCH_JS, MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, &srcMLParser::consume };  // extra consume() for `(`
             temp_array[JS_DEFAULT_COLON]      = { SDEFAULT, 0, MODE_TOP_SECTION | MODE_TOP | MODE_STATEMENT | MODE_NEST | MODE_DETECT_COLON, MODE_STATEMENT, nullptr, nullptr };  // differentiates a `default` specifier from a `default` clause
-            temp_array[ELSE_IF]               = { SELSEIF, 0, MODE_STATEMENT | MODE_NEST | MODE_IF | MODE_ELSE, MODE_CONDITION | MODE_EXPECT, &srcMLParser::if_statement_js, &srcMLParser::consume };  // extra consume() for `if`
+            temp_array[ELSE_IF]               = { SELSEIF, 0, MODE_STATEMENT | MODE_NEST | MODE_IF | MODE_ELSE, MODE_CONDITION | MODE_EXPECT, &srcMLParser::if_statement_start, &srcMLParser::consume };  // extra consume() for `if`
             temp_array[JS_EXPORT_LCURLY]      = { SEXPORT_STATEMENT, 0, MODE_STATEMENT, MODE_NAME_LIST_JS, nullptr, nullptr };  // treats `export` as a statement
             temp_array[JS_EXPORT_MULTOPS]     = { SEXPORT_STATEMENT, 0, MODE_STATEMENT, 0, nullptr, &srcMLParser::multops_as_name };  // treats `*` in `export *` as a name
             temp_array[JS_FUNCTION_MULTOPS]   = { SFUNCTION_GENERATOR_STATEMENT, 0, MODE_STATEMENT | MODE_NEST, MODE_PARAMETER_LIST_JS | MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, &srcMLParser::consume };  // extra consume() for `*`
@@ -1288,22 +1288,30 @@ start_python[] {
             temp_array[BREAK]       = { SBREAK_STATEMENT, 0, MODE_STATEMENT, MODE_VARIABLE_NAME, nullptr, nullptr };
             temp_array[CLASS]       = { SCLASS, 0, MODE_STATEMENT | MODE_NEST, MODE_VARIABLE_NAME, nullptr, nullptr };
             temp_array[CONTINUE]    = { SCONTINUE_STATEMENT, 0, MODE_STATEMENT, MODE_VARIABLE_NAME, nullptr, nullptr };
-            temp_array[IF]          = { SIF, 0, MODE_STATEMENT | MODE_NEST | MODE_IF | MODE_ELSE, MODE_CONDITION | MODE_EXPECT, &srcMLParser::if_statement_js, nullptr };
-            temp_array[ELSE]        = { SELSE, 0, MODE_STATEMENT | MODE_NEST | MODE_ELSE, MODE_STATEMENT | MODE_NEST, &srcMLParser::if_statement_js, nullptr };
-            temp_array[IF]          = { SIF, 0, MODE_STATEMENT | MODE_NEST | MODE_IF | MODE_ELSE, MODE_CONDITION | MODE_EXPECT, &srcMLParser::if_statement_js, nullptr };
+            temp_array[ELSE]        = { SELSE, 0, MODE_STATEMENT | MODE_NEST | MODE_ELSE, MODE_STATEMENT | MODE_NEST, &srcMLParser::if_statement_start, nullptr };
+            temp_array[IF]          = { SIF, 0, MODE_STATEMENT | MODE_NEST | MODE_IF | MODE_ELSE, MODE_CONDITION | MODE_EXPECT, &srcMLParser::if_statement_start, nullptr };
             temp_array[RETURN]      = { SRETURN_STATEMENT, 0, MODE_STATEMENT, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
 
             /* PYTHON STATEMENTS */
             temp_array[PY_DELETE]   = { SDELETE, 0, MODE_STATEMENT, MODE_VARIABLE_NAME | MODE_LIST, nullptr, nullptr };
-            temp_array[PY_ELIF]     = { SELSEIF, 0, MODE_STATEMENT | MODE_NEST | MODE_IF | MODE_ELSE, MODE_CONDITION | MODE_EXPECT, &srcMLParser::if_statement_js, nullptr };
-            temp_array[PY_GLOBAL]   = { SGLOBAL, 0, MODE_STATEMENT, MODE_VARIABLE_NAME | MODE_LIST, nullptr, nullptr };
+            temp_array[PY_ELIF]     = { SELSEIF, 0, MODE_STATEMENT | MODE_NEST | MODE_IF | MODE_ELSE, MODE_CONDITION | MODE_EXPECT, &srcMLParser::if_statement_start, nullptr };
             temp_array[PY_FUNCTION] = { SFUNCTION_STATEMENT, 0, MODE_STATEMENT | MODE_NEST, MODE_PARAMETER_LIST_PY | MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, nullptr };
+            temp_array[PY_GLOBAL]   = { SGLOBAL, 0, MODE_STATEMENT, MODE_VARIABLE_NAME | MODE_LIST, nullptr, nullptr };
+            temp_array[PY_IMPORT]   = { SIMPORT_STATEMENT, 0, MODE_STATEMENT, MODE_VARIABLE_NAME | MODE_LIST, nullptr, nullptr };
 
             /* DUPLEX KEYWORDS */
             /* ... */
 
             return temp_array;
         }();
+
+        // check if "from" is used with an "import" statement; mark as a name otherwise
+        if (LA(1) == PY_FROM) {
+            if (perform_from_import_check())
+                from_py();
+            else
+                from_as_name();
+        }
 
         // invoke the table to handle keywords and duplex keywords
         if (inMode(MODE_STATEMENT)) {
@@ -1333,6 +1341,10 @@ start_python[] {
         // looking for an expression to mark as a condition
         { inMode(MODE_CONDITION | MODE_EXPECT) }?
         condition_py |
+
+        // looking for a name followed by "as"
+        { next_token() == PY_ALIAS }?
+        alias_py |
 
         // invoke start to handle unprocessed tokens (e.g., EOF, literals, operators, etc.)
         start
@@ -15178,12 +15190,13 @@ rparen_with_js[] { ENTRY_DEBUG } :
 ;
 
 /*
-  if_statement_js
+  if_statement_start
 
-  Handles a JavaScript "if" statement.  Wraps the entire "if...else" statement in an if statement tag.
+  Starts a JavaScript "if" statement (if/else if/else) and a Python "if" statement (if/elif/else).
+  Wraps the entire "if...else" statement in an if statement tag.
   Wraps lone "if", "else", or "else if" blocks in an if statement tag to match existing functionality.
 */
-if_statement_js[] { ENTRY_DEBUG } :
+if_statement_start[] { ENTRY_DEBUG } :
         {
             // catchup for isolated else
             if (!inMode(MODE_IF_STATEMENT)) {
@@ -16045,3 +16058,123 @@ condition_py[] { ENTRY_DEBUG } :
 
         expression
 ;
+
+/*
+  alias_py
+
+  Handles a Python name followed by an "as" expression.
+*/
+alias_py[] { SingleElement element(this); ENTRY_DEBUG } :
+        {
+            startNewMode(MODE_VARIABLE_NAME);
+
+            // start outer name
+            startElement(SNAME);
+
+            startNewMode(MODE_VARIABLE_NAME);
+
+            // start inner name
+            startElement(SCNAME);
+        }
+
+        NAME
+
+        {
+            // end inner name
+            endMode(MODE_VARIABLE_NAME);
+
+            startElement(SALIAS);
+        }
+
+        PY_ALIAS
+        compound_name
+
+        {
+            // end outer name
+            endMode(MODE_VARIABLE_NAME);
+        }
+;
+
+/*
+  from_py
+
+  Handles a Python "from" used with an "import" keyword.
+  Use perform_from_import_check to ensure an "import" appears after "from" at some point.
+*/
+from_py[] { ENTRY_DEBUG } :
+        {
+            startNewMode(MODE_STATEMENT);
+            startElement(SIMPORT_STATEMENT);
+
+            startNewMode(MODE_FROM_PY);
+            startElement(SFROM);
+        }
+
+        PY_FROM
+
+        {
+            // mark anything that follows a "from" as a name, including periods
+            if (LA(1) != PY_IMPORT) {
+                startNewMode(MODE_VARIABLE_NAME);
+
+                startElement(SNAME);
+
+                while (LA(1) != PY_IMPORT) {
+                    consume();
+                }
+
+                endMode(MODE_VARIABLE_NAME);
+            }
+
+            endMode(MODE_FROM_PY);
+
+            startNewMode(MODE_VARIABLE_NAME | MODE_LIST);
+        }
+
+        PY_IMPORT
+;
+
+/*
+  from_as_name
+
+  Handles cases where "from" is a name in a Python "import" statement.
+*/
+from_as_name[] { SingleElement element(this); ENTRY_DEBUG } :
+        {
+            startElement(SNAME);
+        }
+
+        PY_FROM
+;
+
+/*
+  perform_from_import_check
+
+  Checks to see if an "import" occurs at some point after a "from" in Python.
+*/
+perform_from_import_check[] returns [bool isimport] {
+        isimport = false;
+        int start = mark();
+        inputState->guessing++;
+
+        try {
+            int token = LA(1);
+
+            while (true) {
+                consume();
+                token = LA(1);
+
+                if (token == PY_IMPORT || token == TERMINATE || token == 1 /* EOF */)
+                    break;
+            }
+
+            if (LA(1) == PY_IMPORT)
+                isimport = true;
+        }
+        catch (...) {}
+
+        inputState->guessing--;
+        rewind(start);
+
+        ENTRY_DEBUG
+} :;
