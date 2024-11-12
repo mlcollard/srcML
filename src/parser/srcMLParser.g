@@ -715,6 +715,8 @@ tokens {
     SDELETE;
     SGLOBAL;
     SHASHTAG_COMMENT;
+    SNONLOCAL;
+    SPASS;
 }
 
 /*
@@ -1285,9 +1287,10 @@ start_python[] {
 
             /* GENERIC STATEMENTS */
             temp_array[ASSERT]      = { SASSERT_STATEMENT, 0, MODE_STATEMENT | MODE_EXPRESSION | MODE_EXPECT | MODE_ASSERT_PY, MODE_CONDITION | MODE_EXPECT, nullptr, nullptr };
-            temp_array[BREAK]       = { SBREAK_STATEMENT, 0, MODE_STATEMENT, MODE_VARIABLE_NAME, nullptr, nullptr };
+            temp_array[BREAK]       = { SBREAK_STATEMENT, 0, MODE_STATEMENT, 0, nullptr, nullptr };
+            temp_array[CASE]        = { SCASE, 0, MODE_STATEMENT | MODE_NEST | MODE_CASE_PY, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
             temp_array[CLASS]       = { SCLASS, 0, MODE_STATEMENT | MODE_NEST, MODE_VARIABLE_NAME, nullptr, nullptr };
-            temp_array[CONTINUE]    = { SCONTINUE_STATEMENT, 0, MODE_STATEMENT, MODE_VARIABLE_NAME, nullptr, nullptr };
+            temp_array[CONTINUE]    = { SCONTINUE_STATEMENT, 0, MODE_STATEMENT, 0, nullptr, nullptr };
             temp_array[ELSE]        = { SELSE, 0, MODE_STATEMENT | MODE_NEST | MODE_ELSE, MODE_STATEMENT | MODE_NEST, &srcMLParser::if_statement_start, nullptr };
             temp_array[IF]          = { SIF, 0, MODE_STATEMENT | MODE_NEST | MODE_IF | MODE_ELSE, MODE_CONDITION | MODE_EXPECT, &srcMLParser::if_statement_start, nullptr };
             temp_array[RETURN]      = { SRETURN_STATEMENT, 0, MODE_STATEMENT, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
@@ -1298,12 +1301,22 @@ start_python[] {
             temp_array[PY_FUNCTION] = { SFUNCTION_STATEMENT, 0, MODE_STATEMENT | MODE_NEST, MODE_PARAMETER_LIST_PY | MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, nullptr };
             temp_array[PY_GLOBAL]   = { SGLOBAL, 0, MODE_STATEMENT, MODE_VARIABLE_NAME | MODE_LIST, nullptr, nullptr };
             temp_array[PY_IMPORT]   = { SIMPORT_STATEMENT, 0, MODE_STATEMENT, MODE_VARIABLE_NAME | MODE_LIST, nullptr, nullptr };
+            temp_array[PY_MATCH]    = { SSWITCH, 0, MODE_STATEMENT | MODE_NEST, MODE_CONDITION | MODE_EXPECT, nullptr, nullptr };
+            temp_array[PY_NONLOCAL] = { SNONLOCAL, 0, MODE_STATEMENT, MODE_VARIABLE_NAME | MODE_LIST, nullptr, nullptr };
+            temp_array[PY_PASS]     = { SPASS, 0, MODE_STATEMENT, 0, nullptr, nullptr };
 
             /* DUPLEX KEYWORDS */
             /* ... */
 
             return temp_array;
         }();
+
+        // special markup for an "if" that appears in a "case" statement
+        if (LA(1) == IF && inTransparentMode(MODE_CASE_PY)) {
+            endDownToMode(MODE_CASE_PY);
+
+            startNewMode(MODE_CONDITION | MODE_EXPECT);
+        }
 
         // check if "from" is used with an "import" statement; mark as a name otherwise
         if (LA(1) == PY_FROM) {
@@ -15945,6 +15958,10 @@ offside_indent[bool content = true] { ENTRY_DEBUG } :
 
                 endMode();
             }
+
+            // ensure Python case expressions end before the block begins
+            if (inLanguage(LANGUAGE_PYTHON) && inMode(MODE_EXPRESSION) && inTransparentMode(MODE_CASE_PY))
+                endMode(MODE_EXPRESSION);
 
             startNewMode(MODE_BLOCK);
 

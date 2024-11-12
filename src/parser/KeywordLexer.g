@@ -356,6 +356,9 @@ tokens {
     PY_FUNCTION;
     PY_GLOBAL;
     PY_IMPORT;
+    PY_MATCH;
+    PY_NONLOCAL;
+    PY_PASS;
 }
 
 {
@@ -777,6 +780,9 @@ KeywordLexer(UTF8CharBuffer* pinput, int language, OPTION_TYPE & options,
         { "from"         , PY_FROM           , LANGUAGE_PYTHON },
         { "global"       , PY_GLOBAL         , LANGUAGE_PYTHON },
         { "import"       , PY_IMPORT         , LANGUAGE_PYTHON },
+        { "match"        , PY_MATCH          , LANGUAGE_PYTHON },
+        { "nonlocal"     , PY_NONLOCAL       , LANGUAGE_PYTHON },
+        { "pass"         , PY_PASS           , LANGUAGE_PYTHON },
    };
 
     // fill up the literals for the language that we are parsing

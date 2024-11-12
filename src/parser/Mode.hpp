@@ -308,4 +308,6 @@ const static srcMLState::MODE_TYPE MODE_ASSERT_PY;
 
 const static srcMLState::MODE_TYPE MODE_FROM_PY;
 
+const static srcMLState::MODE_TYPE MODE_CASE_PY;
+
 #endif

@@ -343,4 +343,6 @@ const std::unordered_map<int, Element> srcMLOutput::process = {
     { TOKEN::SDELETE,                       { "delete",            SRC,      0,           0,     0,      0 }},
     { TOKEN::SGLOBAL,                       { "global",            SRC,      0,           0,     0,      0 }},
     { TOKEN::SHASHTAG_COMMENT,              { "comment",           SRC, "type",      "line",     0,      0 }},
+    { TOKEN::SNONLOCAL,                     { "nonlocal",          SRC,       0,          0,     0,      0 }},
+    { TOKEN::SPASS,                         { "pass",              SRC,       0,          0,     0,      0 }},
 };
