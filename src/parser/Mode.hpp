@@ -312,4 +312,6 @@ const static srcMLState::MODE_TYPE MODE_CASE_PY;
 
 const static srcMLState::MODE_TYPE MODE_RAISE_PY;
 
+const static srcMLState::MODE_TYPE MODE_EXCEPT_PY;
+
 #endif

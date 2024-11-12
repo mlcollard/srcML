@@ -1280,6 +1280,17 @@ catch[...] {
 start_python[] {
         ++start_count;
 
+        const int PY_EXCEPT_MULTOPS = 600;
+
+        // A duplex keyword is a pair of adjacent keywords
+        static const std::array<int, 500 * 500> duplexKeywords = [this](){
+            std::array<int, 500 * 500> temp_array;
+
+            temp_array[PY_EXCEPT + (MULTOPS << 8)] = PY_EXCEPT_MULTOPS;
+
+            return temp_array;
+        }();
+
         // Python rules adhere to the following form:
         // START_TOKEN, MODE_NOT_IN, MODE_TO_START, MODE_FOLLOWING_KEYWORD, pre(), post()
         static const std::array<Rule, 700> python_rules = [this](){
@@ -1292,12 +1303,15 @@ start_python[] {
             temp_array[CLASS]       = { SCLASS, 0, MODE_STATEMENT | MODE_NEST, MODE_VARIABLE_NAME, nullptr, nullptr };
             temp_array[CONTINUE]    = { SCONTINUE_STATEMENT, 0, MODE_STATEMENT, 0, nullptr, nullptr };
             temp_array[ELSE]        = { SELSE, 0, MODE_STATEMENT | MODE_NEST | MODE_ELSE, MODE_STATEMENT | MODE_NEST, &srcMLParser::if_statement_start, nullptr };
+            temp_array[FINALLY]     = { SFINALLY_BLOCK, 0, MODE_STATEMENT | MODE_NEST, 0, nullptr, nullptr };
             temp_array[IF]          = { SIF, 0, MODE_STATEMENT | MODE_NEST | MODE_IF | MODE_ELSE, MODE_CONDITION | MODE_EXPECT, &srcMLParser::if_statement_start, nullptr };
             temp_array[RETURN]      = { SRETURN_STATEMENT, 0, MODE_STATEMENT, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
+            temp_array[TRY]         = { STRY_BLOCK, 0, MODE_STATEMENT, MODE_STATEMENT | MODE_NEST | MODE_TRY, nullptr, nullptr };
 
             /* PYTHON STATEMENTS */
             temp_array[PY_DELETE]   = { SDELETE, 0, MODE_STATEMENT, MODE_VARIABLE_NAME | MODE_LIST, nullptr, nullptr };
             temp_array[PY_ELIF]     = { SELSEIF, 0, MODE_STATEMENT | MODE_NEST | MODE_IF | MODE_ELSE, MODE_CONDITION | MODE_EXPECT, &srcMLParser::if_statement_start, nullptr };
+            temp_array[PY_EXCEPT]   = { SCATCH_BLOCK, 0, MODE_STATEMENT | MODE_NEST | MODE_EXCEPT_PY, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
             temp_array[PY_FUNCTION] = { SFUNCTION_STATEMENT, 0, MODE_STATEMENT | MODE_NEST, MODE_PARAMETER_LIST_PY | MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, nullptr };
             temp_array[PY_GLOBAL]   = { SGLOBAL, 0, MODE_STATEMENT, MODE_VARIABLE_NAME | MODE_LIST, nullptr, nullptr };
             temp_array[PY_IMPORT]   = { SIMPORT_STATEMENT, 0, MODE_STATEMENT, MODE_VARIABLE_NAME | MODE_LIST, nullptr, nullptr };
@@ -1307,7 +1321,7 @@ start_python[] {
             temp_array[PY_RAISE]    = { STHROW_STATEMENT, 0, MODE_STATEMENT | MODE_RAISE_PY, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
 
             /* DUPLEX KEYWORDS */
-            /* ... */
+            temp_array[PY_EXCEPT_MULTOPS] = { SCATCH_BLOCK, 0, MODE_STATEMENT | MODE_NEST | MODE_EXCEPT_PY, MODE_EXPRESSION, nullptr, &srcMLParser::consume };  // extra consume() for `*`
 
             return temp_array;
         }();
@@ -1328,11 +1342,11 @@ start_python[] {
         // invoke the table to handle keywords and duplex keywords
         if (inMode(MODE_STATEMENT)) {
             auto token = LA(1);
-            // if (duplex_keyword_set.member((unsigned int) LA(1))) {
-            //     const auto lookup = duplexKeywords[token + (next_token() << 8)];
-            //     if (lookup)
-            //         token = lookup;
-            // }
+            if (duplex_keyword_set.member((unsigned int) LA(1))) {
+                const auto lookup = duplexKeywords[token + (next_token() << 8)];
+                if (lookup)
+                    token = lookup;
+            }
             const auto& rule = python_rules[token];
             if (rule.elementToken && processRule(rule)) {
                 return;
@@ -15214,7 +15228,7 @@ rparen_with_js[] { ENTRY_DEBUG } :
 if_statement_start[] { ENTRY_DEBUG } :
         {
             // catchup for isolated else
-            if (!inMode(MODE_IF_STATEMENT)) {
+            if (!inMode(MODE_IF_STATEMENT) && !inMode(MODE_TRY)) {
                 // statement with nested statement; detection of else
                 startNewMode(MODE_STATEMENT | MODE_NEST | MODE_IF | MODE_IF_STATEMENT);
 
@@ -15961,8 +15975,15 @@ offside_indent[bool content = true] { ENTRY_DEBUG } :
                 endMode();
             }
 
-            // ensure Python case expressions end before the block begins
-            if (inLanguage(LANGUAGE_PYTHON) && inMode(MODE_EXPRESSION) && inTransparentMode(MODE_CASE_PY))
+            // ensure Python case and catch expressions end before the block begins
+            if (
+                inLanguage(LANGUAGE_PYTHON)
+                && inMode(MODE_EXPRESSION)
+                && (
+                    inTransparentMode(MODE_CASE_PY)
+                    || inTransparentMode(MODE_EXCEPT_PY)
+                )
+            )
                 endMode(MODE_EXPRESSION);
 
             startNewMode(MODE_BLOCK);
@@ -16030,6 +16051,15 @@ offside_dedent[] { ENTRY_DEBUG } :
                 return;
             }
 
+            // special case to ensure "try" encloses the entire "try..except..else..finally" block
+            if (inLanguage(LANGUAGE_PYTHON)
+                && inTransparentMode(MODE_TRY)
+                && (LA(1) == PY_EXCEPT || LA(1) == ELSE || LA(1) == FINALLY)
+            ) {
+                endDownToMode(MODE_TRY);
+                return;
+            }
+
             // end the current mode for the block; do not end more than one since they may be nested
             endMode(MODE_TOP);
 
@@ -16085,6 +16115,10 @@ condition_py[] { ENTRY_DEBUG } :
 */
 alias_py[] { SingleElement element(this); ENTRY_DEBUG } :
         {
+            // possible if called after "except"/"except*" via the table
+            if (inMode(MODE_EXPRESSION))
+                startElement(SEXPRESSION);
+
             startNewMode(MODE_VARIABLE_NAME);
 
             // start outer name

@@ -164,6 +164,7 @@ token_set(srcMLParser, whitespace_token_set,
 )
 
 token_set(srcMLParser, duplex_keyword_set,
+    // JavaScript
     srcMLParser::CATCH,
     srcMLParser::JS_DEFAULT,
     srcMLParser::ELSE,
@@ -172,7 +173,10 @@ token_set(srcMLParser, duplex_keyword_set,
     srcMLParser::JS_IMPORT,
     srcMLParser::JS_STATIC,
     srcMLParser::JS_WITH,
-    srcMLParser::JS_YIELD
+    srcMLParser::JS_YIELD,
+
+    // Python
+    srcMLParser::PY_EXCEPT
 )
 
 #endif

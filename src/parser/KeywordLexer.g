@@ -352,6 +352,7 @@ tokens {
     PY_ALIAS;
     PY_DELETE;
     PY_ELIF;
+    PY_EXCEPT;
     PY_FROM;
     PY_FUNCTION;
     PY_GLOBAL;
@@ -778,6 +779,8 @@ KeywordLexer(UTF8CharBuffer* pinput, int language, OPTION_TYPE & options,
         { "def"          , PY_FUNCTION       , LANGUAGE_PYTHON },
         { "del"          , PY_DELETE         , LANGUAGE_PYTHON },
         { "elif"         , PY_ELIF           , LANGUAGE_PYTHON },
+        { "except"       , PY_EXCEPT         , LANGUAGE_PYTHON },
+        { "finally"      , FINALLY           , LANGUAGE_PYTHON },
         { "from"         , PY_FROM           , LANGUAGE_PYTHON },
         { "global"       , PY_GLOBAL         , LANGUAGE_PYTHON },
         { "import"       , PY_IMPORT         , LANGUAGE_PYTHON },
