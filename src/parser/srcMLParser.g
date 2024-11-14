@@ -1304,6 +1304,7 @@ start_python[] {
             temp_array[CONTINUE]    = { SCONTINUE_STATEMENT, 0, MODE_STATEMENT, 0, nullptr, nullptr };
             temp_array[ELSE]        = { SELSE, 0, MODE_STATEMENT | MODE_NEST | MODE_ELSE, MODE_STATEMENT | MODE_NEST, &srcMLParser::if_statement_start, nullptr };
             temp_array[FINALLY]     = { SFINALLY_BLOCK, 0, MODE_STATEMENT | MODE_NEST, 0, nullptr, nullptr };
+            temp_array[FOR]         = { SFOR_STATEMENT, 0, MODE_STATEMENT | MODE_NEST | MODE_FOR_LOOP_PY, MODE_CONTROL | MODE_EXPECT | MODE_FOR_CONTROL_PY, nullptr, nullptr };
             temp_array[IF]          = { SIF, 0, MODE_STATEMENT | MODE_NEST | MODE_IF | MODE_ELSE, MODE_CONDITION | MODE_EXPECT, &srcMLParser::if_statement_start, nullptr };
             temp_array[RETURN]      = { SRETURN_STATEMENT, 0, MODE_STATEMENT, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
             temp_array[TRY]         = { STRY_BLOCK, 0, MODE_STATEMENT, MODE_STATEMENT | MODE_NEST | MODE_TRY, nullptr, nullptr };
@@ -1360,6 +1361,14 @@ start_python[] {
         { inMode(MODE_PARAMETER_LIST_PY) }?
         parameter_list |
 
+        // looking to start the control part of a for-loop
+        { inMode(MODE_FOR_CONTROL_PY) }?
+        {
+            replaceMode(MODE_CONTROL, MODE_TOP | MODE_CONTROL_INITIALIZATION | MODE_LIST);
+            startElement(SCONTROL);
+        }
+        control_initialization |
+
         // looking for a comma to start the message half of an "assert"
         { inMode(MODE_ASSERT_PY) }?
         (COMMA expression) |
@@ -1374,6 +1383,9 @@ start_python[] {
 
         // looking for "from" that was not a part of "from..import"
         from_py |
+
+        // looking for a keyword or operator that does not belong to a statement
+        range_in_py |
 
         // invoke start to handle unprocessed tokens (e.g., EOF, literals, operators, etc.)
         start
@@ -3389,13 +3401,19 @@ control_initialization_action[] { ENTRY_DEBUG } :
 
             bool in_if_mode = inPrevMode(MODE_IF);
 
-            // setup a mode for initialization that will end with a ";"
-            startNewMode(MODE_EXPRESSION | MODE_EXPECT | MODE_STATEMENT | MODE_LIST);
+            // Python control groups contain a name tag (not an expression or init tag)
+            if (inLanguage(LANGUAGE_PYTHON)) {
+                startNewMode(MODE_VARIABLE_NAME | MODE_STATEMENT | MODE_LIST);
+            }
+            else {
+                // setup a mode for initialization that will end with a ";"
+                startNewMode(MODE_EXPRESSION | MODE_EXPECT | MODE_STATEMENT | MODE_LIST);
 
-            if (!in_if_mode) {
-                startElement(SCONTROL_INITIALIZATION);
-            } else {
-                startElement(SDECLARATION_STATEMENT);
+                if (!in_if_mode) {
+                    startElement(SCONTROL_INITIALIZATION);
+                } else {
+                    startElement(SDECLARATION_STATEMENT);
+                }
             }
 
             switch (LA(1)) {
@@ -15227,8 +15245,8 @@ rparen_with_js[] { ENTRY_DEBUG } :
 */
 if_statement_start[] { ENTRY_DEBUG } :
         {
-            // catchup for isolated else
-            if (!inMode(MODE_IF_STATEMENT) && !inMode(MODE_TRY)) {
+            // Python try-blocks and for-loops can contain "else" that should not be marked in an if-statement
+            if (!inMode(MODE_IF_STATEMENT) && !inMode(MODE_TRY) && !inMode(MODE_FOR_LOOP_PY)) {
                 // statement with nested statement; detection of else
                 startNewMode(MODE_STATEMENT | MODE_NEST | MODE_IF | MODE_IF_STATEMENT);
 
@@ -15986,6 +16004,12 @@ offside_indent[bool content = true] { ENTRY_DEBUG } :
             )
                 endMode(MODE_EXPRESSION);
 
+            // ensure Python for-loop control groups end before the block begins
+            if (inLanguage(LANGUAGE_PYTHON) && inTransparentMode(MODE_FOR_CONTROL_PY)) {
+                endDownToMode(MODE_FOR_CONTROL_PY);
+                endMode(MODE_FOR_CONTROL_PY);
+            }
+
             startNewMode(MODE_BLOCK);
 
             startElement(SBLOCK);
@@ -16060,6 +16084,12 @@ offside_dedent[] { ENTRY_DEBUG } :
                 return;
             }
 
+            // special case to ensure "for" encloses the entire "for..else" block
+            if (inLanguage(LANGUAGE_PYTHON) && LA(1) == ELSE && inTransparentMode(MODE_FOR_LOOP_PY)) {
+                endDownToMode(MODE_FOR_LOOP_PY);
+                return;
+            }
+
             // end the current mode for the block; do not end more than one since they may be nested
             endMode(MODE_TOP);
 
@@ -16090,6 +16120,10 @@ offside_dedent[] { ENTRY_DEBUG } :
             // if true, we need to markup the (abbreviated) variable declaration
             if (inMode(MODE_DECL) && LA(1) != TERMINATE)
                 short_variable_declaration();
+
+            // ensure "for" ends with "else" in "for..else" block
+            if (inLanguage(LANGUAGE_PYTHON) && inMode(MODE_FOR_LOOP_PY))
+                endMode();
         }
 ;
 
@@ -16254,3 +16288,19 @@ perform_from_import_check[] returns [bool isimport] {
 
         ENTRY_DEBUG
 } :;
+
+/*
+  range_in_py
+
+  Handles a Python "in" expression using the range tag.
+*/
+range_in_py[] { SingleElement element(this); ENTRY_DEBUG } :
+        {
+            startNewMode(MODE_EXPRESSION | MODE_EXPECT);
+
+            startElement(SRANGE_IN);
+        }
+
+        PY_RANGE_IN
+        expression
+;

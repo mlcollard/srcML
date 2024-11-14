@@ -361,6 +361,7 @@ tokens {
     PY_NONLOCAL;
     PY_PASS;
     PY_RAISE;
+    PY_RANGE_IN;
 }
 
 {
@@ -784,6 +785,7 @@ KeywordLexer(UTF8CharBuffer* pinput, int language, OPTION_TYPE & options,
         { "from"         , PY_FROM           , LANGUAGE_PYTHON },
         { "global"       , PY_GLOBAL         , LANGUAGE_PYTHON },
         { "import"       , PY_IMPORT         , LANGUAGE_PYTHON },
+        { "in"           , PY_RANGE_IN       , LANGUAGE_PYTHON },
         { "match"        , PY_MATCH          , LANGUAGE_PYTHON },
         { "nonlocal"     , PY_NONLOCAL       , LANGUAGE_PYTHON },
         { "pass"         , PY_PASS           , LANGUAGE_PYTHON },
