@@ -433,6 +433,7 @@ private:
                     srcMLParser::consume();
                 }
 
+
                 break;
 
             case srcMLParser::HASHTAG_COMMENT_START:
@@ -457,6 +458,12 @@ private:
                     pushESkipToken(srcMLParser::SHASHTAG_COMMENT);
                     pushSkipToken();
                     srcMLParser::consume();
+                }
+
+                // null out any inserted terminate after a comment
+                if (srcMLParser::LT(1)->getType() == srcMLParser::TERMINATE &&
+                    srcMLParser::LT(1)->getText() == "") {
+                    srcMLParser::LT(1)->setType(srcMLParser::SNOP);
                 }
 
                 break;
