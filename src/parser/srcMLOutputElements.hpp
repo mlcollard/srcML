@@ -345,4 +345,5 @@ const std::unordered_map<int, Element> srcMLOutput::process = {
     { TOKEN::SHASHTAG_COMMENT,              { "comment",           SRC, "type",      "line",     0,      0 }},
     { TOKEN::SNONLOCAL,                     { "nonlocal",          SRC,       0,          0,     0,      0 }},
     { TOKEN::SPASS,                         { "pass",              SRC,       0,          0,     0,      0 }},
+    { TOKEN::SYIELD_FROM_STATEMENT,         { "yield",             SRC, "type",      "from",     0,      0 }},
 };

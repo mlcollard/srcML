@@ -717,6 +717,7 @@ tokens {
     SHASHTAG_COMMENT;
     SNONLOCAL;
     SPASS;
+    SYIELD_FROM_STATEMENT;
 }
 
 /*
@@ -1281,12 +1282,14 @@ start_python[] {
         ++start_count;
 
         const int PY_EXCEPT_MULTOPS = 600;
+        const int PY_YIELD_PY_FROM = 601;
 
         // A duplex keyword is a pair of adjacent keywords
         static const std::array<int, 500 * 500> duplexKeywords = [this](){
             std::array<int, 500 * 500> temp_array;
 
             temp_array[PY_EXCEPT + (MULTOPS << 8)] = PY_EXCEPT_MULTOPS;
+            temp_array[PY_YIELD + (PY_FROM << 8)] = PY_YIELD_PY_FROM;
 
             return temp_array;
         }();
@@ -1322,9 +1325,11 @@ start_python[] {
             temp_array[PY_PASS]     = { SPASS, 0, MODE_STATEMENT, 0, nullptr, nullptr };
             temp_array[PY_RAISE]    = { STHROW_STATEMENT, 0, MODE_STATEMENT | MODE_RAISE_PY, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
             temp_array[PY_WITH]     = { SWITH_STATEMENT, 0, MODE_STATEMENT | MODE_NEST | MODE_WITH_PY, MODE_EXPRESSION | MODE_EXPECT | MODE_LIST, nullptr, nullptr };
+            temp_array[PY_YIELD]    = { SYIELD_STATEMENT, 0, MODE_STATEMENT, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
 
             /* DUPLEX KEYWORDS */
             temp_array[PY_EXCEPT_MULTOPS] = { SCATCH_BLOCK, 0, MODE_STATEMENT | MODE_NEST | MODE_EXCEPT_PY, MODE_EXPRESSION, nullptr, &srcMLParser::consume };  // extra consume() for `*`
+            temp_array[PY_YIELD_PY_FROM]  = { SYIELD_FROM_STATEMENT, 0, MODE_STATEMENT, MODE_EXPRESSION | MODE_EXPECT, nullptr, &srcMLParser::consume };  // extra consume() for `from`
 
             return temp_array;
         }();

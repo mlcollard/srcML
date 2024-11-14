@@ -176,7 +176,8 @@ token_set(srcMLParser, duplex_keyword_set,
     srcMLParser::JS_YIELD,
 
     // Python
-    srcMLParser::PY_EXCEPT
+    srcMLParser::PY_EXCEPT,
+    srcMLParser::PY_YIELD
 )
 
 #endif

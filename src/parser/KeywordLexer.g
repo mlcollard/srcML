@@ -363,6 +363,7 @@ tokens {
     PY_RAISE;
     PY_RANGE_IN;
     PY_WITH;
+    PY_YIELD;
 }
 
 {
@@ -794,6 +795,7 @@ KeywordLexer(UTF8CharBuffer* pinput, int language, OPTION_TYPE & options,
         { "raise"        , PY_RAISE          , LANGUAGE_PYTHON },
         { "True"         , LITERAL_TRUE      , LANGUAGE_PYTHON },
         { "with"         , PY_WITH           , LANGUAGE_PYTHON },
+        { "yield"        , PY_YIELD          , LANGUAGE_PYTHON },
    };
 
     // fill up the literals for the language that we are parsing
