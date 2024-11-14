@@ -31,6 +31,7 @@
 #include <unit_utilities.hpp>
 #include <srcMLOutput.hpp>
 #include <OffSideRule.hpp>
+#include <NewlineTerminatePython.hpp>
 
 using namespace ::std::literals::string_view_literals;
 
@@ -145,8 +146,11 @@ void srcml_translator::translate(UTF8CharBuffer* parser_input) {
             OffSideRule offside(selector);
             offside.setBlockStartToken(srcMLParser::COLON);
 
+            // intermediate token stage
+            NewlineTerminatePython terminate(offside);
+
             // base stream parser srcML connected to lexical analyzer
-            StreamMLParser parser(offside, getLanguage(), options);
+            StreamMLParser parser(terminate, getLanguage(), options);
 
             // connect local parser to attribute for output
             out.setTokenStream(parser);
