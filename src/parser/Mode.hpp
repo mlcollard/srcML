@@ -258,6 +258,8 @@ const static srcMLState::MODE_TYPE MODE_NO_BLOCK_CONTENT;
 
 const static srcMLState::MODE_TYPE MODE_PSEUDOBLOCK;
 
+const static srcMLState::MODE_TYPE MODE_DECLARATION_STATEMENT;
+
 // JavaScript modes
 const static srcMLState::MODE_TYPE MODE_ARGUMENT_JS;
 
@@ -266,8 +268,6 @@ const static srcMLState::MODE_TYPE MODE_PARAMETER_LIST_JS;
 const static srcMLState::MODE_TYPE MODE_NAME_LIST_JS;
 
 const static srcMLState::MODE_TYPE MODE_ALIAS_COMPOUND_NAME_JS;
-
-const static srcMLState::MODE_TYPE MODE_DECLARATION_STATEMENT;
 
 const static srcMLState::MODE_TYPE MODE_DECLARATION_JS;
 
@@ -308,6 +308,8 @@ const static srcMLState::MODE_TYPE MODE_FOR_CONTROL_PY;
 
 const static srcMLState::MODE_TYPE MODE_FOR_LOOP_PY;
 
+const static srcMLState::MODE_TYPE MODE_WHILE_LOOP_PY;
+
 const static srcMLState::MODE_TYPE MODE_ASSERT_PY;
 
 const static srcMLState::MODE_TYPE MODE_FROM_PY;
@@ -317,5 +319,7 @@ const static srcMLState::MODE_TYPE MODE_CASE_PY;
 const static srcMLState::MODE_TYPE MODE_RAISE_PY;
 
 const static srcMLState::MODE_TYPE MODE_EXCEPT_PY;
+
+const static srcMLState::MODE_TYPE MODE_WITH_PY;
 
 #endif

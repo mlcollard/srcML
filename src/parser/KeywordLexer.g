@@ -362,6 +362,7 @@ tokens {
     PY_PASS;
     PY_RAISE;
     PY_RANGE_IN;
+    PY_WITH;
 }
 
 {
@@ -781,6 +782,7 @@ KeywordLexer(UTF8CharBuffer* pinput, int language, OPTION_TYPE & options,
         { "del"          , PY_DELETE         , LANGUAGE_PYTHON },
         { "elif"         , PY_ELIF           , LANGUAGE_PYTHON },
         { "except"       , PY_EXCEPT         , LANGUAGE_PYTHON },
+        { "False"        , LITERAL_FALSE     , LANGUAGE_PYTHON },
         { "finally"      , FINALLY           , LANGUAGE_PYTHON },
         { "from"         , PY_FROM           , LANGUAGE_PYTHON },
         { "global"       , PY_GLOBAL         , LANGUAGE_PYTHON },
@@ -790,6 +792,8 @@ KeywordLexer(UTF8CharBuffer* pinput, int language, OPTION_TYPE & options,
         { "nonlocal"     , PY_NONLOCAL       , LANGUAGE_PYTHON },
         { "pass"         , PY_PASS           , LANGUAGE_PYTHON },
         { "raise"        , PY_RAISE          , LANGUAGE_PYTHON },
+        { "True"         , LITERAL_TRUE      , LANGUAGE_PYTHON },
+        { "with"         , PY_WITH           , LANGUAGE_PYTHON },
    };
 
     // fill up the literals for the language that we are parsing

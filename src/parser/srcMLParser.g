@@ -1308,6 +1308,7 @@ start_python[] {
             temp_array[IF]          = { SIF, 0, MODE_STATEMENT | MODE_NEST | MODE_IF | MODE_ELSE, MODE_CONDITION | MODE_EXPECT, &srcMLParser::if_statement_start, nullptr };
             temp_array[RETURN]      = { SRETURN_STATEMENT, 0, MODE_STATEMENT, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
             temp_array[TRY]         = { STRY_BLOCK, 0, MODE_STATEMENT, MODE_STATEMENT | MODE_NEST | MODE_TRY, nullptr, nullptr };
+            temp_array[WHILE]       = { SWHILE_STATEMENT, 0, MODE_STATEMENT | MODE_NEST | MODE_WHILE_LOOP_PY, MODE_CONDITION | MODE_EXPECT, nullptr, nullptr };
 
             /* PYTHON STATEMENTS */
             temp_array[PY_DELETE]   = { SDELETE, 0, MODE_STATEMENT, MODE_VARIABLE_NAME | MODE_LIST, nullptr, nullptr };
@@ -1320,6 +1321,7 @@ start_python[] {
             temp_array[PY_NONLOCAL] = { SNONLOCAL, 0, MODE_STATEMENT, MODE_VARIABLE_NAME | MODE_LIST, nullptr, nullptr };
             temp_array[PY_PASS]     = { SPASS, 0, MODE_STATEMENT, 0, nullptr, nullptr };
             temp_array[PY_RAISE]    = { STHROW_STATEMENT, 0, MODE_STATEMENT | MODE_RAISE_PY, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
+            temp_array[PY_WITH]     = { SWITH_STATEMENT, 0, MODE_STATEMENT | MODE_NEST | MODE_WITH_PY, MODE_EXPRESSION | MODE_EXPECT | MODE_LIST, nullptr, nullptr };
 
             /* DUPLEX KEYWORDS */
             temp_array[PY_EXCEPT_MULTOPS] = { SCATCH_BLOCK, 0, MODE_STATEMENT | MODE_NEST | MODE_EXCEPT_PY, MODE_EXPRESSION, nullptr, &srcMLParser::consume };  // extra consume() for `*`
@@ -1379,13 +1381,13 @@ start_python[] {
 
         // looking for a name followed by "as"
         { next_token() == PY_ALIAS }?
-        alias_py |
+        name_as_alias_py |
 
         // looking for "from" that was not a part of "from..import"
         from_py |
 
         // looking for a keyword or operator that does not belong to a statement
-        range_in_py |
+        range_in_py | alias_py |
 
         // invoke start to handle unprocessed tokens (e.g., EOF, literals, operators, etc.)
         start
@@ -15245,8 +15247,13 @@ rparen_with_js[] { ENTRY_DEBUG } :
 */
 if_statement_start[] { ENTRY_DEBUG } :
         {
-            // Python try-blocks and for-loops can contain "else" that should not be marked in an if-statement
-            if (!inMode(MODE_IF_STATEMENT) && !inMode(MODE_TRY) && !inMode(MODE_FOR_LOOP_PY)) {
+            // Several Python statements include "else" that should not be marked as an if-statement
+            if (
+                !inMode(MODE_IF_STATEMENT)
+                && !inMode(MODE_TRY)
+                && !inMode(MODE_FOR_LOOP_PY)
+                && !inMode(MODE_WHILE_LOOP_PY)
+            ) {
                 // statement with nested statement; detection of else
                 startNewMode(MODE_STATEMENT | MODE_NEST | MODE_IF | MODE_IF_STATEMENT);
 
@@ -16010,6 +16017,12 @@ offside_indent[bool content = true] { ENTRY_DEBUG } :
                 endMode(MODE_FOR_CONTROL_PY);
             }
 
+            // ensure the expression following a Python "with" ends before the block begins
+            if (inLanguage(LANGUAGE_PYTHON) && inTransparentMode(MODE_WITH_PY) && inMode(MODE_EXPRESSION)) {
+                endDownToMode(MODE_EXPRESSION);
+                endMode(MODE_EXPRESSION);
+            }
+
             startNewMode(MODE_BLOCK);
 
             startElement(SBLOCK);
@@ -16090,6 +16103,12 @@ offside_dedent[] { ENTRY_DEBUG } :
                 return;
             }
 
+            // special case to ensure "while" encloses the entire "while..else" block
+            if (inLanguage(LANGUAGE_PYTHON) && LA(1) == ELSE && inTransparentMode(MODE_WHILE_LOOP_PY)) {
+                endDownToMode(MODE_WHILE_LOOP_PY);
+                return;
+            }
+
             // end the current mode for the block; do not end more than one since they may be nested
             endMode(MODE_TOP);
 
@@ -16121,8 +16140,8 @@ offside_dedent[] { ENTRY_DEBUG } :
             if (inMode(MODE_DECL) && LA(1) != TERMINATE)
                 short_variable_declaration();
 
-            // ensure "for" ends with "else" in "for..else" block
-            if (inLanguage(LANGUAGE_PYTHON) && inMode(MODE_FOR_LOOP_PY))
+            // ensure "for" or "while" end correctly after "else"
+            if (inLanguage(LANGUAGE_PYTHON) && (inMode(MODE_FOR_LOOP_PY) || inMode(MODE_WHILE_LOOP_PY)))
                 endMode();
         }
 ;
@@ -16143,11 +16162,12 @@ condition_py[] { ENTRY_DEBUG } :
 ;
 
 /*
-  alias_py
+  name_as_alias_py
 
   Handles a Python name followed by an "as" expression.
+  Wraps everything in an extra name tag.
 */
-alias_py[] { SingleElement element(this); ENTRY_DEBUG } :
+name_as_alias_py[] { SingleElement element(this); ENTRY_DEBUG } :
         {
             // possible if called after "except"/"except*" via the table
             if (inMode(MODE_EXPRESSION))
@@ -16180,6 +16200,20 @@ alias_py[] { SingleElement element(this); ENTRY_DEBUG } :
             // end outer name
             endMode(MODE_VARIABLE_NAME);
         }
+;
+
+/*
+  alias_py
+
+  Handles a Python "as" expression on its own.
+*/
+alias_py[] { SingleElement element(this); ENTRY_DEBUG } :
+        {
+            startElement(SALIAS);
+        }
+
+        PY_ALIAS
+        compound_name
 ;
 
 /*
