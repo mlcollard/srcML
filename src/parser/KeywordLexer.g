@@ -350,6 +350,7 @@ tokens {
 
     // Python
     PY_ALIAS;
+    PY_ARROW;
     PY_DELETE;
     PY_ELIF;
     PY_EXCEPT;
@@ -777,6 +778,7 @@ KeywordLexer(UTF8CharBuffer* pinput, int language, OPTION_TYPE & options,
         { ""             , DEDENT            , LANGUAGE_PYTHON },
 
         // Python
+        { "->"           , PY_ARROW          , LANGUAGE_PYTHON },
         { "as"           , PY_ALIAS          , LANGUAGE_PYTHON },
         { "assert"       , ASSERT            , LANGUAGE_PYTHON },
         { "def"          , PY_FUNCTION       , LANGUAGE_PYTHON },
