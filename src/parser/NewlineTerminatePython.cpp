@@ -27,7 +27,7 @@ antlr::RefToken NewlineTerminatePython::nextToken() {
         auto token = input.nextToken();
 
         // For a newline, insert a TERMINATE, except on an INDENT line
-        if (lastToken->getType() != srcMLParser::TERMINATE &&
+        if (!first && lastToken->getType() != srcMLParser::TERMINATE &&
             (!isEmptyLine && token->getType() == srcMLParser::EOL && lastToken->getType() != srcMLParser::INDENT) ||
             (token->getType() == 1 /* EOF */ && lastToken->getType() != srcMLParser::EOL)) {
 
@@ -42,8 +42,10 @@ antlr::RefToken NewlineTerminatePython::nextToken() {
         }
 
         if (token->getType() == srcMLParser::EOL) {
+            first = true;
             isEmptyLine = true;
         } else if (token->getType() != srcMLParser::WS) {
+            first = false;
             isEmptyLine = false;
         }
 
