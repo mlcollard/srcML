@@ -716,7 +716,11 @@ tokens {
     SGLOBAL;
     SHASHTAG_COMMENT;
     SNONLOCAL;
+    SPARAMETER_ARGUMENT;
+    SPARAMETER_KEYWORD_ARGUMENT;
+    SPARAMETER_MODIFIER;
     SPASS;
+    SYIELD_FROM_STATEMENT;
 }
 
 /*
@@ -1281,12 +1285,14 @@ start_python[] {
         ++start_count;
 
         const int PY_EXCEPT_MULTOPS = 600;
+        const int PY_YIELD_PY_FROM = 601;
 
         // A duplex keyword is a pair of adjacent keywords
         static const std::array<int, 500 * 500> duplexKeywords = [this](){
             std::array<int, 500 * 500> temp_array;
 
             temp_array[PY_EXCEPT + (MULTOPS << 8)] = PY_EXCEPT_MULTOPS;
+            temp_array[PY_YIELD + (PY_FROM << 8)] = PY_YIELD_PY_FROM;
 
             return temp_array;
         }();
@@ -1300,13 +1306,15 @@ start_python[] {
             temp_array[ASSERT]      = { SASSERT_STATEMENT, 0, MODE_STATEMENT | MODE_EXPRESSION | MODE_EXPECT | MODE_ASSERT_PY, MODE_CONDITION | MODE_EXPECT, nullptr, nullptr };
             temp_array[BREAK]       = { SBREAK_STATEMENT, 0, MODE_STATEMENT, 0, nullptr, nullptr };
             temp_array[CASE]        = { SCASE, 0, MODE_STATEMENT | MODE_NEST | MODE_CASE_PY, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
-            temp_array[CLASS]       = { SCLASS, 0, MODE_STATEMENT | MODE_NEST, MODE_VARIABLE_NAME, nullptr, nullptr };
+            temp_array[CLASS]       = { SCLASS, 0, MODE_STATEMENT | MODE_NEST, MODE_PARAMETER_LIST_PY | MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, nullptr };
             temp_array[CONTINUE]    = { SCONTINUE_STATEMENT, 0, MODE_STATEMENT, 0, nullptr, nullptr };
             temp_array[ELSE]        = { SELSE, 0, MODE_STATEMENT | MODE_NEST | MODE_ELSE, MODE_STATEMENT | MODE_NEST, &srcMLParser::if_statement_start, nullptr };
             temp_array[FINALLY]     = { SFINALLY_BLOCK, 0, MODE_STATEMENT | MODE_NEST, 0, nullptr, nullptr };
+            temp_array[FOR]         = { SFOR_STATEMENT, 0, MODE_STATEMENT | MODE_NEST | MODE_FOR_LOOP_PY, MODE_CONTROL | MODE_EXPECT | MODE_FOR_CONTROL_PY, nullptr, nullptr };
             temp_array[IF]          = { SIF, 0, MODE_STATEMENT | MODE_NEST | MODE_IF | MODE_ELSE, MODE_CONDITION | MODE_EXPECT, &srcMLParser::if_statement_start, nullptr };
             temp_array[RETURN]      = { SRETURN_STATEMENT, 0, MODE_STATEMENT, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
             temp_array[TRY]         = { STRY_BLOCK, 0, MODE_STATEMENT, MODE_STATEMENT | MODE_NEST | MODE_TRY, nullptr, nullptr };
+            temp_array[WHILE]       = { SWHILE_STATEMENT, 0, MODE_STATEMENT | MODE_NEST | MODE_WHILE_LOOP_PY, MODE_CONDITION | MODE_EXPECT, nullptr, nullptr };
 
             /* PYTHON STATEMENTS */
             temp_array[PY_DELETE]   = { SDELETE, 0, MODE_STATEMENT, MODE_VARIABLE_NAME | MODE_LIST, nullptr, nullptr };
@@ -1319,9 +1327,12 @@ start_python[] {
             temp_array[PY_NONLOCAL] = { SNONLOCAL, 0, MODE_STATEMENT, MODE_VARIABLE_NAME | MODE_LIST, nullptr, nullptr };
             temp_array[PY_PASS]     = { SPASS, 0, MODE_STATEMENT, 0, nullptr, nullptr };
             temp_array[PY_RAISE]    = { STHROW_STATEMENT, 0, MODE_STATEMENT | MODE_RAISE_PY, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
+            temp_array[PY_WITH]     = { SWITH_STATEMENT, 0, MODE_STATEMENT | MODE_NEST | MODE_WITH_PY, MODE_EXPRESSION | MODE_EXPECT | MODE_LIST, nullptr, nullptr };
+            temp_array[PY_YIELD]    = { SYIELD_STATEMENT, 0, MODE_STATEMENT, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
 
             /* DUPLEX KEYWORDS */
             temp_array[PY_EXCEPT_MULTOPS] = { SCATCH_BLOCK, 0, MODE_STATEMENT | MODE_NEST | MODE_EXCEPT_PY, MODE_EXPRESSION, nullptr, &srcMLParser::consume };  // extra consume() for `*`
+            temp_array[PY_YIELD_PY_FROM]  = { SYIELD_FROM_STATEMENT, 0, MODE_STATEMENT, MODE_EXPRESSION | MODE_EXPECT, nullptr, &srcMLParser::consume };  // extra consume() for `from`
 
             return temp_array;
         }();
@@ -1356,9 +1367,25 @@ start_python[] {
         ENTRY_DEBUG_START
         ENTRY_DEBUG
 } :
+        // looking for a name followed by lbracket so the following generic parameter list is detected correctly
+        {inMode(MODE_PARAMETER_LIST_PY) && next_token() == LBRACKET }?
+        function_name_before_generic_py |
+
         // looking for lparen while expecting a parameter list
         { inMode(MODE_PARAMETER_LIST_PY) }?
-        parameter_list |
+        python_parameter_list |
+
+        // looking for lbracket while expecting a parameter list
+        { inMode(MODE_PARAMETER_LIST_PY) }?
+        python_generic_parameter_list |
+
+        // looking to start the control part of a for-loop
+        { inMode(MODE_FOR_CONTROL_PY) }?
+        {
+            replaceMode(MODE_CONTROL, MODE_TOP | MODE_CONTROL_INITIALIZATION | MODE_LIST);
+            startElement(SCONTROL);
+        }
+        control_initialization |
 
         // looking for a comma to start the message half of an "assert"
         { inMode(MODE_ASSERT_PY) }?
@@ -1370,10 +1397,13 @@ start_python[] {
 
         // looking for a name followed by "as"
         { next_token() == PY_ALIAS }?
-        alias_py |
+        name_as_alias_py |
 
         // looking for "from" that was not a part of "from..import"
         from_py |
+
+        // looking for a keyword or operator that does not belong to a statement
+        range_in_py | alias_py | function_annotation_py |
 
         // invoke start to handle unprocessed tokens (e.g., EOF, literals, operators, etc.)
         start
@@ -3389,13 +3419,19 @@ control_initialization_action[] { ENTRY_DEBUG } :
 
             bool in_if_mode = inPrevMode(MODE_IF);
 
-            // setup a mode for initialization that will end with a ";"
-            startNewMode(MODE_EXPRESSION | MODE_EXPECT | MODE_STATEMENT | MODE_LIST);
+            // Python control groups contain a name tag (not an expression or init tag)
+            if (inLanguage(LANGUAGE_PYTHON)) {
+                startNewMode(MODE_VARIABLE_NAME | MODE_STATEMENT | MODE_LIST);
+            }
+            else {
+                // setup a mode for initialization that will end with a ";"
+                startNewMode(MODE_EXPRESSION | MODE_EXPECT | MODE_STATEMENT | MODE_LIST);
 
-            if (!in_if_mode) {
-                startElement(SCONTROL_INITIALIZATION);
-            } else {
-                startElement(SDECLARATION_STATEMENT);
+                if (!in_if_mode) {
+                    startElement(SCONTROL_INITIALIZATION);
+                } else {
+                    startElement(SDECLARATION_STATEMENT);
+                }
             }
 
             switch (LA(1)) {
@@ -15227,8 +15263,13 @@ rparen_with_js[] { ENTRY_DEBUG } :
 */
 if_statement_start[] { ENTRY_DEBUG } :
         {
-            // catchup for isolated else
-            if (!inMode(MODE_IF_STATEMENT) && !inMode(MODE_TRY)) {
+            // Several Python statements include "else" that should not be marked as an if-statement
+            if (
+                !inMode(MODE_IF_STATEMENT)
+                && !inMode(MODE_TRY)
+                && !inMode(MODE_FOR_LOOP_PY)
+                && !inMode(MODE_WHILE_LOOP_PY)
+            ) {
                 // statement with nested statement; detection of else
                 startNewMode(MODE_STATEMENT | MODE_NEST | MODE_IF | MODE_IF_STATEMENT);
 
@@ -15986,6 +16027,18 @@ offside_indent[bool content = true] { ENTRY_DEBUG } :
             )
                 endMode(MODE_EXPRESSION);
 
+            // ensure Python for-loop control groups end before the block begins
+            if (inLanguage(LANGUAGE_PYTHON) && inTransparentMode(MODE_FOR_CONTROL_PY)) {
+                endDownToMode(MODE_FOR_CONTROL_PY);
+                endMode(MODE_FOR_CONTROL_PY);
+            }
+
+            // ensure the expression following a Python "with" ends before the block begins
+            if (inLanguage(LANGUAGE_PYTHON) && inTransparentMode(MODE_WITH_PY) && inMode(MODE_EXPRESSION)) {
+                endDownToMode(MODE_EXPRESSION);
+                endMode(MODE_EXPRESSION);
+            }
+
             startNewMode(MODE_BLOCK);
 
             startElement(SBLOCK);
@@ -16060,6 +16113,18 @@ offside_dedent[] { ENTRY_DEBUG } :
                 return;
             }
 
+            // special case to ensure "for" encloses the entire "for..else" block
+            if (inLanguage(LANGUAGE_PYTHON) && LA(1) == ELSE && inTransparentMode(MODE_FOR_LOOP_PY)) {
+                endDownToMode(MODE_FOR_LOOP_PY);
+                return;
+            }
+
+            // special case to ensure "while" encloses the entire "while..else" block
+            if (inLanguage(LANGUAGE_PYTHON) && LA(1) == ELSE && inTransparentMode(MODE_WHILE_LOOP_PY)) {
+                endDownToMode(MODE_WHILE_LOOP_PY);
+                return;
+            }
+
             // end the current mode for the block; do not end more than one since they may be nested
             endMode(MODE_TOP);
 
@@ -16090,6 +16155,10 @@ offside_dedent[] { ENTRY_DEBUG } :
             // if true, we need to markup the (abbreviated) variable declaration
             if (inMode(MODE_DECL) && LA(1) != TERMINATE)
                 short_variable_declaration();
+
+            // ensure "for" or "while" end correctly after "else"
+            if (inLanguage(LANGUAGE_PYTHON) && (inMode(MODE_FOR_LOOP_PY) || inMode(MODE_WHILE_LOOP_PY)))
+                endMode();
         }
 ;
 
@@ -16109,11 +16178,12 @@ condition_py[] { ENTRY_DEBUG } :
 ;
 
 /*
-  alias_py
+  name_as_alias_py
 
   Handles a Python name followed by an "as" expression.
+  Wraps everything in an extra name tag.
 */
-alias_py[] { SingleElement element(this); ENTRY_DEBUG } :
+name_as_alias_py[] { SingleElement element(this); ENTRY_DEBUG } :
         {
             // possible if called after "except"/"except*" via the table
             if (inMode(MODE_EXPRESSION))
@@ -16146,6 +16216,20 @@ alias_py[] { SingleElement element(this); ENTRY_DEBUG } :
             // end outer name
             endMode(MODE_VARIABLE_NAME);
         }
+;
+
+/*
+  alias_py
+
+  Handles a Python "as" expression on its own.
+*/
+alias_py[] { SingleElement element(this); ENTRY_DEBUG } :
+        {
+            startElement(SALIAS);
+        }
+
+        PY_ALIAS
+        compound_name
 ;
 
 /*
@@ -16254,3 +16338,290 @@ perform_from_import_check[] returns [bool isimport] {
 
         ENTRY_DEBUG
 } :;
+
+/*
+  range_in_py
+
+  Handles a Python "in" expression using the range tag.
+*/
+range_in_py[] { SingleElement element(this); ENTRY_DEBUG } :
+        {
+            startNewMode(MODE_EXPRESSION | MODE_EXPECT);
+
+            startElement(SRANGE_IN);
+        }
+
+        PY_RANGE_IN
+        expression
+;
+
+/*
+  function_name_before_generic_py
+
+  Handles a Python function name as a singular name (not a compound name).
+  Used to ensure the following generic parameter list is detected correctly.
+*/
+function_name_before_generic_py[] { SingleElement element(this); ENTRY_DEBUG } :
+        {
+            startElement(SNAME);
+        }
+
+        NAME
+;
+
+/*
+  python_parameter_list
+
+  Handles a Python parameter list.
+*/
+python_parameter_list[] { CompleteElement element(this); bool lastwasparam = false; bool foundparam = false; ENTRY_DEBUG } :
+        {
+            // list of parameters
+            startNewMode(MODE_PARAMETER | MODE_LIST | MODE_EXPECT);
+
+            // start the parameter list statement
+            startElement(SPARAMETER_LIST);
+        }
+
+        // parameter list must include all possible parts since it is part of a function detection
+        LPAREN
+
+        (
+            {
+                foundparam = true;
+
+                if (!lastwasparam)
+                    empty_element(SPARAMETER, !lastwasparam);
+
+                lastwasparam = false;
+            }
+
+            {
+                // we are in a parameter list; we must end it down to the start of the parameter list
+                if (!inMode(MODE_PARAMETER | MODE_LIST | MODE_EXPECT))
+                    endMode();
+            }
+
+            comma |
+
+            complete_python_parameter
+
+            {
+                foundparam = lastwasparam = true;
+            }
+        )*
+
+        empty_element[SPARAMETER, !lastwasparam && foundparam]
+        rparen[false]
+;
+
+/*
+  python_generic_parameter_list
+
+  Handles a Python generic parameter list.
+*/
+python_generic_parameter_list[] { CompleteElement element(this); bool lastwasparam = false; bool foundparam = false; ENTRY_DEBUG } :
+        {
+            // list of parameters
+            startNewMode(MODE_PARAMETER | MODE_LIST | MODE_EXPECT);
+
+            // start the generic parameter list statement
+            startElement(SGENERIC_PARAMETER_LIST);
+        }
+
+        // generic parameter list must include all possible parts since it is part of a function detection
+        LBRACKET
+
+        (
+            {
+                foundparam = true;
+
+                if (!lastwasparam)
+                    empty_element(SPARAMETER, !lastwasparam);
+
+                lastwasparam = false;
+            }
+
+            {
+                // we are in a generic parameter list; we must end it down to the start of the generic parameter list
+                if (!inMode(MODE_PARAMETER | MODE_LIST | MODE_EXPECT))
+                    endMode();
+            }
+
+            comma |
+
+            complete_python_parameter
+
+            {
+                foundparam = lastwasparam = true;
+            }
+        )*
+
+        empty_element[SPARAMETER, !lastwasparam && foundparam]
+
+        {
+            if (inMode(MODE_PARAMETER))
+                endMode(MODE_PARAMETER);
+        }
+
+        RBRACKET
+;
+
+/*
+  complete_python_parameter
+
+  Handles a Python parameter.  Python parameters have many forms (e.g., modifier, args, kwargs).
+*/
+complete_python_parameter[] {
+        int type_count = 0;
+        int secondtoken = 0;
+        int after_token = 0;
+        STMT_TYPE stmt_type = NONE;
+
+        ENTRY_DEBUG
+} :
+        {
+            startNewMode(MODE_PARAMETER);
+
+            // positional-only ('/') or keyword-only ('*') parameters
+            if (
+                LA(1) == OPERATORS
+                || (
+                    LA(1) == MULTOPS
+                    && (
+                        next_token() == COMMA
+                        || next_token() == RPAREN
+                    )
+                )
+            )
+                startElement(SPARAMETER_MODIFIER);
+
+            // arbitrary positional parameter ('*' NAME)
+            else if (LA(1) == MULTOPS && next_token() == MULTOPS)
+                startElement(SPARAMETER_KEYWORD_ARGUMENT);
+
+            // arbitrary keyword parameter ('**' NAME)
+            else if (LA(1) == MULTOPS)
+                startElement(SPARAMETER_ARGUMENT);
+
+            // general parameter
+            else
+                startElement(SPARAMETER);
+        }
+
+        (
+            // '**' + NAME (with optional annotation)
+            { next_token() == MULTOPS }?
+            MULTOPS
+            MULTOPS
+            compound_name
+            parameter_annotation_py |
+
+            // '*' or '/' only
+            { next_token() == COMMA || next_token() == RPAREN }?
+            (MULTOPS | OPERATORS) |
+
+            // '*' + NAME (with optional annotation)
+            { next_token() == NAME }?
+            MULTOPS
+            compound_name
+            parameter_annotation_py |
+
+            // annotation (with optional initialization)
+            { next_token() == COLON }?
+            compound_name
+            parameter_annotation_py
+            parameter_init_py |
+
+            // initialization
+            { next_token() == EQUAL }?
+            compound_name
+            parameter_init_py |
+
+            compound_name
+        )
+;
+
+/*
+  parameter_annotation_py
+
+  Handles a Python parameter annotation.
+*/
+parameter_annotation_py[] { ENTRY_DEBUG } :
+        {
+            // possible if called after handling an arbitrary positional parameter
+            // or arbitrary keyword parameter in complete_python_parameter
+            if (LA(1) != COLON)
+                return;
+
+            startNewMode(MODE_ANNOTATION_PY);
+
+            startElement(SANNOTATION);
+        }
+
+        COLON
+
+        {
+            startNewMode(MODE_EXPRESSION | MODE_EXPECT);
+        }
+
+        expression
+
+        {
+            if (inTransparentMode(MODE_ANNOTATION_PY)) {
+                endDownToMode(MODE_ANNOTATION_PY);
+                endMode(MODE_ANNOTATION_PY);
+            }
+        }
+;
+
+/*
+  parameter_init_py
+
+  Handles a Python parameter initialization.
+*/
+parameter_init_py[] { SingleElement element(this); ENTRY_DEBUG } :
+        {
+            // possible if called after parameter_annotation_py in complete_python_parameter
+            if (LA(1) != EQUAL)
+                return;
+
+            startElement(SINIT);
+        }
+
+        EQUAL
+
+        {
+            startNewMode(MODE_EXPRESSION | MODE_EXPECT);
+        }
+
+        expression
+;
+
+/*
+  function_annotation_py
+
+  Handles a Python function annotation, starting with an arrow ('->').
+*/
+function_annotation_py[] { ENTRY_DEBUG } :
+        {
+            startNewMode(MODE_ANNOTATION_PY);
+
+            startElement(SANNOTATION);
+        }
+
+        PY_ARROW
+
+        {
+            startNewMode(MODE_EXPRESSION | MODE_EXPECT);
+        }
+
+        expression
+
+        {
+            if (inTransparentMode(MODE_ANNOTATION_PY)) {
+                endDownToMode(MODE_ANNOTATION_PY);
+                endMode(MODE_ANNOTATION_PY);
+            }
+        }
+;

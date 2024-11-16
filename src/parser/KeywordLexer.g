@@ -350,6 +350,7 @@ tokens {
 
     // Python
     PY_ALIAS;
+    PY_ARROW;
     PY_DELETE;
     PY_ELIF;
     PY_EXCEPT;
@@ -361,6 +362,9 @@ tokens {
     PY_NONLOCAL;
     PY_PASS;
     PY_RAISE;
+    PY_RANGE_IN;
+    PY_WITH;
+    PY_YIELD;
 }
 
 {
@@ -774,20 +778,26 @@ KeywordLexer(UTF8CharBuffer* pinput, int language, OPTION_TYPE & options,
         { ""             , DEDENT            , LANGUAGE_PYTHON },
 
         // Python
+        { "->"           , PY_ARROW          , LANGUAGE_PYTHON },
         { "as"           , PY_ALIAS          , LANGUAGE_PYTHON },
         { "assert"       , ASSERT            , LANGUAGE_PYTHON },
         { "def"          , PY_FUNCTION       , LANGUAGE_PYTHON },
         { "del"          , PY_DELETE         , LANGUAGE_PYTHON },
         { "elif"         , PY_ELIF           , LANGUAGE_PYTHON },
         { "except"       , PY_EXCEPT         , LANGUAGE_PYTHON },
+        { "False"        , LITERAL_FALSE     , LANGUAGE_PYTHON },
         { "finally"      , FINALLY           , LANGUAGE_PYTHON },
         { "from"         , PY_FROM           , LANGUAGE_PYTHON },
         { "global"       , PY_GLOBAL         , LANGUAGE_PYTHON },
         { "import"       , PY_IMPORT         , LANGUAGE_PYTHON },
+        { "in"           , PY_RANGE_IN       , LANGUAGE_PYTHON },
         { "match"        , PY_MATCH          , LANGUAGE_PYTHON },
         { "nonlocal"     , PY_NONLOCAL       , LANGUAGE_PYTHON },
         { "pass"         , PY_PASS           , LANGUAGE_PYTHON },
         { "raise"        , PY_RAISE          , LANGUAGE_PYTHON },
+        { "True"         , LITERAL_TRUE      , LANGUAGE_PYTHON },
+        { "with"         , PY_WITH           , LANGUAGE_PYTHON },
+        { "yield"        , PY_YIELD          , LANGUAGE_PYTHON },
    };
 
     // fill up the literals for the language that we are parsing
