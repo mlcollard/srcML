@@ -1306,7 +1306,7 @@ start_python[] {
             temp_array[ASSERT]      = { SASSERT_STATEMENT, 0, MODE_STATEMENT | MODE_EXPRESSION | MODE_EXPECT | MODE_ASSERT_PY, MODE_CONDITION | MODE_EXPECT, nullptr, nullptr };
             temp_array[BREAK]       = { SBREAK_STATEMENT, 0, MODE_STATEMENT, 0, nullptr, nullptr };
             temp_array[CASE]        = { SCASE, 0, MODE_STATEMENT | MODE_NEST | MODE_CASE_PY, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
-            temp_array[CLASS]       = { SCLASS, 0, MODE_STATEMENT | MODE_NEST, MODE_PARAMETER_LIST_PY | MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, nullptr };
+            temp_array[CLASS]       = { SCLASS, 0, MODE_STATEMENT | MODE_NEST, MODE_SUPER_LIST_PY | MODE_PARAMETER_LIST_PY | MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, nullptr };
             temp_array[CONTINUE]    = { SCONTINUE_STATEMENT, 0, MODE_STATEMENT, 0, nullptr, nullptr };
             temp_array[ELSE]        = { SELSE, 0, MODE_STATEMENT | MODE_NEST | MODE_ELSE, MODE_STATEMENT | MODE_NEST, &srcMLParser::if_statement_start, nullptr };
             temp_array[FINALLY]     = { SFINALLY_BLOCK, 0, MODE_STATEMENT | MODE_NEST, 0, nullptr, nullptr };
@@ -1370,6 +1370,10 @@ start_python[] {
         // looking for a name followed by lbracket so the following generic parameter list is detected correctly
         {inMode(MODE_PARAMETER_LIST_PY) && next_token() == LBRACKET }?
         function_name_before_generic_py |
+
+        // looking for lparen while expecting a super list (only used for classes)
+        { inMode(MODE_SUPER_LIST_PY) }?
+        python_super_list |
 
         // looking for lparen while expecting a parameter list
         { inMode(MODE_PARAMETER_LIST_PY) }?
@@ -16623,5 +16627,55 @@ function_annotation_py[] { ENTRY_DEBUG } :
                 endDownToMode(MODE_ANNOTATION_PY);
                 endMode(MODE_ANNOTATION_PY);
             }
+        }
+;
+
+/*
+  python_super_list
+
+  Handles a Python super list, used primarily with classes.
+  Operates under the assumption MODE_SUPER_LIST_PY is the current mode.
+*/
+python_super_list[] { CompleteElement element(this); ENTRY_DEBUG } :
+        {
+            // start the super list
+            startElement(SDERIVATION_LIST);
+        }
+
+        LPAREN
+
+        (options { greedy = true; } :
+            { LA(1) != COMMA && LA(1) != RPAREN }?
+            {
+                startNewMode(MODE_SUPER_PY | MODE_LIST | MODE_EXPECT);
+
+                // start the super, which contains an expression
+                startElement(SDERIVATION);
+
+                startNewMode(MODE_EXPRESSION | MODE_EXPECT);
+            }
+            expression |
+
+            {
+                if (inTransparentMode(MODE_SUPER_PY)) {
+                    endDownToMode(MODE_SUPER_PY);
+                    endMode(MODE_SUPER_PY);
+                }
+            }
+            COMMA
+        )*
+
+        {
+            if (inTransparentMode(MODE_SUPER_PY)) {
+                endDownToMode(MODE_SUPER_PY);
+                endMode(MODE_SUPER_PY);
+            }
+        }
+
+        RPAREN
+
+        {
+            if (inMode(MODE_SUPER_LIST_PY))
+                endMode(MODE_SUPER_LIST_PY);
         }
 ;

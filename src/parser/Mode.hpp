@@ -304,6 +304,8 @@ const static srcMLState::MODE_TYPE MODE_ARRAY_JS;
 // Python modes
 const static srcMLState::MODE_TYPE MODE_PARAMETER_LIST_PY;
 
+const static srcMLState::MODE_TYPE MODE_SUPER_LIST_PY;
+
 const static srcMLState::MODE_TYPE MODE_ANNOTATION_PY;
 
 const static srcMLState::MODE_TYPE MODE_FOR_CONTROL_PY;
@@ -323,5 +325,7 @@ const static srcMLState::MODE_TYPE MODE_RAISE_PY;
 const static srcMLState::MODE_TYPE MODE_FROM_PY;
 
 const static srcMLState::MODE_TYPE MODE_WITH_PY;
+
+const static srcMLState::MODE_TYPE MODE_SUPER_PY;
 
 #endif
