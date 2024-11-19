@@ -196,6 +196,14 @@ antlr::RefToken OffSideRule::nextToken() {
 
     // There is at least one backlogged token
     if (!buffer.empty()) {
+        // Place any unhandled blank lines in the buffer before ending the file
+        if (buffer.back()->getType() == srcMLParser::EOF_ && !blankLineBuffer.empty()) {
+            while (!blankLineBuffer.empty()) {
+                buffer.emplace_back(blankLineBuffer.back());
+                blankLineBuffer.pop_back();
+            }
+        }
+
         // Update the current indentation level at the start of each new line
         if (buffer.back()->getColumn() == 1 && buffer.back()->getType() != srcMLParser::EOL) {
             prevColStart = currentColStart;
