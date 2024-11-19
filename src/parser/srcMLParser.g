@@ -851,12 +851,9 @@ public:
         if (rule.followingMode != 0)
             startNewMode(rule.followingMode);
 
-        if (check_valid_specifier_js()) {
-            // handle multiple pre-keyword specifiers in a row
-            while (check_valid_specifier_js()) {
-                specifier_js();
-            }
-        }
+        handleAttributes();
+
+        handleSpecifiers();
 
         consume();
 
@@ -864,6 +861,40 @@ public:
             (*this.*(rule.post))();
 
         return true;
+    }
+
+    void handleSpecifiers() {
+        // handle JavaScript specifiers
+        if (inLanguage(LANGUAGE_JAVASCRIPT)) {
+            if (check_valid_specifier_js()) {
+                // handle multiple pre-keyword specifiers in a row
+                while (check_valid_specifier_js()) {
+                    specifier_js();
+                }
+            }
+        }
+
+        // handle Python specifiers
+        if (inLanguage(LANGUAGE_PYTHON)) {
+            if (check_valid_specifier_py()) {
+                // handle multiple pre-keyword specifiers in a row
+                while (check_valid_specifier_py()) {
+                    specifier_py();
+                }
+            }
+        }
+    }
+
+    void handleAttributes() {
+        // handle Python decorators
+        if (inLanguage(LANGUAGE_PYTHON)) {
+            if (LA(1) == ATSIGN) {
+                // handle multiple pre-keyword decorators in a row
+                while (LA(1) == ATSIGN) {
+                    attribute_py();
+                }
+            }
+        }
     }
 }
 
@@ -1131,7 +1162,7 @@ start_javascript[] {
 
         // check if the current token is a specifier that occurs before a keyword
         if (check_valid_specifier_js()) {
-            std::array<int, 2> post_specifier_tokens = perform_post_specifier_check();
+            std::array<int, 2> post_specifier_tokens = perform_post_specifier_check_js();
 
             // looking for declarations (e.g., var/let/const/static) separately since they are not in the table
             if (
@@ -1306,7 +1337,7 @@ start_python[] {
             temp_array[ASSERT]      = { SASSERT_STATEMENT, 0, MODE_STATEMENT | MODE_EXPRESSION | MODE_EXPECT | MODE_ASSERT_PY, MODE_CONDITION | MODE_EXPECT, nullptr, nullptr };
             temp_array[BREAK]       = { SBREAK_STATEMENT, 0, MODE_STATEMENT, 0, nullptr, nullptr };
             temp_array[CASE]        = { SCASE, 0, MODE_STATEMENT | MODE_NEST | MODE_CASE_PY, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
-            temp_array[CLASS]       = { SCLASS, 0, MODE_STATEMENT | MODE_NEST, MODE_PARAMETER_LIST_PY | MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, nullptr };
+            temp_array[CLASS]       = { SCLASS, 0, MODE_STATEMENT | MODE_NEST, MODE_SUPER_LIST_PY | MODE_PARAMETER_LIST_PY | MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, nullptr };
             temp_array[CONTINUE]    = { SCONTINUE_STATEMENT, 0, MODE_STATEMENT, 0, nullptr, nullptr };
             temp_array[ELSE]        = { SELSE, 0, MODE_STATEMENT | MODE_NEST | MODE_ELSE, MODE_STATEMENT | MODE_NEST, &srcMLParser::if_statement_start, nullptr };
             temp_array[FINALLY]     = { SFINALLY_BLOCK, 0, MODE_STATEMENT | MODE_NEST, 0, nullptr, nullptr };
@@ -1327,6 +1358,7 @@ start_python[] {
             temp_array[PY_NONLOCAL] = { SNONLOCAL, 0, MODE_STATEMENT, MODE_VARIABLE_NAME | MODE_LIST, nullptr, nullptr };
             temp_array[PY_PASS]     = { SPASS, 0, MODE_STATEMENT, 0, nullptr, nullptr };
             temp_array[PY_RAISE]    = { STHROW_STATEMENT, 0, MODE_STATEMENT | MODE_RAISE_PY, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
+            temp_array[PY_TYPE]     = { STYPEDEF, 0, MODE_STATEMENT | MODE_TYPEDEF, MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, nullptr };
             temp_array[PY_WITH]     = { SWITH_STATEMENT, 0, MODE_STATEMENT | MODE_NEST | MODE_WITH_PY, MODE_EXPRESSION | MODE_EXPECT | MODE_LIST, nullptr, nullptr };
             temp_array[PY_YIELD]    = { SYIELD_STATEMENT, 0, MODE_STATEMENT, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
 
@@ -1350,6 +1382,32 @@ start_python[] {
                 from_import_py();
         }
 
+        // check if the current token starts a decorator that occurs before a keyword (or specifiers)
+        if (LA(1) == ATSIGN) {
+            int post_attribute_token = perform_post_attribute_check_py();
+
+            // looking for functions or classes
+            if (post_attribute_token != -1) {
+                const auto& rule = python_rules[post_attribute_token];
+                if (rule.elementToken && processRule(rule)) {
+                    return;
+                }
+            }
+        }
+
+        // check if the current token is a specifier that occurs before a keyword
+        if (check_valid_specifier_py()) {
+            int post_specifier_token = perform_post_specifier_check_py();
+
+            // looking for for-loops, functions, or with
+            if (post_specifier_token != -1) {
+                const auto& rule = python_rules[post_specifier_token];
+                if (rule.elementToken && processRule(rule)) {
+                    return;
+                }
+            }
+        }
+
         // invoke the table to handle keywords and duplex keywords
         if (inMode(MODE_STATEMENT)) {
             auto token = LA(1);
@@ -1370,6 +1428,10 @@ start_python[] {
         // looking for a name followed by lbracket so the following generic parameter list is detected correctly
         {inMode(MODE_PARAMETER_LIST_PY) && next_token() == LBRACKET }?
         function_name_before_generic_py |
+
+        // looking for lparen while expecting a super list (only used for classes)
+        { inMode(MODE_SUPER_LIST_PY) }?
+        python_super_list |
 
         // looking for lparen while expecting a parameter list
         { inMode(MODE_PARAMETER_LIST_PY) }?
@@ -1398,6 +1460,13 @@ start_python[] {
         // looking for a name followed by "as"
         { next_token() == PY_ALIAS }?
         name_as_alias_py |
+
+        // looking for "=" in a type statement
+        { inTransparentMode(MODE_TYPEDEF) }?
+        EQUAL
+        {
+            startNewMode(MODE_EXPRESSION | MODE_EXPECT);
+        } |
 
         // looking for "from" that was not a part of "from..import"
         from_py |
@@ -15447,12 +15516,12 @@ check_valid_specifier_js[] returns [int isspecifier] {
 } :;
 
 /*
-  perform_post_specifier_check
+  perform_post_specifier_check_js
 
   Returns the next two tokens that occur after a JavaScript specifier.
   If there are multiple specifiers in a row, returns the next two tokens after the last specifier.
 */
-perform_post_specifier_check[] returns [std::array<int, 2> keywords] {
+perform_post_specifier_check_js[] returns [std::array<int, 2> keywords] {
         keywords[0] = -1;
         keywords[1] = -1;
         int start = mark();
@@ -16622,6 +16691,189 @@ function_annotation_py[] { ENTRY_DEBUG } :
             if (inTransparentMode(MODE_ANNOTATION_PY)) {
                 endDownToMode(MODE_ANNOTATION_PY);
                 endMode(MODE_ANNOTATION_PY);
+            }
+        }
+;
+
+/*
+  python_super_list
+
+  Handles a Python super list, used primarily with classes.
+  Operates under the assumption MODE_SUPER_LIST_PY is the current mode.
+*/
+python_super_list[] { CompleteElement element(this); ENTRY_DEBUG } :
+        {
+            // start the super list
+            startElement(SDERIVATION_LIST);
+        }
+
+        LPAREN
+
+        (options { greedy = true; } :
+            { LA(1) != COMMA && LA(1) != RPAREN }?
+            {
+                startNewMode(MODE_SUPER_PY | MODE_LIST | MODE_EXPECT);
+
+                // start the super, which contains an expression
+                startElement(SDERIVATION);
+
+                startNewMode(MODE_EXPRESSION | MODE_EXPECT);
+            }
+            expression |
+
+            {
+                if (inTransparentMode(MODE_SUPER_PY)) {
+                    endDownToMode(MODE_SUPER_PY);
+                    endMode(MODE_SUPER_PY);
+                }
+            }
+            COMMA
+        )*
+
+        {
+            if (inTransparentMode(MODE_SUPER_PY)) {
+                endDownToMode(MODE_SUPER_PY);
+                endMode(MODE_SUPER_PY);
+            }
+        }
+
+        RPAREN
+
+        {
+            if (inMode(MODE_SUPER_LIST_PY))
+                endMode(MODE_SUPER_LIST_PY);
+        }
+;
+
+/*
+  check_valid_specifier_py
+
+  Checks to see if the current token is a Python specifier.
+  Currently, the only Python specifier is "async" (this could change).
+*/
+check_valid_specifier_py[] returns [int isspecifier] {
+        isspecifier = false;
+
+        if (LA(1) == PY_ASYNC)
+            isspecifier = true;
+
+        ENTRY_DEBUG
+} :;
+
+/*
+  perform_post_specifier_check_py
+
+  Returns the next token that occur after a Python specifier.
+  If there are multiple specifiers in a row, returns the next token after the last specifier.
+*/
+perform_post_specifier_check_py[] returns [int keyword] {
+        keyword = -1;
+        int start = mark();
+        inputState->guessing++;
+
+        try {
+            while (true) {
+                consume();
+
+                if (!check_valid_specifier_py())
+                    break;
+            }
+
+            if (
+                LA(1) == FOR
+                || LA(1) == PY_FUNCTION
+                || LA(1) == PY_WITH
+            )
+                keyword = LA(1);
+        }
+        catch (...) {}
+
+        inputState->guessing--;
+        rewind(start);
+
+        ENTRY_DEBUG
+} :;
+
+/*
+  specifier_py
+
+  Used to mark "async" as a specifier (Python).
+*/
+specifier_py[] { SingleElement element(this); ENTRY_DEBUG } :
+        {
+            startElement(SFUNCTION_SPECIFIER);
+        }
+
+        PY_ASYNC
+;
+
+/*
+  perform_post_attribute_check_py
+
+  Returns the next token that occur after a Python decorator.
+  If there are multiple decorators in a row, returns the next token after the last decorator.
+*/
+perform_post_attribute_check_py[] returns [int keyword] {
+        keyword = -1;
+        int start = mark();
+        inputState->guessing++;
+
+        try {
+            while (true) {
+                consume();
+
+                // @todo -- test without "def" to see if this will fail
+                if (LA(1) == CLASS || LA(1) == PY_FUNCTION || LA(1) == INDENT || LA(1) == 1 /* EOF */)
+                    break;
+            }
+
+            if (
+                LA(1) == CLASS
+                || LA(1) == PY_FUNCTION
+            )
+                keyword = LA(1);
+        }
+        catch (...) {}
+
+        inputState->guessing--;
+        rewind(start);
+
+        ENTRY_DEBUG
+} :;
+
+/*
+  attribute_py
+
+  Used to mark decorators (e.g., "@decorator") as attributes (Python).
+*/
+attribute_py[] { ENTRY_DEBUG } :
+        {
+            startNewMode(MODE_DECORATOR_PY);
+
+            startElement(SATTRIBUTE);
+        }
+
+        ATSIGN
+
+        {
+            startNewMode(MODE_EXPRESSION | MODE_EXPECT);
+        }
+
+        (
+            // decorators can have arguments
+            { inMode(MODE_ARGUMENT) }?
+            argument |
+
+            { LA(1) != CLASS && LA(1) != PY_FUNCTION }?
+            expression |
+
+            comma
+        )*
+
+        {
+            if (inTransparentMode(MODE_DECORATOR_PY)) {
+                endDownToMode(MODE_DECORATOR_PY);
+                endMode(MODE_DECORATOR_PY);
             }
         }
 ;
