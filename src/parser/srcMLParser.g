@@ -851,6 +851,8 @@ public:
         if (rule.followingMode != 0)
             startNewMode(rule.followingMode);
 
+        handleAttributes();
+
         handleSpecifiers();
 
         consume();
@@ -878,6 +880,18 @@ public:
                 // handle multiple pre-keyword specifiers in a row
                 while (check_valid_specifier_py()) {
                     specifier_py();
+                }
+            }
+        }
+    }
+
+    void handleAttributes() {
+        // handle Python decorators
+        if (inLanguage(LANGUAGE_PYTHON)) {
+            if (LA(1) == ATSIGN) {
+                // handle multiple pre-keyword decorators in a row
+                while (LA(1) == ATSIGN) {
+                    attribute_py();
                 }
             }
         }
@@ -1365,6 +1379,19 @@ start_python[] {
         if (LA(1) == PY_FROM) {
             if (perform_from_import_check())
                 from_import_py();
+        }
+
+        // check if the current token starts a decorator that occurs before a keyword (or specifiers)
+        if (LA(1) == ATSIGN) {
+            int post_attribute_token = perform_post_attribute_check_py();
+
+            // looking for functions or classes
+            if (post_attribute_token != -1) {
+                const auto& rule = python_rules[post_attribute_token];
+                if (rule.elementToken && processRule(rule)) {
+                    return;
+                }
+            }
         }
 
         // check if the current token is a specifier that occurs before a keyword
@@ -16770,4 +16797,75 @@ specifier_py[] { SingleElement element(this); ENTRY_DEBUG } :
         }
 
         PY_ASYNC
+;
+
+/*
+  perform_post_attribute_check_py
+
+  Returns the next token that occur after a Python decorator.
+  If there are multiple decorators in a row, returns the next token after the last decorator.
+*/
+perform_post_attribute_check_py[] returns [int keyword] {
+        keyword = -1;
+        int start = mark();
+        inputState->guessing++;
+
+        try {
+            while (true) {
+                consume();
+
+                // @todo -- test without "def" to see if this will fail
+                if (LA(1) == CLASS || LA(1) == PY_FUNCTION || LA(1) == INDENT || LA(1) == 1 /* EOF */)
+                    break;
+            }
+
+            if (
+                LA(1) == CLASS
+                || LA(1) == PY_FUNCTION
+            )
+                keyword = LA(1);
+        }
+        catch (...) {}
+
+        inputState->guessing--;
+        rewind(start);
+
+        ENTRY_DEBUG
+} :;
+
+/*
+  attribute_py
+
+  Used to mark decorators (e.g., "@decorator") as attributes (Python).
+*/
+attribute_py[] { ENTRY_DEBUG } :
+        {
+            startNewMode(MODE_DECORATOR_PY);
+
+            startElement(SATTRIBUTE);
+        }
+
+        ATSIGN
+
+        {
+            startNewMode(MODE_EXPRESSION | MODE_EXPECT);
+        }
+
+        (
+            // decorators can have arguments
+            { inMode(MODE_ARGUMENT) }?
+            argument |
+
+            { LA(1) != CLASS && LA(1) != PY_FUNCTION }?
+            expression |
+
+            comma
+        )*
+
+        {
+            if (inTransparentMode(MODE_DECORATOR_PY)) {
+                endDownToMode(MODE_DECORATOR_PY);
+                endMode(MODE_DECORATOR_PY);
+            }
+        }
 ;

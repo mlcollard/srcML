@@ -308,6 +308,8 @@ const static srcMLState::MODE_TYPE MODE_SUPER_LIST_PY;
 
 const static srcMLState::MODE_TYPE MODE_ANNOTATION_PY;
 
+const static srcMLState::MODE_TYPE MODE_DECORATOR_PY;
+
 const static srcMLState::MODE_TYPE MODE_FOR_CONTROL_PY;
 
 const static srcMLState::MODE_TYPE MODE_FOR_LOOP_PY;
