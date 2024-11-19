@@ -851,12 +851,7 @@ public:
         if (rule.followingMode != 0)
             startNewMode(rule.followingMode);
 
-        if (check_valid_specifier_js()) {
-            // handle multiple pre-keyword specifiers in a row
-            while (check_valid_specifier_js()) {
-                specifier_js();
-            }
-        }
+        handleSpecifiers();
 
         consume();
 
@@ -864,6 +859,28 @@ public:
             (*this.*(rule.post))();
 
         return true;
+    }
+
+    void handleSpecifiers() {
+        // handle JavaScript specifiers
+        if (inLanguage(LANGUAGE_JAVASCRIPT)) {
+            if (check_valid_specifier_js()) {
+                // handle multiple pre-keyword specifiers in a row
+                while (check_valid_specifier_js()) {
+                    specifier_js();
+                }
+            }
+        }
+
+        // handle Python specifiers
+        if (inLanguage(LANGUAGE_PYTHON)) {
+            if (check_valid_specifier_py()) {
+                // handle multiple pre-keyword specifiers in a row
+                while (check_valid_specifier_py()) {
+                    specifier_py();
+                }
+            }
+        }
     }
 }
 
@@ -1131,7 +1148,7 @@ start_javascript[] {
 
         // check if the current token is a specifier that occurs before a keyword
         if (check_valid_specifier_js()) {
-            std::array<int, 2> post_specifier_tokens = perform_post_specifier_check();
+            std::array<int, 2> post_specifier_tokens = perform_post_specifier_check_js();
 
             // looking for declarations (e.g., var/let/const/static) separately since they are not in the table
             if (
@@ -1348,6 +1365,19 @@ start_python[] {
         if (LA(1) == PY_FROM) {
             if (perform_from_import_check())
                 from_import_py();
+        }
+
+        // check if the current token is a specifier that occurs before a keyword
+        if (check_valid_specifier_py()) {
+            int post_specifier_token = perform_post_specifier_check_py();
+
+            // looking for for-loops, functions, or with
+            if (post_specifier_token != -1) {
+                const auto& rule = python_rules[post_specifier_token];
+                if (rule.elementToken && processRule(rule)) {
+                    return;
+                }
+            }
         }
 
         // invoke the table to handle keywords and duplex keywords
@@ -15451,12 +15481,12 @@ check_valid_specifier_js[] returns [int isspecifier] {
 } :;
 
 /*
-  perform_post_specifier_check
+  perform_post_specifier_check_js
 
   Returns the next two tokens that occur after a JavaScript specifier.
   If there are multiple specifiers in a row, returns the next two tokens after the last specifier.
 */
-perform_post_specifier_check[] returns [std::array<int, 2> keywords] {
+perform_post_specifier_check_js[] returns [std::array<int, 2> keywords] {
         keywords[0] = -1;
         keywords[1] = -1;
         int start = mark();
@@ -16678,4 +16708,66 @@ python_super_list[] { CompleteElement element(this); ENTRY_DEBUG } :
             if (inMode(MODE_SUPER_LIST_PY))
                 endMode(MODE_SUPER_LIST_PY);
         }
+;
+
+/*
+  check_valid_specifier_py
+
+  Checks to see if the current token is a Python specifier.
+  Currently, the only Python specifier is "async" (this could change).
+*/
+check_valid_specifier_py[] returns [int isspecifier] {
+        isspecifier = false;
+
+        if (LA(1) == PY_ASYNC)
+            isspecifier = true;
+
+        ENTRY_DEBUG
+} :;
+
+/*
+  perform_post_specifier_check_py
+
+  Returns the next token that occur after a Python specifier.
+  If there are multiple specifiers in a row, returns the next token after the last specifier.
+*/
+perform_post_specifier_check_py[] returns [int keyword] {
+        keyword = -1;
+        int start = mark();
+        inputState->guessing++;
+
+        try {
+            while (true) {
+                consume();
+
+                if (!check_valid_specifier_py())
+                    break;
+            }
+
+            if (
+                LA(1) == FOR
+                || LA(1) == PY_FUNCTION
+                || LA(1) == PY_WITH
+            )
+                keyword = LA(1);
+        }
+        catch (...) {}
+
+        inputState->guessing--;
+        rewind(start);
+
+        ENTRY_DEBUG
+} :;
+
+/*
+  specifier_py
+
+  Used to mark "async" as a specifier (Python).
+*/
+specifier_py[] { SingleElement element(this); ENTRY_DEBUG } :
+        {
+            startElement(SFUNCTION_SPECIFIER);
+        }
+
+        PY_ASYNC
 ;

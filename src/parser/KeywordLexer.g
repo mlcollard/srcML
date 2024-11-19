@@ -351,6 +351,7 @@ tokens {
     // Python
     PY_ALIAS;
     PY_ARROW;
+    PY_ASYNC;
     PY_DELETE;
     PY_ELIF;
     PY_EXCEPT;
@@ -781,6 +782,7 @@ KeywordLexer(UTF8CharBuffer* pinput, int language, OPTION_TYPE & options,
         { "->"           , PY_ARROW          , LANGUAGE_PYTHON },
         { "as"           , PY_ALIAS          , LANGUAGE_PYTHON },
         { "assert"       , ASSERT            , LANGUAGE_PYTHON },
+        { "async"        , PY_ASYNC          , LANGUAGE_PYTHON },
         { "def"          , PY_FUNCTION       , LANGUAGE_PYTHON },
         { "del"          , PY_DELETE         , LANGUAGE_PYTHON },
         { "elif"         , PY_ELIF           , LANGUAGE_PYTHON },
