@@ -364,6 +364,7 @@ tokens {
     PY_PASS;
     PY_RAISE;
     PY_RANGE_IN;
+    PY_TYPE;
     PY_WITH;
     PY_YIELD;
 }
@@ -798,6 +799,7 @@ KeywordLexer(UTF8CharBuffer* pinput, int language, OPTION_TYPE & options,
         { "pass"         , PY_PASS           , LANGUAGE_PYTHON },
         { "raise"        , PY_RAISE          , LANGUAGE_PYTHON },
         { "True"         , LITERAL_TRUE      , LANGUAGE_PYTHON },
+        { "type"         , PY_TYPE           , LANGUAGE_PYTHON },
         { "with"         , PY_WITH           , LANGUAGE_PYTHON },
         { "yield"        , PY_YIELD          , LANGUAGE_PYTHON },
    };
