@@ -5411,7 +5411,7 @@ terminate_token[] { LightweightElement element(this); ENTRY_DEBUG } :
                         !inLanguage(LANGUAGE_JAVA)
                         || !inMode(MODE_ENUM | MODE_LIST)
                     )
-                ) && (inLanguage(LANGUAGE_PYTHON) && !LT(1)->getText().empty())
+                ) && (!inLanguage(LANGUAGE_PYTHON) || !LT(1)->getText().empty())
             )
                 startElement(SEMPTY);
 
