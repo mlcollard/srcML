@@ -330,4 +330,6 @@ const static srcMLState::MODE_TYPE MODE_WITH_PY;
 
 const static srcMLState::MODE_TYPE MODE_SUPER_PY;
 
+const static srcMLState::MODE_TYPE MODE_ARRAY_PY;
+
 #endif

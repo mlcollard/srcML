@@ -5968,6 +5968,7 @@ comma[] { bool markup_comma = true; ENTRY_DEBUG } :
             if (
                 inMode(MODE_INIT | MODE_VARIABLE_NAME | MODE_LIST)
                 || inTransparentMode(MODE_CONTROL_CONDITION | MODE_END_AT_COMMA)
+                || (inLanguage(LANGUAGE_PYTHON) && inMode(MODE_ARRAY_PY))
                 || (
                     inLanguage(LANGUAGE_JAVASCRIPT)
                     && (
@@ -12048,6 +12049,10 @@ expression_part[CALL_TYPE type = NOCALL, int call_count = 1] {
 
         ENTRY_DEBUG
 } :
+        // looking for lbracket to start a Python array
+        { inLanguage(LANGUAGE_PYTHON) && last_consumed != NAME }?
+        array_py |
+
         // do not mark JavaScript method blocks as objects (e.g., methodName() {})
         { inLanguage(LANGUAGE_JAVASCRIPT) && last_consumed == RPAREN }?
         lcurly[true] |
@@ -15947,7 +15952,21 @@ array_js[] { CompleteElement element(this); ENTRY_DEBUG } :
         }
 
         LBRACKET
-        complete_expression
+
+        (
+            {
+                startNewMode(MODE_EXPRESSION | MODE_EXPECT);
+            }
+            expression |
+
+            comma
+        )*
+
+        {
+            if (inMode(MODE_EXPRESSION))
+                endMode(MODE_EXPRESSION);
+        }
+
         RBRACKET
 
         {
@@ -16875,5 +16894,41 @@ attribute_py[] { ENTRY_DEBUG } :
                 endDownToMode(MODE_DECORATOR_PY);
                 endMode(MODE_DECORATOR_PY);
             }
+        }
+;
+
+/*
+  array_py
+
+  Handles Python arrays.  Not used directly, but can be called by expression_part.
+*/
+array_py[] { CompleteElement element(this); ENTRY_DEBUG } :
+        {
+            startNewMode(MODE_LOCAL | MODE_TOP | MODE_LIST | MODE_ARRAY_PY);
+
+            startElement(SARRAY);
+        }
+
+        LBRACKET
+
+        (
+            {
+                startNewMode(MODE_EXPRESSION | MODE_EXPECT);
+            }
+            expression |
+
+            comma
+        )*
+
+        {
+            if (inMode(MODE_EXPRESSION))
+                endMode(MODE_EXPRESSION);
+        }
+
+        RBRACKET
+
+        {
+            if (inMode(MODE_ARRAY_PY))
+                endMode(MODE_ARRAY_PY);
         }
 ;
