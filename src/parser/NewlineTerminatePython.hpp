@@ -31,6 +31,7 @@ private:
     antlr::RefToken lastToken = srcMLToken::factory();
     bool isEmptyLine = true;
     bool first = true;
+    int parenthesesCount = 0;
 };
 
 #endif
