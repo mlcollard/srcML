@@ -302,6 +302,8 @@ const static srcMLState::MODE_TYPE MODE_SETTER_JS;
 const static srcMLState::MODE_TYPE MODE_ARRAY_JS;
 
 // Python modes
+const static srcMLState::MODE_TYPE MODE_LIST_COMPREHENSION_PY;
+
 const static srcMLState::MODE_TYPE MODE_PARAMETER_LIST_PY;
 
 const static srcMLState::MODE_TYPE MODE_SUPER_LIST_PY;
@@ -309,6 +311,10 @@ const static srcMLState::MODE_TYPE MODE_SUPER_LIST_PY;
 const static srcMLState::MODE_TYPE MODE_ANNOTATION_PY;
 
 const static srcMLState::MODE_TYPE MODE_DECORATOR_PY;
+
+const static srcMLState::MODE_TYPE MODE_SPECIFIER_PY;
+
+const static srcMLState::MODE_TYPE MODE_RANGE_IN_PY;
 
 const static srcMLState::MODE_TYPE MODE_FOR_CONTROL_PY;
 

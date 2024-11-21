@@ -715,6 +715,7 @@ tokens {
     SDELETE;
     SGLOBAL;
     SHASHTAG_COMMENT;
+    SLIST_COMPREHENSION;
     SNONLOCAL;
     SPARAMETER_ARGUMENT;
     SPARAMETER_KEYWORD_ARGUMENT;
@@ -16445,6 +16446,79 @@ range_in_py[] { SingleElement element(this); ENTRY_DEBUG } :
 ;
 
 /*
+  list_comprehension_range_py
+
+  Handles a Python "in" expression in a list comprehension using the range tag.
+  An "if" expression can appear after the "in" expression (only for list comprehensions).
+*/
+list_comprehension_range_py[] { ENTRY_DEBUG } :
+        {
+            startNewMode(MODE_RANGE_IN_PY);
+
+            startElement(SRANGE_IN);
+        }
+
+        PY_RANGE_IN
+
+        {
+            startNewMode(MODE_EXPRESSION | MODE_EXPECT);
+        }
+
+        expression
+
+        {
+            endMode(MODE_EXPRESSION);
+
+            // handle if expressions in list comprehensions
+            if (inTransparentMode(MODE_LIST_COMPREHENSION_PY))
+                list_comprehension_if_py();
+
+            if (inTransparentMode(MODE_RANGE_IN_PY)) {
+                endDownToMode(MODE_RANGE_IN_PY);
+                endMode(MODE_RANGE_IN_PY);
+            }
+        }
+;
+
+/*
+  list_comprehension_if_py
+
+  Handles an "if" in a Python list comprehension differently from other "if" expressions.
+*/
+list_comprehension_if_py[] { ENTRY_DEBUG } :
+        (options { greedy = true; } :
+            start_list_comprehension_if_py |
+
+            {
+                if (!inMode(MODE_EXPRESSION))
+                    startNewMode(MODE_EXPRESSION | MODE_EXPECT);
+            }
+            expression
+        )*
+;
+
+/*
+  start_list_comprehension_if_py
+
+  Starts an "if" in a Python list comprehension.
+*/
+start_list_comprehension_if_py[] { ENTRY_DEBUG } :
+        {
+            // end previous "if" to start a new "if"
+            if (inTransparentMode(MODE_IF)) {
+                endDownToMode(MODE_IF);
+                endMode(MODE_IF);
+            }
+
+            startNewMode(MODE_IF);
+
+            startElement(SIF);
+        }
+
+        IF
+;
+
+/*
   function_name_before_generic_py
 
   Handles a Python function name as a singular name (not a compound name).
@@ -16817,14 +16891,20 @@ perform_post_specifier_check_py[] returns [int keyword] {
 /*
   specifier_py
 
-  Used to mark "async" as a specifier (Python).
+  Used to mark "async" as a specifier in Python for-loops and list comprehensions.
 */
-specifier_py[] { SingleElement element(this); ENTRY_DEBUG } :
+specifier_py[] { ENTRY_DEBUG } :
         {
+            startNewMode(MODE_SPECIFIER_PY);
+
             startElement(SFUNCTION_SPECIFIER);
         }
 
         PY_ASYNC
+
+        {
+            endMode(MODE_SPECIFIER_PY);
+        }
 ;
 
 /*
@@ -16914,6 +16994,13 @@ array_py[] { CompleteElement element(this); ENTRY_DEBUG } :
 
         (
             {
+                start_list_comprehension_py();
+            }
+            specifier_py |
+
+            list_comprehension_py |
+
+            {
                 if (!inMode(MODE_EXPRESSION))
                     startNewMode(MODE_EXPRESSION | MODE_EXPECT);
             }
@@ -16932,5 +17019,58 @@ array_py[] { CompleteElement element(this); ENTRY_DEBUG } :
         {
             if (inMode(MODE_ARRAY_PY))
                 endMode(MODE_ARRAY_PY);
+        }
+;
+
+/*
+  list_comprehension_py
+
+  Handles Python list comprehensions.  Not used directly, but can be called by array_py.
+*/
+list_comprehension_py[] { ENTRY_DEBUG } :
+        {
+            start_list_comprehension_py();
+
+            startNewMode(MODE_CONTROL | MODE_EXPECT | MODE_FOR_CONTROL_PY);
+        }
+
+        FOR
+
+        {
+            replaceMode(MODE_CONTROL, MODE_TOP | MODE_CONTROL_INITIALIZATION | MODE_LIST);
+
+            startElement(SCONTROL);
+        }
+
+        control_initialization
+
+        (expression | comma)*
+
+        list_comprehension_range_py
+
+        {
+            if (inTransparentMode(MODE_LIST_COMPREHENSION_PY)) {
+                endDownToMode(MODE_LIST_COMPREHENSION_PY);
+                endMode(MODE_LIST_COMPREHENSION_PY);
+            }
+        }
+;
+
+/*
+  start_list_comprehension_py
+
+  Starts a Python list comprehension.  Used in multiple places.
+*/
+start_list_comprehension_py[] { ENTRY_DEBUG } :
+        {
+            // end the array expression
+            if (inMode(MODE_EXPRESSION) && inTransparentMode(MODE_ARRAY_PY))
+                endMode(MODE_EXPRESSION);
+
+            // "for" part already started while processing specifier(s)
+            if (last_consumed != PY_ASYNC) {
+                startNewMode(MODE_LIST_COMPREHENSION_PY);
+                startElement(SLIST_COMPREHENSION);
+            }
         }
 ;
