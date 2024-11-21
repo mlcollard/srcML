@@ -15955,7 +15955,8 @@ array_js[] { CompleteElement element(this); ENTRY_DEBUG } :
 
         (
             {
-                startNewMode(MODE_EXPRESSION | MODE_EXPECT);
+                if (!inMode(MODE_EXPRESSION))
+                    startNewMode(MODE_EXPRESSION | MODE_EXPECT);
             }
             expression |
 
@@ -16913,7 +16914,8 @@ array_py[] { CompleteElement element(this); ENTRY_DEBUG } :
 
         (
             {
-                startNewMode(MODE_EXPRESSION | MODE_EXPECT);
+                if (!inMode(MODE_EXPRESSION))
+                    startNewMode(MODE_EXPRESSION | MODE_EXPECT);
             }
             expression |
 
