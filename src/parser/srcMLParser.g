@@ -17016,6 +17016,9 @@ array_py[] { CompleteElement element(this); ENTRY_DEBUG } :
 
             list_comprehension_py |
 
+            { inMode(MODE_ARGUMENT) }?
+            argument |
+
             {
                 if (!inMode(MODE_EXPRESSION))
                     startNewMode(MODE_EXPRESSION | MODE_EXPECT);
@@ -17026,14 +17029,14 @@ array_py[] { CompleteElement element(this); ENTRY_DEBUG } :
         )*
 
         {
-            if (inMode(MODE_EXPRESSION))
-                endMode(MODE_EXPRESSION);
+            if (inTransparentMode(MODE_ARRAY_PY))
+                endDownToMode(MODE_ARRAY_PY);
         }
 
         RBRACKET
 
         {
-            if (inMode(MODE_ARRAY_PY))
+            if (inTransparentMode(MODE_ARRAY_PY))
                 endMode(MODE_ARRAY_PY);
         }
 ;
@@ -17060,7 +17063,14 @@ list_comprehension_py[] { ENTRY_DEBUG } :
 
         control_initialization
 
-        (expression | comma)*
+        (options { greedy = true; } :
+            { inMode(MODE_ARGUMENT) }?
+            argument |
+
+            expression |
+
+            comma
+        )*
 
         list_comprehension_range_py
 
@@ -17133,6 +17143,9 @@ lambda_py[] { ENTRY_DEBUG } :
         COLON
 
         (options { greedy = true; } :
+            { inMode(MODE_ARGUMENT) }?
+            argument |
+
             {
                 if (!inMode(MODE_EXPRESSION))
                     startNewMode(MODE_EXPRESSION | MODE_EXPECT);
