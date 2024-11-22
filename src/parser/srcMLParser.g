@@ -12054,6 +12054,10 @@ expression_part[CALL_TYPE type = NOCALL, int call_count = 1] {
         { inLanguage(LANGUAGE_PYTHON) && last_consumed != NAME }?
         array_py |
 
+        // looking for "lambda" to start a Python lambda
+        { inLanguage(LANGUAGE_PYTHON) }?
+        lambda_py |
+
         // do not mark JavaScript method blocks as objects (e.g., methodName() {})
         { inLanguage(LANGUAGE_JAVASCRIPT) && last_consumed == RPAREN }?
         lcurly[true] |
@@ -16464,7 +16468,14 @@ list_comprehension_range_py[] { ENTRY_DEBUG } :
             startNewMode(MODE_EXPRESSION | MODE_EXPECT);
         }
 
-        expression
+        (options { greedy = true; } :
+            { inMode(MODE_ARGUMENT) }?
+            argument |
+
+            expression |
+
+            comma
+        )*
 
         {
             endMode(MODE_EXPRESSION);
@@ -16681,7 +16692,11 @@ complete_python_parameter[] {
             parameter_annotation_py |
 
             // '*' or '/' only
-            { next_token() == COMMA || next_token() == RPAREN }?
+            {
+                next_token() == COMMA
+                || next_token() == RPAREN
+                || (inTransparentMode(MODE_LAMBDA_PY) && next_token() == COLON)
+            }?
             (MULTOPS | OPERATORS) |
 
             // '*' + NAME (with optional annotation)
@@ -16713,8 +16728,9 @@ complete_python_parameter[] {
 parameter_annotation_py[] { ENTRY_DEBUG } :
         {
             // possible if called after handling an arbitrary positional parameter
-            // or arbitrary keyword parameter in complete_python_parameter
-            if (LA(1) != COLON)
+            // or arbitrary keyword parameter in complete_python_parameter.  In a
+            // Python lambda, colon indicates the start of a block (not annotation).
+            if (LA(1) != COLON || inTransparentMode(MODE_LAMBDA_PY))
                 return;
 
             startNewMode(MODE_ANNOTATION_PY);
@@ -17071,6 +17087,70 @@ start_list_comprehension_py[] { ENTRY_DEBUG } :
             if (last_consumed != PY_ASYNC) {
                 startNewMode(MODE_LIST_COMPREHENSION_PY);
                 startElement(SLIST_COMPREHENSION);
+            }
+        }
+;
+
+/*
+  lambda_py
+
+  Handles a Python lambda.  Uses its own block tag (separate from INDENT/DEDENT).
+*/
+lambda_py[] { ENTRY_DEBUG } :
+        {
+            startNewMode(MODE_LAMBDA_PY);
+
+            startElement(SFUNCTION_LAMBDA);
+        }
+
+        PY_LAMBDA
+
+        {
+            startNewMode(MODE_PARAMETER | MODE_LIST | MODE_EXPECT);
+        }
+
+        (
+            complete_python_parameter |
+
+            {
+                if (inMode(MODE_PARAMETER))
+                    endMode(MODE_PARAMETER);
+            }
+            comma
+        )*
+
+        {
+            if (inTransparentMode(MODE_PARAMETER)) {
+                endDownToMode(MODE_PARAMETER);
+                endMode(MODE_PARAMETER);
+            }
+
+            startNewMode(MODE_EXPRESSION_BLOCK);
+
+            startElement(SBLOCK);
+        }
+
+        COLON
+
+        (options { greedy = true; } :
+            {
+                if (!inMode(MODE_EXPRESSION))
+                    startNewMode(MODE_EXPRESSION | MODE_EXPECT);
+            }
+            expression |
+
+            comma
+        )*
+
+        {
+            if (inTransparentMode(MODE_EXPRESSION_BLOCK)) {
+                endDownToMode(MODE_EXPRESSION_BLOCK);
+                endMode(MODE_EXPRESSION_BLOCK);
+            }
+
+            if (inTransparentMode(MODE_LAMBDA_PY) && LA(1) != FOR) {
+                endDownToMode(MODE_LAMBDA_PY);
+                endMode(MODE_LAMBDA_PY);
             }
         }
 ;

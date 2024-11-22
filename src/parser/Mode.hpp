@@ -338,4 +338,6 @@ const static srcMLState::MODE_TYPE MODE_SUPER_PY;
 
 const static srcMLState::MODE_TYPE MODE_ARRAY_PY;
 
+const static srcMLState::MODE_TYPE MODE_LAMBDA_PY;
+
 #endif

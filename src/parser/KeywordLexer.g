@@ -359,6 +359,7 @@ tokens {
     PY_FUNCTION;
     PY_GLOBAL;
     PY_IMPORT;
+    PY_LAMBDA;
     PY_MATCH;
     PY_NONLOCAL;
     PY_PASS;
@@ -794,6 +795,7 @@ KeywordLexer(UTF8CharBuffer* pinput, int language, OPTION_TYPE & options,
         { "global"       , PY_GLOBAL         , LANGUAGE_PYTHON },
         { "import"       , PY_IMPORT         , LANGUAGE_PYTHON },
         { "in"           , PY_RANGE_IN       , LANGUAGE_PYTHON },
+        { "lambda"       , PY_LAMBDA         , LANGUAGE_PYTHON },
         { "match"        , PY_MATCH          , LANGUAGE_PYTHON },
         { "nonlocal"     , PY_NONLOCAL       , LANGUAGE_PYTHON },
         { "pass"         , PY_PASS           , LANGUAGE_PYTHON },
