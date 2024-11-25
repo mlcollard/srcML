@@ -721,6 +721,7 @@ tokens {
     SPARAMETER_KEYWORD_ARGUMENT;
     SPARAMETER_MODIFIER;
     SPASS;
+    SSET;
     SYIELD_FROM_STATEMENT;
 }
 
@@ -5969,7 +5970,13 @@ comma[] { bool markup_comma = true; ENTRY_DEBUG } :
             if (
                 inMode(MODE_INIT | MODE_VARIABLE_NAME | MODE_LIST)
                 || inTransparentMode(MODE_CONTROL_CONDITION | MODE_END_AT_COMMA)
-                || (inLanguage(LANGUAGE_PYTHON) && inMode(MODE_ARRAY_PY))
+                || (
+                    inLanguage(LANGUAGE_PYTHON)
+                    && (
+                        inMode(MODE_ARRAY_PY)
+                        || inMode(MODE_SET_PY)
+                    )
+                )
                 || (
                     inLanguage(LANGUAGE_JAVASCRIPT)
                     && (
@@ -12054,6 +12061,10 @@ expression_part[CALL_TYPE type = NOCALL, int call_count = 1] {
         { inLanguage(LANGUAGE_PYTHON) && last_consumed != NAME }?
         array_py |
 
+        // looking for lcurly to start a Python set
+        { inLanguage(LANGUAGE_PYTHON) }?
+        set_py |
+
         // looking for "lambda" to start a Python lambda
         { inLanguage(LANGUAGE_PYTHON) }?
         lambda_py |
@@ -17051,6 +17062,8 @@ list_comprehension_py[] { ENTRY_DEBUG } :
             start_list_comprehension_py();
 
             startNewMode(MODE_CONTROL | MODE_EXPECT | MODE_FOR_CONTROL_PY);
+
+            startElement(SFOR_STATEMENT);
         }
 
         FOR
@@ -17090,7 +17103,7 @@ list_comprehension_py[] { ENTRY_DEBUG } :
 start_list_comprehension_py[] { ENTRY_DEBUG } :
         {
             // end the array expression
-            if (inMode(MODE_EXPRESSION) && inTransparentMode(MODE_ARRAY_PY))
+            if (inMode(MODE_EXPRESSION) && (inTransparentMode(MODE_ARRAY_PY) || inTransparentMode(MODE_SET_PY)))
                 endMode(MODE_EXPRESSION);
 
             // "for" part already started while processing specifier(s)
@@ -17165,5 +17178,52 @@ lambda_py[] { ENTRY_DEBUG } :
                 endDownToMode(MODE_LAMBDA_PY);
                 endMode(MODE_LAMBDA_PY);
             }
+        }
+;
+
+/*
+  set_py
+
+  Handles Python sets.  Not used directly, but can be called by array_py.
+*/
+set_py[] { CompleteElement element(this); ENTRY_DEBUG } :
+        {
+            startNewMode(MODE_LOCAL | MODE_TOP | MODE_LIST | MODE_SET_PY);
+
+            startElement(SSET);
+        }
+
+        PY_LCURLY
+
+        (
+            {
+                start_list_comprehension_py();
+            }
+            specifier_py |
+
+            list_comprehension_py |
+
+            { inMode(MODE_ARGUMENT) }?
+            argument |
+
+            {
+                if (!inMode(MODE_EXPRESSION))
+                    startNewMode(MODE_EXPRESSION | MODE_EXPECT);
+            }
+            expression |
+
+            comma
+        )*
+
+        {
+            if (inTransparentMode(MODE_SET_PY))
+                endDownToMode(MODE_SET_PY);
+        }
+
+        PY_RCURLY
+
+        {
+            if (inTransparentMode(MODE_SET_PY))
+                endMode(MODE_SET_PY);
         }
 ;

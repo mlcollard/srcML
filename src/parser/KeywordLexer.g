@@ -360,11 +360,13 @@ tokens {
     PY_GLOBAL;
     PY_IMPORT;
     PY_LAMBDA;
+    PY_LCURLY;
     PY_MATCH;
     PY_NONLOCAL;
     PY_PASS;
     PY_RAISE;
     PY_RANGE_IN;
+    PY_RCURLY;
     PY_TYPE;
     PY_WITH;
     PY_YIELD;
@@ -781,6 +783,8 @@ KeywordLexer(UTF8CharBuffer* pinput, int language, OPTION_TYPE & options,
         { ""             , DEDENT            , LANGUAGE_PYTHON },
 
         // Python
+        { "}"            , PY_RCURLY         , LANGUAGE_PYTHON },
+        { "{"            , PY_LCURLY         , LANGUAGE_PYTHON },
         { "->"           , PY_ARROW          , LANGUAGE_PYTHON },
         { "as"           , PY_ALIAS          , LANGUAGE_PYTHON },
         { "assert"       , ASSERT            , LANGUAGE_PYTHON },
