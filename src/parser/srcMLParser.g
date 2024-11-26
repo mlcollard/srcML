@@ -713,6 +713,7 @@ tokens {
 
     // Python
     SDELETE;
+    SDICTIONARY;
     SGLOBAL;
     SHASHTAG_COMMENT;
     SLIST_COMPREHENSION;
@@ -12061,6 +12062,10 @@ expression_part[CALL_TYPE type = NOCALL, int call_count = 1] {
         { inLanguage(LANGUAGE_PYTHON) && last_consumed != NAME }?
         array_py |
 
+        // looking for rcurly immediately after lcurly (empty dictionary)
+        { inLanguage(LANGUAGE_PYTHON) && next_token() == PY_RCURLY }?
+        dictionary_py[true] |
+
         // looking for lcurly to start a Python set
         { inLanguage(LANGUAGE_PYTHON) }?
         set_py |
@@ -16949,7 +16954,6 @@ perform_post_attribute_check_py[] returns [int keyword] {
             while (true) {
                 consume();
 
-                // @todo -- test without "def" to see if this will fail
                 if (LA(1) == CLASS || LA(1) == PY_FUNCTION || LA(1) == INDENT || LA(1) == 1 /* EOF */)
                     break;
             }
@@ -17060,10 +17064,6 @@ array_py[] { CompleteElement element(this); ENTRY_DEBUG } :
 list_comprehension_py[] { ENTRY_DEBUG } :
         {
             start_list_comprehension_py();
-
-            startNewMode(MODE_CONTROL | MODE_EXPECT | MODE_FOR_CONTROL_PY);
-
-            startElement(SFOR_STATEMENT);
         }
 
         FOR
@@ -17102,14 +17102,27 @@ list_comprehension_py[] { ENTRY_DEBUG } :
 */
 start_list_comprehension_py[] { ENTRY_DEBUG } :
         {
-            // end the array expression
-            if (inMode(MODE_EXPRESSION) && (inTransparentMode(MODE_ARRAY_PY) || inTransparentMode(MODE_SET_PY)))
+            // end the current expression before starting a list comprehension
+            if (
+                inMode(MODE_EXPRESSION)
+                && (
+                    inTransparentMode(MODE_ARRAY_PY)
+                    || inTransparentMode(MODE_SET_PY)
+                    || inTransparentMode(MODE_DICTIONARY_PY)
+                )
+            )
                 endMode(MODE_EXPRESSION);
 
-            // "for" part already started while processing specifier(s)
+            // "comprehension" tag already started while processing previous specifier(s)
             if (last_consumed != PY_ASYNC) {
                 startNewMode(MODE_LIST_COMPREHENSION_PY);
                 startElement(SLIST_COMPREHENSION);
+            }
+
+            // "for" tag already started while processing previous specifier(s)
+            if (last_consumed != PY_ASYNC) {
+                startNewMode(MODE_CONTROL | MODE_EXPECT | MODE_FOR_CONTROL_PY);
+                startElement(SFOR_STATEMENT);
             }
         }
 ;
@@ -17184,10 +17197,17 @@ lambda_py[] { ENTRY_DEBUG } :
 /*
   set_py
 
-  Handles Python sets.  Not used directly, but can be called by array_py.
+  Handles Python sets.  Not used directly, but can be called by expression_part.
+  An empty set is a dictionary, and is marked as such.
 */
 set_py[] { CompleteElement element(this); ENTRY_DEBUG } :
         {
+            // Empty sets or sets containing colons are marked as dictionaries
+            if (perform_dictionary_check_py()) {
+                dictionary_py(false);
+                return;
+            }
+
             startNewMode(MODE_LOCAL | MODE_TOP | MODE_LIST | MODE_SET_PY);
 
             startElement(SSET);
@@ -17227,3 +17247,99 @@ set_py[] { CompleteElement element(this); ENTRY_DEBUG } :
                 endMode(MODE_SET_PY);
         }
 ;
+
+/*
+  dictionary_py
+
+  Handles Python dictionaries.  Not used directly, but can be called by expression_part or set_py.
+  An empty set is a dictionary, and is marked as such.
+*/
+dictionary_py[bool isempty = false] { CompleteElement element(this); ENTRY_DEBUG } :
+        {
+            startNewMode(MODE_LOCAL | MODE_TOP | MODE_LIST | MODE_DICTIONARY_PY);
+
+            startElement(SDICTIONARY);
+        }
+
+        PY_LCURLY
+
+        {
+            // handle empty dictionaries
+            if (isempty) {
+                consume();
+
+                if (inTransparentMode(MODE_DICTIONARY_PY)) {
+                    endDownToMode(MODE_DICTIONARY_PY);
+                    endMode(MODE_DICTIONARY_PY);
+                }
+
+                return;
+            }
+        }
+
+        (
+            {
+                start_list_comprehension_py();
+            }
+            specifier_py |
+
+            list_comprehension_py |
+
+            { inMode(MODE_ARGUMENT) }?
+            argument |
+
+            {
+                endDownToMode(MODE_DICTIONARY_PY);
+            }
+            colon |
+
+            {
+                if (!inMode(MODE_EXPRESSION))
+                    startNewMode(MODE_EXPRESSION | MODE_EXPECT);
+            }
+            expression |
+
+            comma
+        )*
+
+        {
+            if (inTransparentMode(MODE_DICTIONARY_PY))
+                endDownToMode(MODE_DICTIONARY_PY);
+        }
+
+        PY_RCURLY
+
+        {
+            if (inTransparentMode(MODE_DICTIONARY_PY))
+                endMode(MODE_DICTIONARY_PY);
+        }
+;
+
+/*
+  perform_dictionary_check_py
+
+  Differentiates a Python set and dictionary; the latter has entries with a colon.
+*/
+perform_dictionary_check_py[] returns [int isdictionary] {
+        isdictionary = false;
+        int start = mark();
+        inputState->guessing++;
+
+        try {
+            while (true) {
+                consume();
+
+                if (LA(1) == COLON || LA(1) == PY_RCURLY || LA(1) == COMMA || LA(1) == 1 /* EOF */)
+                    break;
+            }
+
+            if (LA(1) == COLON)
+                isdictionary = true;
+        }
+        catch (...) {}
+
+        inputState->guessing--;
+        rewind(start);
+
+        ENTRY_DEBUG
+} :;

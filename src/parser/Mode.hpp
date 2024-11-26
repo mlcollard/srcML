@@ -342,4 +342,6 @@ const static srcMLState::MODE_TYPE MODE_LAMBDA_PY;
 
 const static srcMLState::MODE_TYPE MODE_SET_PY;
 
+const static srcMLState::MODE_TYPE MODE_DICTIONARY_PY;
+
 #endif
