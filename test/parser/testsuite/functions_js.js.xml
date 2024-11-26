@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.srcML.org/srcML/src" revision="1.0.0" language="JavaScript" filename="script.js" url="function_types">
+
+    <!--Unit 1-->
+    <unit language="JavaScript">
+        <comment type="block">/*Function Declaration*/</comment>
+        <function>function <name>functionName</name><parameter_list>(<parameter><decl><name>parameters</name></decl></parameter>)</parameter_list> <block>{<block_content>
+            <comment type="line">// function body</comment>
+        </block_content>}</block></function>
+    </unit>
+
+    <!--Unit 2-->
+    <unit language="JavaScript">
+        <function>function <name>greet</name><parameter_list>(<parameter><decl><name>name</name></decl></parameter>)</parameter_list> <block>{<block_content>
+            <return>return <expr><literal type="string">`Hello, ${name}!`</literal></expr>;</return>
+        </block_content>}</block></function>
+    </unit>
+
+    <!--Unit 3-->
+    <unit language="JavaScript">
+        <comment type="block">/*Function Expression*/</comment>
+        <decl_stmt><decl type="const">const <name>functionName2</name> <init>= <expr><lambda>function<parameter_list>(<parameter><decl><name>parameters</name></decl></parameter>)</parameter_list> <block>{<block_content>
+            <comment type="line">// function body</comment>
+        </block_content>}</block></lambda></expr></init></decl>;</decl_stmt>
+    </unit>
+
+    <!--Unit 4-->
+    <unit language="JavaScript">
+        <decl_stmt><decl type="const">const <name>add</name> <init>= <expr><lambda>function<parameter_list>(<parameter><decl><name>a</name></decl></parameter>, <parameter><decl><name>b</name></decl></parameter>)</parameter_list> <block>{<block_content>
+            <return>return <expr><name>a</name> <operator>+</operator> <name>b</name></expr>;</return>
+        </block_content>}</block></lambda></expr></init></decl>;</decl_stmt>
+    </unit>
+
+    <!--Unit 5-->
+    <unit language="JavaScript">
+        <comment type="block">/*Arrow Function*/</comment>
+        <decl_stmt><decl type="const">const <name>functionName3</name> <init>= <expr><lambda type="arrow"><parameter_list>(<parameter><decl><name>parameters</name></decl></parameter>)</parameter_list> <operator>=&gt;</operator> <block>{<block_content>
+            <comment type="line">// function body</comment>
+        </block_content>}</block></lambda></expr></init></decl>;</decl_stmt>
+    </unit>
+
+    <!--Unit 6-->
+    <unit language="JavaScript">
+        <decl_stmt><decl type="const">const <name>multiply</name> <init>= <expr><lambda type="arrow"><parameter_list>(<parameter><decl><name>a</name></decl></parameter>, <parameter><decl><name>b</name></decl></parameter>)</parameter_list> <operator>=&gt;</operator> <name>a</name> <operator>*</operator> <name>b</name></lambda></expr></init></decl>;</decl_stmt>
+    </unit>
+
+    <!--Unit 7-->
+    <unit language="JavaScript">
+        <decl_stmt><decl type="const">const <name>square</name> <init>= <expr><lambda type="arrow"><parameter><decl><name>x</name></decl></parameter> <operator>=&gt;</operator> <name>x</name> <operator>*</operator> <name>x</name></lambda></expr></init></decl>;</decl_stmt>
+    </unit>
+
+    <!--Unit 8-->
+    <unit language="JavaScript">
+        <comment type="block">/*Immediately Invoked Function Expression (IIFE)*/</comment>
+        <expr_stmt><expr><operator>(</operator><lambda>function<parameter_list>(<parameter><decl><name>parameters</name></decl></parameter>)</parameter_list> <block>{<block_content>
+            <comment type="line">// function body</comment>
+        </block_content>}</block></lambda></expr></expr_stmt>)<expr_stmt><expr><operator>(</operator><name>arguments</name><operator>)</operator></expr>;</expr_stmt>
+    </unit>
+
+    <!--Unit 9-->
+    <unit language="JavaScript">
+        <expr_stmt><expr><operator>(</operator><lambda>function<parameter_list>()</parameter_list> <block>{<block_content>
+            <decl_stmt><decl type="const">const <name>message</name> <init>= <expr><literal type="string">'This is an IIFE'</literal></expr></init></decl>;</decl_stmt>
+            <expr_stmt><expr><call><name><name>console</name><operator>.</operator><name>log</name></name><argument_list>(<argument><expr><name>message</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+        </block_content>}</block></lambda></expr></expr_stmt>)<expr_stmt><expr><operator>(</operator><operator>)</operator></expr>;</expr_stmt> <comment type="line">// Output: This is an IIFE</comment>
+    </unit>
+
+    <!--Unit 10-->
+    <unit language="JavaScript">
+        <expr_stmt><expr><operator>(</operator><lambda>function<parameter_list>(<parameter><decl><name>name</name></decl></parameter>)</parameter_list> <block>{<block_content>
+            <expr_stmt><expr><call><name><name>console</name><operator>.</operator><name>log</name></name><argument_list>(<argument><expr><literal type="string">`Hello, ${name}!`</literal></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+        </block_content>}</block></lambda></expr></expr_stmt>)<expr_stmt><expr><operator>(</operator><literal type="string">'Bob'</literal><operator>)</operator></expr>;</expr_stmt> <comment type="line">// Output: Hello, Bob!</comment>
+    </unit>
+
+    <!--Unit 11-->
+    <unit language="JavaScript">
+        <comment type="block">/*Generator Functions*/</comment>
+        <function type="generator">function* <name>generatorFunction</name><parameter_list>(<parameter><decl><name>parameters</name></decl></parameter>)</parameter_list> <block>{<block_content>
+            <comment type="line">// function body</comment>
+            <yield>yield <expr><name>value</name></expr>;</yield>
+        </block_content>}</block></function>
+    </unit>
+
+    <!--Unit 12-->
+    <unit language="JavaScript">
+        <function type="generator">function* <name>countUpTo</name><parameter_list>(<parameter><decl><name>max</name></decl></parameter>)</parameter_list> <block>{<block_content>
+        <for>for <control>(<init><decl type="let">let <name>i</name> <init>= <expr><literal type="number">1</literal></expr></init></decl>;</init> <condition><expr><name>i</name> <operator>&lt;=</operator> <name>max</name></expr>;</condition> <incr><expr><name>i</name><operator>++</operator>)</expr> <block>{<block_content>
+            <yield>yield <expr><name>i</name></expr>;</yield>
+        </block_content>}</block></incr>
+        }</control></for></block_content></block></function>
+    </unit>
+
+    <!--Unit 13-->
+    <unit language="JavaScript">
+        <comment type="block">/*Higher-Order Functions*/</comment>
+        <function>function <name>higherOrderFunction</name><parameter_list>(<parameter><decl><name>callback</name></decl></parameter>)</parameter_list> <block>{<block_content>
+            <decl_stmt><decl type="const">const <name>result</name> <init>= <expr><call><name>callback</name><argument_list>(<argument><expr><literal type="number">5</literal></expr></argument>)</argument_list></call></expr></init></decl>;</decl_stmt>
+            <expr_stmt><expr><call><name><name>console</name><operator>.</operator><name>log</name></name><argument_list>(<argument><expr><name>result</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+        </block_content>}</block></function>
+    </unit>
+
+    <!--Unit 14-->
+    <unit language="JavaScript">
+        <function>function <name>square2</name><parameter_list>(<parameter><decl><name>x</name></decl></parameter>)</parameter_list> <block>{<block_content>
+            <return>return <expr><name>x</name> <operator>*</operator> <name>x</name></expr>;</return>
+        </block_content>}</block></function>
+    </unit>
+
+    <!--Unit 15-->
+    <unit language="JavaScript">
+        <expr_stmt><expr><call><name>higherOrderFunction</name><argument_list>(<argument><expr><name>square2</name></expr></argument>)</argument_list></call></expr>;</expr_stmt> <comment type="line">// Output: 25</comment>
+    </unit>
+
+    <!--Unit 16-->
+    <unit language="JavaScript">
+        <comment type="block">/*Callback Functions*/</comment>
+        <function>function <name>fetchData3</name><parameter_list>(<parameter><decl><name>callback</name></decl></parameter>)</parameter_list> <block>{<block_content>
+            <expr_stmt><expr><call><name>setTimeout</name><argument_list>(<argument><expr><operator>(</operator>) <operator>=&gt;</operator> <block>{<block_content>
+                <decl_stmt><decl type="const">const <name>data</name> <init>= <expr><object>{ <property><name>id</name>: <expr><literal type="number">1</literal></expr></property>, <property><name>name</name>: <expr><literal type="string">'Eve'</literal></expr></property> }</object></expr></init></decl>;</decl_stmt>
+                <expr_stmt><expr><call><name>callback</name><argument_list>(<argument><expr><name>data</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+            </block_content>}</block></expr></argument></argument_list></call></expr></expr_stmt><operator>,</operator> <expr_stmt><expr><literal type="number">1000</literal>)</expr>;</expr_stmt>
+        </block_content>}</block></function>
+    </unit>
+
+    <!--Unit 17-->
+    <unit language="JavaScript">
+        <function>function <name>displayData</name><parameter_list>(<parameter><decl><name>data</name></decl></parameter>)</parameter_list> <block>{<block_content>
+            <expr_stmt><expr><call><name><name>console</name><operator>.</operator><name>log</name></name><argument_list>(<argument><expr><literal type="string">'Data received:'</literal></expr></argument>, <argument><expr><name>data</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+        </block_content>}</block></function>
+    </unit>
+
+    <!--Unit 18-->
+    <unit language="JavaScript">
+        <expr_stmt><expr><call><name>fetchData3</name><argument_list>(<argument><expr><name>displayData</name></expr></argument>)</argument_list></call></expr>;</expr_stmt>
+    </unit>
+
+</unit>

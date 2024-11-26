@@ -206,9 +206,10 @@ foreach(GENURL IN ITEMS ${TESTFILES})
 
     # Generate "formfeed" "comment" "block" "struct" "ifthenelse"
     foreach(VARIATION IN ITEMS "formfeed" "comment" "block" "struct" "preproc" "ifthenelse")
-        # preproc and struct do not work with Java
+        # preproc and struct do not work with Java or JavaScript
         if((LANGEXT STREQUAL "java" AND (VARIATION STREQUAL "struct" OR VARIATION STREQUAL "preproc")) OR
-           (LANGEXT STREQUAL "cs" AND VARIATION STREQUAL "struct"))
+           (LANGEXT STREQUAL "cs" AND VARIATION STREQUAL "struct") OR
+           (LANGEXT STREQUAL "js" AND (VARIATION STREQUAL "struct" OR VARIATION STREQUAL "preproc")))
             continue()
         endif()
 
@@ -232,6 +233,25 @@ foreach(GENURL IN ITEMS ${TESTFILES})
         OUTPUT ${URL}.all.${LANGEXT}.xml
     )
     list(APPEND CONTEXT_FILES ${URL}.all.${LANGEXT}.xml)
+
+endforeach()
+
+# Create a copy of CONTEXT_FILES to avoid modifying the original list
+set(JS_XML_FILES ${CONTEXT_FILES})
+
+# Filter the JS_XML_FILES list to include only files matching *.js.xml
+list(APPEND JS_XML_FILES "${TESTFILES}")
+list(FILTER JS_XML_FILES INCLUDE REGEX ".*\\.js\\.xml$")
+
+# Generate variations: formfeed, comment, block, etc.
+foreach(GENURL IN ITEMS ${JS_XML_FILES})
+
+    # ${URL}.${LANGEXT}.xml
+    get_filename_component(SRCFILENAME "${GENURL}" NAME_WLE)
+    get_filename_component(URL "${SRCFILENAME}" NAME_WLE)
+    get_filename_component(EXTENSION "${SRCFILENAME}" LAST_EXT)
+    # remove '.'
+    string(SUBSTRING "${EXTENSION}" 1 -1 LANGEXT)
 
 endforeach()
 

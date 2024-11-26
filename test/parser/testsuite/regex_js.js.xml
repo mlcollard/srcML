@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.srcML.org/srcML/src" revision="1.0.0" language="JavaScript" filename="regex.js" url="regex"><comment type="line">//variable declaration</comment>
+
+    <!--Unit 1-->
+    <unit language="Javascript">
+    <decl_stmt><decl type="const">const <name>regex1</name> <init>= <expr><literal type="regex">/hello/</literal></expr></init></decl>;</decl_stmt>
+    </unit>
+
+    <!--Unit 2-->
+    <unit language="Javascript">
+        <decl_stmt><decl type="const">const <name>regex5</name> <init>= <expr><literal type="regex">/^\d+\.\d+$/</literal></expr></init></decl>;</decl_stmt>
+    </unit>
+
+    <!--Unit 3-->
+    <unit language="Javascript">
+        <decl_stmt><decl type="const">const <name>regex96</name> <init>= <expr><literal type="regex">/,(?=(?:[^"]*"[^"]*")*[^"]*$)/</literal></expr></init></decl>;</decl_stmt>
+    </unit>
+
+</unit>

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.srcML.org/srcML/src" revision="1.0.0" language="JavaScript" filename="objects.js" url="objects">
+
+    <!--Unit 1-->
+    <unit language="JavaScript">
+        <comment type="line">//create object</comment>
+        <decl_stmt><decl type="const">const <name>car</name> <init>= <expr><object>{<property><name>type</name>:<expr><literal type="string">"Fiat"</literal></expr></property>, <property><name>model</name>:<expr><literal type="string">"500"</literal></expr></property>, <property><name>color</name>:<expr><literal type="string">"white"</literal></expr></property>}</object></expr></init></decl>;</decl_stmt>
+    </unit>
+
+    <!--Unit 2-->
+    <unit language="JavaScript">
+        <decl_stmt><decl type="const">const <name>person</name> <init>= <expr><object>{<property/></object></expr></init></decl>;</decl_stmt>
+    </unit>
+
+    <!--Unit 3-->
+    <unit language="JavaScript">
+        <expr_stmt><expr><name><name>person</name><operator>.</operator><name>firstName</name></name> <operator>=</operator> <literal type="string">"John"</literal></expr>;</expr_stmt>
+    </unit>
+
+    <!--Unit 4-->
+    <unit language="JavaScript">
+        <expr_stmt><expr><name><name>person</name><operator>.</operator><name>lastName</name></name> <operator>=</operator> <literal type="string">"Doe"</literal></expr>;</expr_stmt>
+    </unit>
+
+    <!--Unit 5-->
+    <unit language="JavaScript">
+        <expr_stmt><expr><name><name>person</name><operator>.</operator><name>age</name></name> <operator>=</operator> <literal type="number">50</literal></expr>;</expr_stmt>
+    </unit>
+
+    <!--Unit 6-->
+    <unit language="JavaScript">
+        <expr_stmt><expr><name><name>person</name><operator>.</operator><name>eyeColor</name></name> <operator>=</operator> <literal type="string">"blue"</literal></expr>;</expr_stmt>
+    </unit>
+
+    <!--Unit 7-->
+    <unit language="JavaScript">
+        <decl_stmt><decl type="const">const <name>person2</name> <init>= <expr><operator>new</operator> <call><name>Object</name><argument_list>()</argument_list></call></expr></init></decl>;</decl_stmt>
+    </unit>
+
+    <!--Unit 8-->
+    <unit language="JavaScript">
+        <expr_stmt><expr><name><name>person</name><operator>.</operator><name>firstName</name></name> <operator>=</operator> <literal type="string">"John"</literal></expr>;</expr_stmt>
+    </unit>
+
+    <!--Unit 9-->
+    <unit language="JavaScript">
+        <expr_stmt><expr><name><name>person</name><operator>.</operator><name>lastName</name></name> <operator>=</operator> <literal type="string">"Doe"</literal></expr>;</expr_stmt>
+    </unit>
+
+    <!--Unit 10-->
+    <unit language="JavaScript">
+        <expr_stmt><expr><name><name>person</name><operator>.</operator><name>age</name></name> <operator>=</operator> <literal type="number">50</literal></expr>;</expr_stmt>
+    </unit>
+
+    <!--Unit 11-->
+    <unit language="JavaScript">
+        <expr_stmt><expr><name><name>person</name><operator>.</operator><name>eyeColor</name></name> <operator>=</operator> <literal type="string">"blue"</literal></expr>;</expr_stmt>
+    </unit>
+
+    <!--Unit 12-->
+    <unit language="JavaScript">
+        <decl_stmt><decl type="const">const <name>x</name> <init>= <expr><name>person2</name></expr></init></decl>;</decl_stmt>
+    </unit>
+
+    <!--Unit 13-->
+    <unit language="JavaScript">
+        <expr_stmt><expr><name><name>x</name><operator>.</operator><name>age</name></name> <operator>=</operator> <literal type="number">10</literal></expr>;</expr_stmt>
+        <comment type="line">// Change Age in both</comment>
+    </unit>
+
+    <!--Unit 14-->
+    <unit language="JavaScript">
+        <decl_stmt><decl type="const">const <name>person3</name> <init>= <expr><object>{
+            <property><name>firstName</name>: <expr><literal type="string">"John"</literal></expr></property>,
+            <property><name>lastName</name> : <expr><literal type="string">"Doe"</literal></expr></property>,
+            <property><name>id</name>       : <expr><literal type="number">5566</literal></expr></property>,
+            <property><name>fullName</name> : <expr><lambda>function<parameter_list>()</parameter_list> <block>{<block_content>
+                <return>return <expr><name><name>this</name><operator>.</operator><name>firstName</name></name> <operator>+</operator> <literal type="string">" "</literal> <operator>+</operator> <name><name>this</name><operator>.</operator><name>lastName</name></name></expr>;</return>
+            </block_content>}</block></lambda></expr></property>
+            }</object></expr></init></decl>;</decl_stmt>
+    </unit>
+
+    <!--Unit 15-->
+    <unit language="JavaScript">
+        <comment type="block">/*Methods in Objects*/</comment>
+        <decl_stmt><decl type="const">const <name>objectName</name> <init>= <expr><object>{
+            <property><name>methodName</name>: <expr><lambda>function<parameter_list>(<parameter><decl><name>parameters</name></decl></parameter>)</parameter_list> <block>{<block_content>
+                <comment type="line">// method body</comment>
+            </block_content>}</block></lambda></expr></property>
+            }</object></expr></init></decl>;</decl_stmt>
+    </unit>
+
+</unit>
