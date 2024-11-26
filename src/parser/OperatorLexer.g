@@ -98,6 +98,29 @@ tokens {
 OPERATORS options { testLiterals = true; } {
     int start = LA(1);
 } : (
+    // # (C++ or Python), #! (JavaScript)
+    '#' (
+        { inLanguage(LANGUAGE_PYTHON) }?
+            { $setType(HASHTAG_COMMENT_START); changetotextlexer(HASHTAG_COMMENT_END); } |
+
+        { inLanguage(LANGUAGE_JAVASCRIPT) && LA(1) == '!' }?
+            { $setType(HASHBANG_COMMENT_START); changetotextlexer(HASHBANG_COMMENT_END); } |
+
+        { inLanguage(LANGUAGE_JAVASCRIPT) && LA(1) != '!' }?
+            NAME { $setType(NAME); } |
+
+        { startline }?
+            {
+                $setType(PREPROC);
+
+                // record that we are on a preprocessor line,
+                // primarily so that unterminated strings in
+                // a preprocessor line will end at the right spot
+                onpreprocline = true;
+                //firstpreprocline = true;
+            }
+    )? |
+
     '+' ('+' | '=')? |
     '-' ('-' | '=' | '>' ('*')? )? |
 
