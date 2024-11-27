@@ -151,6 +151,12 @@ foreach(GEN IN ITEMS ${SUITE})
 
         list(APPEND TESTFILES "${URL}.cpp.xml")
         setlanguage("C++" "${URL}" "C" "Objective-C")
+
+    elseif(CATEGORY STREQUAL "LANGUAGE_C_FAMILY_NO_JAVASCRIPT")
+
+        # explicitly generated
+        list(APPEND TESTFILES "${URL}.cpp.xml")
+        setlanguage("C++" "${URL}" "Java" "C#" "Objective-C" "C")
  
     elseif(CATEGORY STREQUAL "LANGUAGE_C_ONLY")
 
