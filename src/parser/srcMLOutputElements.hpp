@@ -351,5 +351,6 @@ const std::unordered_map<int, Element> srcMLOutput::process = {
     { TOKEN::SPARAMETER_MODIFIER,           { "parameter",         SRC, "type",  "modifier",     0,      0 }},
     { TOKEN::SPASS,                         { "pass",              SRC,       0,          0,     0,      0 }},
     { TOKEN::SSET,                          { "set",               SRC,       0,          0,     0,      0 }},
-    { TOKEN::SYIELD_FROM_STATEMENT,         { "yield",             SRC, "type",      "from",     0,      0 }},
+    { TOKEN::STUPLE,                        { "tuple",             SRC,       0,          0,     0,      0 }},
+    { TOKEN::SYIELD_FROM_STATEMENT,         { "yield",             SRC,  "type",     "from",     0,      0 }},
 };
