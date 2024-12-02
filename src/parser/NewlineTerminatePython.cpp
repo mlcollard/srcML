@@ -11,15 +11,7 @@
 
 #include <NewlineTerminatePython.hpp>
 
-/**
- * An abstract method for getting the next token.
- * 
- * Whenever a `blockStartToken` is found, an INDENT token is generated. Whenever the next line starts with
- * less indentation that the previous line, a DEDENT token is generated (ignores blank lines).
- * 
- * INDENT and DEDENT are meant to handle blocks in languages such as Python that use a colon to represent
- * the start of a block (as opposed to curly braces, etc.).
- */
+// Inserts TERMINATE tokens at EOL for Python
 antlr::RefToken NewlineTerminatePython::nextToken() {
 
     // place all input tokens in the buffer so we can insert a TERMINATE
@@ -31,9 +23,33 @@ antlr::RefToken NewlineTerminatePython::nextToken() {
         else if (token->getType() == srcMLParser::RPAREN && parenthesesCount > 0)
             --parenthesesCount;
 
-        // For a newline, insert a TERMINATE, except on an INDENT line
-        if (parenthesesCount == 0 && !first && lastToken->getType() != srcMLParser::TERMINATE &&
-            (!isEmptyLine && token->getType() == srcMLParser::EOL && lastToken->getType() != srcMLParser::INDENT) ||
+        // // For a newline, insert a TERMINATE, except on an INDENT line
+        // if (parenthesesCount == 0 && !first && lastToken->getType() != srcMLParser::TERMINATE &&
+        //     (!isEmptyLine && token->getType() == srcMLParser::EOL && lastToken->getType() != srcMLParser::INDENT) ||
+        //     (token->getType() == 1 /* EOF */ && lastToken->getType() != srcMLParser::EOL)) {
+
+        // For a newline, insert a TERMINATE in certain cases
+        if ((token->getType() == srcMLParser::EOL &&
+
+            // not an empty line
+            !firstCharacter &&
+
+            // not an existing TERMINATE
+            lastToken->getType() != srcMLParser::TERMINATE &&
+
+            // not in the middle of an expression with a previous operator
+            // Python does not have any postfix operators, so an operator at the end means the expression is not complete
+            lastNonWhitespaceToken->getType() != srcMLParser::OPERATORS &&
+            lastNonWhitespaceToken->getType() != srcMLParser::TEMPOPE &&
+            lastNonWhitespaceToken->getType() != srcMLParser::TEMPOPS &&
+
+            // not a whitespace line
+            !isWhitespaceLine &&
+
+            // no inserted INDENT, which implies a block
+            lastToken->getType() != srcMLParser::INDENT) ||
+
+            // At EOF with no previous EOL
             (token->getType() == 1 /* EOF */ && lastToken->getType() != srcMLParser::EOL)) {
 
             // create new terminate token
