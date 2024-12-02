@@ -30,9 +30,7 @@ private:
     std::deque<antlr::RefToken> buffer;
     antlr::RefToken lastToken = srcMLToken::factory();
     bool isEmptyLine = true;
-    bool first = true;
     int parenthesesCount = 0;
-    bool isWhitespaceLine = true;
     bool firstCharacter = true;
     antlr::RefToken lastNonWhitespaceToken = srcMLToken::factory();
 };

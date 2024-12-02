@@ -18,15 +18,11 @@ antlr::RefToken NewlineTerminatePython::nextToken() {
     if (buffer.empty()) {
         auto token = input.nextToken();
 
+        // update the open parentheses count
         if (token->getType() == srcMLParser::LPAREN)
             ++parenthesesCount;
         else if (token->getType() == srcMLParser::RPAREN && parenthesesCount > 0)
             --parenthesesCount;
-
-        // // For a newline, insert a TERMINATE, except on an INDENT line
-        // if (parenthesesCount == 0 && !first && lastToken->getType() != srcMLParser::TERMINATE &&
-        //     (!isEmptyLine && token->getType() == srcMLParser::EOL && lastToken->getType() != srcMLParser::INDENT) ||
-        //     (token->getType() == 1 /* EOF */ && lastToken->getType() != srcMLParser::EOL)) {
 
         // For a newline, insert a TERMINATE in certain cases
         if ((token->getType() == srcMLParser::EOL &&
@@ -37,17 +33,17 @@ antlr::RefToken NewlineTerminatePython::nextToken() {
             // not an existing TERMINATE
             lastToken->getType() != srcMLParser::TERMINATE &&
 
+            // // not a whitespace line
+            // !isWhitespaceLine &&
+
+            // no inserted INDENT, which implies a block
+            lastToken->getType() != srcMLParser::INDENT &&
+
             // not in the middle of an expression with a previous operator
             // Python does not have any postfix operators, so an operator at the end means the expression is not complete
             lastNonWhitespaceToken->getType() != srcMLParser::OPERATORS &&
             lastNonWhitespaceToken->getType() != srcMLParser::TEMPOPE &&
-            lastNonWhitespaceToken->getType() != srcMLParser::TEMPOPS &&
-
-            // not a whitespace line
-            !isWhitespaceLine &&
-
-            // no inserted INDENT, which implies a block
-            lastToken->getType() != srcMLParser::INDENT) ||
+            lastNonWhitespaceToken->getType() != srcMLParser::TEMPOPS) ||
 
             // At EOF with no previous EOL
             (token->getType() == 1 /* EOF */ && lastToken->getType() != srcMLParser::EOL)) {
@@ -58,15 +54,18 @@ antlr::RefToken NewlineTerminatePython::nextToken() {
             terminateToken->setColumn(1);
             terminateToken->setLine(token->getLine());
 
+            // reset the parentheses count
+            parenthesesCount = 0;
+
             // insert terminal token
             buffer.emplace_back(terminateToken);
         }
 
         if (token->getType() == srcMLParser::EOL) {
-            first = true;
+            firstCharacter = true;
             isEmptyLine = true;
         } else if (token->getType() != srcMLParser::WS) {
-            first = false;
+            firstCharacter = false;
             isEmptyLine = false;
         }
 
