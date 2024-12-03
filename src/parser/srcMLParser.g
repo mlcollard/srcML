@@ -723,6 +723,7 @@ tokens {
     SPARAMETER_MODIFIER;
     SPASS;
     SSET;
+    STUPLE;
     SYIELD_FROM_STATEMENT;
 }
 
@@ -5976,6 +5977,7 @@ comma[] { bool markup_comma = true; ENTRY_DEBUG } :
                     && (
                         inMode(MODE_ARRAY_PY)
                         || inMode(MODE_SET_PY)
+                        || inMode(MODE_TUPLE_PY)
                     )
                 )
                 || (
@@ -12058,6 +12060,10 @@ expression_part[CALL_TYPE type = NOCALL, int call_count = 1] {
 
         ENTRY_DEBUG
 } :
+        // looking for lparen to start a Python tuple
+        { inLanguage(LANGUAGE_PYTHON) && last_consumed != NAME }?
+        tuple_py |
+
         // looking for lbracket to start a Python array
         { inLanguage(LANGUAGE_PYTHON) && last_consumed != NAME }?
         array_py |
@@ -17343,3 +17349,51 @@ perform_dictionary_check_py[] returns [int isdictionary] {
 
         ENTRY_DEBUG
 } :;
+
+/*
+  tuple_py
+
+  Handles Python tuples.  Not used directly, but can be called by expression_part.
+*/
+tuple_py[] { CompleteElement element(this); int inner_lparen = 0; ENTRY_DEBUG } :
+        {
+            startNewMode(MODE_LOCAL | MODE_TOP | MODE_LIST | MODE_TUPLE_PY);
+
+            startElement(STUPLE);
+        }
+
+        LPAREN
+
+        (options { greedy = true; } :
+            // found rparen that ends the current tuple
+            // tuples end if followed by EOL or a keyword (e.g., "in" for list comprehensions)
+            { LA(1) == RPAREN && (next_token() == TERMINATE || keyword_token_set.member((unsigned int) next_token())) }?
+            {
+                break;
+            } |
+
+            { inMode(MODE_ARGUMENT) }?
+            argument |
+
+            { !inMode(MODE_TUPLE_PY) || (LA(1) != LPAREN && LA(1) != RPAREN) }?
+            {
+                if (!inMode(MODE_EXPRESSION))
+                    startNewMode(MODE_EXPRESSION | MODE_EXPECT);
+            }
+            expression |
+
+            comma
+        )*
+
+        {
+            if (inTransparentMode(MODE_TUPLE_PY))
+                endDownToMode(MODE_TUPLE_PY);
+        }
+
+        RPAREN
+
+        {
+            if (inTransparentMode(MODE_TUPLE_PY))
+                endMode(MODE_TUPLE_PY);
+        }
+;
