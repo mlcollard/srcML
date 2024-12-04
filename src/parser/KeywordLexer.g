@@ -352,10 +352,6 @@ tokens {
     JS_WITH;
     JS_YIELD;
 
-    // Offside rule
-    INDENT;
-    DEDENT;
-
     // Python
     PY_ALIAS;
     PY_ARROW;
@@ -792,10 +788,6 @@ KeywordLexer(UTF8CharBuffer* pinput, int language, OPTION_TYPE & options,
         { "void"         , JS_VOID           , LANGUAGE_JAVASCRIPT },
         { "with"         , JS_WITH           , LANGUAGE_JAVASCRIPT },
         { "yield"        , JS_YIELD          , LANGUAGE_JAVASCRIPT },
-
-        // Offside
-        { ""             , INDENT            , LANGUAGE_PYTHON },
-        { ""             , DEDENT            , LANGUAGE_PYTHON },
 
         // Python
         { "}"            , PY_RCURLY         , LANGUAGE_PYTHON },

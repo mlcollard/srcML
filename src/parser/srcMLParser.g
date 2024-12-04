@@ -16717,7 +16717,7 @@ complete_python_parameter[] {
             {
                 next_token() == COMMA
                 || next_token() == RPAREN
-                || (inTransparentMode(MODE_LAMBDA_PY) && next_token() == COLON)
+                || (inTransparentMode(MODE_LAMBDA_PY) && next_token() == INDENT)
             }?
             (MULTOPS | OPERATORS) |
 
@@ -17136,7 +17136,7 @@ start_list_comprehension_py[] { ENTRY_DEBUG } :
 /*
   lambda_py
 
-  Handles a Python lambda.  Uses its own block tag (separate from INDENT/DEDENT).
+  Handles a Python lambda.  Not used directly, but can be called by expression_part.
 */
 lambda_py[] { ENTRY_DEBUG } :
         {
@@ -17151,7 +17151,7 @@ lambda_py[] { ENTRY_DEBUG } :
             startNewMode(MODE_PARAMETER | MODE_LIST | MODE_EXPECT);
         }
 
-        (
+        (options { greedy = true; } :
             complete_python_parameter |
 
             {
@@ -17165,37 +17165,6 @@ lambda_py[] { ENTRY_DEBUG } :
             if (inTransparentMode(MODE_PARAMETER)) {
                 endDownToMode(MODE_PARAMETER);
                 endMode(MODE_PARAMETER);
-            }
-
-            startNewMode(MODE_EXPRESSION_BLOCK);
-
-            startElement(SBLOCK);
-        }
-
-        COLON
-
-        (options { greedy = true; } :
-            { inMode(MODE_ARGUMENT) }?
-            argument |
-
-            {
-                if (!inMode(MODE_EXPRESSION))
-                    startNewMode(MODE_EXPRESSION | MODE_EXPECT);
-            }
-            expression |
-
-            comma
-        )*
-
-        {
-            if (inTransparentMode(MODE_EXPRESSION_BLOCK)) {
-                endDownToMode(MODE_EXPRESSION_BLOCK);
-                endMode(MODE_EXPRESSION_BLOCK);
-            }
-
-            if (inTransparentMode(MODE_LAMBDA_PY) && LA(1) != FOR) {
-                endDownToMode(MODE_LAMBDA_PY);
-                endMode(MODE_LAMBDA_PY);
             }
         }
 ;

@@ -17,8 +17,7 @@
  * Whenever a `blockStartToken` is found, an INDENT token is generated. Whenever the next line starts with
  * less indentation that the previous line, a DEDENT token is generated (ignores blank lines).
  * 
- * INDENT and DEDENT are meant to handle blocks in languages such as Python that use a colon to represent
- * the start of a block (as opposed to curly braces, etc.).
+ * INDENT and DEDENT are meant to handle blocks (which start with `:`) in Python.
  */
 antlr::RefToken OffSideRule::nextToken() {
     // There are no backlogged tokens
@@ -36,40 +35,63 @@ antlr::RefToken OffSideRule::nextToken() {
         }
 
         // [INDENT] The token matches the token used to indicate the start of a block
-        if (token->getType() == blockStartToken) {
+        // Colons always start a block unless in a comment or in group tokens (e.g., `()`, `{}`, and `[]`).
+        if (token->getType() == blockStartToken && numParen == 0 && numBraces == 0 && numBrackets == 0) {
             const auto& nextToken = input.nextToken();  // reads in a token
 
-            // Check if LA(1) == EOL or EOF_; valid indentation
-            if ((nextToken->getType() == srcMLParser::EOL || nextToken->getType() == srcMLParser::EOF_) && nextToken->getColumn() > 1) {
-                token->setType(srcMLParser::INDENT);
-                buffer.emplace_back(nextToken);
-                ++numIndents;
+            switch (nextToken->getType()) {
+                // Typical multi-line statement with a block
+                case srcMLParser::EOL:
+                    break;
 
-                newIndent = true;
-                buffer.emplace_back(token);
-            }
+                // Could have EOL after whitespace
+                case srcMLParser::WS: {
+                    const auto& extraToken = input.nextToken();  // reads in a token
+                    buffer.emplace_back(extraToken);
 
-            // Check if LA(1) == WS; could be valid indentation
-            if (buffer.empty() && nextToken->getType() == srcMLParser::WS) {
-                const auto& extraToken = input.nextToken();  // reads in a token
-                buffer.emplace_back(extraToken);
+                    // no EOL after whitespace indicates a one-line statement
+                    if (extraToken->getType() != srcMLParser::EOL)
+                        oneLineStatement = true;
 
-                // Check if LA(2) == EOL or EOF_; valid indentation
-                if ((extraToken->getType() == srcMLParser::EOL || extraToken->getType() == srcMLParser::EOF_) && extraToken->getColumn() > 1) {
-                    token->setType(srcMLParser::INDENT);
-                    buffer.emplace_back(nextToken);
-                    ++numIndents;
-
-                    newIndent = true;
-                    buffer.emplace_back(token);
+                    break;
                 }
+                // All other non-EOL tokens indicate a one-line statement
+                default:
+                    oneLineStatement = true;
+                    break;
             }
 
-            // blockStartToken did not indicate new indentation
-            if (!newIndent) {
-                buffer.emplace_back(nextToken);
+            token->setType(srcMLParser::INDENT);
+            buffer.emplace_back(nextToken);
+            ++numIndents;
+
+            if (!oneLineStatement)
+                newIndent = true;
+
+            buffer.emplace_back(token);
+        }
+
+        // [DEDENT] One-line statements with a block must end on their respective line
+        if (buffer.empty() && oneLineStatement && (token->getType() == srcMLParser::EOL || token->getType() == srcMLParser::EOF_) && numIndents > 0) {
+            oneLineStatement = false;
+            int prevNumIndents = numIndents;
+
+            // End of a one-line statement that is not nested; generate a DEDENT token
+            auto dedentToken = srcMLToken::factory();
+            dedentToken->setType(srcMLParser::DEDENT);
+            dedentToken->setColumn(1);
+            dedentToken->setLine(token->getLine());
+            --numIndents;
+
+            // End of a nested one-line statement; may need to generate multiple DEDENT tokens
+            if (numIndents > 0)
+                generateMultipleDedents(token);
+
+            // Only add token to buffer if initial numIndents was 1 (it was already added if >1)
+            if (prevNumIndents == 1)
                 buffer.emplace_back(token);
-            }
+
+            buffer.emplace_back(dedentToken);
         }
 
         // [DEDENT] Blocks with improper indentation need to be handled differently
@@ -105,89 +127,9 @@ antlr::RefToken OffSideRule::nextToken() {
             numIndents = 0;
         }
 
-        // [DEDENT] A newline ('\n') token could indicate the end of a block
-        if (buffer.empty() && token->getType() == srcMLParser::EOL && token->getColumn() > 1 && numIndents > 0) {
-            while (true) {
-                const auto& nextToken = input.nextToken();
-
-                // The next line starts with indentation, so record where the next token would start
-                if (nextToken->getType() == srcMLParser::WS) {
-                    buffer.emplace_back(nextToken);
-                    prevColStart = currentColStart;
-                    currentColStart = nextToken->getText().length() + 1;  // e.g., 4 spaces starting at column 1, text starting at column 5
-
-                    while (!blankLineBuffer.empty()) {
-                        buffer.emplace_back(blankLineBuffer.back());
-                        blankLineBuffer.pop_back();
-                    }
-
-                    if (currentColStart < prevColStart) {
-                        auto dedentToken = srcMLToken::factory();
-                        dedentToken->setType(srcMLParser::DEDENT);
-                        dedentToken->setColumn(1);
-                        dedentToken->setLine(token->getLine() + 1);
-
-                        buffer.emplace_back(dedentToken);
-                        --numIndents;
-                    }
-
-                    buffer.emplace_back(token);
-                    break;
-                }
-
-                // The next line is a blank line, so look for the next non-blank-line token
-                else if (nextToken->getType() == srcMLParser::EOL && nextToken->getColumn() == 1) {
-                    blankLineBuffer.emplace_back(nextToken);
-                    continue;
-                }
-
-                // The next token is the end of the file, so generate DEDENT tokens equal to the remaining INDENT tokens
-                else if (nextToken->getType() == srcMLParser::EOF_) {
-                    buffer.emplace_back(nextToken);
-
-                    for (int i = 0; i < numIndents; ++i) {
-                        auto dedentToken = srcMLToken::factory();
-                        dedentToken->setType(srcMLParser::DEDENT);
-                        dedentToken->setLine(nextToken->getLine());
-                        dedentToken->setColumn(numIndents - i);
-
-                        buffer.emplace_back(dedentToken);
-                    }
-
-                    numIndents = 0;
-                    buffer.emplace_back(token);
-                    break;
-                }
-
-                // The next token starts at column 1
-                else {
-                    buffer.emplace_back(nextToken);
-                    prevColStart = currentColStart;
-                    currentColStart = 1;
-
-                    while (!blankLineBuffer.empty()) {
-                        buffer.emplace_back(blankLineBuffer.back());
-                        blankLineBuffer.pop_back();
-                    }
-
-                    if (currentColStart < prevColStart) {
-                        for (int i = 0; i < numIndents; ++i) {
-                            auto dedentToken = srcMLToken::factory();
-                            dedentToken->setType(srcMLParser::DEDENT);
-                            dedentToken->setLine(nextToken->getLine());
-                            dedentToken->setColumn(numIndents - i);
-
-                            buffer.emplace_back(dedentToken);
-                        }
-
-                        numIndents = 0;
-                    }
-
-                    buffer.emplace_back(token);
-                    break;
-                }
-            }
-        }
+        // [DEDENT] A newline ('\n') token could indicate the end of a (nested) block
+        if (buffer.empty() && token->getType() == srcMLParser::EOL && token->getColumn() > 1 && numIndents > 0)
+            generateMultipleDedents(token);
 
         // Place the unhandled token into the buffer to ensure it is not lost
         if (buffer.empty())
@@ -196,6 +138,9 @@ antlr::RefToken OffSideRule::nextToken() {
 
     // There is at least one backlogged token
     if (!buffer.empty()) {
+        // Detect if currently in/out of `()`, `{}`, or `[]`.
+        checkGroupSymbol();
+
         // Place any unhandled blank lines in the buffer before ending the file
         if (buffer.back()->getType() == srcMLParser::EOF_ && !blankLineBuffer.empty()) {
             while (!blankLineBuffer.empty()) {
@@ -219,6 +164,131 @@ antlr::RefToken OffSideRule::nextToken() {
     antlr::RefToken bufferToken = buffer.back();
     buffer.pop_back();
     return bufferToken;
+}
+
+/**
+ * Generates multiple DEDENT tokens for nested Python blocks.
+ * 
+ * `token` should be the same token used at the top level of `nextToken()`.
+ */
+void OffSideRule::generateMultipleDedents(antlr::RefToken token) {
+    while (true) {
+        const auto& nextToken = input.nextToken();  // reads in a token
+
+        // The next line starts with indentation, so record where the next token would start
+        if (nextToken->getType() == srcMLParser::WS) {
+            buffer.emplace_back(nextToken);
+            prevColStart = currentColStart;
+            currentColStart = nextToken->getText().length() + 1;  // e.g., 4 spaces starting at column 1, text starting at column 5
+
+            while (!blankLineBuffer.empty()) {
+                buffer.emplace_back(blankLineBuffer.back());
+                blankLineBuffer.pop_back();
+            }
+
+            if (currentColStart < prevColStart) {
+                auto dedentToken = srcMLToken::factory();
+                dedentToken->setType(srcMLParser::DEDENT);
+                dedentToken->setColumn(1);
+                dedentToken->setLine(token->getLine() + 1);
+
+                buffer.emplace_back(dedentToken);
+                --numIndents;
+            }
+
+            buffer.emplace_back(token);
+            break;
+        }
+
+        // The next line is a blank line, so look for the next non-blank-line token
+        else if (nextToken->getType() == srcMLParser::EOL && nextToken->getColumn() == 1) {
+            blankLineBuffer.emplace_back(nextToken);
+            continue;
+        }
+
+        // The next token is the end of the file, so generate DEDENT tokens equal to the remaining INDENT tokens
+        else if (nextToken->getType() == srcMLParser::EOF_) {
+            buffer.emplace_back(nextToken);
+
+            for (int i = 0; i < numIndents; ++i) {
+                auto dedentToken = srcMLToken::factory();
+                dedentToken->setType(srcMLParser::DEDENT);
+                dedentToken->setLine(nextToken->getLine());
+                dedentToken->setColumn(numIndents - i);
+
+                buffer.emplace_back(dedentToken);
+            }
+
+            numIndents = 0;
+            buffer.emplace_back(token);
+            break;
+        }
+
+        // The next token starts at column 1
+        else {
+            buffer.emplace_back(nextToken);
+            prevColStart = currentColStart;
+            currentColStart = 1;
+
+            while (!blankLineBuffer.empty()) {
+                buffer.emplace_back(blankLineBuffer.back());
+                blankLineBuffer.pop_back();
+            }
+
+            if (currentColStart < prevColStart) {
+                for (int i = 0; i < numIndents; ++i) {
+                    auto dedentToken = srcMLToken::factory();
+                    dedentToken->setType(srcMLParser::DEDENT);
+                    dedentToken->setLine(nextToken->getLine());
+                    dedentToken->setColumn(numIndents - i);
+
+                    buffer.emplace_back(dedentToken);
+                }
+
+                numIndents = 0;
+            }
+
+            buffer.emplace_back(token);
+            break;
+        }
+    }
+}
+
+/**
+ * Detects tokens that group elements (e.g., `()`, `{}`, and `[]`).
+ * 
+ * Ensures certain colon (`:`) tokens do not start blocks in Python.
+ * Examples including array slicing, dictionairies, and type annotations.
+ */
+void OffSideRule::checkGroupSymbol() {
+    switch (buffer.back()->getType()) {
+        case srcMLParser::LPAREN:
+            ++numParen;
+            break;
+
+        case srcMLParser::PY_LCURLY:
+            ++numBraces;
+            break;
+
+        case srcMLParser::LBRACKET:
+            ++numBrackets;
+            break;
+
+        case srcMLParser::RPAREN:
+            --numParen;
+            break;
+
+        case srcMLParser::PY_RCURLY:
+            --numBraces;
+            break;
+
+        case srcMLParser::RBRACKET:
+            --numBrackets;
+            break;
+
+        default:
+            break;
+    }
 }
 
 /**

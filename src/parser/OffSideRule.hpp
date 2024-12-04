@@ -25,6 +25,10 @@ public:
 
     antlr::RefToken nextToken();
 
+    void generateMultipleDedents(antlr::RefToken token);
+
+    void checkGroupSymbol();
+
     void setBlockStartToken(int token);
 
     int getBlockStartToken() const;
@@ -38,9 +42,11 @@ private:
     int prevColStart = 1;
     int currentColStart = 1;
     int numIndents = 0;
+    int numParen = 0, numBraces = 0, numBrackets = 0;
 
     bool skippedColSet = false;
     bool newIndent = false;
+    bool oneLineStatement = false;
 };
 
 #endif
