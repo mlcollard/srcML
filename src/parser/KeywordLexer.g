@@ -353,6 +353,8 @@ tokens {
     JS_YIELD;
 
     // Python
+    LITERAL_ELLIPSIS;
+    LITERAL_NONE;
     PY_ALIAS;
     PY_ARROW;
     PY_ASYNC;
@@ -792,6 +794,7 @@ KeywordLexer(UTF8CharBuffer* pinput, int language, OPTION_TYPE & options,
         // Python
         { "}"            , PY_RCURLY         , LANGUAGE_PYTHON },
         { "{"            , PY_LCURLY         , LANGUAGE_PYTHON },
+        { "..."          , LITERAL_ELLIPSIS  , LANGUAGE_PYTHON },
         { "->"           , PY_ARROW          , LANGUAGE_PYTHON },
         { "as"           , PY_ALIAS          , LANGUAGE_PYTHON },
         { "assert"       , ASSERT            , LANGUAGE_PYTHON },
@@ -808,6 +811,7 @@ KeywordLexer(UTF8CharBuffer* pinput, int language, OPTION_TYPE & options,
         { "in"           , PY_RANGE_IN       , LANGUAGE_PYTHON },
         { "lambda"       , PY_LAMBDA         , LANGUAGE_PYTHON },
         { "match"        , PY_MATCH          , LANGUAGE_PYTHON },
+        { "None"         , LITERAL_NONE      , LANGUAGE_PYTHON },
         { "nonlocal"     , PY_NONLOCAL       , LANGUAGE_PYTHON },
         { "pass"         , PY_PASS           , LANGUAGE_PYTHON },
         { "raise"        , PY_RAISE          , LANGUAGE_PYTHON },

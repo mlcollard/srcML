@@ -91,7 +91,7 @@ token_set(srcMLParser, enum_preprocessing_token_set,
 
 token_set(srcMLParser, literal_tokens_set,
     srcMLParser::CHAR_START, srcMLParser::COMPLEX_NUMBER, srcMLParser::STRING_START, srcMLParser::CONSTANTS, srcMLParser::LITERAL_FALSE, srcMLParser::LITERAL_TRUE, srcMLParser::NULLPTR,
-    srcMLParser::NULLLITERAL, srcMLParser::NIL
+    srcMLParser::NULLLITERAL, srcMLParser::NIL, srcMLParser::LITERAL_NONE, srcMLParser::LITERAL_ELLIPSIS
 )
 
 token_set(srcMLParser, modifier_tokens_set,

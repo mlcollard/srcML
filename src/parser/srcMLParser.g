@@ -714,6 +714,7 @@ tokens {
     // Python
     SDELETE;
     SDICTIONARY;
+    SELLIPSIS;
     SGLOBAL;
     SHASHTAG_COMMENT;
     SLIST_COMPREHENSION;
@@ -12319,7 +12320,8 @@ expression_part[CALL_TYPE type = NOCALL, int call_count = 1] {
   Handles various rules for literals.
 */
 literals[] { ENTRY_DEBUG } :
-        string_literal | char_literal | backtick_literal | literal | boolean | null_literal | complex_literal | nil_literal
+        string_literal | char_literal | backtick_literal | literal | boolean | null_literal |
+        complex_literal | nil_literal | none_literal | ellipsis_literal
 ;
 
 /*
@@ -12386,6 +12388,32 @@ nil_literal[] { LightweightElement element(this); ENTRY_DEBUG } :
         }
 
         NIL
+;
+
+/*
+  none_py
+
+  Handles a "None" literal in Python.
+*/
+none_literal[] { LightweightElement element(this); ENTRY_DEBUG } :
+        {
+            startElement(SNULL);
+        }
+
+        LITERAL_NONE
+;
+
+/*
+  ellipsis_py
+
+  Handles a "..." (ellipsis) literal in Python.
+*/
+ellipsis_literal[] { LightweightElement element(this); ENTRY_DEBUG } :
+        {
+            startElement(SELLIPSIS);
+        }
+
+        LITERAL_ELLIPSIS
 ;
 
 /*

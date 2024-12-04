@@ -342,6 +342,7 @@ const std::unordered_map<int, Element> srcMLOutput::process = {
     // Python
     { TOKEN::SDELETE,                       { "delete",            SRC,      0,           0,     0,      0 }},
     { TOKEN::SDICTIONARY,                   { "dictionary",        SRC,      0,           0,     0,      0 }},
+    { TOKEN::SELLIPSIS,                     { "literal",           SRC, "type",  "ellipsis",     0,      0 }},
     { TOKEN::SGLOBAL,                       { "global",            SRC,      0,           0,     0,      0 }},
     { TOKEN::SHASHTAG_COMMENT,              { "comment",           SRC, "type",      "line",     0,      0 }},
     { TOKEN::SLIST_COMPREHENSION,           { "comprehension",     SRC,       0,          0,     0,      0 }},
