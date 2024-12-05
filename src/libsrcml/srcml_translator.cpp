@@ -144,7 +144,7 @@ void srcml_translator::translate(UTF8CharBuffer* parser_input) {
         if (getLanguage() == LANGUAGE_PYTHON) {
             // intermediate token stage
             OffSideRule offside(selector);
-            offside.setBlockStartToken(srcMLParser::COLON);
+            offside.setBlockStartToken(srcMLParser::PY_COLON);
 
             // intermediate token stage
             NewlineTerminatePython terminate(offside);

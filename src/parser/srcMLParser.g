@@ -6120,7 +6120,7 @@ colon[] { ENTRY_DEBUG } :
                 endDownToMode(MODE_TOP_SECTION);
         }
 
-        COLON
+        (COLON | PY_COLON)
 
         {
             if (inMode(MODE_DETECT_COLON))
@@ -11702,8 +11702,7 @@ general_operators[] { LightweightElement element(this); ENTRY_DEBUG } :
 
             // Python
             { next_token() == PY_NOT }? PY_IS PY_NOT | { next_token() == PY_IN }? PY_NOT PY_IN |
-            { inLanguage(LANGUAGE_PYTHON) }? COLON | EXPONENTIATION | PY_AND | PY_ATSIGN | PY_AWAIT |
-            PY_IN | PY_IS | PY_NOT | PY_OR
+            EXPONENTIATION | PY_AND | PY_ATSIGN | PY_AWAIT | PY_COLON | PY_IN | PY_IS | PY_NOT | PY_OR
         )
 ;
 
@@ -16768,7 +16767,7 @@ complete_python_parameter[] {
             parameter_annotation_py |
 
             // annotation (with optional initialization)
-            { next_token() == COLON }?
+            { next_token() == PY_COLON }?
             compound_name
             parameter_annotation_py
             parameter_init_py |
@@ -16792,7 +16791,7 @@ parameter_annotation_py[] { ENTRY_DEBUG } :
             // possible if called after handling an arbitrary positional parameter
             // or arbitrary keyword parameter in complete_python_parameter.  In a
             // Python lambda, colon indicates the start of a block (not annotation).
-            if (LA(1) != COLON || inTransparentMode(MODE_LAMBDA_PY))
+            if (LA(1) != PY_COLON || inTransparentMode(MODE_LAMBDA_PY))
                 return;
 
             startNewMode(MODE_ANNOTATION_PY);
@@ -16800,7 +16799,7 @@ parameter_annotation_py[] { ENTRY_DEBUG } :
             startElement(SANNOTATION);
         }
 
-        COLON
+        PY_COLON
 
         {
             startNewMode(MODE_EXPRESSION | MODE_EXPECT);
@@ -17351,11 +17350,11 @@ perform_dictionary_check_py[] returns [int isdictionary] {
             while (true) {
                 consume();
 
-                if (LA(1) == COLON || LA(1) == PY_RCURLY || LA(1) == COMMA || LA(1) == 1 /* EOF */)
+                if (LA(1) == PY_COLON || LA(1) == PY_RCURLY || LA(1) == COMMA || LA(1) == 1 /* EOF */)
                     break;
             }
 
-            if (LA(1) == COLON)
+            if (LA(1) == PY_COLON)
                 isdictionary = true;
         }
         catch (...) {}

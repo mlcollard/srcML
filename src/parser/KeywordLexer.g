@@ -362,6 +362,7 @@ tokens {
     PY_ASYNC;
     PY_ATSIGN;
     PY_AWAIT;
+    PY_COLON;
     PY_DELETE;
     PY_ELIF;
     PY_EXCEPT;
@@ -801,6 +802,7 @@ KeywordLexer(UTF8CharBuffer* pinput, int language, OPTION_TYPE & options,
         // Python special characters or operators
         { "}"            , PY_RCURLY         , LANGUAGE_PYTHON },
         { "{"            , PY_LCURLY         , LANGUAGE_PYTHON },
+        { ":"            , PY_COLON          , LANGUAGE_PYTHON },
         { "@"            , PY_ATSIGN         , LANGUAGE_PYTHON },
         { "**"           , EXPONENTIATION    , LANGUAGE_PYTHON },
         { "..."          , LITERAL_ELLIPSIS  , LANGUAGE_PYTHON },
