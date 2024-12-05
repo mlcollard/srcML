@@ -361,6 +361,7 @@ tokens {
     PY_ARROW;
     PY_ASYNC;
     PY_ATSIGN;
+    PY_AWAIT;
     PY_DELETE;
     PY_ELIF;
     PY_EXCEPT;
@@ -805,6 +806,7 @@ KeywordLexer(UTF8CharBuffer* pinput, int language, OPTION_TYPE & options,
         { "..."          , LITERAL_ELLIPSIS  , LANGUAGE_PYTHON },
         { "->"           , PY_ARROW          , LANGUAGE_PYTHON },
         { "and"          , PY_AND            , LANGUAGE_PYTHON },
+        { "await"        , PY_AWAIT          , LANGUAGE_PYTHON },
         { "in"           , PY_IN             , LANGUAGE_PYTHON },
         { "is"           , PY_IS             , LANGUAGE_PYTHON },
         { "not"          , PY_NOT            , LANGUAGE_PYTHON },

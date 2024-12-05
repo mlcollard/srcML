@@ -11702,7 +11702,7 @@ general_operators[] { LightweightElement element(this); ENTRY_DEBUG } :
 
             // Python
             { next_token() == PY_NOT }? PY_IS PY_NOT | { next_token() == PY_IN }? PY_NOT PY_IN |
-            { inLanguage(LANGUAGE_PYTHON) }? COLON | EXPONENTIATION | PY_AND | PY_ATSIGN |
+            { inLanguage(LANGUAGE_PYTHON) }? COLON | EXPONENTIATION | PY_AND | PY_ATSIGN | PY_AWAIT |
             PY_IN | PY_IS | PY_NOT | PY_OR
         )
 ;
