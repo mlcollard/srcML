@@ -41,7 +41,7 @@ token_set(srcMLParser, keyword_token_set,
     srcMLParser::JS_FROM, srcMLParser::JS_FUNCTION, srcMLParser::JS_GET, srcMLParser::JS_IMPORT, srcMLParser::JS_SET, srcMLParser::JS_WITH,
     srcMLParser::JS_YIELD, srcMLParser::PY_ALIAS, srcMLParser::PY_ASYNC, srcMLParser::PY_FUNCTION, srcMLParser::PY_DELETE,
     srcMLParser::PY_ELIF, srcMLParser::PY_EXCEPT, srcMLParser::PY_FROM, srcMLParser::PY_GLOBAL, srcMLParser::PY_IMPORT,
-    srcMLParser::PY_RANGE_IN, srcMLParser::PY_LAMBDA, srcMLParser::PY_MATCH, srcMLParser::PY_NONLOCAL, srcMLParser::PY_PASS,
+    srcMLParser::PY_IN, srcMLParser::PY_LAMBDA, srcMLParser::PY_MATCH, srcMLParser::PY_NONLOCAL, srcMLParser::PY_PASS,
     srcMLParser::PY_RAISE, srcMLParser::PY_TYPE, srcMLParser::PY_WITH, srcMLParser::PY_YIELD
 )
 

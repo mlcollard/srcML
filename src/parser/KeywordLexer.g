@@ -357,6 +357,7 @@ tokens {
     LITERAL_ELLIPSIS;
     LITERAL_NONE;
     PY_ALIAS;
+    PY_AND;
     PY_ARROW;
     PY_ASYNC;
     PY_ATSIGN;
@@ -367,13 +368,16 @@ tokens {
     PY_FUNCTION;
     PY_GLOBAL;
     PY_IMPORT;
+    PY_IN;
+    PY_IS;
     PY_LAMBDA;
     PY_LCURLY;
     PY_MATCH;
     PY_NONLOCAL;
+    PY_NOT;
+    PY_OR;
     PY_PASS;
     PY_RAISE;
-    PY_RANGE_IN;
     PY_RCURLY;
     PY_TYPE;
     PY_WITH;
@@ -793,13 +797,20 @@ KeywordLexer(UTF8CharBuffer* pinput, int language, OPTION_TYPE & options,
         { "with"         , JS_WITH           , LANGUAGE_JAVASCRIPT },
         { "yield"        , JS_YIELD          , LANGUAGE_JAVASCRIPT },
 
-        // Python
+        // Python special characters or operators
         { "}"            , PY_RCURLY         , LANGUAGE_PYTHON },
         { "{"            , PY_LCURLY         , LANGUAGE_PYTHON },
         { "@"            , PY_ATSIGN         , LANGUAGE_PYTHON },
         { "**"           , EXPONENTIATION    , LANGUAGE_PYTHON },
         { "..."          , LITERAL_ELLIPSIS  , LANGUAGE_PYTHON },
         { "->"           , PY_ARROW          , LANGUAGE_PYTHON },
+        { "and"          , PY_AND            , LANGUAGE_PYTHON },
+        { "in"           , PY_IN             , LANGUAGE_PYTHON },
+        { "is"           , PY_IS             , LANGUAGE_PYTHON },
+        { "not"          , PY_NOT            , LANGUAGE_PYTHON },
+        { "or"           , PY_OR             , LANGUAGE_PYTHON },
+
+        // Python
         { "as"           , PY_ALIAS          , LANGUAGE_PYTHON },
         { "assert"       , ASSERT            , LANGUAGE_PYTHON },
         { "async"        , PY_ASYNC          , LANGUAGE_PYTHON },
@@ -812,7 +823,6 @@ KeywordLexer(UTF8CharBuffer* pinput, int language, OPTION_TYPE & options,
         { "from"         , PY_FROM           , LANGUAGE_PYTHON },
         { "global"       , PY_GLOBAL         , LANGUAGE_PYTHON },
         { "import"       , PY_IMPORT         , LANGUAGE_PYTHON },
-        { "in"           , PY_RANGE_IN       , LANGUAGE_PYTHON },
         { "lambda"       , PY_LAMBDA         , LANGUAGE_PYTHON },
         { "match"        , PY_MATCH          , LANGUAGE_PYTHON },
         { "None"         , LITERAL_NONE      , LANGUAGE_PYTHON },

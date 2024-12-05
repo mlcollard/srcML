@@ -1454,6 +1454,10 @@ start_python[] {
         }
         control_initialization |
 
+        // range-based "in" only occurs in for-loops and list comprehensions
+        { inTransparentMode(MODE_FOR_CONTROL_PY) }?
+        range_in_py |
+
         // looking for a comma to start the message half of an "assert"
         { inMode(MODE_ASSERT_PY) }?
         (COMMA expression) |
@@ -1477,7 +1481,7 @@ start_python[] {
         from_py |
 
         // looking for a keyword or operator that does not belong to a statement
-        range_in_py | alias_py | function_annotation_py |
+        alias_py | function_annotation_py |
 
         // invoke start to handle unprocessed tokens (e.g., EOF, literals, operators, etc.)
         start
@@ -11653,7 +11657,10 @@ pure_expression_block[] { ENTRY_DEBUG } :
 */
 general_operators[] { LightweightElement element(this); ENTRY_DEBUG } :
         {
-            if ((LA(1) != IN || !inTransparentMode(MODE_CONTROL_CONDITION)))
+            if (
+                (LA(1) != IN || !inTransparentMode(MODE_CONTROL_CONDITION))
+                || (LA(1) == PY_IN && !inTransparentMode(MODE_FOR_CONTROL_PY))
+            )
                 startElement(SOPERATOR);
         }
 
@@ -11693,7 +11700,8 @@ general_operators[] { LightweightElement element(this); ENTRY_DEBUG } :
             JS_AWAIT | JS_DELETE | JS_INSTANCE_OF | JS_TYPEOF | JS_VOID |
 
             // Python
-            EXPONENTIATION | PY_ATSIGN
+            { next_token() == PY_NOT }? PY_IS PY_NOT | { next_token() == PY_IN }? PY_NOT PY_IN |
+            EXPONENTIATION | PY_AND | PY_ATSIGN | PY_IN | PY_IS | PY_NOT | PY_OR
         )
 ;
 
@@ -16498,7 +16506,7 @@ range_in_py[] { SingleElement element(this); ENTRY_DEBUG } :
             startElement(SRANGE_IN);
         }
 
-        PY_RANGE_IN
+        PY_IN
         expression
 ;
 
@@ -16515,7 +16523,7 @@ list_comprehension_range_py[] { ENTRY_DEBUG } :
             startElement(SRANGE_IN);
         }
 
-        PY_RANGE_IN
+        PY_IN
 
         {
             startNewMode(MODE_EXPRESSION | MODE_EXPECT);
@@ -17113,6 +17121,11 @@ list_comprehension_py[] { ENTRY_DEBUG } :
         control_initialization
 
         (options { greedy = true; } :
+            { LA(1) == PY_IN }?
+            {
+                break;
+            } |
+
             { inMode(MODE_ARGUMENT) }?
             argument |
 
