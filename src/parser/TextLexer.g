@@ -122,7 +122,7 @@ CONSTANTS :
     { startline = false; }
     ('0'..'9') (options { greedy = true; } : '0'..'9' | '_')*
     (options { greedy = true; } : '.' | '0'..'9')*
-    (options { greedy = true; } : 'e' ('+' | '-')* ('0'..'9')*)?
+    (options { greedy = true; } : ('e' | 'E') ('+' | '-')* ('0'..'9')*)?
     (options { greedy = true; } :
         'i' { $setType(COMPLEX_NUMBER); } |
 
