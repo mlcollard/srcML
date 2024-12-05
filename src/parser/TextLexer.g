@@ -123,7 +123,12 @@ CONSTANTS :
     ('0'..'9') (options { greedy = true; } : '0'..'9' | '_')*
     (options { greedy = true; } : '.' | '0'..'9')*
     (options { greedy = true; } : 'e' ('+' | '-')* ('0'..'9')*)?
-    (options { greedy = true; } : 'i' { $setType(COMPLEX_NUMBER); })*
+    (options { greedy = true; } :
+        'i' { $setType(COMPLEX_NUMBER); } |
+
+        { inLanguage(LANGUAGE_PYTHON) }?
+        'j' { $setType(COMPLEX_NUMBER); }
+    )*
     (options { greedy = true; } : NAME)*
     {
         //firstpreprocline = false;
