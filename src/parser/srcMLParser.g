@@ -5981,6 +5981,7 @@ comma[] { bool markup_comma = true; ENTRY_DEBUG } :
                     inLanguage(LANGUAGE_PYTHON)
                     && (
                         inMode(MODE_ARRAY_PY)
+                        || inMode(MODE_DICTIONARY_PY)
                         || inMode(MODE_SET_PY)
                         || inMode(MODE_TUPLE_PY)
                     )
@@ -11701,7 +11702,8 @@ general_operators[] { LightweightElement element(this); ENTRY_DEBUG } :
 
             // Python
             { next_token() == PY_NOT }? PY_IS PY_NOT | { next_token() == PY_IN }? PY_NOT PY_IN |
-            EXPONENTIATION | PY_AND | PY_ATSIGN | PY_IN | PY_IS | PY_NOT | PY_OR
+            { inLanguage(LANGUAGE_PYTHON) }? COLON | EXPONENTIATION | PY_AND | PY_ATSIGN |
+            PY_IN | PY_IS | PY_NOT | PY_OR
         )
 ;
 
@@ -17295,7 +17297,7 @@ dictionary_py[bool isempty = false] { CompleteElement element(this); ENTRY_DEBUG
             }
         }
 
-        (
+        (options { greedy = true; } :
             {
                 start_list_comprehension_py();
             }
@@ -17306,6 +17308,8 @@ dictionary_py[bool isempty = false] { CompleteElement element(this); ENTRY_DEBUG
             { inMode(MODE_ARGUMENT) }?
             argument |
 
+            // ensure colon is not marked as an operator
+            { inTransparentMode(MODE_DICTIONARY_PY) }?
             {
                 endDownToMode(MODE_DICTIONARY_PY);
             }
