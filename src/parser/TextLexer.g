@@ -147,7 +147,16 @@ NAME options { testLiterals = true; } :
         { $setType(STRING_START); } STRING_START |
 
         { inLanguage(LANGUAGE_CXX) && (text == "R"sv || text == "u8R"sv || text == "LR"sv || text == "UR"sv || text == "uR"sv) }?
-        { $setType(STRING_START); } RAW_STRING_START
+        { $setType(STRING_START); } RAW_STRING_START |
+
+        { inLanguage(LANGUAGE_PYTHON) && (text == "b"sv || text == "f"sv || text == "r"sv || text == "u"sv) }?
+        (
+            { LA(1) == '"' }?
+            { $setType(STRING_START); } STRING_START |
+
+            { LA(1) == '\'' }?
+            { $setType(CHAR_START); } CHAR_START
+        )
     )?
 ;
 
