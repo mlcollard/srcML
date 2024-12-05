@@ -124,8 +124,8 @@ OPERATORS options { testLiterals = true; } {
     '+' ('+' | '=')? |
     '-' ('-' | '=' | '>' ('*')? )? |
 
-    // *, *=, ** (JavaScript), **= (JavaScript)
-    '*' ({ inLanguage(LANGUAGE_JAVASCRIPT) }? '*')? ('=')? |
+    // *, *=, ** (JavaScript & Python), **= (JavaScript & Python)
+    '*' ({ inLanguage(LANGUAGE_JAVASCRIPT) || inLanguage(LANGUAGE_PYTHON) }? '*')? ('=')? |
 
     '%' ('=')? |
     '^' ('=')? |
@@ -134,7 +134,8 @@ OPERATORS options { testLiterals = true; } {
     // !, !=, !== (JavaScript)
     '!' ('=' ({ inLanguage(LANGUAGE_JAVASCRIPT) }? '=')?)? |
 
-    ':' (':')? |
+    // :, := (Python), ::
+    ':' ({ inLanguage(LANGUAGE_PYTHON) }? '=')? (':')? |
 
     // =, ==, =>, === (JavaScript)
     '=' ('=' ({ inLanguage(LANGUAGE_JAVASCRIPT) }? '=')? | { (inLanguage(LANGUAGE_CSHARP) && (lastpos != (getColumn() - 1) || prev == ')' || prev == '#')) || inLanguage(LANGUAGE_JAVASCRIPT) }? '>')? |
@@ -154,6 +155,9 @@ OPERATORS options { testLiterals = true; } {
     // names can start with a @ in C#
     '@' (
 
+        { inLanguage(LANGUAGE_PYTHON) }?
+          '='
+        |
         { inLanguage(LANGUAGE_OBJECTIVE_C) }?
           '(' 
         |

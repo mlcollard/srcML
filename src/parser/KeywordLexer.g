@@ -353,11 +353,13 @@ tokens {
     JS_YIELD;
 
     // Python
+    EXPONENTIATION;
     LITERAL_ELLIPSIS;
     LITERAL_NONE;
     PY_ALIAS;
     PY_ARROW;
     PY_ASYNC;
+    PY_ATSIGN;
     PY_DELETE;
     PY_ELIF;
     PY_EXCEPT;
@@ -794,6 +796,8 @@ KeywordLexer(UTF8CharBuffer* pinput, int language, OPTION_TYPE & options,
         // Python
         { "}"            , PY_RCURLY         , LANGUAGE_PYTHON },
         { "{"            , PY_LCURLY         , LANGUAGE_PYTHON },
+        { "@"            , PY_ATSIGN         , LANGUAGE_PYTHON },
+        { "**"           , EXPONENTIATION    , LANGUAGE_PYTHON },
         { "..."          , LITERAL_ELLIPSIS  , LANGUAGE_PYTHON },
         { "->"           , PY_ARROW          , LANGUAGE_PYTHON },
         { "as"           , PY_ALIAS          , LANGUAGE_PYTHON },

@@ -149,11 +149,20 @@ NAME options { testLiterals = true; } :
 // Single-line comments (no EOL)
 LINE_COMMENT_START options { testLiterals = true; } { int mode = 0; } : '/' 
     ('/' 
-        { mode = LINE_COMMENT_END; }
-        (('/' | '!') {
-            $setType(LINE_DOXYGEN_COMMENT_START);
-            mode = LINE_DOXYGEN_COMMENT_END; 
-        })? |
+        {
+            // '//' is an operator in Python
+            if (inLanguage(LANGUAGE_PYTHON)) {
+                $setType(OPERATORS);
+                mode = 0;
+            }
+            else
+                mode = LINE_COMMENT_END;
+        }
+        (
+            ('/' | '!') { $setType(LINE_DOXYGEN_COMMENT_START); mode = LINE_DOXYGEN_COMMENT_END; } |
+            // '//=' is an operator in Python
+            { inLanguage(LANGUAGE_PYTHON) }? ('=')
+        )? |
     '*'
         { 
             $setType(BLOCK_COMMENT_START);

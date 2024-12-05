@@ -892,12 +892,10 @@ public:
 
     void handleAttributes() {
         // handle Python decorators
-        if (inLanguage(LANGUAGE_PYTHON)) {
-            if (LA(1) == ATSIGN) {
-                // handle multiple pre-keyword decorators in a row
-                while (LA(1) == ATSIGN) {
-                    attribute_py();
-                }
+        if (LA(1) == PY_ATSIGN) {
+            // handle multiple pre-keyword decorators in a row
+            while (LA(1) == PY_ATSIGN) {
+                attribute_py();
             }
         }
     }
@@ -944,6 +942,7 @@ start[] { ++start_count; ENTRY_DEBUG_START ENTRY_DEBUG } :
         { inMode(MODE_ENUM) }?
         enum_block |
 
+        { next_token() != EQUAL }?
         offside_indent |
 
         // namespace block does not have block content element
@@ -1388,7 +1387,8 @@ start_python[] {
         }
 
         // check if the current token starts a decorator that occurs before a keyword (or specifiers)
-        if (LA(1) == ATSIGN) {
+        // "@" is an operator in expressions, not a decorator
+        if (LA(1) == PY_ATSIGN && !inMode(MODE_EXPRESSION)) {
             int post_attribute_token = perform_post_attribute_check_py();
 
             // looking for functions or classes
@@ -11690,7 +11690,10 @@ general_operators[] { LightweightElement element(this); ENTRY_DEBUG } :
             BLOCKOP |
 
             // JavaScript
-            JS_AWAIT | JS_DELETE | JS_INSTANCE_OF | JS_TYPEOF | JS_VOID
+            JS_AWAIT | JS_DELETE | JS_INSTANCE_OF | JS_TYPEOF | JS_VOID |
+
+            // Python
+            EXPONENTIATION | PY_ATSIGN
         )
 ;
 
@@ -16721,12 +16724,12 @@ complete_python_parameter[] {
                 startElement(SPARAMETER_MODIFIER);
 
             // arbitrary positional parameter ('*' NAME)
-            else if (LA(1) == MULTOPS && next_token() == MULTOPS)
-                startElement(SPARAMETER_KEYWORD_ARGUMENT);
-
-            // arbitrary keyword parameter ('**' NAME)
             else if (LA(1) == MULTOPS)
                 startElement(SPARAMETER_ARGUMENT);
+
+            // arbitrary keyword parameter ('**' NAME)
+            else if (LA(1) == EXPONENTIATION)
+                startElement(SPARAMETER_KEYWORD_ARGUMENT);
 
             // general parameter
             else
@@ -16735,9 +16738,8 @@ complete_python_parameter[] {
 
         (
             // '**' + NAME (with optional annotation)
-            { next_token() == MULTOPS }?
-            MULTOPS
-            MULTOPS
+            { next_token() == NAME }?
+            EXPONENTIATION
             compound_name
             parameter_annotation_py |
 
@@ -17018,7 +17020,7 @@ attribute_py[] { ENTRY_DEBUG } :
             startElement(SATTRIBUTE);
         }
 
-        ATSIGN
+        PY_ATSIGN
 
         {
             startNewMode(MODE_EXPRESSION | MODE_EXPECT);
