@@ -98,16 +98,16 @@ tokens {
 OPERATORS options { testLiterals = true; } {
     int start = LA(1);
 } : (
-    // # (C++ or Python), #! (JavaScript)
+    // # (C++ or Python), #! (JavaScript or Python)
     '#' (
-        { inLanguage(LANGUAGE_PYTHON) }?
-            { $setType(HASHTAG_COMMENT_START); changetotextlexer(HASHTAG_COMMENT_END); } |
-
-        { inLanguage(LANGUAGE_JAVASCRIPT) && LA(1) == '!' }?
+        { (inLanguage(LANGUAGE_JAVASCRIPT) || inLanguage(LANGUAGE_PYTHON)) && LA(1) == '!' }?
             { $setType(HASHBANG_COMMENT_START); changetotextlexer(HASHBANG_COMMENT_END); } |
 
         { inLanguage(LANGUAGE_JAVASCRIPT) && LA(1) != '!' }?
             NAME { $setType(NAME); } |
+
+        { inLanguage(LANGUAGE_PYTHON) && LA(1) != '!' }?
+            { $setType(HASHTAG_COMMENT_START); changetotextlexer(HASHTAG_COMMENT_END); } |
 
         { startline }?
             {
