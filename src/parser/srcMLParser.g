@@ -16443,11 +16443,11 @@ from_import_py[] { ENTRY_DEBUG } :
   See from_import_py for the "from..import" case.
 */
 from_py[] { ENTRY_DEBUG } :
-        // mark "from" as a name
+        // mark whatever follows "from" as a name
         { !inTransparentMode(MODE_RAISE_PY) }?
         from_as_name |
 
-        // enclose "from" in tags since it is part of a "raise" statement
+        // "raise" statement: enclose whatever follows "from" in an expression
         {
             endDownToMode(MODE_RAISE_PY);
 
@@ -16456,7 +16456,19 @@ from_py[] { ENTRY_DEBUG } :
         }
 
         PY_FROM
-        compound_name
+
+        (options { greedy = true; } :
+            { inMode(MODE_ARGUMENT) }?
+            argument |
+
+            {
+                if (!inMode(MODE_EXPRESSION))
+                    startNewMode(MODE_EXPRESSION | MODE_EXPECT);
+            }
+            expression |
+
+            comma
+        )*
 ;
 
 /*
