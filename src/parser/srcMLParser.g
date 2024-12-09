@@ -1352,14 +1352,14 @@ start_python[] {
             temp_array[WHILE]       = { SWHILE_STATEMENT, 0, MODE_STATEMENT | MODE_NEST | MODE_WHILE_LOOP_PY, MODE_CONDITION | MODE_EXPECT, nullptr, nullptr };
 
             /* PYTHON STATEMENTS */
-            temp_array[PY_DELETE]   = { SDELETE, 0, MODE_STATEMENT, MODE_VARIABLE_NAME | MODE_LIST, nullptr, nullptr };
+            temp_array[PY_DELETE]   = { SDELETE, 0, MODE_STATEMENT, MODE_VARIABLE_NAME | MODE_LIST | MODE_NO_OPERATOR_COMMA, nullptr, nullptr };
             temp_array[PY_ELIF]     = { SELSEIF, 0, MODE_STATEMENT | MODE_NEST | MODE_IF | MODE_ELSE, MODE_CONDITION | MODE_EXPECT, &srcMLParser::if_statement_start, nullptr };
             temp_array[PY_EXCEPT]   = { SCATCH_BLOCK, 0, MODE_STATEMENT | MODE_NEST | MODE_EXCEPT_PY, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
             temp_array[PY_FUNCTION] = { SFUNCTION_STATEMENT, 0, MODE_STATEMENT | MODE_NEST, MODE_PARAMETER_LIST_PY | MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, nullptr };
             temp_array[PY_GLOBAL]   = { SGLOBAL, 0, MODE_STATEMENT, MODE_VARIABLE_NAME | MODE_LIST, nullptr, nullptr };
-            temp_array[PY_IMPORT]   = { SIMPORT_STATEMENT, 0, MODE_STATEMENT, MODE_VARIABLE_NAME | MODE_LIST, nullptr, nullptr };
+            temp_array[PY_IMPORT]   = { SIMPORT_STATEMENT, 0, MODE_STATEMENT, MODE_VARIABLE_NAME | MODE_LIST | MODE_NO_OPERATOR_COMMA, nullptr, nullptr };
             temp_array[PY_MATCH]    = { SSWITCH, 0, MODE_STATEMENT | MODE_NEST, MODE_CONDITION | MODE_EXPECT, nullptr, nullptr };
-            temp_array[PY_NONLOCAL] = { SNONLOCAL, 0, MODE_STATEMENT, MODE_VARIABLE_NAME | MODE_LIST, nullptr, nullptr };
+            temp_array[PY_NONLOCAL] = { SNONLOCAL, 0, MODE_STATEMENT, MODE_VARIABLE_NAME | MODE_LIST | MODE_NO_OPERATOR_COMMA, nullptr, nullptr };
             temp_array[PY_PASS]     = { SPASS, 0, MODE_STATEMENT, 0, nullptr, nullptr };
             temp_array[PY_RAISE]    = { STHROW_STATEMENT, 0, MODE_STATEMENT | MODE_RAISE_PY, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
             temp_array[PY_TYPE]     = { STYPEDEF, 0, MODE_STATEMENT | MODE_TYPEDEF, MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, nullptr };
@@ -3499,7 +3499,7 @@ control_initialization_action[] { ENTRY_DEBUG } :
 
             // Python control groups contain a name tag (not an expression or init tag)
             if (inLanguage(LANGUAGE_PYTHON)) {
-                startNewMode(MODE_VARIABLE_NAME | MODE_STATEMENT | MODE_LIST);
+                startNewMode(MODE_VARIABLE_NAME | MODE_STATEMENT | MODE_LIST | MODE_NO_OPERATOR_COMMA);
             }
             else {
                 // setup a mode for initialization that will end with a ";"
@@ -5980,7 +5980,9 @@ comma[] { bool markup_comma = true; ENTRY_DEBUG } :
                 || (
                     inLanguage(LANGUAGE_PYTHON)
                     && (
-                        inMode(MODE_ARRAY_PY)
+                        inMode(MODE_NO_OPERATOR_COMMA)
+                        || inMode(MODE_ASSERT_PY)
+                        || inMode(MODE_ARRAY_PY)
                         || inMode(MODE_DICTIONARY_PY)
                         || inMode(MODE_SET_PY)
                         || inMode(MODE_TUPLE_PY)
