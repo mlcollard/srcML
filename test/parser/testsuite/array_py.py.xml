@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.srcML.org/srcML/src" language="Python" url="array">
+
+<!-- 1 -->
+<unit language="Python">
+<expr_stmt><expr><array>[]</array></expr></expr_stmt>
+</unit>
+
+<!-- 2 -->
+<unit language="Python">
+<expr_stmt><expr><array>[<expr><literal type="number">1</literal></expr>]</array></expr></expr_stmt>
+</unit>
+
+<!-- 3 -->
+<unit language="Python">
+<expr_stmt><expr><array>[<expr><literal type="number">1</literal></expr>, <expr><literal type="number">2</literal></expr>]</array></expr></expr_stmt>
+</unit>
+
+<!-- 4 -->
+<unit language="Python">
+<expr_stmt><expr><array>[<expr><literal type="number">1</literal></expr>, <expr><literal type="number">2</literal></expr>, <expr><literal type="number">3</literal></expr>]</array></expr></expr_stmt>
+</unit>
+
+<!-- 5 -->
+<unit language="Python">
+<expr_stmt><expr><array>[<expr><literal type="number">1</literal></expr>,]</array></expr></expr_stmt>
+</unit>
+
+<!-- 6 -->
+<unit language="Python">
+<expr_stmt><expr><name>x</name> <operator>=</operator> <array>[<expr><literal type="number">1</literal></expr>]</array></expr></expr_stmt>
+</unit>
+
+<!-- 7 -->
+<unit language="Python">
+<expr_stmt><expr><array>[<expr><literal type="number">1</literal></expr>,<expr><literal type="string">"type"</literal></expr>,<expr><literal type="null">None</literal></expr>,<expr><name>exec</name></expr>]</array></expr></expr_stmt>
+</unit>
+
+<!-- 8 -->
+<unit language="Python">
+<expr_stmt><expr><array>[<expr><name>x</name></expr> <comprehension><for>for <control><name>x</name> <range>in <expr><call><name>range</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control></for></comprehension>]</array></expr></expr_stmt>
+</unit>
+
+<!-- 9 -->
+<unit language="Python">
+<expr_stmt><expr><array>[<expr><array>[]</array></expr>,<expr><array>[]</array></expr>]</array></expr></expr_stmt>
+</unit>
+
+<!-- 10 -->
+<unit language="Python">
+<expr_stmt><expr><array>[<expr><array>[<expr><literal type="number">1</literal></expr>,<expr><literal type="number">2</literal></expr>]</array></expr>,<expr><array>[<expr><literal type="number">3</literal></expr>,<expr><literal type="number">4</literal></expr>]</array></expr>,<expr><array>[<expr><literal type="number">5</literal></expr>,<expr><literal type="number">6</literal></expr>]</array></expr>]</array></expr></expr_stmt>
+</unit>
+
+<!-- 11 -->
+<unit language="Python">
+<expr_stmt><expr><array>[<expr><name>a</name></expr>, <expr><name>b</name></expr>, <expr><name>c</name></expr>]</array> <operator>=</operator> <array>[<expr><literal type="number">1</literal></expr>, <expr><literal type="number">2</literal></expr>, <expr><literal type="number">3</literal></expr>]</array></expr></expr_stmt>
+</unit>
+
+</unit>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.srcML.org/srcML/src" language="Python" url="argument">
+
+<!-- 1 -->
+<unit language="Python">
+<expr_stmt><expr><call><name>print</name><argument_list>()</argument_list></call></expr></expr_stmt>
+</unit>
+
+<!-- 2 -->
+<unit language="Python">
+<expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"Hello World"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
+</unit>
+
+<!-- 3 -->
+<unit language="Python">
+<expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"Hello"</literal></expr></argument>, <argument><expr><literal type="string">"World"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
+</unit>
+
+<!-- 4 -->
+<unit language="Python">
+<expr_stmt><expr><call><name>print</name><argument_list>(<argument><name>end</name>=<expr><literal type="string">"\t"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
+</unit>
+
+<!-- 5 -->
+<unit language="Python">
+<expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"Hello"</literal></expr></argument>, <argument><expr><literal type="string">"World"</literal></expr></argument>, <argument><name>sep</name>=<expr><literal type="string">"|"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
+</unit>
+
+</unit>

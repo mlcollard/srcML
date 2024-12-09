@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.srcML.org/srcML/src" language="Python" url="literal">
+
+<!-- 1 -->
+<unit language="Python">
+<expr_stmt><expr><literal type="number">1</literal></expr></expr_stmt>
+</unit>
+
+<!-- 2 -->
+<unit language="Python">
+<expr_stmt><expr><literal type="number">0</literal></expr></expr_stmt>
+</unit>
+
+<!-- 3 -->
+<unit language="Python">
+<expr_stmt><expr><operator>-</operator><literal type="number">1</literal></expr></expr_stmt>
+</unit>
+
+<!-- 4 -->
+<unit language="Python">
+<expr_stmt><expr><literal type="number">1.1</literal></expr></expr_stmt>
+</unit>
+
+<!-- 5 -->
+<unit language="Python">
+<expr_stmt><expr><literal type="number">.1</literal></expr></expr_stmt>
+</unit>
+
+<!-- 6 -->
+<unit language="Python">
+<expr_stmt><expr><literal type="number">1.</literal></expr></expr_stmt>
+</unit>
+
+<!-- 7 -->
+<unit language="Python">
+<expr_stmt><expr><literal type="number">0.0</literal></expr></expr_stmt>
+</unit>
+
+<!-- 8 -->
+<unit language="Python">
+<expr_stmt><expr><operator>-</operator><literal type="number">1.1</literal></expr></expr_stmt>
+</unit>
+
+<!-- 9 -->
+<unit language="Python">
+<expr_stmt><expr><operator>-</operator><literal type="number">.1</literal></expr></expr_stmt>
+</unit>
+
+<!-- 10 -->
+<unit language="Python">
+<expr_stmt><expr><operator>-</operator><literal type="number">1.</literal></expr></expr_stmt>
+</unit>
+
+<!-- 11 -->
+<unit language="Python">
+<expr_stmt><expr><literal type="number">6_000_000</literal></expr></expr_stmt>
+</unit>
+
+<!-- 12 -->
+<unit language="Python">
+<expr_stmt><expr><literal type="number">6_0_0_0</literal></expr></expr_stmt>
+</unit>
+
+<!-- 13 -->
+<unit language="Python">
+<expr_stmt><expr><literal type="string">"c"</literal></expr></expr_stmt>
+</unit>
+
+<!-- 14 -->
+<unit language="Python">
+<expr_stmt><expr><literal type="string">'c'</literal></expr></expr_stmt>
+</unit>
+
+<!-- 15 -->
+<unit language="Python">
+<expr_stmt><expr><literal type="string">"ch"</literal></expr></expr_stmt>
+</unit>
+
+<!-- 16 -->
+<unit language="Python">
+<expr_stmt><expr><literal type="string">'ch'</literal></expr></expr_stmt>
+</unit>
+
+<!-- 17 -->
+<unit language="Python">
+<expr_stmt><expr><literal type="string">r"\n"</literal></expr></expr_stmt>
+</unit>
+
+<!-- 18 -->
+<unit language="Python">
+<expr_stmt><expr><literal type="string">r'\n'</literal></expr></expr_stmt>
+</unit>
+
+<!-- 19 -->
+<unit language="Python">
+<expr_stmt><expr><literal type="string">f"{x}"</literal></expr></expr_stmt>
+</unit>
+
+<!-- 20 -->
+<unit language="Python">
+<expr_stmt><expr><literal type="string">f'{x}'</literal></expr></expr_stmt>
+</unit>
+
+<!-- 21 -->
+<unit language="Python">
+<expr_stmt><expr><literal type="string">u"4"</literal></expr></expr_stmt>
+</unit>
+
+<!-- 22 -->
+<unit language="Python">
+<expr_stmt><expr><literal type="string">u'4'</literal></expr></expr_stmt>
+</unit>
+
+<!-- 23 -->
+<unit language="Python">
+<expr_stmt><expr><literal type="string">"""
+multiline
+"""</literal></expr></expr_stmt>
+</unit>
+
+<!-- 24 -->
+<unit language="Python">
+<expr_stmt><expr><literal type="string">'''
+multiline
+'''</literal></expr></expr_stmt>
+</unit>
+
+<!-- 25 -->
+<unit language="Python">
+<expr_stmt><expr><literal type="string">"also\
+multiline\
+with no\
+newlines"</literal></expr></expr_stmt>
+</unit>
+
+<!-- 26 -->
+<unit language="Python">
+<expr_stmt><expr><literal type="string">'also\
+multiline\
+with no\
+newlines'</literal></expr></expr_stmt>
+</unit>
+
+<!-- 27 -->
+<unit language="Python">
+<expr_stmt><expr><literal type="string">b"a"</literal></expr></expr_stmt>
+</unit>
+
+<!-- 28 -->
+<unit language="Python">
+<expr_stmt><expr><literal type="string">b'a'</literal></expr></expr_stmt>
+</unit>
+
+<!-- 29 -->
+<unit language="Python">
+<expr_stmt><expr><literal type="complex">5j</literal></expr></expr_stmt>
+</unit>
+
+<!-- 30 -->
+<unit language="Python">
+<expr_stmt><expr><literal type="complex">0j</literal></expr></expr_stmt>
+</unit>
+
+<!-- 31 -->
+<unit language="Python">
+<expr_stmt><expr><operator>-</operator><literal type="complex">1j</literal></expr></expr_stmt>
+</unit>
+
+<!-- 32 -->
+<unit language="Python">
+<expr_stmt><expr><literal type="number">0b10101</literal></expr></expr_stmt>
+</unit>
+
+<!-- 33 -->
+<unit language="Python">
+<expr_stmt><expr><operator>-</operator><literal type="number">0b111</literal></expr></expr_stmt>
+</unit>
+
+<!-- 34 -->
+<unit language="Python">
+<expr_stmt><expr><literal type="number">0o350</literal></expr></expr_stmt>
+</unit>
+
+<!-- 35 -->
+<unit language="Python">
+<expr_stmt><expr><operator>-</operator><literal type="number">0o777</literal></expr></expr_stmt>
+</unit>
+
+<!-- 36 -->
+<unit language="Python">
+<expr_stmt><expr><operator>-</operator><literal type="number">0xA8</literal></expr></expr_stmt>
+</unit>
+
+<!-- 37 -->
+<unit language="Python">
+<expr_stmt><expr><literal type="number">0xFF</literal></expr></expr_stmt>
+</unit>
+
+<!-- 38 -->
+<unit language="Python">
+<expr_stmt><expr><literal type="number">2.556E4</literal></expr></expr_stmt>
+</unit>
+
+<!-- 39 -->
+<unit language="Python">
+<expr_stmt><expr><literal type="number">1.45E-3</literal></expr></expr_stmt>
+</unit>
+
+<!-- 40 -->
+<unit language="Python">
+<expr_stmt><expr><literal type="boolean">True</literal></expr></expr_stmt>
+</unit>
+
+<!-- 41 -->
+<unit language="Python">
+<expr_stmt><expr><literal type="boolean">False</literal></expr></expr_stmt>
+</unit>
+
+<!-- 42 -->
+<unit language="Python">
+<expr_stmt><expr><literal type="null">None</literal></expr></expr_stmt>
+</unit>
+
+<!-- 43 -->
+<unit language="Python">
+<expr_stmt><expr><literal type="ellipsis">...</literal></expr></expr_stmt>
+</unit>
+
+</unit>

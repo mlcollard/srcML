@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.srcML.org/srcML/src" language="Python" url="python_2">
+
+<!-- 1 -->
+<unit language="Python">
+<exec>exec <expr><literal type="string">"x = 4"</literal></expr></exec>
+</unit>
+
+<!-- 2 -->
+<unit language="Python">
+<print>print <expr><literal type="string">"Hello World"</literal></expr></print>
+</unit>
+
+<!-- 3 -->
+<unit language="Python">
+<try>try<block>:<block_content>
+    <expr_stmt><expr><literal type="number">1</literal><operator>/</operator><literal type="number">0</literal></expr></expr_stmt></block_content></block>
+<catch>except <alias><expr><name>ZeroDivisionError</name></expr>, <name>e</name></alias><block>:<block_content>
+    <print>print <expr><name>e</name></expr></print></block_content></block></catch></try>
+</unit>
+
+</unit>

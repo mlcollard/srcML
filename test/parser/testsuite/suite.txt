@@ -253,6 +253,51 @@ LANGUAGE_OO throw
 
 LANGUAGE_NOP comment_eof
 
+# Python
+LANGUAGE_PYTHON alias_py
+LANGUAGE_PYTHON annotation_py
+LANGUAGE_PYTHON argument_py
+LANGUAGE_PYTHON array_py
+LANGUAGE_PYTHON assert_py
+LANGUAGE_PYTHON attribute_py
+LANGUAGE_PYTHON block_py
+LANGUAGE_PYTHON break_py
+LANGUAGE_PYTHON call_py
+LANGUAGE_PYTHON case_py
+LANGUAGE_PYTHON catch_py
+LANGUAGE_PYTHON class_py
+LANGUAGE_PYTHON comment_py
+LANGUAGE_PYTHON comprehension_py
+LANGUAGE_PYTHON condition_py
+LANGUAGE_PYTHON continue_py
+LANGUAGE_PYTHON delete_py
+LANGUAGE_PYTHON dictionary_py
+LANGUAGE_PYTHON else_py
+LANGUAGE_PYTHON finally_py
+LANGUAGE_PYTHON for_py
+LANGUAGE_PYTHON function_py
+LANGUAGE_PYTHON global_py
+LANGUAGE_PYTHON if_py
+LANGUAGE_PYTHON import_py
+LANGUAGE_PYTHON lambda_py
+LANGUAGE_PYTHON literal_py
+LANGUAGE_PYTHON nonlocal_py
+LANGUAGE_PYTHON operator_py
+LANGUAGE_PYTHON parameter_py
+LANGUAGE_PYTHON pass_py
+LANGUAGE_PYTHON python_2_py
+LANGUAGE_PYTHON return_py
+LANGUAGE_PYTHON set_py
+LANGUAGE_PYTHON specifier_py
+LANGUAGE_PYTHON switch_py
+LANGUAGE_PYTHON ternary_py
+LANGUAGE_PYTHON throw_py
+LANGUAGE_PYTHON try_py
+LANGUAGE_PYTHON tuple_py
+LANGUAGE_PYTHON while_py
+LANGUAGE_PYTHON with_py
+LANGUAGE_PYTHON yield_py
+
 # class -> struct
 LANGUAGE_TRANSFORM struct.cpp.xml class.cpp.xml struct class2struct.xsl
 LANGUAGE_TRANSFORM struct_cpp.cpp.xml class_cpp.cpp.xml struct class2struct.xsl

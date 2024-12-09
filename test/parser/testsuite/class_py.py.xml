@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.srcML.org/srcML/src" language="Python" url="class">
+
+<!-- 1 -->
+<unit language="Python">
+<class>class <name>Car</name><block>:<block_content>
+    <pass>pass</pass>
+</block_content></block></class>
+</unit>
+
+<!-- 2 -->
+<unit language="Python">
+<class>class <name>Truck</name><block>:<block_content>
+    <function>def <name>__init__</name><parameter_list>(<parameter><name>self</name></parameter>)</parameter_list><block>:<block_content>
+        <pass>pass</pass>
+</block_content></block></function></block_content></block></class>
+</unit>
+
+<!-- 3 -->
+<unit language="Python">
+<class>class <name>Nothing</name><super_list>()</super_list><block>:<block_content>
+    <pass>pass</pass>
+</block_content></block></class>
+</unit>
+
+<!-- 4 -->
+<unit language="Python">
+<class>class <name>EV</name><super_list>(<super><expr><name>Car</name></expr></super>)</super_list><block>:<block_content>
+    <pass>pass</pass>
+</block_content></block></class>
+</unit>
+
+<!-- 5 -->
+<unit language="Python">
+<class>class <name>ETruck</name><super_list>(<super><expr><name>EV</name></expr></super>, <super><expr><name>Truck</name></expr></super>)</super_list><block>:<block_content>
+    <pass>pass</pass>
+</block_content></block></class>
+</unit>
+
+<!-- 6 -->
+<unit language="Python">
+<class><attribute>@<expr><name>unique</name></expr></attribute>
+class <name>License</name><block>:<block_content>
+    <pass>pass</pass>
+</block_content></block></class>
+</unit>
+
+<!-- 7 -->
+<unit language="Python">
+<class><attribute>@<expr><name>Operator</name></expr></attribute>
+<attribute>@<expr><call><name>GetType</name><argument_list>()</argument_list></call></expr></attribute>
+class <name>new_op</name><block>:<block_content>
+    <pass>pass</pass>
+</block_content></block></class>
+</unit>
+
+<!-- 8 -->
+<unit language="Python">
+<class><attribute>@<expr><name>unique</name></expr></attribute>
+<attribute>@<expr><call><name>GetType</name><argument_list>()</argument_list></call></expr></attribute>
+class <name>All</name><super_list>(<super><name>Nothing</name></super>,<super><name>new_op</name></super>,<super><expr><call><name>GetParent</name><argument_list>()</argument_list></call></expr></super>)</super_list><block>:<block_content>
+    <pass>pass</pass>
+</block_content></block></class>
+</unit>
+
+</unit>
+
+
+<unit language="Python">
+
+</unit>
