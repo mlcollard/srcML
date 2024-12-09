@@ -868,6 +868,16 @@ public:
         return true;
     }
 
+    void handleAttributes() {
+        // handle Python decorators
+        if (LA(1) == PY_ATSIGN) {
+            // handle multiple pre-keyword decorators in a row
+            while (LA(1) == PY_ATSIGN) {
+                attribute_py();
+            }
+        }
+    }
+
     void handleSpecifiers() {
         // handle JavaScript specifiers
         if (inLanguage(LANGUAGE_JAVASCRIPT)) {
@@ -886,16 +896,6 @@ public:
                 while (check_valid_specifier_py()) {
                     specifier_py();
                 }
-            }
-        }
-    }
-
-    void handleAttributes() {
-        // handle Python decorators
-        if (LA(1) == PY_ATSIGN) {
-            // handle multiple pre-keyword decorators in a row
-            while (LA(1) == PY_ATSIGN) {
-                attribute_py();
             }
         }
     }
@@ -17053,6 +17053,11 @@ attribute_py[] { ENTRY_DEBUG } :
                 endDownToMode(MODE_DECORATOR_PY);
                 endMode(MODE_DECORATOR_PY);
             }
+
+            // TERMINATE after a decorator does not indicate the end of a statement
+            // decorators occur before a function/class, so ignore the TERMINATE
+            if (LA(1) == TERMINATE)
+                consume();
         }
 ;
 
