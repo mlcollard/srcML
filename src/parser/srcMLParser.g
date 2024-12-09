@@ -8706,6 +8706,7 @@ compound_name_inner[bool index] { CompleteElement element(this); TokenPosition t
             { inLanguage(LANGUAGE_C) }?
             compound_name_c[iscompound] |
 
+            // JavaScript and Python use the same C++ logic for names
             {
                 inLanguage(LANGUAGE_CXX)
                 || inLanguage(LANGUAGE_JAVASCRIPT)
@@ -8751,7 +8752,7 @@ multops_star[] { ENTRY_DEBUG } :
 /*
   compound_name_cpp
 
-  Handles a compound name (C++).
+  Handles a compound name (C++, JavaScript, and Python).
 */
 compound_name_cpp[bool& iscompound] { namestack.fill(""); bool iscolon = false; ENTRY_DEBUG } :
         (options { greedy = true; } :
@@ -15658,8 +15659,8 @@ export_specifier[] { SingleElement element(this); ENTRY_DEBUG } :
 /*
   multops_as_name
 
-  Handles cases where "*" is a name in a JavaScript "export" or "import" statement.
-  Invokes compound name logic if the next token is an "alias."
+  Handles cases where "*" is a name in JavaScript import/export statements or Python import statements.
+  JavaScript: Invokes compound name logic if the next token is an "alias."
 */
 multops_as_name[] { SingleElement element(this); ENTRY_DEBUG } :
         {
@@ -16427,6 +16428,12 @@ from_import_py[] { ENTRY_DEBUG } :
         }
 
         PY_IMPORT
+
+        {
+            // special case; "*" will not be marked as a name otherwise
+            if (LA(1) == MULTOPS)
+                multops_as_name();
+        }
 ;
 
 /*
