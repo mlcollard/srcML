@@ -16253,10 +16253,6 @@ offside_dedent[] { ENTRY_DEBUG } :
             // flush any whitespace tokens since sections should end at the last possible place
             flushSkip();
 
-            if (isPaused()) {
-                nopStreamStart();
-            }
-
             // end any sections inside the mode
             endWhileMode(MODE_TOP_SECTION);
 
