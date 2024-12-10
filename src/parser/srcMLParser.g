@@ -16565,6 +16565,15 @@ list_comprehension_range_py[] { ENTRY_DEBUG } :
             { inMode(MODE_ARGUMENT) }?
             argument |
 
+            // do not accidentally consume the tuple ending RPAREN
+            {
+                (!inTransparentMode(MODE_TUPLE_PY) || last_consumed != RPAREN || LA(1) != RPAREN || next_token() == RPAREN)
+                && next_token() != TERMINATE
+            }?
+            {
+                if (!inMode(MODE_EXPRESSION))
+                    startNewMode(MODE_EXPRESSION | MODE_EXPECT);
+            }
             expression |
 
             comma
@@ -16593,6 +16602,11 @@ list_comprehension_if_py[] { ENTRY_DEBUG } :
         (options { greedy = true; } :
             start_list_comprehension_if_py |
 
+            // do not accidentally consume the tuple ending RPAREN
+            {
+                (!inTransparentMode(MODE_TUPLE_PY) || last_consumed != RPAREN || LA(1) != RPAREN || next_token() == RPAREN)
+                && next_token() != TERMINATE
+            }?
             {
                 if (!inMode(MODE_EXPRESSION))
                     startNewMode(MODE_EXPRESSION | MODE_EXPECT);
@@ -17422,6 +17436,8 @@ tuple_py[] { CompleteElement element(this); int inner_lparen = 0; ENTRY_DEBUG } 
             {
                 break;
             } |
+
+            list_comprehension_py |
 
             { inMode(MODE_ARGUMENT) }?
             argument |
