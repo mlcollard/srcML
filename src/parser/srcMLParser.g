@@ -9512,7 +9512,7 @@ call[int call_count = 1] { ENTRY_DEBUG } :
 */
 call_argument_list[] { ENTRY_DEBUG } :
         {
-            // list of parameters
+            // list of arguments
             replaceMode(MODE_ARGUMENT_LIST, MODE_EXPECT | MODE_LIST | MODE_INTERNAL_END_PAREN | MODE_END_ONLY_AT_RPAREN);
 
             // start the argument list
@@ -12826,6 +12826,16 @@ argument[] { ENTRY_DEBUG } :
 
             // start the argument
             startElement(SARGUMENT);
+
+            // python has named arguments
+            if (inLanguage(LANGUAGE_PYTHON) && LA(1) == NAME && next_token() == EQUAL) {
+                startNewMode(MODE_VARIABLE_NAME | MODE_EXPECT);
+
+                compound_name();
+                match(EQUAL);
+
+                startNewMode(MODE_EXPRESSION | MODE_EXPECT);
+            }
         }
 
         (options { greedy = true; } :
