@@ -49,6 +49,7 @@ tokens {
     COMPLEX_NUMBER;
     HASHBANG_COMMENT_START;
     HASHTAG_COMMENT_START;
+    DOCSTRING_COMMENT_START;
 }
 
 {
@@ -57,7 +58,7 @@ public:
     std::string delimiter;
 }
 
-STRING_START :
+STRING_START { bool isdocstring = false; } :
     { startline = false; }
 
     // double quoted string
@@ -66,8 +67,13 @@ STRING_START :
     // #define a "abc
     // note that the "abc does not end at the end of this line,
     // but the #define must end, so EOL is not a valid string character
-    '"' {
-        changetotextlexer(STRING_END); 
+    '"' ({ inLanguage(LANGUAGE_PYTHON) }? ('"' '"') { isdocstring = true; })? {
+        // """ starts a Python docstring
+        if (isdocstring) {
+            $setType(DOCSTRING_COMMENT_START); changetotextlexer(DOCSTRING_COMMENT_END);
+        }
+        else
+            changetotextlexer(STRING_END);
 
         atstring = false;
     }
@@ -97,11 +103,19 @@ RSTRING_DELIMITER:
     (options { greedy = true; } : { delimiter += static_cast<char>(LA(1)); } ~('(' | ')' | '\\' | '\n' | ' ' | '\t' ))*
 ;
 
-CHAR_START :
+CHAR_START { bool isdocstring = false; } :
     { startline = false; }
 
     // character literal or single quoted string
-    '\'' { $setType(CHAR_START); changetotextlexer(CHAR_END); }
+    '\'' ({ inLanguage(LANGUAGE_PYTHON) }? ('\'' '\'') { isdocstring = true; })? {
+        // ''' starts a Python docstring
+        if (isdocstring) {
+            $setType(DOCSTRING_COMMENT_START); changetotextlexer(DOCSTRING_COMMENT_END);
+        }
+        else {
+            $setType(CHAR_START); changetotextlexer(CHAR_END);
+        }
+    }
 ;
 
 BACKTICK_START :

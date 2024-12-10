@@ -66,6 +66,7 @@ tokens {
     DOXYGEN_COMMENT_END;
     HASHBANG_COMMENT_END;
     HASHTAG_COMMENT_END;
+    DOCSTRING_COMMENT_END;
 }
 
 {
@@ -85,6 +86,8 @@ std::string delimiter1;
 std::string delimiter;
 
 int dquote_count = 0;
+
+int squote_count = 0;
 
 OPTION_TYPE options;
 
@@ -180,6 +183,11 @@ COMMENT_TEXT {
         { dquote_count = 1; }
         (options { greedy = true; } : { prevLA != '\\' || noescape }? '\042' { ++dquote_count; })*
     {
+        if (dquote_count == 3 && (mode == DOCSTRING_COMMENT_END)) {
+            $setType(mode);
+            selector->pop();
+        }
+
         if ((noescape && (dquote_count % 2 == 1)) ||
             (!noescape && (prevLA != '\\') && (mode == STRING_END))) {
             $setType(mode);
@@ -191,7 +199,15 @@ COMMENT_TEXT {
 
     '&' |
 
-    '\047' /* '\'' */ {
+    '\047' /* '\'' */
+        { squote_count = 1; }
+        (options { greedy = true; } : { mode == DOCSTRING_COMMENT_END && (prevLA != '\\' || noescape) }? '\047' { ++squote_count; })*
+    {
+        if (squote_count == 3 && (mode == DOCSTRING_COMMENT_END)) {
+            $setType(mode);
+            selector->pop();
+        }
+
         if (prevLA != '\\' && mode == CHAR_END) {
             $setType(mode);
             selector->pop();

@@ -714,6 +714,7 @@ tokens {
     // Python
     SDELETE;
     SDICTIONARY;
+    SDOCSTRING_COMMENT;
     SELLIPSIS;
     SGLOBAL;
     SHASHTAG_COMMENT;
