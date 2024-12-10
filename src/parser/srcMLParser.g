@@ -3089,7 +3089,7 @@ call_check[int& postnametoken, int& argumenttoken, int& postcalltoken, bool& ise
         ]
 
         (
-            { isoption(parser_options, SRCML_PARSER_OPTION_CPP) }?
+            { isoption(parser_options, SRCML_PARSER_OPTION_CPP) || inLanguage(LANGUAGE_PYTHON) }?
             // check for proper form of argument list
             (call_check_paren_pair[argumenttoken] set_int[call_count, call_count + 1])*
             // record token after argument list to differentiate between call and macro
