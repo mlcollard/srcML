@@ -27,7 +27,9 @@ public:
 
     void generateMultipleDedents(antlr::RefToken token);
 
-    void checkGroupSymbol();
+    void checkGroupSymbol(antlr::RefToken token);
+
+    bool checkCommentToken(antlr::RefToken token);
 
     void setBlockStartToken(int token);
 

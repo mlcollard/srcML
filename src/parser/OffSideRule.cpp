@@ -26,17 +26,64 @@ antlr::RefToken OffSideRule::nextToken() {
 
         // Update the current indentation level at the start of each new line
         if (token->getColumn() == 1 && token->getType() != srcMLParser::EOL) {
-            prevColStart = currentColStart;
-            currentColStart = token->getColumn();
+            const auto& nextToken = input.nextToken();  // reads in a token
+            bool isBlankLine = (token->getType() == srcMLParser::WS && nextToken->getType() == srcMLParser::EOL);
 
-            if (token->getType() == srcMLParser::WS) {
-                currentColStart = token->getText().length() + 1;  // e.g., 4 spaces starting at column 1, text starting at column 5
+            // Do not update column start values if line only contains whitespace (e.g., a WS followed by an EOL token)
+            if (!isBlankLine) {
+                prevColStart = currentColStart;
+                currentColStart = token->getColumn();
+
+                if (token->getType() == srcMLParser::WS) {
+                    currentColStart = token->getText().length() + 1;  // e.g., 4 spaces starting at column 1, text starting at column 5
+                }
             }
+
+            // [INDENT] The token matches the token used to indicate the start of a block
+            // At the start of the line, if the next token is a colon, it starts a block (e.g., "try: " or "else: ")
+            if (nextToken->getType() == blockStartToken) {
+                nextToken->setType(srcMLParser::INDENT);
+                ++numIndents;
+
+                const auto& extraToken = input.nextToken();  // reads in a token
+                const auto& potentialEOLToken = input.nextToken();  // reads in a token
+
+                // Anything that is not EOL after the colon indicates a one-line statement
+                if ((extraToken->getType() != srcMLParser::EOL) || (extraToken->getType() == srcMLParser::WS && potentialEOLToken->getType() != srcMLParser::EOL))
+                    oneLineStatement = true;
+
+                if (!oneLineStatement)
+                    newIndent = true;
+
+                // potentialEOLToken could be the start of a new line (i.e., might require an indentation level update)
+                if (potentialEOLToken->getColumn() == 1 && potentialEOLToken->getType() != srcMLParser::EOL) {
+                    const auto& blankLineCheckToken = input.nextToken();  // reads in a token
+                    isBlankLine = (potentialEOLToken->getType() == srcMLParser::WS && blankLineCheckToken->getType() == srcMLParser::EOL);
+
+                    // Do not update column start values if line only contains whitespace (e.g., a WS followed by an EOL token)
+                    if (!isBlankLine) {
+                        prevColStart = currentColStart;
+                        currentColStart = potentialEOLToken->getColumn();
+
+                        if (potentialEOLToken->getType() == srcMLParser::WS) {
+                            currentColStart = potentialEOLToken->getText().length() + 1;  // e.g., 4 spaces starting at column 1, text starting at column 5
+                        }
+                    }
+
+                    buffer.emplace_back(blankLineCheckToken);
+                }
+
+                buffer.emplace_back(potentialEOLToken);
+                buffer.emplace_back(extraToken);
+            }
+
+            buffer.emplace_back(nextToken);
+            buffer.emplace_back(token);
         }
 
         // [INDENT] The token matches the token used to indicate the start of a block
         // Colons always start a block unless in a comment or in group tokens (e.g., `()`, `{}`, and `[]`).
-        if (token->getType() == blockStartToken && numParen == 0 && numBraces == 0 && numBrackets == 0) {
+        if (buffer.empty() && token->getType() == blockStartToken && numParen == 0 && numBraces == 0 && numBrackets == 0) {
             const auto& nextToken = input.nextToken();  // reads in a token
 
             switch (nextToken->getType()) {
@@ -139,23 +186,13 @@ antlr::RefToken OffSideRule::nextToken() {
     // There is at least one backlogged token
     if (!buffer.empty()) {
         // Detect if currently in/out of `()`, `{}`, or `[]`.
-        checkGroupSymbol();
+        checkGroupSymbol(buffer.back());
 
         // Place any unhandled blank lines in the buffer before ending the file
         if (buffer.back()->getType() == srcMLParser::EOF_ && !blankLineBuffer.empty()) {
             while (!blankLineBuffer.empty()) {
                 buffer.emplace_back(blankLineBuffer.back());
                 blankLineBuffer.pop_back();
-            }
-        }
-
-        // Update the current indentation level at the start of each new line
-        if (buffer.back()->getColumn() == 1 && buffer.back()->getType() != srcMLParser::EOL) {
-            prevColStart = currentColStart;
-            currentColStart = buffer.back()->getColumn();
-
-            if (buffer.back()->getType() == srcMLParser::WS) {
-                currentColStart = buffer.back()->getText().length() + 1;  // e.g., 4 spaces starting at column 1, text starting at column 5
             }
         }
     }
@@ -201,7 +238,13 @@ void OffSideRule::generateMultipleDedents(antlr::RefToken token) {
         }
 
         // The next line is a blank line, so look for the next non-blank-line token
-        else if (nextToken->getType() == srcMLParser::EOL && nextToken->getColumn() == 1) {
+        else if (nextToken->getType() == srcMLParser::EOL) {
+            blankLineBuffer.emplace_back(nextToken);
+            continue;
+        }
+
+        // The next token begins or ends a comment, so store it with the blank lines to preserve order
+        else if (checkCommentToken(nextToken)) {
             blankLineBuffer.emplace_back(nextToken);
             continue;
         }
@@ -260,8 +303,8 @@ void OffSideRule::generateMultipleDedents(antlr::RefToken token) {
  * Ensures certain colon (`:`) tokens do not start blocks in Python.
  * Examples including array slicing, dictionairies, and type annotations.
  */
-void OffSideRule::checkGroupSymbol() {
-    switch (buffer.back()->getType()) {
+void OffSideRule::checkGroupSymbol(antlr::RefToken token) {
+    switch (token->getType()) {
         case srcMLParser::LPAREN:
             ++numParen;
             break;
@@ -289,6 +332,31 @@ void OffSideRule::checkGroupSymbol() {
         default:
             break;
     }
+}
+
+/**
+ * Checks if `token` is a starting or ending comment token in Python.
+ * 
+ * Returns `true` if `token` is a comment token, `false` otherwise.
+ */
+bool OffSideRule::checkCommentToken(antlr::RefToken token) {
+    bool isComment = false;
+
+    switch (token->getType()) {
+        case srcMLParser::HASHTAG_COMMENT_START:
+        case srcMLParser::HASHTAG_COMMENT_END:
+        case srcMLParser::HASHBANG_COMMENT_START:
+        case srcMLParser::HASHBANG_COMMENT_END:
+        case srcMLParser::DOCSTRING_COMMENT_START:
+        case srcMLParser::DOCSTRING_COMMENT_END:
+            isComment = true;
+            break;
+
+        default:
+            break;
+    }
+
+    return isComment;
 }
 
 /**
