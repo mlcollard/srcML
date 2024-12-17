@@ -3,17 +3,20 @@
 
 <unit language="Python">
 <function>def <name>void</name><parameter_list>()</parameter_list><block>:<block_content>
-    <return>return</return></block_content></block></function>
+    <return>return</return>
+</block_content></block></function>
 </unit>
 
 <unit language="Python">
 <function>def <name>get_true</name><parameter_list>()</parameter_list><block>:<block_content>
-    <return>return <expr><literal type="boolean">True</literal></expr></return></block_content></block></function>
+    <return>return <expr><literal type="boolean">True</literal></expr></return>
+</block_content></block></function>
 </unit>
 
 <unit language="Python">
 <function>def <name>calc</name><parameter_list>(<parameter><name>x</name></parameter>,<parameter><name>y</name></parameter>)</parameter_list><block>:<block_content>
-    <return>return <expr><name>x</name> <operator>+</operator> <name>y</name></expr></return></block_content></block></function>
+    <return>return <expr><name>x</name> <operator>+</operator> <name>y</name></expr></return>
+</block_content></block></function>
 </unit>
 
 </unit>

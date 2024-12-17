@@ -1,22 +1,27 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <unit xmlns="http://www.srcML.org/srcML/src" language="Python" url="ternary">
 
+<!-- 1 -->
 <unit language="Python">
 <expr_stmt><expr><ternary><then><expr><name>a</name></expr></then> if <condition><expr><name>b</name></expr></condition> <else>else <expr><name>c</name></expr></else></ternary></expr></expr_stmt>
 </unit>
 
+<!-- 2 -->
 <unit language="Python">
 <expr_stmt><expr><ternary><then><expr><call><name>x</name><argument_list>()</argument_list></call></expr></then> if <condition><expr><name>a</name> <operator>%</operator> <literal type="number">2</literal> <operator>==</operator> <literal type="number">0</literal></expr></condition> <else>else <expr><call><name>y</name><argument_list>()</argument_list></call></expr></else></ternary></expr></expr_stmt>
 </unit>
 
+<!-- 3 -->
 <unit language="Python">
 <expr_stmt><expr><ternary><then><expr><literal type="number">1</literal></expr></then> if <condition><expr><operator>(</operator><ternary><then><expr><literal type="number">2</literal></expr></then> if <condition><expr><literal type="number">3</literal></expr></condition> <else>else <expr><literal type="number">4</literal></expr></else></ternary><operator>)</operator></expr></condition> <else>else <expr><literal type="number">5</literal></expr></else></ternary></expr></expr_stmt>
 </unit>
 
+<!-- 4 -->
 <unit language="Python">
 <expr_stmt><expr><name>value</name> <operator>=</operator> <ternary><then><expr><name>a</name></expr></then> if <condition><expr><name>b</name></expr></condition> <else>else <expr><name>c</name></expr></else></ternary></expr></expr_stmt>
 </unit>
 
+<!-- 5 -->
 <unit language="Python">
 <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><ternary><then><expr><literal type="string">"hello"</literal></expr></then> if <condition><expr><name>value</name></expr></condition> <else>else <expr><literal type="string">"goodbye"</literal></expr></else></ternary></expr></argument>)</argument_list></call></expr></expr_stmt>
 </unit>

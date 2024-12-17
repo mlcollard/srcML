@@ -1,27 +1,34 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <unit xmlns="http://www.srcML.org/srcML/src" language="Python" url="try">
 
+<!-- 1 -->
 <unit language="Python">
 <try>try<block>:<block_content>
     <expr_stmt><expr><literal type="number">1</literal><operator>/</operator><literal type="number">0</literal></expr></expr_stmt>
 </block_content></block><catch>except<block>:<block_content>
-    <pass>pass</pass></block_content></block></catch></try>
+    <pass>pass</pass>
+</block_content></block></catch></try>
 </unit>
 
+<!-- 2 -->
 <unit language="Python">
 <try>try<block>:<block_content>
     <expr_stmt><expr><literal type="number">1</literal><operator>/</operator><literal type="number">0</literal></expr></expr_stmt>
 </block_content></block><catch>except <expr><name>ZeroDivisionError</name></expr><block>:<block_content>
-    <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"Error"</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></catch></try>
+    <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"Error"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
+</block_content></block></catch></try>
 </unit>
 
+<!-- 3 -->
 <unit language="Python">
 <try>try<block>:<block_content>
     <expr_stmt><expr><literal type="number">1</literal><operator>/</operator><literal type="number">0</literal></expr></expr_stmt>
 </block_content></block><catch>except <expr><name><name>ZeroDivisionError</name> <alias>as <name>e</name></alias></name></expr><block>:<block_content>
-    <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><name>e</name></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></catch></try>
+    <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><name>e</name></expr></argument>)</argument_list></call></expr></expr_stmt>
+</block_content></block></catch></try>
 </unit>
 
+<!-- 4 -->
 <unit language="Python">
 <try>try<block>:<block_content>
     <expr_stmt><expr><literal type="number">1</literal><operator>/</operator><literal type="number">0</literal></expr></expr_stmt>
@@ -30,27 +37,33 @@
 </block_content></block></catch><catch>except <expr><name>NameError</name></expr><block>:<block_content>
     <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"Error"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
 </block_content></block></catch><catch>except<block>:<block_content>
-    <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"other"</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></catch></try>
+    <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"other"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
+</block_content></block></catch></try>
 </unit>
 
+<!-- 5 -->
 <unit language="Python">
 <try>try<block>:<block_content>
     <expr_stmt><expr><literal type="number">1</literal><operator>/</operator><literal type="number">0</literal></expr></expr_stmt>
 </block_content></block><catch>except* <expr><name><name>NameError</name> <alias>as <name>e</name></alias></name></expr><block>:<block_content>
     <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><name>e</name></expr></argument>)</argument_list></call></expr></expr_stmt>
 </block_content></block></catch><catch>except* <expr><name>ZeroDivisionError</name></expr><block>:<block_content>
-    <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"* error"</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></catch></try> 
+    <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"* error"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
+</block_content></block></catch></try> 
 </unit>
 
+<!-- 6 -->
 <unit language="Python">
 <try>try<block>:<block_content>
     <pass>pass</pass>
 </block_content></block><catch>except <expr><name>ZeroDivisionError</name></expr><block>:<block_content>
     <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">'error'</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
 </block_content></block></catch><else>else<block>:<block_content>
-    <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">'try_else'</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></else></try>
+    <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">'try_else'</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
+</block_content></block></else></try>
 </unit>
 
+<!-- 7 -->
 <unit language="Python">
 <try>try<block>:<block_content>
     <pass>pass</pass>
@@ -59,25 +72,31 @@
 </block_content></block></catch><catch>except<block>:<block_content>
     <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"other error"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
 </block_content></block></catch><else>else<block>:<block_content>
-    <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">'try_else'</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></else></try>
+    <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">'try_else'</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
+</block_content></block></else></try>
 </unit>
 
+<!-- 8 -->
 <unit language="Python">
 <try>try<block>:<block_content>
     <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"Valid"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
 </block_content></block><finally>finally<block>:<block_content>
-    <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">'finally'</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></finally></try>
+    <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">'finally'</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
+</block_content></block></finally></try>
 </unit>
 
+<!-- 9 -->
 <unit language="Python">
 <try>try<block>:<block_content>
     <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="number">1</literal><operator>/</operator><literal type="number">0</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
 </block_content></block><catch>except<block>:<block_content>
     <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"Error Caught"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
 </block_content></block></catch><finally>finally<block>:<block_content>
-    <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">'finally'</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></finally></try>
+    <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">'finally'</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
+</block_content></block></finally></try>
 </unit>
 
+<!-- 10 -->
 <unit language="Python">
 <try>try<block>:<block_content>
     <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"Try"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
@@ -86,9 +105,11 @@
 </block_content></block></catch><else>else<block>:<block_content>
     <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"Else"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
 </block_content></block></else><finally>finally<block>:<block_content>
-    <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"Finally"</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></finally></try>
+    <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"Finally"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
+</block_content></block></finally></try>
 </unit>
 
+<!-- 11 -->
 <unit language="Python">
 <try>try<block>:<block_content>
     <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"Try"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
@@ -101,28 +122,35 @@
 </block_content></block></catch><else>else<block>:<block_content>
     <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"Else"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
 </block_content></block></else><finally>finally<block>:<block_content>
-    <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"Finally"</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></finally></try>
+    <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"Finally"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
+</block_content></block></finally></try>
 </unit>
 
+<!-- 12 -->
 <unit language="Python">
 <try>try<block>:<block_content>
     <expr_stmt><expr><literal type="number">1</literal><operator>/</operator><literal type="number">0</literal></expr></expr_stmt>
 </block_content></block><catch>except <expr><tuple>(<expr><name>ValueError</name></expr>, <expr><name>ZeroDivisionError</name></expr>)</tuple></expr><block>:<block_content>
-    <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"Error"</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></catch></try>
+    <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"Error"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
+</block_content></block></catch></try>
 </unit>
 
+<!-- 13 -->
 <unit language="Python">
 <try>try<block>:<block_content>
     <expr_stmt><expr><literal type="number">1</literal><operator>/</operator><literal type="number">0</literal></expr></expr_stmt>
 </block_content></block><catch>except <expr><tuple>(<expr><name>ValueError</name></expr>, <expr><name>ZeroDivisionError</name></expr>)</tuple> <alias>as <name>e</name></alias></expr><block>:<block_content>
-    <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><name>e</name></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></catch></try>
+    <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><name>e</name></expr></argument>)</argument_list></call></expr></expr_stmt>
+</block_content></block></catch></try>
 </unit>
 
+<!-- 14 --> <!-- Python 2 Specific -->
 <unit language="Python">
 <try>try<block>:<block_content>
     <expr_stmt><expr><literal type="number">1</literal><operator>/</operator><literal type="number">0</literal></expr></expr_stmt>
 </block_content></block><catch>except <alias><expr><name>ZeroDivisionError</name></expr>, <name>e</name></alias><block>:<block_content>
-    <print>print <expr><name>e</name></expr></print></block_content></block></catch></try>
+    <print>print <expr><name>e</name></expr></print>
+</block_content></block></catch></try>
 </unit>
 
 </unit>

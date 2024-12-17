@@ -1,76 +1,104 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <unit xmlns="http://www.srcML.org/srcML/src" language="Python" url="with">
 
+<!-- 1 -->
 <unit language="Python">
 <with>with <expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call></expr><block>:<block_content>
-    <pass>pass</pass></block_content></block></with>
+    <pass>pass</pass>
+</block_content></block></with>
 </unit>
 
+<!-- 2 -->
 <unit language="Python">
 <with>with <expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test1.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call></expr><operator>,</operator> <expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test2.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call></expr><block>:<block_content>
-    <pass>pass</pass></block_content></block></with>
+    <pass>pass</pass>
+</block_content></block></with>
 </unit>
 
+<!-- 3 -->
 <unit language="Python">
 <with>with <expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call> <alias>as <name>file</name></alias></expr><block>:<block_content>
-    <expr_stmt><expr><call><name><name>file</name><operator>.</operator><name>write</name></name><argument_list>(<argument><expr><literal type="string">"Hello World"</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></with>
+    <expr_stmt><expr><call><name><name>file</name><operator>.</operator><name>write</name></name><argument_list>(<argument><expr><literal type="string">"Hello World"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
+</block_content></block></with>
 </unit>
 
+<!-- 4 -->
 <unit language="Python">
 <with>with <expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test1.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call> <alias>as <name>file1</name></alias></expr><operator>,</operator> <expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test2.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call> <alias>as <name>file2</name></alias></expr><block>:<block_content>
     <expr_stmt><expr><call><name><name>file1</name><operator>.</operator><name>write</name></name><argument_list>(<argument><expr><literal type="string">"Hello"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
-    <expr_stmt><expr><call><name><name>file2</name><operator>.</operator><name>write</name></name><argument_list>(<argument><expr><literal type="string">"World"</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></with>
+    <expr_stmt><expr><call><name><name>file2</name><operator>.</operator><name>write</name></name><argument_list>(<argument><expr><literal type="string">"World"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
+</block_content></block></with>
 </unit>
 
+<!-- 5 -->
 <unit language="Python">
 <with>with <expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test1.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call> <alias>as <name>file1</name></alias></expr><operator>,</operator> <expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test2.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call></expr><block>:<block_content>
-    <expr_stmt><expr><call><name><name>file1</name><operator>.</operator><name>write</name></name><argument_list>(<argument><expr><literal type="string">"Hello"</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></with>
+    <expr_stmt><expr><call><name><name>file1</name><operator>.</operator><name>write</name></name><argument_list>(<argument><expr><literal type="string">"Hello"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
+</block_content></block></with>
 </unit>
 
+<!-- 6 -->
 <unit language="Python">
 <with>with <expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test1.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call></expr><operator>,</operator> <expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test2.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call> <alias>as <name>file2</name></alias></expr><block>:<block_content>
-    <expr_stmt><expr><call><name><name>file2</name><operator>.</operator><name>write</name></name><argument_list>(<argument><expr><literal type="string">"World"</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></with>
+    <expr_stmt><expr><call><name><name>file2</name><operator>.</operator><name>write</name></name><argument_list>(<argument><expr><literal type="string">"World"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
+</block_content></block></with>
 </unit>
 
+<!-- 7 -->
 <unit language="Python">
 <with>with <operator>(</operator><expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call></expr><operator>)</operator><block>:<block_content>
-    <pass>pass</pass></block_content></block></with>
+    <pass>pass</pass>
+</block_content></block></with>
 </unit>
 
+<!-- 8 -->
 <unit language="Python">
 <with>with <operator>(</operator><expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test1.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call></expr><operator>,</operator> <expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test2.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call></expr><operator>)</operator><block>:<block_content>
-    <pass>pass</pass></block_content></block></with>
+    <pass>pass</pass>
+</block_content></block></with>
 </unit>
 
+<!-- 9 -->
 <unit language="Python">
 <with>with <operator>(</operator><expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call> <alias>as <name>file</name></alias><operator>)</operator></expr><block>:<block_content>
-    <expr_stmt><expr><call><name><name>file</name><operator>.</operator><name>write</name></name><argument_list>(<argument><expr><literal type="string">"Hello World"</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></with>
+    <expr_stmt><expr><call><name><name>file</name><operator>.</operator><name>write</name></name><argument_list>(<argument><expr><literal type="string">"Hello World"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
+</block_content></block></with>
 </unit>
 
+<!-- 10 -->
 <unit language="Python">
 <with>with <operator>(</operator><expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test1.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call> <alias>as <name>file1</name></alias></expr><operator>,</operator> <expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test2.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call> <alias>as <name>file2</name></alias><operator>)</operator></expr><block>:<block_content>
     <expr_stmt><expr><call><name><name>file1</name><operator>.</operator><name>write</name></name><argument_list>(<argument><expr><literal type="string">"Hello"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
-    <expr_stmt><expr><call><name><name>file2</name><operator>.</operator><name>write</name></name><argument_list>(<argument><expr><literal type="string">"World"</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></with>
+    <expr_stmt><expr><call><name><name>file2</name><operator>.</operator><name>write</name></name><argument_list>(<argument><expr><literal type="string">"World"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
+</block_content></block></with>
 </unit>
 
+<!-- 11 -->
 <unit language="Python">
 <with>with <operator>(</operator><expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test1.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call> <alias>as <name>file1</name></alias></expr><operator>,</operator> <expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test2.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call><operator>)</operator></expr><block>:<block_content>
-    <expr_stmt><expr><call><name><name>file1</name><operator>.</operator><name>write</name></name><argument_list>(<argument><expr><literal type="string">"Hello"</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></with>
+    <expr_stmt><expr><call><name><name>file1</name><operator>.</operator><name>write</name></name><argument_list>(<argument><expr><literal type="string">"Hello"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
+</block_content></block></with>
 </unit>
 
+<!-- 12 -->
 <unit language="Python">
 <with>with <operator>(</operator><expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test1.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call></expr><operator>,</operator> <expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test2.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call> <alias>as <name>file2</name></alias><operator>)</operator></expr><block>:<block_content>
-    <expr_stmt><expr><call><name><name>file2</name><operator>.</operator><name>write</name></name><argument_list>(<argument><expr><literal type="string">"World"</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></with>
+    <expr_stmt><expr><call><name><name>file2</name><operator>.</operator><name>write</name></name><argument_list>(<argument><expr><literal type="string">"World"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
+</block_content></block></with>
 </unit>
 
+<!-- 13 -->
 <unit language="Python">
 <with><specifier>async</specifier> with <expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call></expr><block>:<block_content>
-    <pass>pass</pass></block_content></block></with>
+    <pass>pass</pass>
+</block_content></block></with>
 </unit>
 
+<!-- 14 -->
 <unit language="Python">
 <with><specifier>async</specifier> with <expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call> <alias>as <name>file</name></alias></expr><block>:<block_content>
-    <expr_stmt><expr><call><name><name>file</name><operator>.</operator><name>write</name></name><argument_list>(<argument><expr><literal type="string">"Hello World"</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></with>
+    <expr_stmt><expr><call><name><name>file</name><operator>.</operator><name>write</name></name><argument_list>(<argument><expr><literal type="string">"Hello World"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
+</block_content></block></with>
 </unit>
 
 </unit>

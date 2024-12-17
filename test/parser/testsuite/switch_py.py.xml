@@ -1,20 +1,25 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <unit xmlns="http://www.srcML.org/srcML/src" language="Python" url="switch">
 
+<!-- 1 -->
 <unit language="Python">
-<switch>match <condition><expr>x</expr></condition><block>:<block_content>
+<switch>match <condition><expr><name>x</name></expr></condition><block>:<block_content>
     <case>case <expr><literal type="number">1</literal></expr><block>:<block_content>
-        <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><name>x</name></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></case></block_content></block></switch>
+        <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><name>x</name></expr></argument>)</argument_list></call></expr></expr_stmt>
+</block_content></block></case></block_content></block></switch>
 </unit>
 
+<!-- 2 -->
 <unit language="Python">
 <switch>match <condition><expr><call><name>input</name><argument_list>()</argument_list></call></expr></condition><block>:<block_content>
     <case>case <expr><literal type="string">"/hi"</literal></expr><block>:<block_content>
         <expr_stmt><expr><call><name>call_hi</name><argument_list>()</argument_list></call></expr></expr_stmt>
 </block_content></block></case>    <case>case <expr><literal type="string">"/bye"</literal></expr><block>:<block_content>
-        <expr_stmt><expr><call><name>exit</name><argument_list>()</argument_list></call></expr></expr_stmt></block_content></block></case></block_content></block></switch>
+        <expr_stmt><expr><call><name>exit</name><argument_list>()</argument_list></call></expr></expr_stmt>
+</block_content></block></case></block_content></block></switch>
 </unit>
 
+<!-- 3 -->
 <unit language="Python">
 <switch>match <condition><expr><call><name>input</name><argument_list>()</argument_list></call><operator>.</operator><call><name>split</name><argument_list>()</argument_list></call></expr></condition><block>:<block_content>
     <case>case <expr><array>[<expr><literal type="string">'./'</literal></expr>]</array></expr><block>:<block_content>
@@ -24,7 +29,8 @@
 </block_content></block></case>    <case>case <expr><array>[<expr><literal type="string">'move'</literal></expr>]</array></expr> if <condition><expr><name>auth</name></expr></condition><block>:<block_content>
         <expr_stmt><expr><call><name>move</name><argument_list>()</argument_list></call></expr></expr_stmt>
 </block_content></block></case>    <case>case <expr><name>_</name></expr><block>:<block_content>
-        <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"Incorrect"</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></case></block_content></block></switch>
+        <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"Incorrect"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
+</block_content></block></case></block_content></block></switch>
 </unit>
 
 </unit>
