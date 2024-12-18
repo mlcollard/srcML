@@ -163,9 +163,7 @@ token_set(srcMLParser, whitespace_token_set,
     srcMLParser::HASHBANG_COMMENT_START,
     srcMLParser::HASHBANG_COMMENT_END,
     srcMLParser::HASHTAG_COMMENT_START,
-    srcMLParser::HASHTAG_COMMENT_END,
-    srcMLParser::DOCSTRING_COMMENT_START,
-    srcMLParser::DOCSTRING_COMMENT_END
+    srcMLParser::HASHTAG_COMMENT_END
 )
 
 token_set(srcMLParser, duplex_keyword_set,

@@ -468,38 +468,6 @@ private:
 
                 break;
 
-            case srcMLParser::DOCSTRING_COMMENT_START:
-
-                pushSSkipToken(srcMLParser::SDOCSTRING_COMMENT);
-                pushSkipToken();
-                srcMLParser::consume();
-
-                open_comments.push(srcMLParser::SDOCSTRING_COMMENT);
-
-                break;
-
-            case srcMLParser::DOCSTRING_COMMENT_END:
-
-                open_comments.pop();
-
-                if (srcMLParser::LT(1)->getText().back() != '\n') {
-                    pushSkipToken();
-                    srcMLParser::consume();
-                    pushESkipToken(srcMLParser::SDOCSTRING_COMMENT);
-                } else {
-                    pushESkipToken(srcMLParser::SDOCSTRING_COMMENT);
-                    pushSkipToken();
-                    srcMLParser::consume();
-                }
-
-                // null out any inserted terminate after a comment
-                if (srcMLParser::LT(1)->getType() == srcMLParser::TERMINATE &&
-                    srcMLParser::LT(1)->getText() == "") {
-                    srcMLParser::LT(1)->setType(srcMLParser::SNOP);
-                }
-
-                break;
-
             default:
                 // skipped tokens are put on a special buffer
                 pushSkipToken();

@@ -49,7 +49,6 @@ tokens {
     COMPLEX_NUMBER;
     HASHBANG_COMMENT_START;
     HASHTAG_COMMENT_START;
-    DOCSTRING_COMMENT_START;
 }
 
 {
@@ -58,7 +57,7 @@ public:
     std::string delimiter;
 }
 
-STRING_START { bool isdocstring = false; } :
+STRING_START :
     { startline = false; }
 
     // double quoted string
@@ -67,11 +66,10 @@ STRING_START { bool isdocstring = false; } :
     // #define a "abc
     // note that the "abc does not end at the end of this line,
     // but the #define must end, so EOL is not a valid string character
-    '"' ({ inLanguage(LANGUAGE_PYTHON) }? ('"' '"') { isdocstring = true; })? {
-        // """ starts a Python docstring
-        if (isdocstring) {
-            $setType(DOCSTRING_COMMENT_START); changetotextlexer(DOCSTRING_COMMENT_END);
-        }
+    '"' {
+        // handle a potential triple-quoted string in Python
+        if (inLanguage(LANGUAGE_PYTHON) && LA(1) == '"')
+            changetotextlexer(PY_STRING_START);
         else
             changetotextlexer(STRING_END);
 
@@ -103,15 +101,14 @@ RSTRING_DELIMITER:
     (options { greedy = true; } : { delimiter += static_cast<char>(LA(1)); } ~('(' | ')' | '\\' | '\n' | ' ' | '\t' ))*
 ;
 
-CHAR_START { bool isdocstring = false; } :
+CHAR_START :
     { startline = false; }
 
     // character literal or single quoted string
-    '\'' ({ inLanguage(LANGUAGE_PYTHON) }? ('\'' '\'') { isdocstring = true; })? {
-        // ''' starts a Python docstring
-        if (isdocstring) {
-            $setType(DOCSTRING_COMMENT_START); changetotextlexer(DOCSTRING_COMMENT_END);
-        }
+    '\'' {
+        // handle a potential triple-quoted string in Python
+        if (inLanguage(LANGUAGE_PYTHON) && LA(1) == '\'')
+            changetotextlexer(PY_STRING_START);
         else {
             $setType(CHAR_START); changetotextlexer(CHAR_END);
         }
@@ -163,7 +160,11 @@ NAME options { testLiterals = true; } :
         { inLanguage(LANGUAGE_CXX) && (text == "R"sv || text == "u8R"sv || text == "LR"sv || text == "UR"sv || text == "uR"sv) }?
         { $setType(STRING_START); } RAW_STRING_START |
 
-        { inLanguage(LANGUAGE_PYTHON) && (text == "b"sv || text == "f"sv || text == "r"sv || text == "u"sv) }?
+        {
+            inLanguage(LANGUAGE_PYTHON)
+            && (text == "b"sv || text == "f"sv || text == "r"sv || text == "u"sv
+            || text == "B"sv || text == "F"sv || text == "R"sv || text == "U"sv)
+        }?
         (
             { LA(1) == '"' }?
             { $setType(STRING_START); } STRING_START |

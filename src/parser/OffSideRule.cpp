@@ -347,8 +347,6 @@ bool OffSideRule::checkCommentToken(antlr::RefToken token) {
         case srcMLParser::HASHTAG_COMMENT_END:
         case srcMLParser::HASHBANG_COMMENT_START:
         case srcMLParser::HASHBANG_COMMENT_END:
-        case srcMLParser::DOCSTRING_COMMENT_START:
-        case srcMLParser::DOCSTRING_COMMENT_END:
             isComment = true;
             break;
 

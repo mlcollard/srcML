@@ -66,7 +66,7 @@ tokens {
     DOXYGEN_COMMENT_END;
     HASHBANG_COMMENT_END;
     HASHTAG_COMMENT_END;
-    DOCSTRING_COMMENT_END;
+    PY_STRING_START;
 }
 
 {
@@ -81,13 +81,22 @@ bool onpreprocline;
 // ignore character escapes
 bool noescape;
 
+// two or more single-quotes or double-quotes next to each other in Python
+bool ismultiplequotes = false;
+
 std::string delimiter1;
 
 std::string delimiter;
 
 int dquote_count = 0;
 
+// separate double-quote counter to account for different behavior with Python strings
+int dquote_count_py = 0;
+
 int squote_count = 0;
+
+// separate single-quote counter to account for different behavior with Python strings
+int squote_count_py = 0;
 
 OPTION_TYPE options;
 
@@ -181,17 +190,49 @@ COMMENT_TEXT {
 
     '\042' /* '\"' */
         { dquote_count = 1; }
-        (options { greedy = true; } : { prevLA != '\\' || noescape }? '\042' { ++dquote_count; })*
-    {
-        if (dquote_count == 3 && (mode == DOCSTRING_COMMENT_END)) {
-            $setType(mode);
-            selector->pop();
-        }
+        (options { greedy = true; } :
+            { prevLA != '\\' || noescape }?
+            '\042'
+            {
+                ++dquote_count;
 
-        if ((noescape && (dquote_count % 2 == 1)) ||
-            (!noescape && (prevLA != '\\') && (mode == STRING_END))) {
-            $setType(mode);
-            selector->pop();
+                // 5 double quotes (+ 1 initial double quote) is an empty triple-quoted Python string
+                if (mode == PY_STRING_START && dquote_count == 5)
+                    break;
+            }
+        )*
+    {
+        switch (mode) {
+            case PY_STRING_START: {
+                dquote_count_py = dquote_count + 1;
+                mode = STRING_END;
+                ismultiplequotes = true;
+
+                // special case for empty strings (e.g., "" and """""", """""""""""", etc.)
+                if (dquote_count_py == 2 || dquote_count_py % 6 == 0) {
+                    dquote_count_py = 0;
+                    ismultiplequotes = false;
+                    $setType(mode);
+                    selector->pop();
+                }
+                break;
+            }
+
+            default: {
+                if (!ismultiplequotes && ((noescape && (dquote_count % 2 == 1)) ||
+                    (!noescape && (prevLA != '\\') && (mode == STRING_END)))) {
+                    $setType(mode);
+                    selector->pop();
+                }
+
+                if (ismultiplequotes && (dquote_count_py == dquote_count)) {
+                    dquote_count_py = 0;
+                    ismultiplequotes = false;
+                    $setType(mode);
+                    selector->pop();
+                }
+                break;
+            }
         }
     } |
 
@@ -201,16 +242,48 @@ COMMENT_TEXT {
 
     '\047' /* '\'' */
         { squote_count = 1; }
-        (options { greedy = true; } : { mode == DOCSTRING_COMMENT_END && (prevLA != '\\' || noescape) }? '\047' { ++squote_count; })*
-    {
-        if (squote_count == 3 && (mode == DOCSTRING_COMMENT_END)) {
-            $setType(mode);
-            selector->pop();
-        }
+        (options { greedy = true; } :
+            { (mode == PY_STRING_START || ismultiplequotes) && (prevLA != '\\' || noescape) }?
+            '\047'
+            {
+                ++squote_count;
 
-        if (prevLA != '\\' && mode == CHAR_END) {
-            $setType(mode);
-            selector->pop();
+                // 5 single quotes (+ 1 initial single quote) is an empty triple-quoted Python string
+                if (mode == PY_STRING_START && squote_count == 5)
+                    break;
+            }
+        )*
+    {
+        switch (mode) {
+            case PY_STRING_START: {
+                squote_count_py = squote_count + 1;
+                mode = CHAR_END;
+                ismultiplequotes = true;
+
+                // special case for empty strings (e.g., '' and '''''', '''''''''''', etc.)
+                if (squote_count_py == 2 || squote_count_py % 6 == 0) {
+                    squote_count_py = 0;
+                    ismultiplequotes = false;
+                    $setType(mode);
+                    selector->pop();
+                }
+                break;
+            }
+
+            default: {
+                if (!ismultiplequotes && (prevLA != '\\' && mode == CHAR_END)) {
+                    $setType(mode);
+                    selector->pop();
+                }
+
+                if (ismultiplequotes && (squote_count_py == squote_count)) {
+                    squote_count_py = 0;
+                    ismultiplequotes = false;
+                    $setType(mode);
+                    selector->pop();
+                }
+                break;
+            }
         }
     } |
 
