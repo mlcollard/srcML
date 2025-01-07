@@ -25,9 +25,11 @@ public:
 
     antlr::RefToken nextToken();
 
-    void generateMultipleDedents(antlr::RefToken token);
+    void handleBlocks(antlr::RefToken token);
 
-    void checkGroupSymbol(antlr::RefToken token);
+    void arrangeBlockEnds();
+
+    void checkBracketToken(antlr::RefToken token);
 
     bool checkCommentToken(antlr::RefToken token);
 
@@ -37,18 +39,23 @@ public:
 
 private:
     antlr::TokenStream& input;
+
     std::deque<antlr::RefToken> buffer;
-    std::deque<antlr::RefToken> blankLineBuffer;
+    std::deque<antlr::RefToken> indentBuffer;
+    std::deque<antlr::RefToken> tempBuffer;
+    std::deque<int> bracketBuffer;
+
+    antlr::RefToken tempPostWSToken = srcMLToken::factory();
+    antlr::RefToken tokenAfterIndent = srcMLToken::factory();
 
     int blockStartToken = -1;
-    int prevColStart = 1;
-    int currentColStart = 1;
     int numIndents = 0;
-    int numParen = 0, numBraces = 0, numBrackets = 0;
+    int numBrackets = 0;  // encompasses (), {}, and []
+    int numSpacesPerIndent = -1;
 
-    bool skippedColSet = false;
-    bool newIndent = false;
-    bool oneLineStatement = false;
+    bool isOneLineStatement = false;
+    bool checkOneLineStatement = false;
+    bool recordToken = false;
 };
 
 #endif

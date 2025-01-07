@@ -49,6 +49,7 @@ tokens {
     COMPLEX_NUMBER;
     HASHBANG_COMMENT_START;
     HASHTAG_COMMENT_START;
+    WS_EOL;
 }
 
 {
@@ -233,7 +234,26 @@ WS : (
 
     // horizontal tab
     '\t'
-)+ ;
+)+
+
+(
+    { inLanguage(LANGUAGE_PYTHON) && LA(1) == '\n' }?
+    '\n'
+    {
+        $setType(WS_EOL);
+        onpreprocline = false;
+        startline = true;
+        newline();
+
+        if (isoption(options, SRCML_OPTION_LINE))
+            setLine(getLine() + (1 << 16));
+        if (isline && line_number > -1)
+            setLine((int)(line_number << 16 | (getLine() & 0xFFFF)));
+
+        isline = false;
+        line_number = -1;
+    }
+)? ;
 
 // end of line
 EOL : '\n' { 
