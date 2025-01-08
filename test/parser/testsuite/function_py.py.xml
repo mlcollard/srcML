@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <unit xmlns="http://www.srcML.org/srcML/src" language="Python" url="function">
 
-<unit language="Python">
+<unit revision="1.1.0" language="Python">
 <function>def <name>do_nothing</name><parameter_list>()</parameter_list><block>:<block_content>
     <pass>pass</pass>
 </block_content></block></function>
 </unit>
 
-<unit language="Python">
+<unit revision="1.1.0" language="Python">
 <function><attribute>@<expr><name>do_nothing</name></expr></attribute>
 def <name>func</name><parameter_list>()</parameter_list><block>:<block_content>
     <pass>pass</pass>
 </block_content></block></function>
 </unit>
 
-<unit language="Python">
+<unit revision="1.1.0" language="Python">
 <function><attribute>@<expr><name>print</name></expr></attribute>
 <attribute>@<expr><name>exec</name></expr></attribute>
 def <name>func</name><parameter_list>()</parameter_list><block>:<block_content>
@@ -22,29 +22,38 @@ def <name>func</name><parameter_list>()</parameter_list><block>:<block_content>
 </block_content></block></function>
 </unit>
 
-<unit language="Python">
+<unit revision="1.1.0" language="Python">
 <function><specifier>async</specifier> def <name>async_loop</name><parameter_list>()</parameter_list><block>:<block_content>
     <expr_stmt><expr><operator>await</operator> <call><name>start_loop</name><argument_list>()</argument_list></call></expr></expr_stmt>
 </block_content></block></function>
 </unit>
 
-<unit language="Python">
+<unit revision="1.1.0" language="Python">
 <function>def <name>printf</name><parameter_list>(<parameter><name>x</name></parameter>)</parameter_list><block>:<block_content>
     <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">f"{x}"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
 </block_content></block></function>
 </unit>
 
-<unit language="Python">
+<unit revision="1.1.0" language="Python">
 <function>def <name>get_time_str</name><parameter_list>()</parameter_list> <annotation>-&gt; <expr><name>str</name></expr></annotation><block>:<block_content>
     <return>return <expr><call><name>str</name><argument_list>(<argument><expr><call><name><name>time</name><operator>.</operator><name>time</name></name><argument_list>()</argument_list></call></expr></argument>)</argument_list></call></expr></return>
 </block_content></block></function>
 </unit>
 
-<unit language="Python">
+<unit revision="1.1.0" language="Python">
 <function><attribute>@<expr><name>print</name></expr></attribute>
 <specifier>async</specifier> def <name>async_printf</name><parameter_list>(<parameter><name>content</name></parameter>, <parameter>format_str</parameter>)</parameter_list> <annotation>-&gt; <expr><literal type="null">None</literal></expr></annotation><block>:<block_content>
     <expr_stmt><expr><operator>await</operator> <call><name>print</name><argument_list>(<argument><expr><call><name><name>format_str</name><operator>.</operator><name>format</name></name><argument_list>(<argument><expr><name>content</name></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr></expr_stmt>
 </block_content></block></function>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<function>def <name>foo</name><parameter_list>()</parameter_list><block>:<block_content> <return>return <expr><literal type="string">"foo"</literal></expr></return></block_content></block></function>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<function>def <name>bar</name><parameter_list>()</parameter_list><block>:<block_content> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="number">1</literal></expr></argument>,
+                 <argument><expr><literal type="number">2</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></function>
 </unit>
 
 </unit>

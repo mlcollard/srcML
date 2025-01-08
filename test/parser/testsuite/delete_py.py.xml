@@ -1,10 +1,10 @@
 <unit xmlns="http://www.srcML.org/srcML/src" language="Python" url="delete">
 
-<unit language="Python">
+<unit revision="1.1.0" language="Python">
 <delete>del <name>x</name></delete>
 </unit>
 
-<unit language="Python">
+<unit revision="1.1.0" language="Python">
 <delete>del <name>x</name>, <name>y</name></delete>
 </unit>
 

@@ -1,63 +1,63 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <unit xmlns="http://www.srcML.org/srcML/src" language="Python" url="comprehension">
 
-<unit language="Python">
+<unit revision="1.1.0" language="Python">
 <expr_stmt><expr><operator>(</operator><comprehension><expr><name>x</name></expr> <for>for <control><name>x</name> <range>in <expr><call><name>range</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control></for></comprehension><operator>)</operator></expr></expr_stmt>
 </unit>
 
-<unit language="Python">
+<unit revision="1.1.0" language="Python">
 <expr_stmt><expr><operator>(</operator><comprehension><expr><name>x</name></expr> <for><specifier>async</specifier> for <control><name>x</name> <range>in <expr><call><name>async_range</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control></for></comprehension><operator>)</operator></expr></expr_stmt>
 </unit>
 
-<unit language="Python">
+<unit revision="1.1.0" language="Python">
 <expr_stmt><expr><array>[<expr><name>x</name></expr> <comprehension><for>for <control><name>x</name> <range>in <expr><call><name>range</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control></for></comprehension>]</array></expr></expr_stmt>
 </unit>
 
-<unit language="Python">
+<unit revision="1.1.0" language="Python">
 <expr_stmt><expr><array>[<expr><name>x</name></expr> <comprehension><for><specifier>async</specifier> for <control><name>x</name> <range>in <expr><call><name>async_range</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control></for></comprehension>]</array></expr></expr_stmt>
 </unit>
 
-<unit language="Python">
+<unit revision="1.1.0" language="Python">
 <expr_stmt><expr><set>{<expr><name>x</name></expr> <comprehension><for>for <control><name>x</name> <range>in <expr><call><name>range</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control></for></comprehension>}</set></expr></expr_stmt>
 </unit>
 
-<unit language="Python">
+<unit revision="1.1.0" language="Python">
 <expr_stmt><expr><set>{<expr><name>x</name></expr> <comprehension><for><specifier>async</specifier> for <control><name>x</name> <range>in <expr><call><name>async_range</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control></for></comprehension>}</set></expr></expr_stmt>
 </unit>
 
-<unit language="Python">
+<unit revision="1.1.0" language="Python">
 <expr_stmt><expr><dictionary>{<expr><name>x</name></expr>:<expr><name>x</name><operator>+</operator><literal type="number">1</literal></expr> <comprehension><for>for <control><name>x</name> <range>in <expr><call><name>range</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control></for></comprehension>}</dictionary></expr></expr_stmt>
 </unit>
 
-<unit language="Python">
+<unit revision="1.1.0" language="Python">
 <expr_stmt><expr><dictionary>{<expr><name>x</name></expr>:<expr><name>x</name><operator>+</operator><literal type="number">1</literal></expr> <comprehension><for><specifier>async</specifier> for <control><name>x</name> <range>in <expr><call><name>async_range</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control></for></comprehension>}</dictionary></expr></expr_stmt>
 </unit>
 
-<unit language="Python">
+<unit revision="1.1.0" language="Python">
 <expr_stmt><expr><name>x</name> <operator>=</operator> <array>[<expr><name>x</name></expr> <comprehension><for>for <control><name>x</name> <range>in <expr><call><name>range</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control></for></comprehension>]</array></expr></expr_stmt>
 </unit>
 
-<unit language="Python">
+<unit revision="1.1.0" language="Python">
 <expr_stmt><expr><array>[<expr><name>val</name> <operator>*</operator> <literal type="number">2</literal></expr> <comprehension><for>for <control><name>val</name> <range>in <expr><name>array</name></expr></range></control></for></comprehension>]</array></expr></expr_stmt>
 </unit>
 
-<unit language="Python">
+<unit revision="1.1.0" language="Python">
 <expr_stmt><expr><array>[<expr><call><name><name>val</name><operator>.</operator><name>example</name></name><argument_list>(<argument><expr><name>a</name></expr></argument>, <argument><expr><name>b</name></expr></argument>)</argument_list></call> <operator>*</operator> <literal type="number">2</literal></expr> <comprehension><for>for <control><name>a</name>,<name>b</name> <range>in <expr><name>array</name></expr></range></control></for></comprehension>]</array></expr></expr_stmt>
 </unit>
 
-<unit language="Python">
+<unit revision="1.1.0" language="Python">
 <expr_stmt><expr><array>[<expr><name>user</name> <operator>+</operator> <literal type="string">' '</literal> <operator>+</operator> <name>status</name></expr> <comprehension><for>for <control><name>user</name>, <name>status</name> <range>in <expr><call><name><name>users</name><operator>.</operator><name>items</name></name><argument_list>()</argument_list></call></expr></range></control></for></comprehension>]</array></expr></expr_stmt>
 </unit>
 
-<unit language="Python">
+<unit revision="1.1.0" language="Python">
 <expr_stmt><expr><array>[<expr><name>val</name></expr> <comprehension><for>for <control><name>val</name> <range>in <expr><name>a</name></expr></range></control></for> <if>if <condition><expr><name>val</name> <operator>%</operator> <literal type="number">2</literal> <operator>==</operator> <literal type="number">0</literal></expr></condition></if></comprehension>]</array></expr></expr_stmt>
 </unit>
 
-<unit language="Python">
+<unit revision="1.1.0" language="Python">
 <expr_stmt><expr><array>[<expr><name>val</name></expr> <comprehension><for>for <control><name>val</name> <range>in <expr><name>a</name></expr></range></control></for> <if>if <condition><expr><name>val</name> <operator>%</operator> <literal type="number">2</literal> <operator>==</operator> <literal type="number">0</literal></expr></condition></if> <if>if <condition><expr><name>val</name> <operator>%</operator> <literal type="number">3</literal> <operator>==</operator> <literal type="number">0</literal></expr></condition></if></comprehension>]</array></expr></expr_stmt>
 </unit>
 
-<unit language="Python">
+<unit revision="1.1.0" language="Python">
 <expr_stmt><expr><array>[<expr><name>x</name></expr> <comprehension><for>for <control><name>x</name> <range>in <expr><array>[<expr><name>a</name></expr> <comprehension><for>for <control><name>a</name> <range>in <expr><call><name>range</name><argument_list>(<argument><expr><literal type="number">100</literal></expr></argument>)</argument_list></call></expr></range></control></for> <if>if <condition><expr><name>a</name> <operator>&lt;</operator> <literal type="number">50</literal></expr></condition></if></comprehension>]</array></expr></range></control></for> <if>if <condition><expr><name>x</name> <operator>%</operator> <literal type="number">2</literal> <operator>==</operator> <literal type="number">0</literal></expr></condition></if></comprehension>]</array></expr></expr_stmt>
 </unit>
 
