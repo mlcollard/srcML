@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <unit xmlns="http://www.srcML.org/srcML/src" language="Python" url="switch">
 
-<!-- 1 -->
 <unit language="Python">
 <switch>match <condition><expr><name>x</name></expr></condition><block>:<block_content>
     <case>case <expr><literal type="number">1</literal></expr><block>:<block_content>
@@ -9,7 +8,6 @@
 </block_content></block></case></block_content></block></switch>
 </unit>
 
-<!-- 2 -->
 <unit language="Python">
 <switch>match <condition><expr><call><name>input</name><argument_list>()</argument_list></call></expr></condition><block>:<block_content>
     <case>case <expr><literal type="string">"/hi"</literal></expr><block>:<block_content>
@@ -19,7 +17,6 @@
 </block_content></block></case></block_content></block></switch>
 </unit>
 
-<!-- 3 -->
 <unit language="Python">
 <switch>match <condition><expr><call><name>input</name><argument_list>()</argument_list></call><operator>.</operator><call><name>split</name><argument_list>()</argument_list></call></expr></condition><block>:<block_content>
     <case>case <expr><array>[<expr><literal type="string">'./'</literal></expr>]</array></expr><block>:<block_content>

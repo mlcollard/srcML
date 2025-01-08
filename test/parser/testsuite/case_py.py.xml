@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <unit xmlns="http://www.srcML.org/srcML/src" language="Python" url="case">
 
-<!-- 1 -->
 <unit language="Python">
 <switch>match <condition><expr><name>x</name></expr></condition><block>:<block_content>
     <case>case <expr><literal type="number">3</literal></expr><block>:<block_content>
@@ -9,7 +8,6 @@
 </block_content></block></case></block_content></block></switch>
 </unit>
 
-<!-- 2 -->
 <unit language="Python">
 <switch>match <condition><expr><name>word</name></expr></condition><block>:<block_content>
     <case>case <expr><literal type="string">"one"</literal></expr><block>:<block_content>
@@ -21,7 +19,6 @@
 </block_content></block></case></block_content></block></switch>
 </unit>
 
-<!-- 3 -->
 <unit language="Python">
 <switch>match <condition><expr><name>truth</name></expr></condition><block>:<block_content>
     <case>case <expr><literal type="boolean">True</literal></expr><block>:<block_content>

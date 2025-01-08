@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <unit xmlns="http://www.srcML.org/srcML/src" language="Python" url="lambda">
 
-<!-- 1 -->
 <unit language="Python">
 <expr_stmt><expr><lambda>lambda <parameter><name>string</name></parameter> <block>:<block_content> <expr><call><name>print</name><argument_list>(<argument><expr><name>string</name></expr></argument>)</argument_list></call></expr></block_content></block></lambda></expr></expr_stmt>
 </unit>
 
-<!-- 2 -->
 <unit language="Python">
 <expr_stmt><expr><lambda>lambda <parameter><name>x</name></parameter>, <parameter><name>y</name></parameter> <block>:<block_content> <expr><name>x</name> <operator>+</operator> <name>y</name></expr></block_content></block></lambda></expr></expr_stmt>
 </unit>
 
-<!-- 3 -->
 <unit language="Python">
 <expr_stmt><expr><lambda>lambda <parameter><name>value</name> <init>= <expr><literal type="null">None</literal></expr></init></parameter> <block>:<block_content> <expr><call><name>str</name><argument_list>(<argument><expr><name>value</name></expr></argument>)</argument_list></call></expr></block_content></block></lambda></expr></expr_stmt>
 </unit>
 
-<!-- 4 -->
 <unit language="Python">
 <expr_stmt><expr><name>simple_print</name> <operator>=</operator> <lambda>lambda <parameter><name>x</name></parameter> <block>:<block_content> <expr><call><name>print</name><argument_list>(<argument><expr><name>x</name></expr></argument>)</argument_list></call></expr></block_content></block></lambda></expr></expr_stmt>
+</unit>
+
+<unit language="Python">
+<expr_stmt><expr><call><name>func</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>, <argument><expr><lambda>lambda <parameter><name>a</name></parameter> <block>:<block_content> <expr><call><name>print</name><argument_list>(<argument><expr><name>a</name> <operator>**</operator> <literal type="number">2</literal></expr></argument>)</argument_list></call></expr></block_content></block></lambda></expr></argument>)</argument_list></call></expr></expr_stmt>
 </unit>
 
 </unit>

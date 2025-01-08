@@ -1,275 +1,222 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <unit xmlns="http://www.srcML.org/srcML/src" language="Python" url="operator">
 
-<!-- 1 -->
 <unit language="Python">
 <expr_stmt><expr><name>x</name> <operator>+</operator> <name>y</name></expr></expr_stmt>
 </unit>
 
-<!-- 2 -->
 <unit language="Python">
 <expr_stmt><expr><name>x</name> <operator>-</operator> <name>y</name></expr></expr_stmt>
 </unit>
 
-<!-- 3 -->
 <unit language="Python">
 <expr_stmt><expr><name>x</name> <operator>*</operator> <name>y</name></expr></expr_stmt>
 </unit>
 
-<!-- 4 -->
 <unit language="Python">
 <expr_stmt><expr><name>x</name> <operator>/</operator> <name>y</name></expr></expr_stmt>
 </unit>
 
-<!-- 5 -->
 <unit language="Python">
 <expr_stmt><expr><name>x</name> <operator>%</operator> <name>y</name></expr></expr_stmt>
 </unit>
 
-<!-- 6 -->
 <unit language="Python">
 <expr_stmt><expr><name>x</name> <operator>**</operator> <name>y</name></expr></expr_stmt>
 </unit>
 
-<!-- 7 -->
 <unit language="Python">
 <expr_stmt><expr><name>x</name> <operator>//</operator> <name>y</name></expr></expr_stmt>
 </unit>
 
-<!-- 8 -->
 <unit language="Python">
 <expr_stmt><expr><name>x</name> <operator>@</operator> <name>y</name></expr></expr_stmt>
 </unit>
 
-<!-- 9 -->
 <unit language="Python">
 <expr_stmt><expr><operator>+</operator><name>num</name></expr></expr_stmt>
 </unit>
 
-<!-- 10 -->
 <unit language="Python">
 <expr_stmt><expr><operator>-</operator><name>num</name></expr></expr_stmt>
 </unit>
 
-<!-- 11 -->
 <unit language="Python">
 <expr_stmt><expr><name>x</name> <operator>&amp;</operator> <name>y</name></expr></expr_stmt>
 </unit>
 
-<!-- 12 -->
 <unit language="Python">
 <expr_stmt><expr><name>x</name> <operator>|</operator> <name>y</name></expr></expr_stmt>
 </unit>
 
-<!-- 13 -->
 <unit language="Python">
 <expr_stmt><expr><name>x</name> <operator>^</operator> <name>y</name></expr></expr_stmt>
 </unit>
 
-<!-- 14 -->
 <unit language="Python">
 <expr_stmt><expr><operator>~</operator><name>value</name></expr></expr_stmt>
 </unit>
 
-<!-- 15 -->
 <unit language="Python">
 <expr_stmt><expr><name>x</name> <operator>&lt;&lt;</operator> <name>y</name></expr></expr_stmt>
 </unit>
 
-<!-- 16 -->
 <unit language="Python">
 <expr_stmt><expr><name>x</name> <operator>&gt;&gt;</operator> <name>y</name></expr></expr_stmt>
 </unit>
 
-<!-- 17 -->
 <unit language="Python">
 <expr_stmt><expr><name>x</name> <operator>==</operator> <name>y</name></expr></expr_stmt>
 </unit>
 
-<!-- 18 -->
 <unit language="Python">
 <expr_stmt><expr><name>x</name> <operator>!=</operator> <name>y</name></expr></expr_stmt>
 </unit>
 
-<!-- 19 -->
 <unit language="Python">
 <expr_stmt><expr><name>x</name> <operator>&gt;</operator> <name>y</name></expr></expr_stmt>
 </unit>
 
-<!-- 20 -->
 <unit language="Python">
 <expr_stmt><expr><name>x</name> <operator>&lt;</operator> <name>y</name></expr></expr_stmt>
 </unit>
 
-<!-- 21 -->
 <unit language="Python">
 <expr_stmt><expr><name>x</name> <operator>&gt;=</operator> <name>y</name></expr></expr_stmt>
 </unit>
 
-<!-- 22 -->
 <unit language="Python">
 <expr_stmt><expr><name>x</name> <operator>&lt;=</operator> <name>y</name></expr></expr_stmt>
 </unit>
 
-<!-- 23 -->
 <unit language="Python">
 <expr_stmt><expr><name>x</name> <operator>=</operator> <name>y</name></expr></expr_stmt>
 </unit>
 
-<!-- 24 -->
 <unit language="Python">
 <expr_stmt><expr><operator>(</operator><name>x</name> <operator>:=</operator> <name>y</name><operator>)</operator></expr></expr_stmt>
 </unit>
 
-<!-- 25 -->
 <unit language="Python">
 <expr_stmt><expr><name>x</name> <operator>+=</operator> <name>y</name></expr></expr_stmt>
 </unit>
 
-<!-- 26 -->
 <unit language="Python">
 <expr_stmt><expr><name>x</name> <operator>-=</operator> <name>y</name></expr></expr_stmt>
 </unit>
 
-<!-- 27 -->
 <unit language="Python">
 <expr_stmt><expr><name>x</name> <operator>*=</operator> <name>y</name></expr></expr_stmt>
 </unit>
 
-<!-- 28 -->
 <unit language="Python">
 <expr_stmt><expr><name>x</name> <operator>/=</operator> <name>y</name></expr></expr_stmt>
 </unit>
 
-<!-- 29 -->
 <unit language="Python">
 <expr_stmt><expr><name>x</name> <operator>%=</operator> <name>y</name></expr></expr_stmt>
 </unit>
 
-<!-- 30 -->
 <unit language="Python">
 <expr_stmt><expr><name>x</name> <operator>**=</operator> <name>y</name></expr></expr_stmt>
 </unit>
 
-<!-- 31 -->
 <unit language="Python">
 <expr_stmt><expr><name>x</name> <operator>//=</operator> <name>y</name></expr></expr_stmt>
 </unit>
 
-<!-- 32 -->
 <unit language="Python">
 <expr_stmt><expr><name>x</name> <operator>@=</operator> <name>y</name></expr></expr_stmt>
 </unit>
 
-<!-- 33 -->
 <unit language="Python">
 <expr_stmt><expr><name>x</name> <operator>&amp;=</operator> <name>y</name></expr></expr_stmt>
 </unit>
 
-<!-- 34 -->
 <unit language="Python">
 <expr_stmt><expr><name>x</name> <operator>|=</operator> <name>y</name></expr></expr_stmt>
 </unit>
 
-<!-- 35 -->
 <unit language="Python">
 <expr_stmt><expr><name>x</name> <operator>^=</operator> <name>y</name></expr></expr_stmt>
 </unit>
 
-<!-- 36 -->
 <unit language="Python">
 <expr_stmt><expr><name>x</name> <operator>&lt;&lt;=</operator> <name>y</name></expr></expr_stmt>
 </unit>
 
-<!-- 37 -->
 <unit language="Python">
 <expr_stmt><expr><name>x</name> <operator>&gt;&gt;=</operator> <name>y</name></expr></expr_stmt>
 </unit>
 
-<!-- 38 -->
 <unit language="Python">
 <expr_stmt><expr><name><name>x</name><operator>.</operator><name>y</name></name></expr></expr_stmt>
 </unit>
 
-<!-- 39 -->
 <unit language="Python">
 <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><operator>*</operator><name>args</name></expr></argument>)</argument_list></call></expr></expr_stmt>
 </unit>
 
-<!-- 40 -->
 <unit language="Python">
 <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><operator>**</operator><name>kwargs</name></expr></argument>)</argument_list></call></expr></expr_stmt>
 </unit>
 
-<!-- 41 -->
 <unit language="Python">
 <expr_stmt><expr><name><name>array</name><index>[<expr><name>x</name><operator>:</operator><name>y</name></expr>]</index></name></expr></expr_stmt>
 </unit>
 
-<!-- 42 -->
 <unit language="Python">
 <expr_stmt><expr><name><name>array</name><index>[<expr><operator>:</operator><name>y</name></expr>]</index></name></expr></expr_stmt>
 </unit>
 
-<!-- 43 -->
 <unit language="Python">
 <expr_stmt><expr><name><name>array</name><index>[<expr><name>x</name><operator>:</operator></expr>]</index></name></expr></expr_stmt>
 </unit>
 
-<!-- 44 -->
 <unit language="Python">
 <expr_stmt><expr><name><name>array</name><index>[<expr><operator>:</operator></expr>]</index></name></expr></expr_stmt>
 </unit>
 
-<!-- 45 -->
 <unit language="Python">
 <expr_stmt><expr><name>x</name> <operator>and</operator> <name>y</name></expr></expr_stmt>
 </unit>
 
-<!-- 46 -->
 <unit language="Python">
 <expr_stmt><expr><name>x</name> <operator>or</operator> <name>y</name></expr></expr_stmt>
 </unit>
 
-<!-- 47 -->
 <unit language="Python">
 <expr_stmt><expr><operator>not</operator> <name>value</name></expr></expr_stmt>
 </unit>
 
-<!-- 48 -->
 <unit language="Python">
 <expr_stmt><expr><name>x</name> <operator>is</operator> <name>y</name></expr></expr_stmt>
 </unit>
 
-<!-- 49 -->
 <unit language="Python">
 <expr_stmt><expr><name>x</name> <operator>is not</operator> <name>y</name></expr></expr_stmt>
 </unit>
 
-<!-- 50 -->
 <unit language="Python">
 <expr_stmt><expr><name>x</name> <operator>in</operator> <name>y</name></expr></expr_stmt>
 </unit>
 
-<!-- 51 -->
 <unit language="Python">
 <expr_stmt><expr><name>x</name> <operator>not in</operator> <name>y</name></expr></expr_stmt>
 </unit>
 
-<!-- 52 -->
 <unit language="Python">
 <expr_stmt><expr><operator>await</operator> <name>x</name></expr></expr_stmt>
 </unit>
 
-<!-- 53 -->
 <unit language="Python">
 <expr_stmt><expr><operator>await</operator> <call><name>async_print</name><argument_list>()</argument_list></call></expr></expr_stmt>
 </unit>
 
-<!-- 54 -->
 <unit language="Python">
 <if_stmt><if>if <condition><expr><name>x</name> <operator>:=</operator> <literal type="number">10</literal></expr></condition><block>:<block_content>
     <pass>pass</pass>
 </block_content></block></if></if_stmt>
 </unit>
+
 </unit>

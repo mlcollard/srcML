@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <unit xmlns="http://www.srcML.org/srcML/src" language="Python" url="try">
 
-<!-- 1 -->
 <unit language="Python">
 <try>try<block>:<block_content>
     <expr_stmt><expr><literal type="number">1</literal><operator>/</operator><literal type="number">0</literal></expr></expr_stmt>
@@ -10,7 +9,6 @@
 </block_content></block></catch></try>
 </unit>
 
-<!-- 2 -->
 <unit language="Python">
 <try>try<block>:<block_content>
     <expr_stmt><expr><literal type="number">1</literal><operator>/</operator><literal type="number">0</literal></expr></expr_stmt>
@@ -19,7 +17,6 @@
 </block_content></block></catch></try>
 </unit>
 
-<!-- 3 -->
 <unit language="Python">
 <try>try<block>:<block_content>
     <expr_stmt><expr><literal type="number">1</literal><operator>/</operator><literal type="number">0</literal></expr></expr_stmt>
@@ -28,7 +25,6 @@
 </block_content></block></catch></try>
 </unit>
 
-<!-- 4 -->
 <unit language="Python">
 <try>try<block>:<block_content>
     <expr_stmt><expr><literal type="number">1</literal><operator>/</operator><literal type="number">0</literal></expr></expr_stmt>
@@ -41,7 +37,6 @@
 </block_content></block></catch></try>
 </unit>
 
-<!-- 5 -->
 <unit language="Python">
 <try>try<block>:<block_content>
     <expr_stmt><expr><literal type="number">1</literal><operator>/</operator><literal type="number">0</literal></expr></expr_stmt>
@@ -52,7 +47,6 @@
 </block_content></block></catch></try> 
 </unit>
 
-<!-- 6 -->
 <unit language="Python">
 <try>try<block>:<block_content>
     <pass>pass</pass>
@@ -63,7 +57,6 @@
 </block_content></block></else></try>
 </unit>
 
-<!-- 7 -->
 <unit language="Python">
 <try>try<block>:<block_content>
     <pass>pass</pass>
@@ -76,7 +69,6 @@
 </block_content></block></else></try>
 </unit>
 
-<!-- 8 -->
 <unit language="Python">
 <try>try<block>:<block_content>
     <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"Valid"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
@@ -85,7 +77,6 @@
 </block_content></block></finally></try>
 </unit>
 
-<!-- 9 -->
 <unit language="Python">
 <try>try<block>:<block_content>
     <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="number">1</literal><operator>/</operator><literal type="number">0</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
@@ -96,7 +87,6 @@
 </block_content></block></finally></try>
 </unit>
 
-<!-- 10 -->
 <unit language="Python">
 <try>try<block>:<block_content>
     <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"Try"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
@@ -109,7 +99,6 @@
 </block_content></block></finally></try>
 </unit>
 
-<!-- 11 -->
 <unit language="Python">
 <try>try<block>:<block_content>
     <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"Try"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
@@ -126,7 +115,6 @@
 </block_content></block></finally></try>
 </unit>
 
-<!-- 12 -->
 <unit language="Python">
 <try>try<block>:<block_content>
     <expr_stmt><expr><literal type="number">1</literal><operator>/</operator><literal type="number">0</literal></expr></expr_stmt>
@@ -135,7 +123,6 @@
 </block_content></block></catch></try>
 </unit>
 
-<!-- 13 -->
 <unit language="Python">
 <try>try<block>:<block_content>
     <expr_stmt><expr><literal type="number">1</literal><operator>/</operator><literal type="number">0</literal></expr></expr_stmt>
@@ -144,7 +131,6 @@
 </block_content></block></catch></try>
 </unit>
 
-<!-- 14 --> <!-- Python 2 Specific -->
 <unit language="Python">
 <try>try<block>:<block_content>
     <expr_stmt><expr><literal type="number">1</literal><operator>/</operator><literal type="number">0</literal></expr></expr_stmt>

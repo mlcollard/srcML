@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <unit xmlns="http://www.srcML.org/srcML/src" language="Python" url="global">
 
-<!-- 1 -->
 <unit language="Python">
 <global>global <name>var</name></global>
 </unit>
 
-<!-- 1 -->
 <unit language="Python">
 <function>def <name>myfunc</name><parameter_list>()</parameter_list><block>:<block_content>
     <global>global <name>x</name></global>

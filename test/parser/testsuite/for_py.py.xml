@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <unit xmlns="http://www.srcML.org/srcML/src" language="Python" url="for">
 
-<!-- 1 -->
 <unit language="Python">
 <for>for <control><name>x</name> <range>in <expr><call><name>range</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
     <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><name>x</name></expr></argument>)</argument_list></call></expr></expr_stmt>
 </block_content></block></for>
 </unit>
 
-<!-- 2 -->
 <unit language="Python">
 <for>for <control><name>x</name> <range>in <expr><call><name>range</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
     <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><name>x</name><operator>**</operator><literal type="number">2</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
@@ -17,14 +15,12 @@
 </block_content></block></else></for>
 </unit>
 
-<!-- 3 -->
 <unit language="Python">
 <for><specifier>async</specifier> for <control><name>x</name> <range>in <expr><call><name>range</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
     <expr_stmt><expr><operator>await</operator> <call><name>do_thing</name><argument_list>(<argument><expr><name>x</name></expr></argument>)</argument_list></call></expr></expr_stmt>
 </block_content></block></for>
 </unit>
 
-<!-- 4 -->
 <unit language="Python">
 <for><specifier>async</specifier> for <control><name>x</name> <range>in <expr><call><name>range</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
     <expr_stmt><expr><operator>await</operator> <call><name>do_thing</name><argument_list>(<argument><expr><name>x</name></expr></argument>)</argument_list></call></expr></expr_stmt>

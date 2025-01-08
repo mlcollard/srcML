@@ -69,4 +69,8 @@
 <expr_stmt><expr><array>[<expr><name>a</name></expr>, <expr><name>b</name></expr>, <expr><name>c</name></expr>]</array> <operator>=</operator> <array>[<expr><literal type="number">1</literal></expr>, <expr><literal type="number">2</literal></expr>, <expr><literal type="number">3</literal></expr>]</array></expr></expr_stmt>
 </unit>
 
+<unit language="Python">
+<expr_stmt><expr><name>empty</name> <operator>=</operator> <operator>(</operator><array>[]</array><operator>)</operator></expr></expr_stmt>
+</unit>
+
 </unit>

@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <unit xmlns="http://www.srcML.org/srcML/src" language="Python" url="if">
 
-<!-- 1 -->
 <unit language="Python">
 <if_stmt><if>if <condition><expr><name>x</name> <operator>&lt;</operator> <literal type="number">10</literal></expr></condition><block>:<block_content>
     <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><name>x</name></expr></argument>)</argument_list></call></expr></expr_stmt>
 </block_content></block></if></if_stmt>
 </unit>
 
-<!-- 2 -->
 <unit language="Python">
 <if_stmt><if>if <condition><expr><name>x</name> <operator>&gt;</operator> <literal type="number">10</literal></expr></condition><block>:<block_content>
     <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"Large"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
@@ -17,7 +15,6 @@
 </block_content></block></else></if_stmt>
 </unit>
 
-<!-- 3 -->
 <unit language="Python">
 <if_stmt><if>if <condition><expr><name>x</name> <operator>&gt;</operator> <literal type="number">10</literal></expr></condition><block>:<block_content>
     <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"Large"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
@@ -26,7 +23,6 @@
 </block_content></block></if></if_stmt>
 </unit>
 
-<!-- 4 -->
 <unit language="Python">
 <if_stmt><if>if <condition><expr><name>x</name> <operator>&gt;</operator> <literal type="number">10</literal></expr></condition><block>:<block_content>
     <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"Large"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
@@ -37,7 +33,6 @@
 </block_content></block></else></if_stmt>
 </unit>
 
-<!-- 5 -->
 <unit language="Python">
 <if_stmt><if>if <condition><expr><operator>not</operator> <call><name>int_check</name><argument_list>(<argument><expr><name>value</name></expr></argument>)</argument_list></call></expr></condition><block>:<block_content>
     <if_stmt><if>if <condition><expr><call><name>str_check</name><argument_list>(<argument><expr><name>value</name></expr></argument>)</argument_list></call></expr></condition><block>:<block_content>

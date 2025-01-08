@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <unit xmlns="http://www.srcML.org/srcML/src" language="Python" url="catch">
 
-<!-- 1 -->
 <unit language="Python">
 <try>try<block>:<block_content>
     <expr_stmt><expr><literal type="number">1</literal><operator>/</operator><literal type="number">0</literal></expr></expr_stmt>
@@ -10,7 +9,6 @@
 </block_content></block></catch></try>
 </unit>
 
-<!-- 2 -->
 <unit language="Python">
 <try>try<block>:<block_content>
     <expr_stmt><expr><literal type="number">1</literal><operator>/</operator><literal type="number">0</literal></expr></expr_stmt>
@@ -19,7 +17,6 @@
 </block_content></block></catch></try>
 </unit>
 
-<!-- 3 -->
 <unit language="Python">
 <try>try<block>:<block_content>
     <expr_stmt><expr><literal type="number">1</literal><operator>/</operator><literal type="number">0</literal></expr></expr_stmt>
@@ -28,7 +25,6 @@
 </block_content></block></catch></try>
 </unit>
 
-<!-- 4 -->
 <unit language="Python">
 <try>try<block>:<block_content>
     <expr_stmt><expr><literal type="number">1</literal><operator>/</operator><literal type="number">0</literal></expr></expr_stmt>
@@ -41,7 +37,6 @@
 </block_content></block></catch></try>
 </unit>
 
-<!-- 5 -->
 <unit language="Python">
 <try>try<block>:<block_content>
     <expr_stmt><expr><literal type="number">1</literal><operator>/</operator><literal type="number">0</literal></expr></expr_stmt>
