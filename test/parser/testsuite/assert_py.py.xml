@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.srcML.org/srcML/src" language="Python" url="assert">
+
+<unit revision="1.1.0" language="Python">
+<assert>assert <condition><expr><literal type="boolean">True</literal></expr></condition></assert>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<assert>assert <condition><expr><literal type="number">1</literal> <operator>+</operator> <literal type="number">1</literal> <operator>==</operator> <literal type="number">2</literal></expr></condition></assert>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<assert>assert <condition><expr><operator>not</operator> <literal type="boolean">False</literal></expr></condition></assert>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<assert>assert <condition><expr><literal type="boolean">False</literal></expr></condition>, <expr><literal type="string">"Fail Message"</literal></expr></assert>
+</unit>
+
+</unit>
