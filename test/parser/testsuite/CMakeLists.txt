@@ -120,6 +120,19 @@ foreach(GEN IN ITEMS ${SUITE})
         list(APPEND TESTFILES "${URL}.cpp.xml")
         setlanguage("C++" "${URL}" "Java" "C#" "Objective-C" "C" "JavaScript")
 
+    elseif(CATEGORY STREQUAL "LANGUAGE_ALL_NO_JAVASCRIPT_NO_PYTHON")
+
+        # explicitly generated
+        list(APPEND TESTFILES "${URL}.cpp.xml")
+        setlanguage("C++" "${URL}" "Java" "C#" "Objective-C" "C")
+
+    elseif(CATEGORY STREQUAL "LANGUAGE_ALL_NO_PYTHON")
+
+        # explicitly generated
+        list(APPEND TESTFILES "${URL}.cpp.xml")
+        setlanguage("C++" "${URL}" "Java" "JavaScript" "C#" "Objective-C" "C")
+
+
     elseif(CATEGORY STREQUAL "LANGUAGE_CSHARP")
 
         # exist, just add to list
@@ -152,12 +165,6 @@ foreach(GEN IN ITEMS ${SUITE})
         list(APPEND TESTFILES "${URL}.cpp.xml")
         setlanguage("C++" "${URL}" "C" "Objective-C")
 
-    elseif(CATEGORY STREQUAL "LANGUAGE_C_FAMILY_NO_JAVASCRIPT")
-
-        # explicitly generated
-        list(APPEND TESTFILES "${URL}.cpp.xml")
-        setlanguage("C++" "${URL}" "Java" "C#" "Objective-C" "C")
- 
     elseif(CATEGORY STREQUAL "LANGUAGE_C_ONLY")
 
         list(APPEND TESTFILES "${URL}.c.xml")
@@ -217,9 +224,11 @@ foreach(GENURL IN ITEMS ${TESTFILES})
     # Generate "formfeed" "comment" "block" "struct" "ifthenelse"
     foreach(VARIATION IN ITEMS "formfeed" "comment" "block" "struct" "preproc" "ifthenelse")
         # preproc and struct do not work with Java or JavaScript
+        # skip generating any of these tests for Python
         if((LANGEXT STREQUAL "java" AND (VARIATION STREQUAL "struct" OR VARIATION STREQUAL "preproc")) OR
            (LANGEXT STREQUAL "cs" AND VARIATION STREQUAL "struct") OR
-           (LANGEXT STREQUAL "js" AND (VARIATION STREQUAL "struct" OR VARIATION STREQUAL "preproc")))
+           (LANGEXT STREQUAL "js" AND (VARIATION STREQUAL "struct" OR VARIATION STREQUAL "preproc")) OR
+           (LANGEXT STREQUAL "py"))
             continue()
         endif()
 
