@@ -17431,8 +17431,46 @@ perform_dictionary_check_py[] returns [int isdictionary] {
 
   Handles Python tuples.  Not used directly, but can be called by expression_part.
 */
-tuple_py[] { CompleteElement element(this); int inner_lparen = 0; ENTRY_DEBUG } :
+tuple_py[] {
+        CompleteElement element(this);
+        bool use_operator_lparen = false;
+        int starting_lparen = 0;
+
+        // Checks for constructs such as "(())", "((()))", "(((())))", etc.
+        // Only the inner-most pair of parentheses is a tuple
+        if (LA(1) == LPAREN && next_token() == LPAREN) {
+            int start = mark();
+            inputState->guessing++;
+
+            try {
+                while (true) {
+                    if (LA(1) == LPAREN)
+                        ++starting_lparen;
+                    else
+                        break;
+
+                    consume();
+                }
+
+                if (LA(1) == RPAREN && next_token() == RPAREN)
+                    use_operator_lparen = true;
+            }
+            catch (...) {}
+
+            inputState->guessing--;
+            rewind(start);
+        }
+
+        ENTRY_DEBUG
+} :
         {
+            // At the start of a construct such as "((()))"
+            if (use_operator_lparen) {
+                while (LA(1) != LPAREN || next_token() != RPAREN) {
+                    lparen_marked();
+                }
+            }
+
             startNewMode(MODE_LOCAL | MODE_TOP | MODE_LIST | MODE_TUPLE_PY);
 
             startElement(STUPLE);
@@ -17441,9 +17479,20 @@ tuple_py[] { CompleteElement element(this); int inner_lparen = 0; ENTRY_DEBUG } 
         LPAREN
 
         (options { greedy = true; } :
-            // found rparen that ends the current tuple
-            // tuples end if followed by EOL or a keyword (e.g., "in" for list comprehensions)
-            { LA(1) == RPAREN && (next_token() == TERMINATE || keyword_token_set.member((unsigned int) next_token())) }?
+            // tuples end if RPAREN is followed by COMMA, EQUAL, INDENT, RPAREN,
+            // TERMINATE, or a keyword (e.g., "in" for list comprehensions)
+            {
+                LA(1) == RPAREN
+                && (
+                    last_consumed == LPAREN  // empty tuple "()"
+                    || next_token() == COMMA
+                    || next_token() == EQUAL
+                    || next_token() == INDENT
+                    || next_token() == RPAREN
+                    || next_token() == TERMINATE
+                    || keyword_token_set.member((unsigned int) next_token())
+                )
+            }?
             {
                 break;
             } |
@@ -17453,7 +17502,6 @@ tuple_py[] { CompleteElement element(this); int inner_lparen = 0; ENTRY_DEBUG } 
             { inMode(MODE_ARGUMENT) }?
             argument |
 
-            { !inMode(MODE_TUPLE_PY) || (LA(1) != LPAREN && LA(1) != RPAREN) }?
             {
                 if (!inMode(MODE_EXPRESSION))
                     startNewMode(MODE_EXPRESSION | MODE_EXPECT);
@@ -17473,5 +17521,13 @@ tuple_py[] { CompleteElement element(this); int inner_lparen = 0; ENTRY_DEBUG } 
         {
             if (inTransparentMode(MODE_TUPLE_PY))
                 endMode(MODE_TUPLE_PY);
+
+            // At the end of a construct such as "((()))"
+            if (use_operator_lparen) {
+                while (LA(1) == RPAREN) {
+                    decParen();
+                    rparen_operator();
+                }
+            }
         }
 ;
