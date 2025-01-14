@@ -1434,7 +1434,7 @@ start_python[] {
         ENTRY_DEBUG
 } :
         // looking for a name followed by lbracket so the following generic parameter list is detected correctly
-        {inMode(MODE_PARAMETER_LIST_PY) && next_token() == LBRACKET }?
+        { inMode(MODE_PARAMETER_LIST_PY) && next_token() == LBRACKET }?
         function_name_before_generic_py |
 
         // looking for lparen while expecting a super list (only used for classes)
@@ -1486,6 +1486,13 @@ start_python[] {
         // looking for a keyword or operator that does not belong to a statement
         alias_py | function_annotation_py |
 
+        // looking for rparen that was not part of a tuple
+        { !inMode(MODE_TUPLE_PY) && getParen() > 0 }?
+        {
+            decParen();
+        }
+        rparen_operator |
+
         // invoke start to handle unprocessed tokens (e.g., EOF, literals, operators, etc.)
         start
 ;
@@ -1508,12 +1515,17 @@ catch[...] {
 */
 keyword_statements[] { ENTRY_DEBUG } :
         // conditional statements
+        // Python if/elif/else are handled in start_py
+        { !inLanguage(LANGUAGE_PYTHON) }?
         if_statement |
 
-        { next_token() == IF }?
+        { !inLanguage(LANGUAGE_PYTHON) && next_token() == IF }?
         elseif_statement |
 
-        else_statement | switch_statement | switch_case | switch_default |
+        { !inLanguage(LANGUAGE_PYTHON) }?
+        else_statement |
+
+        switch_statement | switch_case | switch_default |
 
         // iterative statements
         while_statement | for_statement | do_statement | foreach_statement |
@@ -1648,7 +1660,7 @@ pattern_statements[] {
         property_method[SFUNCTION_DECLARATION] |
 
         // standalone macro
-        { stmt_type == SINGLE_MACRO }?
+        { !inLanguage(LANGUAGE_PYTHON) && stmt_type == SINGLE_MACRO }?
         macro_call |
 
         // constructor
@@ -1712,7 +1724,8 @@ pattern_statements[] {
 
         // call
         {
-            isoption(parser_options, SRCML_PARSER_OPTION_CPP)
+            !inLanguage(LANGUAGE_PYTHON)
+            && isoption(parser_options, SRCML_PARSER_OPTION_CPP)
             && (
                 inMode(MODE_ACCESS_REGION)
                 || (
@@ -3155,6 +3168,19 @@ call_check_paren_pair[int& argumenttoken, int depth = 0] { int call_token = LA(1
             { depth == 0 }?
             (identifier | generic_selection)
             throw_exception[true] |
+
+            // forbid parentheses (handled recursively) but allow "if"/"else" for Python ternaries
+            {
+                call_token == LPAREN
+                && inLanguage(LANGUAGE_PYTHON)
+                && (
+                    !keyword_token_set.member(LA(1))
+                    || LA(1) == IF
+                    || LA(1) == ELSE
+                )
+            }?
+            ~(LPAREN | RPAREN | TERMINATE)
+            set_bool[name, false] |
 
             // forbid parentheses (handled recursively) and cfg tokens
             { call_token == LPAREN && !keyword_token_set.member(LA(1)) }?
@@ -12028,7 +12054,7 @@ expression_process[] { ENTRY_DEBUG } :
                 if (inPrevMode(MODE_TERNARY_CONDITION))
                     setMode(MODE_TERNARY_CONDITION);
 
-                // start the expression statement
+                // start the expression
                 startElement(SEXPRESSION);
             }
         }
@@ -17453,31 +17479,17 @@ perform_dictionary_check_py[] returns [int isdictionary] {
 tuple_py[] {
         CompleteElement element(this);
         bool use_operator_lparen = false;
-        int starting_lparen = 0;
 
         // Checks for constructs such as "(())", "((()))", "(((())))", etc.
         // Only the inner-most pair of parentheses is a tuple
-        if (LA(1) == LPAREN && next_token() == LPAREN) {
-            int start = mark();
-            inputState->guessing++;
+        if (LA(1) == LPAREN && next_token() == LPAREN)
+            use_operator_lparen = perform_tuple_construct_check_py();
 
-            try {
-                while (true) {
-                    if (LA(1) == LPAREN)
-                        ++starting_lparen;
-                    else
-                        break;
-
-                    consume();
-                }
-
-                if (LA(1) == RPAREN && next_token() == RPAREN)
-                    use_operator_lparen = true;
-            }
-            catch (...) {}
-
-            inputState->guessing--;
-            rewind(start);
+        // In Python, tuples must contain an comma (unless they are empty)
+        // If there is no comma, then the LPAREN is an operator
+        if (!perform_tuple_check_py() && !use_operator_lparen && next_token() != RPAREN) {
+            lparen_marked();
+            return;
         }
 
         ENTRY_DEBUG
@@ -17550,3 +17562,68 @@ tuple_py[] {
             }
         }
 ;
+
+/*
+  perform_tuple_construct_check_py
+
+  Checks for constructs such as "(())", "((()))", "(((())))", etc.
+  Only the inner-most pair of parentheses is a tuple.
+*/
+perform_tuple_construct_check_py[] returns [bool use_operator_lparen] {
+        use_operator_lparen = false;
+        int starting_lparen = 0;
+        int start = mark();
+        inputState->guessing++;
+
+        try {
+            while (true) {
+                if (LA(1) == LPAREN)
+                    ++starting_lparen;
+                else
+                    break;
+
+                consume();
+            }
+
+            if (LA(1) == RPAREN && next_token() == RPAREN)
+                use_operator_lparen = true;
+        }
+        catch (...) {}
+
+        inputState->guessing--;
+        rewind(start);
+} :;
+
+/*
+  perform_tuple_check_py
+
+  Determines if an LPAREN starts a tuple or is an operator.
+*/
+perform_tuple_check_py[] returns [bool is_tuple] {
+        is_tuple = false;
+        int num_parens = 1;  // record initial LPAREN
+        int start = mark();
+        inputState->guessing++;
+
+        try {
+            while (num_parens > 0) {
+                consume();
+
+                // the outermost "tuple" has a comma
+                if (LA(1) == COMMA && num_parens == 1) {
+                    is_tuple = true;
+                    break;
+                }
+
+                if (LA(1) == LPAREN)
+                    ++num_parens;
+
+                if (LA(1) == RPAREN)
+                    --num_parens;
+            }
+        }
+        catch (...) {}
+
+        inputState->guessing--;
+        rewind(start);
+} :;
