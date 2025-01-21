@@ -6,6 +6,10 @@
 </unit>
 
 <unit language="Python">
+<expr_stmt><expr><tuple>(,)</tuple></expr></expr_stmt>
+</unit>
+
+<unit language="Python">
 <expr_stmt><expr><tuple>(<expr><literal type="number">1</literal></expr>,)</tuple></expr></expr_stmt>
 </unit>
 
@@ -26,11 +30,19 @@
 </unit>
 
 <unit language="Python">
+<expr_stmt><expr><tuple>(<expr><call><name>b</name><argument_list>()</argument_list></call></expr>, <expr><call><name>c</name><argument_list>()</argument_list></call></expr>)</tuple></expr></expr_stmt>
+</unit>
+
+<unit language="Python">
 <expr_stmt><expr><name>x</name> <operator>=</operator> <tuple>(<expr><literal type="string">"hello"</literal></expr>,<expr><literal type="string">"world"</literal></expr>)</tuple></expr></expr_stmt>
 </unit>
 
 <unit language="Python">
 <expr_stmt><expr><tuple>(<expr><tuple>()</tuple></expr>,<expr><tuple>()</tuple></expr>)</tuple></expr></expr_stmt>
+</unit>
+
+<unit language="Python">
+<expr_stmt><expr><tuple>(<expr><operator>(</operator><name>d</name><operator>)</operator></expr>, <expr><operator>(</operator><name>e</name><operator>)</operator></expr>)</tuple></expr></expr_stmt>
 </unit>
 
 <unit language="Python">
@@ -71,6 +83,18 @@
 
 <unit language="Python">
 <expr_stmt><expr><tuple>(<expr><name>a</name></expr>, <expr><name>b</name></expr>, <expr><name>c</name></expr>)</tuple> <operator>=</operator> <tuple>(<expr><literal type="number">4</literal></expr>, <expr><literal type="number">5</literal></expr>, <expr><literal type="number">6</literal></expr>)</tuple></expr></expr_stmt>
+</unit>
+
+<unit language="Python">
+<expr_stmt><expr><tuple>(<expr><call><name>a</name><argument_list>(<argument><expr><tuple>(<expr><name>x</name></expr>, <expr><name>y</name></expr>)</tuple></expr></argument>, <argument><expr><name>z</name></expr></argument>)</argument_list></call></expr>, <expr><name>b</name></expr>)</tuple></expr></expr_stmt>
+</unit>
+
+<unit language="Python">
+<expr_stmt><expr><name>construct</name> <operator>=</operator> <operator>(</operator><operator>(</operator><tuple>(<expr><call><name>a</name><argument_list>()</argument_list></call></expr>, <expr><call><name>b</name><argument_list>()</argument_list></call></expr>)</tuple><operator>)</operator><operator>)</operator></expr></expr_stmt>
+</unit>
+
+<unit language="Python">
+<expr_stmt><expr><name>construct</name> <operator>=</operator> <operator>(</operator><tuple>(<expr><operator>(</operator><name>a</name><operator>)</operator></expr>, <expr><operator>(</operator><name>b</name><operator>)</operator></expr>, <expr><name>c</name></expr>)</tuple><operator>)</operator></expr></expr_stmt>
 </unit>
 
 </unit>
