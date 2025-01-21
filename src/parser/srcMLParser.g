@@ -16584,6 +16584,7 @@ from_as_name[] { SingleElement element(this); ENTRY_DEBUG } :
 */
 perform_from_import_check[] returns [bool isimport] {
         isimport = false;
+        int last_consumed_current = last_consumed;
         int start = mark();
         inputState->guessing++;
 
@@ -16605,6 +16606,8 @@ perform_from_import_check[] returns [bool isimport] {
 
         inputState->guessing--;
         rewind(start);
+
+        last_consumed = last_consumed_current;
 
         ENTRY_DEBUG
 } :;
@@ -17067,6 +17070,7 @@ check_valid_specifier_py[] returns [int isspecifier] {
 */
 perform_post_specifier_check_py[] returns [int keyword] {
         keyword = -1;
+        int last_consumed_current = last_consumed;
         int start = mark();
         inputState->guessing++;
 
@@ -17089,6 +17093,8 @@ perform_post_specifier_check_py[] returns [int keyword] {
 
         inputState->guessing--;
         rewind(start);
+
+        last_consumed = last_consumed_current;
 
         ENTRY_DEBUG
 } :;
@@ -17120,6 +17126,7 @@ specifier_py[] { ENTRY_DEBUG } :
 */
 perform_post_attribute_check_py[] returns [int keyword] {
         keyword = -1;
+        int last_consumed_current = last_consumed;
         int start = mark();
         inputState->guessing++;
 
@@ -17141,6 +17148,8 @@ perform_post_attribute_check_py[] returns [int keyword] {
 
         inputState->guessing--;
         rewind(start);
+
+        last_consumed = last_consumed_current;
 
         ENTRY_DEBUG
 } :;
@@ -17476,6 +17485,7 @@ dictionary_py[bool isempty = false] { CompleteElement element(this); ENTRY_DEBUG
 */
 perform_dictionary_check_py[] returns [int isdictionary] {
         isdictionary = false;
+        int last_consumed_current = last_consumed;
         int start = mark();
         inputState->guessing++;
 
@@ -17494,6 +17504,8 @@ perform_dictionary_check_py[] returns [int isdictionary] {
 
         inputState->guessing--;
         rewind(start);
+
+        last_consumed = last_consumed_current;
 
         ENTRY_DEBUG
 } :;
@@ -17696,6 +17708,8 @@ perform_tuple_construct_check_py[] returns [int starting_lparen] {
         rewind(start);
 
         last_consumed = last_consumed_current;
+
+        ENTRY_DEBUG
 } :;
 
 /*
@@ -17741,4 +17755,6 @@ perform_tuple_check_py[] returns [bool is_tuple] {
         rewind(start);
 
         last_consumed = last_consumed_current;
+
+        ENTRY_DEBUG
 } :;
