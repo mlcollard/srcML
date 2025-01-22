@@ -12123,14 +12123,14 @@ expression_part[CALL_TYPE type = NOCALL, int call_count = 1] {
         ENTRY_DEBUG
 } :
         // looking for a Python operator lparen (which indicates the lparen does not start a call or tuple)
-        { inLanguage(LANGUAGE_PYTHON) && next_token() != RPAREN && !perform_tuple_check_py() && next_token() != LPAREN }?
+        { inLanguage(LANGUAGE_PYTHON) && !perform_tuple_check_py() }?
         {
             lparen_types_py.emplace_back('o');  // operator LPAREN
         }
         lparen_marked |
 
         // looking for lparen to start a Python tuple
-        { inLanguage(LANGUAGE_PYTHON) && last_consumed != NAME && (perform_tuple_check_py() || next_token() == LPAREN) }?
+        { inLanguage(LANGUAGE_PYTHON) && last_consumed != NAME && perform_tuple_check_py() }?
         tuple_py |
 
         // looking for an operator rparen to end the mode started by an operator lparen
@@ -17520,30 +17520,9 @@ tuple_py[] {
         int num_starting_operator_lparen = 0;
         bool use_operator_lparen = false;
 
-        // Checks for constructs such as "(())", "((()))", "(((())))", etc.
-        // Only the inner-most pair of parentheses is a tuple
-        // Exclude the special case when "((" is the start of 2 tuples
-        if (LA(1) == LPAREN && next_token() == LPAREN && !perform_tuple_check_py()) {
-            num_starting_operator_lparen = perform_tuple_construct_check_py();
-
-            // Apply special logic if 2 or more LPAREN were found
-            if (num_starting_operator_lparen > 1) {
-                --num_starting_operator_lparen;  // the inner LPAREN is a tuple
-                use_operator_lparen = true;
-            }
-        }
-
         ENTRY_DEBUG
 } :
         {
-            // At the start of a construct such as "((()))" or "((a, b))"
-            if (use_operator_lparen) {
-                for (int i = 0; i < num_starting_operator_lparen; i++) {
-                    lparen_marked();
-                    lparen_types_py.emplace_back('o');  // operator LPAREN
-                }
-            }
-
             startNewMode(MODE_LOCAL | MODE_TOP | MODE_LIST | MODE_TUPLE_PY);
 
             startElement(STUPLE);
@@ -17616,101 +17595,8 @@ tuple_py[] {
         {
             if (inTransparentMode(MODE_TUPLE_PY))
                 endMode(MODE_TUPLE_PY);
-
-            // At the end of a construct such as "((()))" or "((a, b))"
-            if (use_operator_lparen) {
-                while (LA(1) == RPAREN) {
-                    rparen_operator();
-
-                    if (lparen_types_py.back() == 'o')
-                        lparen_types_py.pop_back();
-                }
-            }
         }
 ;
-
-/*
-  perform_tuple_construct_check_py
-
-  Checks for constructs such as "(())", "((a, b))", "((()))", etc.
-  Only the inner-most pair of parentheses is a tuple.
-*/
-perform_tuple_construct_check_py[] returns [int starting_lparen] {
-        starting_lparen = 0;
-        int ending_rparen = 0;
-        int temp_ending_rparen = 0;
-        int last_consumed_current = last_consumed;
-        int start = mark();
-        inputState->guessing++;
-
-        try {
-            while (true) {
-                if (next_token() == LPAREN)
-                    ++starting_lparen;
-                else
-                    break;
-
-                consume();
-            }
-
-            // right-most starting LPAREN might not be included
-            // (e.g., "(((a), (b), c))" only has 2 starting LPARENs)
-            if (perform_tuple_check_py())
-                ++starting_lparen;
-
-            consume();  // LPAREN
-
-            // construct must have 2 or more LPAREN next to one another
-            if (starting_lparen > 1) {
-                std::deque<int> open_lparens;
-                open_lparens.emplace_back(0);
-
-                while (true) {
-                    if (LA(1) == LPAREN) {
-                        open_lparens.emplace_back(1);
-                    }
-
-                    // do not use argument list/call/etc. parentheses in final count
-                    if (LA(1) == RPAREN && !open_lparens.back()) {
-                        temp_ending_rparen = 0;
-
-                        while (true) {
-                            if (LA(1) == RPAREN)
-                                ++temp_ending_rparen;
-                            else
-                                break;
-
-                            consume();
-                        }
-
-                        if (temp_ending_rparen > ending_rparen)
-                            ending_rparen = temp_ending_rparen;
-                    }
-
-                    if (LA(1) == RPAREN && open_lparens.back()) {
-                        open_lparens.pop_back();
-                    }
-
-                    if (LA(1) == TERMINATE || LA(1) == INDENT || LA(1) == 1 /* EOF */)
-                        break;
-                    else
-                        consume();
-                }
-            }
-
-            // construct must have the same num. of consecutive LPAREN as the num. of consecutive RPAREN
-            if (starting_lparen != ending_rparen)
-                starting_lparen = -1;
-        }
-        catch (...) {}
-
-        inputState->guessing--;
-        rewind(start);
-
-        last_consumed = last_consumed_current;
-
-        ENTRY_DEBUG
-} :;
 
 /*
   perform_tuple_check_py
@@ -17735,6 +17621,10 @@ perform_tuple_check_py[] returns [bool is_tuple] {
 
                     if (LA(1) == RPAREN)
                         --num_parens;
+
+                    // cannot be a parenthesized tuple if the number of parentheses is 0 or less
+                    if (num_parens < 1)
+                        break;
 
                     // the tuple contains a comma (does not matter if calls, etc. contain a comma)
                     if (LA(1) == COMMA && num_parens == 1 /* the outer-most LPAREN */) {
