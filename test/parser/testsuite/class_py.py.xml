@@ -62,7 +62,7 @@ class <name>new_op</name><block>:<block_content>
 <unit revision="1.1.0" language="Python">
 <class><attribute>@<expr><name>unique</name></expr></attribute>
 <attribute>@<expr><call><name>GetType</name><argument_list>()</argument_list></call></expr></attribute>
-class <name>All</name><super_list>(<super><name>Nothing</name></super>,<super><name>new_op</name></super>,<super><expr><call><name>GetParent</name><argument_list>()</argument_list></call></expr></super>)</super_list><block>:<block_content>
+class <name>All</name><super_list>(<super><expr><name>Nothing</name></expr></super>,<super><expr><name>new_op</name></expr></super>,<super><expr><call><name>GetParent</name><argument_list>()</argument_list></call></expr></super>)</super_list><block>:<block_content>
     <pass>pass</pass>
 </block_content></block></class>
 </unit>
