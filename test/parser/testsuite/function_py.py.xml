@@ -42,7 +42,7 @@ def <name>func</name><parameter_list>()</parameter_list><block>:<block_content>
 
 <unit revision="1.1.0" language="Python">
 <function><attribute>@<expr><name>print</name></expr></attribute>
-<specifier>async</specifier> def <name>async_printf</name><parameter_list>(<parameter><name>content</name></parameter>, <parameter>format_str</parameter>)</parameter_list> <annotation>-&gt; <expr><literal type="null">None</literal></expr></annotation><block>:<block_content>
+<specifier>async</specifier> def <name>async_printf</name><parameter_list>(<parameter><name>content</name></parameter>, <parameter><name>format_str</name></parameter>)</parameter_list> <annotation>-&gt; <expr><literal type="null">None</literal></expr></annotation><block>:<block_content>
     <expr_stmt><expr><operator>await</operator> <call><name>print</name><argument_list>(<argument><expr><call><name><name>format_str</name><operator>.</operator><name>format</name></name><argument_list>(<argument><expr><name>content</name></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr></expr_stmt>
 </block_content></block></function>
 </unit>
