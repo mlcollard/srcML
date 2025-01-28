@@ -44,7 +44,7 @@
     <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><name>e</name></expr></argument>)</argument_list></call></expr></expr_stmt>
 </block_content></block></catch><catch>except* <expr><name>ZeroDivisionError</name></expr><block>:<block_content>
     <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"* error"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
-</block_content></block></catch></try> 
+</block_content></block></catch></try>
 </unit>
 
 </unit>

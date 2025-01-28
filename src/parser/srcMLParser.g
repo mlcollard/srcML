@@ -1371,7 +1371,7 @@ start_python[] {
             temp_array[PY_YIELD]    = { SYIELD_STATEMENT, 0, MODE_STATEMENT, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
 
             /* DUPLEX KEYWORDS */
-            temp_array[PY_EXCEPT_MULTOPS] = { SCATCH_BLOCK, 0, MODE_STATEMENT | MODE_NEST | MODE_EXCEPT_PY, MODE_EXPRESSION, nullptr, &srcMLParser::consume };  // extra consume() for `*`
+            temp_array[PY_EXCEPT_MULTOPS] = { SCATCH_BLOCK, 0, MODE_STATEMENT | MODE_NEST | MODE_EXCEPT_PY, MODE_EXPRESSION | MODE_EXPECT, nullptr, &srcMLParser::consume };  // extra consume() for `*`
             temp_array[PY_YIELD_PY_FROM]  = { SYIELD_FROM_STATEMENT, 0, MODE_STATEMENT, MODE_EXPRESSION | MODE_EXPECT, nullptr, &srcMLParser::consume };  // extra consume() for `from`
 
             return temp_array;
