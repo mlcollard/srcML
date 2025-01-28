@@ -166,7 +166,8 @@ NAME options { testLiterals = true; } :
             && (text == "b"sv || text == "f"sv || text == "r"sv || text == "u"sv
             || text == "B"sv || text == "F"sv || text == "R"sv || text == "U"sv
             || text == "rf"sv || text == "rb"sv || text == "Rf"sv || text == "Rb"sv
-            || text == "rF"sv || text == "rB"sv || text == "RF"sv || text == "RB"sv)
+            || text == "rF"sv || text == "rB"sv || text == "RF"sv || text == "RB"sv
+            || text == "ur"sv || text == "Ur"sv || text == "uR"sv || text == "UR"sv)
         }?
         (
             { LA(1) == '"' }?
