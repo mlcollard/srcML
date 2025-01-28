@@ -4,20 +4,23 @@
 <unit revision="1.1.0" language="Python">
 <class><attribute>@<expr><name>unique</name></expr></attribute>
 class <name>Human</name><block>:<block_content>
-    <pass>pass</pass></block_content></block></class>
+    <pass>pass</pass>
+</block_content></block></class>
 </unit>
 
 <unit revision="1.1.0" language="Python">
 <class><attribute>@<expr><call><name>operator</name><argument_list>()</argument_list></call></expr></attribute>
 class <name>t_op</name><block>:<block_content>
-    <pass>pass</pass></block_content></block></class>
+    <pass>pass</pass>
+</block_content></block></class>
 </unit>
 
 <unit revision="1.1.0" language="Python">
 <class><attribute>@<expr><name>operator</name></expr></attribute>
 <attribute>@<expr><call><name>decorator_getter</name><argument_list>()</argument_list></call></expr></attribute>
 class <name>d_op</name><block>:<block_content>
-    <pass>pass</pass></block_content></block></class>
+    <pass>pass</pass>
+</block_content></block></class>
 </unit>
 
 <unit revision="1.1.0" language="Python">
@@ -39,19 +42,22 @@ class <name>MyClass</name><block>:<block_content>
 <unit revision="1.1.0" language="Python">
 <class><attribute>@<expr><name>A</name> <operator>+</operator> <name>B</name></expr></attribute>
 class <name>new_op</name><block>:<block_content>
-    <pass>pass</pass></block_content></block></class>
+    <pass>pass</pass>
+</block_content></block></class>
 </unit>
 
 <unit revision="1.1.0" language="Python">
 <function><attribute>@<expr><name>print</name></expr></attribute>
 def <name>func</name><parameter_list>()</parameter_list><block>:<block_content>
-    <pass>pass</pass></block_content></block></function>
+    <pass>pass</pass>
+</block_content></block></function>
 </unit>
 
 <unit revision="1.1.0" language="Python">
 <function><attribute>@<expr><call><name>decorator_getter</name><argument_list>()</argument_list></call></expr></attribute>
 def <name>new</name><parameter_list>()</parameter_list><block>:<block_content>
-    <pass>pass</pass></block_content></block></function>
+    <pass>pass</pass>
+</block_content></block></function>
 </unit>
 
 <unit revision="1.1.0" language="Python">
