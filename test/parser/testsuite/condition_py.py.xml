@@ -6,7 +6,7 @@
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<expr_stmt><expr><ternary><then><expr><literal type="string">"even"</literal></expr></then> if <condition><expr><name>x</name> <operator>%</operator> <literal type="number">2</literal> <operator>==</operator> <literal type="number">0</literal></expr></condition> <else>else <expr><literal type="string">"odd"</literal></expr></else></ternary></expr></expr_stmt>
+<expr_stmt><expr><literal type="string">"even"</literal> <ternary>if <condition><expr><name>x</name> <operator>%</operator> <literal type="number">2</literal> <operator>==</operator> <literal type="number">0</literal></expr></condition> <else>else <expr><literal type="string">"odd"</literal></expr></else></ternary></expr></expr_stmt>
 </unit>
 
 <unit revision="1.1.0" language="Python">
