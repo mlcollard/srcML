@@ -1596,8 +1596,9 @@ pattern_statements[] {
         STMT_TYPE stmt_type = NONE;
         CALL_TYPE type = NOCALL;
 
-        // detect the declaration/definition type
-        pattern_check(stmt_type, secondtoken, type_count, after_token);
+        // detect the declaration/definition type for non-Python languages
+        if (!inLanguage(LANGUAGE_PYTHON))
+            pattern_check(stmt_type, secondtoken, type_count, after_token);
 
         ENTRY_DEBUG
 } :
@@ -1670,7 +1671,7 @@ pattern_statements[] {
         property_method[SFUNCTION_DECLARATION] |
 
         // standalone macro
-        { !inLanguage(LANGUAGE_PYTHON) && stmt_type == SINGLE_MACRO }?
+        { stmt_type == SINGLE_MACRO }?
         macro_call |
 
         // constructor
