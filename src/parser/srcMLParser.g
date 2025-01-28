@@ -8246,6 +8246,11 @@ complete_expression[] { CompleteElement element(this); ENTRY_DEBUG } :
 
             // expression with right parentheses if a previous match is in one
             { LA(1) != RPAREN || inTransparentMode(MODE_INTERNAL_END_PAREN) }?
+            {
+                // ensure each part of a comma-separated Python index is marked as an expression
+                if (inLanguage(LANGUAGE_PYTHON) && !inMode(MODE_EXPRESSION))
+                    startNewMode(MODE_EXPRESSION | MODE_EXPECT);
+            }
             expression |
 
             colon_marked
