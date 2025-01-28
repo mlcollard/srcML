@@ -16641,7 +16641,19 @@ range_in_py[] { SingleElement element(this); ENTRY_DEBUG } :
         }
 
         PY_IN
-        expression
+
+        (options { greedy = true; } :
+            { inMode(MODE_ARGUMENT) }?
+            argument |
+
+            {
+                if (!inMode(MODE_EXPRESSION))
+                    startNewMode(MODE_EXPRESSION | MODE_EXPECT);
+            }
+            expression |
+
+            comma
+        )*
 ;
 
 /*
