@@ -164,7 +164,9 @@ NAME options { testLiterals = true; } :
         {
             inLanguage(LANGUAGE_PYTHON)
             && (text == "b"sv || text == "f"sv || text == "r"sv || text == "u"sv
-            || text == "B"sv || text == "F"sv || text == "R"sv || text == "U"sv)
+            || text == "B"sv || text == "F"sv || text == "R"sv || text == "U"sv
+            || text == "rf"sv || text == "rb"sv || text == "Rf"sv || text == "Rb"sv
+            || text == "rF"sv || text == "rB"sv || text == "RF"sv || text == "RB"sv)
         }?
         (
             { LA(1) == '"' }?
