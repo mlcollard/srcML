@@ -1384,7 +1384,7 @@ start_python[] {
         // special markup for an "if" that appears in a "case" statement
         if (LA(1) == IF && inTransparentMode(MODE_CASE_PY)) {
             endDownToMode(MODE_CASE_PY);
-
+            consume();  // IF
             startNewMode(MODE_CONDITION | MODE_EXPECT);
         }
 
@@ -1441,9 +1441,14 @@ start_python[] {
         // looking for an operator rparen to end the mode started by an operator lparen
         { lparen_types_py.back() == 'o' }?
         {
+            decParen();
             lparen_types_py.pop_back();
         }
         rparen_operator |
+
+        // if an "if" is found in an expression, it must start a ternary (not an if-statement)
+        { inMode(MODE_EXPRESSION) }?
+        ternary_py[false] |
 
         // looking for a name followed by lbracket so the following generic parameter list is detected correctly
         { inMode(MODE_PARAMETER_LIST_PY) && next_token() == LBRACKET }?
@@ -12136,9 +12141,14 @@ expression_part[CALL_TYPE type = NOCALL, int call_count = 1] {
         // looking for an operator rparen to end the mode started by an operator lparen
         { inLanguage(LANGUAGE_PYTHON) && lparen_types_py.back() == 'o' }?
         {
+            decParen();
             lparen_types_py.pop_back();
         }
         rparen_operator |
+
+        // if an "if" is found in an expression, it must start a ternary (not an if-statement)
+        { inMode(MODE_EXPRESSION) }?
+        ternary_py[false] |
 
         // looking for lbracket to start a Python array
         { inLanguage(LANGUAGE_PYTHON) && last_consumed != NAME }?
@@ -16648,6 +16658,11 @@ list_comprehension_range_py[] { ENTRY_DEBUG } :
         }
 
         (options { greedy = true; } :
+            { LA(1) == IF && getParen() == 0 }?
+            {
+                break;
+            } |
+
             { inMode(MODE_ARGUMENT) }?
             argument |
 
@@ -16686,6 +16701,7 @@ list_comprehension_range_py[] { ENTRY_DEBUG } :
 */
 list_comprehension_if_py[] { ENTRY_DEBUG } :
         (options { greedy = true; } :
+            { getParen() == 0 }?
             start_list_comprehension_if_py |
 
             // do not accidentally consume the tuple ending RPAREN
@@ -17538,6 +17554,7 @@ tuple_py[] {
                 LA(1) == RPAREN && lparen_types_py.back() == 'o'
             }?
             {
+                decParen();
                 lparen_types_py.pop_back();
             }
             rparen_operator |
@@ -17645,6 +17662,144 @@ perform_tuple_check_py[] returns [bool is_tuple] {
         rewind(start);
 
         last_consumed = last_consumed_current;
+
+        ENTRY_DEBUG
+} :;
+
+/*
+  ternary_py
+
+  Handles Python ternaries.  Used in multiple places.
+*/
+ternary_py[bool is_nested = false] { CompleteElement element(this); ENTRY_DEBUG } :
+        {
+            startNewMode(MODE_TERNARY);
+            startElement(STERNARY);
+        }
+
+        IF
+
+        {
+            startNewMode(MODE_CONDITION);
+            startElement(SCONDITION);
+            startNewMode(MODE_TERNARY_CONDITION | MODE_LIST | MODE_EXPRESSION | MODE_EXPECT);
+        }
+
+        (options { greedy = true; } :
+            // condition ends if ELSE is found
+            { LA(1) == ELSE }?
+            {
+                break;
+            } |
+
+            // found a nested ternary
+            { LA(1) == IF && inTransparentMode(MODE_TERNARY) }?
+            ternary_py[true] |
+
+            { inMode(MODE_ARGUMENT) }?
+            argument |
+
+            {
+                if (!inMode(MODE_EXPRESSION))
+                    startNewMode(MODE_EXPRESSION | MODE_EXPECT);
+            }
+            expression |
+
+            comma
+        )*
+
+        {
+            if (inTransparentMode(MODE_CONDITION)) {
+                endDownToMode(MODE_CONDITION);
+                endMode(MODE_CONDITION);
+            }
+
+            startNewMode(MODE_ELSE);
+            startElement(SELSE);
+
+            if (is_nested)
+                startNewMode(MODE_INTERNAL_END_PAREN);
+        }
+
+        ELSE
+
+        (options { greedy = true; } :
+            // else clause ends if:
+            // - at RPAREN in mode where it ends at internal parentheses (nested ternary)
+            // - at RPAREN in a tuple
+            // - at RPAREN and the next token is IF (special case)
+            // - at RPAREN and the current mode has no parentheses
+            // - last consumed token was COMMA in a tuple
+            {
+                (
+                    LA(1) == RPAREN
+                    && (
+                        inTransparentMode(MODE_INTERNAL_END_PAREN)
+                        || inTransparentMode(MODE_TUPLE_PY)
+                        || next_token() == IF
+                        || getParen() == 0
+                    )
+                )
+                || (last_consumed == COMMA && inTransparentMode(MODE_TUPLE_PY))
+            }?
+            {
+                break;
+            } |
+
+            // found a nested ternary
+            { LA(1) == IF && inTransparentMode(MODE_TERNARY) }?
+            ternary_py[true] |
+
+            { inMode(MODE_ARGUMENT) }?
+            argument |
+
+            {
+                if (!inMode(MODE_EXPRESSION))
+                    startNewMode(MODE_EXPRESSION | MODE_EXPECT);
+            }
+            expression |
+
+            comma
+        )*
+
+        {
+            if (inTransparentMode(MODE_ELSE)) {
+                endDownToMode(MODE_ELSE);
+                endMode(MODE_ELSE);
+            }
+
+            if (inTransparentMode(MODE_TERNARY)) {
+                endDownToMode(MODE_TERNARY);
+                endMode(MODE_TERNARY);
+            }
+        }
+;
+
+/*
+  perform_nested_ternary_check_py
+
+  Determines if a Python ternary is nested in another Python ternary.
+*/
+perform_nested_ternary_check_py[] returns [bool is_nested] {
+        is_nested = false;
+        int start = mark();
+        inputState->guessing++;
+
+        try {
+            while (true) {
+                consume();
+
+                if (LA(1) == IF || LA(1) == TERMINATE || LA(1) == INDENT || LA(1) == 1 /* EOF */)
+                    break;
+            }
+
+            if (LA(1) == IF)
+                is_nested = true;
+
+        } catch(...) {}
+
+        inputState->guessing--;
+        rewind(start);
 
         ENTRY_DEBUG
 } :;
