@@ -1438,14 +1438,6 @@ start_python[] {
         ENTRY_DEBUG_START
         ENTRY_DEBUG
 } :
-        // looking for an operator rparen to end the mode started by an operator lparen
-        { lparen_types_py.back() == 'o' }?
-        {
-            decParen();
-            lparen_types_py.pop_back();
-        }
-        rparen_operator |
-
         // if an "if" is found in an expression, it must start a ternary (not an if-statement)
         { inMode(MODE_EXPRESSION) }?
         ternary_py[false] |
@@ -12135,22 +12127,11 @@ expression_part[CALL_TYPE type = NOCALL, int call_count = 1] {
 } :
         // looking for a Python operator lparen (which indicates the lparen does not start a call or tuple)
         { inLanguage(LANGUAGE_PYTHON) && !perform_tuple_check_py() }?
-        {
-            lparen_types_py.emplace_back('o');  // operator LPAREN
-        }
-        lparen_marked |
+        operator_parenthesis_complete_py |
 
         // looking for lparen to start a Python tuple
         { inLanguage(LANGUAGE_PYTHON) && last_consumed != NAME && perform_tuple_check_py() }?
         tuple_py |
-
-        // looking for an operator rparen to end the mode started by an operator lparen
-        { inLanguage(LANGUAGE_PYTHON) && lparen_types_py.back() == 'o' }?
-        {
-            decParen();
-            lparen_types_py.pop_back();
-        }
-        rparen_operator |
 
         // if an "if" is found in an expression, it must start a ternary (not an if-statement)
         { inMode(MODE_EXPRESSION) }?
@@ -12171,6 +12152,10 @@ expression_part[CALL_TYPE type = NOCALL, int call_count = 1] {
         // looking for "lambda" to start a Python lambda
         { inLanguage(LANGUAGE_PYTHON) }?
         lambda_py |
+
+        // looking for "yield" or "yield from" to start a Python yield expression
+        { inLanguage(LANGUAGE_PYTHON) }?
+        yield_expression_py |
 
         // do not mark JavaScript method blocks as objects (e.g., methodName() {})
         { inLanguage(LANGUAGE_JAVASCRIPT) && last_consumed == RPAREN }?
@@ -17567,16 +17552,6 @@ tuple_py[] {
         LPAREN
 
         (options { greedy = true; } :
-            // found closing RPAREN for the previously-recorded operator LPAREN
-            {
-                LA(1) == RPAREN && lparen_types_py.back() == 'o'
-            }?
-            {
-                decParen();
-                lparen_types_py.pop_back();
-            }
-            rparen_operator |
-
             // found closing RPAREN for a tuple if:
             // - LPAREN deque does not have a call parenthesis at the back
             // - last token consumed was LPAREN (e.g., an empty tuple)
@@ -17821,3 +17796,105 @@ perform_nested_ternary_check_py[] returns [bool is_nested] {
 
         ENTRY_DEBUG
 } :;
+
+/*
+  yield_expression_py
+
+  Handles a "yield" or "yield from" expression in Python.
+  The statement versions are included in start_py's table.
+*/
+yield_expression_py[] { bool is_yield_from = (next_token() == PY_FROM); ENTRY_DEBUG } :
+        {
+            startNewMode(MODE_YIELD_PY);
+
+            if (is_yield_from)
+                startElement(SYIELD_FROM_STATEMENT);
+            else
+                startElement(SYIELD_STATEMENT);
+        }
+
+        (
+            { is_yield_from }?
+            PY_YIELD PY_FROM |
+
+            PY_YIELD
+        )
+
+        {
+            startNewMode(MODE_EXPRESSION | MODE_EXPECT);
+        }
+;
+
+/*
+  operator_parenthesis_complete_py
+
+  Handles an opening/closing pair of operator parentheses in Python.
+*/
+operator_parenthesis_complete_py[] {
+        CompleteElement element(this);
+        TokenPosition tp;
+        int lparen_types_size = 0;
+
+        ENTRY_DEBUG
+} :
+        {
+            lparen_types_py.emplace_back('o');  // operator LPAREN
+            lparen_types_size = lparen_types_py.size();  // do not end nested operator parentheses early
+        }
+
+        lparen_marked
+
+        {
+            startNewMode(MODE_OPERATOR_PAREN_PY);
+
+            // start the "fake" expression
+            startElement(SEXPRESSION);
+
+            // record the "fake" expression start location so we can replace it later
+            setTokenPosition(tp);
+
+            startNewMode(MODE_EXPRESSION);
+        }
+
+        (options { greedy = true; } :
+            // found an operator rparen to close the starting operator lparen
+            { LA(1) == RPAREN && lparen_types_py.back() == 'o' && lparen_types_py.size() == lparen_types_size }?
+            {
+                break;
+            } |
+
+            // found an operator rparen to close a nested operator lparen
+            { lparen_types_py.back() == 'o' }?
+            {
+                decParen();
+                lparen_types_py.pop_back();
+            }
+            rparen_operator |
+
+            alias_py |
+
+            { inMode(MODE_ARGUMENT) }?
+            argument |
+
+            expression |
+
+            comma
+        )*
+
+        {
+            // set the token to NOP to remove the "fake" expression
+            tp.setType(SNOP);
+
+            if (inTransparentMode(MODE_OPERATOR_PAREN_PY)) {
+                endDownToMode(MODE_OPERATOR_PAREN_PY);
+                endMode(MODE_OPERATOR_PAREN_PY);
+            }
+
+            // found an operator rparen to close the starting operator lparen
+            if (LA(1) == RPAREN && lparen_types_py.back() == 'o' && lparen_types_py.size() == lparen_types_size) {
+                decParen();
+                lparen_types_py.pop_back();
+                rparen_operator();
+            }
+        }
+;
