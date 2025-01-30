@@ -17265,7 +17265,7 @@ array_py[] { CompleteElement element(this); ENTRY_DEBUG } :
 /*
   list_comprehension_py
 
-  Handles Python list comprehensions.  Not used directly, but can be called by array_py.
+  Handles Python list comprehensions.
 */
 list_comprehension_py[] { ENTRY_DEBUG } :
         {
@@ -17871,7 +17871,12 @@ operator_parenthesis_complete_py[] {
             }
             rparen_operator |
 
-            alias_py |
+            {
+                start_list_comprehension_py();
+            }
+            specifier_py |
+
+            list_comprehension_py | alias_py |
 
             { inMode(MODE_ARGUMENT) }?
             argument |

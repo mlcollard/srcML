@@ -2,11 +2,11 @@
 <unit xmlns="http://www.srcML.org/srcML/src" language="Python" url="comprehension">
 
 <unit revision="1.1.0" language="Python">
-<expr_stmt><expr><operator>(</operator><comprehension><expr><name>x</name></expr> <for>for <control><name>x</name> <range>in <expr><call><name>range</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control></for></comprehension><operator>)</operator></expr></expr_stmt>
+<expr_stmt><expr><operator>(</operator><name>x</name> <comprehension><for>for <control><name>x</name> <range>in <expr><call><name>range</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control></for></comprehension><operator>)</operator></expr></expr_stmt>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<expr_stmt><expr><operator>(</operator><comprehension><expr><name>x</name></expr> <for><specifier>async</specifier> for <control><name>x</name> <range>in <expr><call><name>async_range</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control></for></comprehension><operator>)</operator></expr></expr_stmt>
+<expr_stmt><expr><operator>(</operator><name>x</name> <comprehension><for><specifier>async</specifier> for <control><name>x</name> <range>in <expr><call><name>async_range</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control></for></comprehension><operator>)</operator></expr></expr_stmt>
 </unit>
 
 <unit revision="1.1.0" language="Python">
