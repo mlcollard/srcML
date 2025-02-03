@@ -3172,7 +3172,8 @@ call_check_paren_pair[int& argumenttoken, int depth = 0] { int call_token = LA(1
             (identifier | generic_selection)
             throw_exception[true] |
 
-            // forbid parentheses (handled recursively) but allow "if"/"else" for Python ternaries
+            // forbid parentheses (handled recursively) but allow "if"/"else"
+            // for Python ternaries and "lambda" for Python lambdas
             {
                 call_token == LPAREN
                 && inLanguage(LANGUAGE_PYTHON)
@@ -3180,6 +3181,7 @@ call_check_paren_pair[int& argumenttoken, int depth = 0] { int call_token = LA(1
                     !keyword_token_set.member(LA(1))
                     || LA(1) == IF
                     || LA(1) == ELSE
+                    || LA(1) == PY_LAMBDA
                 )
             }?
             ~(LPAREN | RPAREN | TERMINATE)
@@ -16288,11 +16290,7 @@ offside_indent[bool content = true] { ENTRY_DEBUG } :
         set_bool[skip_ternary, false]
 
         {
-            // Python lambdas only contain an expression (no statements)
-            if (inTransparentMode(MODE_LAMBDA_PY))
-                setMode(MODE_EXPRESSION | MODE_EXPECT);
-            else
-                setMode(MODE_TOP | MODE_STATEMENT | MODE_NEST | MODE_LIST);
+            setMode(MODE_TOP | MODE_STATEMENT | MODE_NEST | MODE_LIST);
         }
 ;
 
@@ -16908,7 +16906,13 @@ complete_python_parameter[] {
             {
                 next_token() == COMMA
                 || next_token() == RPAREN
-                || (inTransparentMode(MODE_LAMBDA_PY) && next_token() == INDENT)
+                || (
+                    inTransparentMode(MODE_LAMBDA_PY)
+                    && (
+                        next_token() == PY_COLON
+                        || next_token() == INDENT
+                    )
+                )
             }?
             (MULTOPS | OPERATORS) |
 
@@ -16940,9 +16944,9 @@ complete_python_parameter[] {
 */
 parameter_annotation_py[] { ENTRY_DEBUG } :
         {
-            // possible if called after handling an arbitrary positional parameter
-            // or arbitrary keyword parameter in complete_python_parameter.  In a
-            // Python lambda, colon indicates the start of a block (not annotation).
+            // This is possible if called after handling an arbitrary positional parameter
+            // or arbitrary keyword parameter in complete_python_parameter.  In a Python
+            // lambda, a colon indicates the start of an expression (not annotation).
             if (LA(1) != PY_COLON || inTransparentMode(MODE_LAMBDA_PY))
                 return;
 
@@ -17366,6 +17370,11 @@ lambda_py[] { ENTRY_DEBUG } :
         }
 
         (options { greedy = true; } :
+            { (LA(1) == PY_COLON || LA(1) == INDENT) && inMode(MODE_LAMBDA_PY) }?
+            {
+                break;
+            } |
+
             complete_python_parameter |
 
             {
@@ -17380,6 +17389,13 @@ lambda_py[] { ENTRY_DEBUG } :
                 endDownToMode(MODE_PARAMETER);
                 endMode(MODE_PARAMETER);
             }
+        }
+
+        // Python lambdas do not contain blocks, so consume the colon (':')
+        (PY_COLON | INDENT)
+
+        {
+            startNewMode(MODE_EXPRESSION | MODE_EXPECT);
         }
 ;
 
@@ -17776,35 +17792,6 @@ ternary_py[bool is_nested = false] { CompleteElement element(this); ENTRY_DEBUG 
             }
         }
 ;
-
-/*
-  perform_nested_ternary_check_py
-
-  Determines if a Python ternary is nested in another Python ternary.
-*/
-perform_nested_ternary_check_py[] returns [bool is_nested] {
-        is_nested = false;
-        int start = mark();
-        inputState->guessing++;
-
-        try {
-            while (true) {
-                consume();
-
-                if (LA(1) == IF || LA(1) == TERMINATE || LA(1) == INDENT || LA(1) == 1 /* EOF */)
-                    break;
-            }
-
-            if (LA(1) == IF)
-                is_nested = true;
-
-        } catch(...) {}
-
-        inputState->guessing--;
-        rewind(start);
-
-        ENTRY_DEBUG
-} :;
 
 /*
   yield_expression_py

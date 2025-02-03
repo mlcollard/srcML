@@ -114,9 +114,9 @@ World
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<expr_stmt><expr><lambda>lambda <parameter><name>a</name></parameter><block>:<block_content> <expr><literal type="string">f"""
+<expr_stmt><expr><lambda>lambda <parameter><name>a</name></parameter>: <expr><literal type="string">f"""
 Func {a}
-"""</literal></expr></block_content></block></lambda></expr></expr_stmt>
+"""</literal></expr></lambda></expr></expr_stmt>
 </unit>
 
 <unit revision="1.1.0" language="Python">
