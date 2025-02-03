@@ -54,11 +54,11 @@
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<expr_stmt><expr><name>result</name> <operator>=</operator> <array>[<expr><name>val</name></expr> <comprehension><for>for <control><name>val</name> <range>in <expr><name>a</name></expr> <if>if <expr><name>val</name> <operator>%</operator> <literal type="number">2</literal> <operator>==</operator> <literal type="number">0</literal></expr></if></range></control></for></comprehension>]</array></expr></expr_stmt>
+<expr_stmt><expr><name>result</name> <operator>=</operator> <array>[<expr><name>val</name></expr> <comprehension><for>for <control><name>val</name> <range>in <expr><name>a</name></expr></range></control></for> <if>if <condition><expr><name>val</name> <operator>%</operator> <literal type="number">2</literal> <operator>==</operator> <literal type="number">0</literal></expr></condition></if></comprehension>]</array></expr></expr_stmt>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<expr_stmt><expr><name>result</name> <operator>=</operator> <array>[<expr><name>val</name></expr> <comprehension><for>for <control><name>val</name> <range>in <expr><operator>(</operator><name>array</name> <ternary>if <condition><expr><literal type="boolean">True</literal></expr></condition> <else>else <expr><literal type="boolean">False</literal></expr></else></ternary><operator>)</operator></expr> <if>if <expr><operator>(</operator><literal type="boolean">True</literal> <ternary>if <condition><expr><name>val</name> <operator>%</operator> <literal type="number">2</literal> <operator>==</operator> <literal type="number">0</literal></expr></condition> <else>else <expr><literal type="boolean">False</literal></expr></else></ternary><operator>)</operator></expr></if></range></control></for></comprehension>]</array></expr></expr_stmt>
+<expr_stmt><expr><name>result</name> <operator>=</operator> <array>[<expr><name>val</name></expr> <comprehension><for>for <control><name>val</name> <range>in <expr><operator>(</operator><name>array</name> <ternary>if <condition><expr><literal type="boolean">True</literal></expr></condition> <else>else <expr><literal type="boolean">False</literal></expr></else></ternary><operator>)</operator></expr></range></control></for> <if>if <condition><expr><operator>(</operator><literal type="boolean">True</literal> <ternary>if <condition><expr><name>val</name> <operator>%</operator> <literal type="number">2</literal> <operator>==</operator> <literal type="number">0</literal></expr></condition> <else>else <expr><literal type="boolean">False</literal></expr></else></ternary><operator>)</operator></expr></condition></if></comprehension>]</array></expr></expr_stmt>
 </unit>
 
 </unit>

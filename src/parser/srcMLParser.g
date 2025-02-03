@@ -16686,10 +16686,6 @@ list_comprehension_range_py[] { ENTRY_DEBUG } :
         {
             endMode(MODE_EXPRESSION);
 
-            // handle if expressions in list comprehensions
-            if (inTransparentMode(MODE_LIST_COMPREHENSION_PY))
-                list_comprehension_if_py();
-
             if (inTransparentMode(MODE_RANGE_IN_PY)) {
                 endDownToMode(MODE_RANGE_IN_PY);
                 endMode(MODE_RANGE_IN_PY);
@@ -16739,6 +16735,12 @@ start_list_comprehension_if_py[] { ENTRY_DEBUG } :
         }
 
         IF
+
+        {
+            startElement(SCONDITION);
+
+            setMode(MODE_LIST | MODE_EXPRESSION | MODE_EXPECT);
+        }
 ;
 
 /*
@@ -17297,6 +17299,13 @@ list_comprehension_py[] { ENTRY_DEBUG } :
         )*
 
         list_comprehension_range_py
+
+        {
+            if (inTransparentMode(MODE_LIST_COMPREHENSION_PY))
+                endDownToMode(MODE_LIST_COMPREHENSION_PY);
+        }
+
+        list_comprehension_if_py
 
         {
             if (inTransparentMode(MODE_LIST_COMPREHENSION_PY)) {
