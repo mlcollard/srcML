@@ -1342,10 +1342,10 @@ start_python[] {
             std::array<Rule, 700> temp_array;
 
             /* GENERIC STATEMENTS */
-            temp_array[ASSERT]      = { SASSERT_STATEMENT, 0, MODE_STATEMENT | MODE_EXPRESSION | MODE_EXPECT | MODE_ASSERT_PY, MODE_CONDITION | MODE_EXPECT, nullptr, nullptr };
+            temp_array[ASSERT]      = { SASSERT_STATEMENT, 0, MODE_STATEMENT | MODE_EXPRESSION | MODE_EXPECT | MODE_EXCLUDE_NO_PAREN_TUPLES_PY | MODE_ASSERT_PY, MODE_CONDITION | MODE_EXPECT, nullptr, nullptr };
             temp_array[BREAK]       = { SBREAK_STATEMENT, 0, MODE_STATEMENT, 0, nullptr, nullptr };
             temp_array[CASE]        = { SCASE, 0, MODE_STATEMENT | MODE_NEST | MODE_CASE_PY, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
-            temp_array[CLASS]       = { SCLASS, 0, MODE_STATEMENT | MODE_NEST, MODE_SUPER_LIST_PY | MODE_PARAMETER_LIST_PY | MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, nullptr };
+            temp_array[CLASS]       = { SCLASS, 0, MODE_STATEMENT | MODE_NEST, MODE_EXCLUDE_NO_PAREN_TUPLES_PY | MODE_SUPER_LIST_PY | MODE_PARAMETER_LIST_PY | MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, nullptr };
             temp_array[CONTINUE]    = { SCONTINUE_STATEMENT, 0, MODE_STATEMENT, 0, nullptr, nullptr };
             temp_array[ELSE]        = { SELSE, 0, MODE_STATEMENT | MODE_NEST | MODE_ELSE, MODE_STATEMENT | MODE_NEST, &srcMLParser::if_statement_start, nullptr };
             temp_array[FINALLY]     = { SFINALLY_BLOCK, 0, MODE_STATEMENT | MODE_NEST, 0, nullptr, nullptr };
@@ -1359,7 +1359,7 @@ start_python[] {
             temp_array[PY_DELETE]   = { SDELETE, 0, MODE_STATEMENT, MODE_VARIABLE_NAME | MODE_LIST, nullptr, nullptr };
             temp_array[PY_ELIF]     = { SELSEIF, 0, MODE_STATEMENT | MODE_NEST | MODE_IF | MODE_ELSE, MODE_CONDITION | MODE_EXPECT, &srcMLParser::if_statement_start, nullptr };
             temp_array[PY_EXCEPT]   = { SCATCH_BLOCK, 0, MODE_STATEMENT | MODE_NEST | MODE_EXCEPT_PY, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
-            temp_array[PY_FUNCTION] = { SFUNCTION_STATEMENT, 0, MODE_STATEMENT | MODE_NEST, MODE_PARAMETER_LIST_PY | MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, nullptr };
+            temp_array[PY_FUNCTION] = { SFUNCTION_STATEMENT, 0, MODE_STATEMENT | MODE_NEST, MODE_EXCLUDE_NO_PAREN_TUPLES_PY | MODE_PARAMETER_LIST_PY | MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, nullptr };
             temp_array[PY_GLOBAL]   = { SGLOBAL, 0, MODE_STATEMENT, MODE_VARIABLE_NAME | MODE_LIST, nullptr, nullptr };
             temp_array[PY_IMPORT]   = { SIMPORT_STATEMENT, 0, MODE_STATEMENT, MODE_VARIABLE_NAME | MODE_LIST, nullptr, nullptr };
             temp_array[PY_MATCH]    = { SSWITCH, 0, MODE_STATEMENT | MODE_NEST, MODE_CONDITION | MODE_EXPECT, nullptr, nullptr };
@@ -7874,6 +7874,8 @@ variable_identifier_array_grammar_sub[bool& iscomplex] { CompleteElement element
                 )
             )
                 startNewMode(MODE_LOCAL | MODE_TOP | MODE_LIST | MODE_END_AT_COMMA);
+            else if (inLanguage(LANGUAGE_PYTHON))
+                startNewMode(MODE_EXCLUDE_NO_PAREN_TUPLES_PY | MODE_LOCAL | MODE_TOP | MODE_LIST);
             else
                 startNewMode(MODE_LOCAL | MODE_TOP | MODE_LIST);
 
@@ -12124,6 +12126,19 @@ expression_part[CALL_TYPE type = NOCALL, int call_count = 1] {
         bool flag;
         bool isempty = false;
         bool end_control_incr = false;
+
+        // special case: expression that starts a Python tuple without parentheses
+        if (
+            inLanguage(LANGUAGE_PYTHON)
+            && (LA(1) != EQUAL && !keyword_token_set.member(LA(1)))
+            && !inTransparentMode(MODE_EXCLUDE_NO_PAREN_TUPLES_PY)
+            && !inTransparentMode(MODE_ARGUMENT)
+            && inMode(MODE_EXPRESSION)
+            && perform_tuple_check_no_paren_py()
+        ) {
+            tuple_no_paren_py();
+            return;
+        }
 
         ENTRY_DEBUG
 } :
@@ -17228,7 +17243,7 @@ attribute_py[] { ENTRY_DEBUG } :
 */
 array_py[] { CompleteElement element(this); ENTRY_DEBUG } :
         {
-            startNewMode(MODE_LOCAL | MODE_TOP | MODE_LIST | MODE_ARRAY_PY);
+            startNewMode(MODE_EXCLUDE_NO_PAREN_TUPLES_PY | MODE_LOCAL | MODE_TOP | MODE_LIST | MODE_ARRAY_PY);
 
             startElement(SARRAY);
         }
@@ -17413,7 +17428,7 @@ set_py[] { CompleteElement element(this); ENTRY_DEBUG } :
                 return;
             }
 
-            startNewMode(MODE_LOCAL | MODE_TOP | MODE_LIST | MODE_SET_PY);
+            startNewMode(MODE_EXCLUDE_NO_PAREN_TUPLES_PY | MODE_LOCAL | MODE_TOP | MODE_LIST | MODE_SET_PY);
 
             startElement(SSET);
         }
@@ -17461,7 +17476,7 @@ set_py[] { CompleteElement element(this); ENTRY_DEBUG } :
 */
 dictionary_py[bool isempty = false] { CompleteElement element(this); ENTRY_DEBUG } :
         {
-            startNewMode(MODE_LOCAL | MODE_TOP | MODE_LIST | MODE_DICTIONARY_PY);
+            startNewMode(MODE_EXCLUDE_NO_PAREN_TUPLES_PY | MODE_LOCAL | MODE_TOP | MODE_LIST | MODE_DICTIONARY_PY);
 
             startElement(SDICTIONARY);
         }
@@ -17567,7 +17582,7 @@ tuple_py[] {
         ENTRY_DEBUG
 } :
         {
-            startNewMode(MODE_LOCAL | MODE_TOP | MODE_LIST | MODE_TUPLE_PY);
+            startNewMode(MODE_EXCLUDE_NO_PAREN_TUPLES_PY | MODE_LOCAL | MODE_TOP | MODE_LIST | MODE_TUPLE_PY);
 
             startElement(STUPLE);
 
@@ -17672,6 +17687,103 @@ perform_tuple_check_py[] returns [bool is_tuple] {
 
                     consume();
                 }
+            }
+        }
+        catch (...) {}
+
+        inputState->guessing--;
+        rewind(start);
+
+        last_consumed = last_consumed_current;
+
+        ENTRY_DEBUG
+} :;
+
+/*
+  tuple_no_paren_py
+
+  Handles Python tuples that do not use parentheses.
+  Not used directly, but can be called by expression_part.
+*/
+tuple_no_paren_py[] { CompleteElement element(this); ENTRY_DEBUG } :
+        {
+            startNewMode(MODE_EXCLUDE_NO_PAREN_TUPLES_PY | MODE_LOCAL | MODE_TOP | MODE_LIST | MODE_TUPLE_NO_PAREN_PY);
+
+            startElement(STUPLE);
+        }
+
+        (options { greedy = true; } :
+            // end the no-parenthesis tuple if:
+            // - current token is INDENT or TERMINATE
+            // - at the top level of the tuple and find EQUAL
+            {
+                LA(1) == INDENT
+                || LA(1) == TERMINATE
+                || (
+                    inTransparentMode(MODE_TUPLE_NO_PAREN_PY)
+                    && LA(1) == EQUAL
+                )
+            }?
+            {
+                break;
+            } |
+
+            alias_py |
+
+            { inMode(MODE_ARGUMENT) }?
+            argument |
+
+            {
+                if (!inMode(MODE_EXPRESSION))
+                    startNewMode(MODE_EXPRESSION | MODE_EXPECT);
+            }
+            expression |
+
+            comma
+        )*
+
+        {
+            if (inTransparentMode(MODE_TUPLE_NO_PAREN_PY)) {
+                endDownToMode(MODE_TUPLE_NO_PAREN_PY);
+                endMode(MODE_TUPLE_NO_PAREN_PY);
+            }
+        }
+;
+
+/*
+  perform_tuple_check_no_paren_py
+
+  Determines if an expression with a COMMA should start a tuple (e.g., "1,").
+*/
+perform_tuple_check_no_paren_py[] returns [bool is_tuple] {
+        is_tuple = false;
+        int num_brackets = 0;  // counts all "()", "{}", and "[]"
+        int last_consumed_current = last_consumed;
+        int start = mark();
+        inputState->guessing++;
+
+        try {
+            while (true) {
+                if (LA(1) == LPAREN || LA(1) == PY_LCURLY || LA(1) == LBRACKET)
+                    ++num_brackets;
+
+                if (LA(1) == RPAREN || LA(1) == PY_RCURLY || LA(1) == RBRACKET)
+                    --num_brackets;
+
+                // something went wrong if the number of brackets is 0 or less
+                if (num_brackets < 0)
+                    break;
+
+                // the expression contains a comma not in any brackets
+                if (LA(1) == COMMA && num_brackets == 0) {
+                    is_tuple = true;
+                    break;
+                }
+
+                if (LA(1) == TERMINATE || LA(1) == INDENT || LA(1) == 1 /* EOF */)
+                    break;
+
+                consume();
             }
         }
         catch (...) {}
@@ -17841,7 +17953,7 @@ operator_parenthesis_complete_py[] {
         lparen_marked
 
         {
-            startNewMode(MODE_OPERATOR_PAREN_PY);
+            startNewMode(MODE_EXCLUDE_NO_PAREN_TUPLES_PY | MODE_OPERATOR_PAREN_PY);
 
             // start the "fake" expression
             startElement(SEXPRESSION);
