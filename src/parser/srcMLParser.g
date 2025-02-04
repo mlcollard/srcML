@@ -16682,10 +16682,16 @@ list_comprehension_range_py[] { ENTRY_DEBUG } :
             { inMode(MODE_ARGUMENT) }?
             argument |
 
-            // do not accidentally consume the tuple ending RPAREN
+            // do not accidentally consume the tuple-ending RPAREN or operator RPAREN
             {
-                (!inTransparentMode(MODE_TUPLE_PY) || last_consumed != RPAREN || LA(1) != RPAREN || next_token() == RPAREN)
+                (
+                    !inTransparentMode(MODE_TUPLE_PY)
+                    || last_consumed != RPAREN
+                    || LA(1) != RPAREN
+                    || next_token() == RPAREN
+                )
                 && next_token() != TERMINATE
+                && (LA(1) != RPAREN || lparen_types_py.back() != 'o')
             }?
             {
                 if (!inMode(MODE_EXPRESSION))
@@ -16697,7 +16703,8 @@ list_comprehension_range_py[] { ENTRY_DEBUG } :
         )*
 
         {
-            endMode(MODE_EXPRESSION);
+            if (LA(1) != RPAREN || lparen_types_py.back() != 'o')
+                endMode(MODE_EXPRESSION);
 
             if (inTransparentMode(MODE_RANGE_IN_PY)) {
                 endDownToMode(MODE_RANGE_IN_PY);
@@ -16716,10 +16723,16 @@ list_comprehension_if_py[] { ENTRY_DEBUG } :
             { getParen() == 0 }?
             start_list_comprehension_if_py |
 
-            // do not accidentally consume the tuple ending RPAREN
+            // do not accidentally consume the tuple-ending RPAREN or operator RPAREN
             {
-                (!inTransparentMode(MODE_TUPLE_PY) || last_consumed != RPAREN || LA(1) != RPAREN || next_token() == RPAREN)
+                (
+                    !inTransparentMode(MODE_TUPLE_PY)
+                    || last_consumed != RPAREN
+                    || LA(1) != RPAREN
+                    || next_token() == RPAREN
+                )
                 && next_token() != TERMINATE
+                && (LA(1) != RPAREN || lparen_types_py.back() != 'o')
             }?
             {
                 if (!inMode(MODE_EXPRESSION))
