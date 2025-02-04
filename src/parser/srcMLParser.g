@@ -718,6 +718,7 @@ tokens {
     SDELETE;
     SDICTIONARY;
     SELLIPSIS;
+    SEXEC_PYTHON2;
     SGLOBAL;
     SHASHTAG_COMMENT;
     SLIST_COMPREHENSION;
@@ -726,6 +727,7 @@ tokens {
     SPARAMETER_KEYWORD_ARGUMENT;
     SPARAMETER_MODIFIER;
     SPASS;
+    SPRINT_PYTHON2;
     SSET;
     STUPLE;
     SYIELD_FROM_STATEMENT;
@@ -1356,6 +1358,8 @@ start_python[] {
             temp_array[WHILE]       = { SWHILE_STATEMENT, 0, MODE_STATEMENT | MODE_NEST | MODE_WHILE_LOOP_PY, MODE_CONDITION | MODE_EXPECT, nullptr, nullptr };
 
             /* PYTHON STATEMENTS */
+            temp_array[PY_2_EXEC]   = { SEXEC_PYTHON2, 0, MODE_STATEMENT, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
+            temp_array[PY_2_PRINT]  = { SPRINT_PYTHON2, 0, MODE_STATEMENT, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
             temp_array[PY_DELETE]   = { SDELETE, 0, MODE_STATEMENT, MODE_VARIABLE_NAME | MODE_LIST, nullptr, nullptr };
             temp_array[PY_ELIF]     = { SELSEIF, 0, MODE_STATEMENT | MODE_NEST | MODE_IF | MODE_ELSE, MODE_CONDITION | MODE_EXPECT, &srcMLParser::if_statement_start, nullptr };
             temp_array[PY_EXCEPT]   = { SCATCH_BLOCK, 0, MODE_STATEMENT | MODE_NEST | MODE_EXCEPT_PY, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
@@ -1424,14 +1428,19 @@ start_python[] {
         // invoke the table to handle keywords and duplex keywords
         if (inMode(MODE_STATEMENT)) {
             auto token = LA(1);
-            if (duplex_keyword_set.member((unsigned int) LA(1))) {
-                const auto lookup = duplexKeywords[token + (next_token() << 8)];
-                if (lookup)
-                    token = lookup;
-            }
-            const auto& rule = python_rules[token];
-            if (rule.elementToken && processRule(rule)) {
-                return;
+
+            // differentiate "exec" and "print" calls from Python 2 statements
+            if ((token != PY_2_EXEC && token != PY_2_PRINT) || next_token() != LPAREN) {
+                if (duplex_keyword_set.member((unsigned int) LA(1))) {
+                    const auto lookup = duplexKeywords[token + (next_token() << 8)];
+                    if (lookup)
+                        token = lookup;
+                }
+
+                const auto& rule = python_rules[token];
+                if (rule.elementToken && processRule(rule)) {
+                    return;
+                }
             }
         }
 
@@ -8580,7 +8589,10 @@ identifier_list[] { ENTRY_DEBUG } :
 
         // JavaScript
         JS_BREAK | JS_CATCH | JS_CONTINUE | JS_DO | JS_ELSE | JS_FINALLY | JS_ASYNC | JS_DEBUGGER | JS_DEFAULT | JS_EACH |
-        JS_EXPORT | JS_FUNCTION | JS_IMPORT | JS_RANGE_IN | JS_WITH | JS_YIELD | JS_SWITCH | JS_TRY
+        JS_EXPORT | JS_FUNCTION | JS_IMPORT | JS_RANGE_IN | JS_WITH | JS_YIELD | JS_SWITCH | JS_TRY |
+
+        // Python 2
+        PY_2_EXEC | PY_2_PRINT
 ;
 
 /*

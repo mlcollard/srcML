@@ -357,6 +357,8 @@ tokens {
     EXPONENTIATION;
     LITERAL_ELLIPSIS;
     LITERAL_NONE;
+    PY_2_EXEC;
+    PY_2_PRINT;
     PY_ALIAS;
     PY_AND;
     PY_ARROW;
@@ -825,6 +827,7 @@ KeywordLexer(UTF8CharBuffer* pinput, int language, OPTION_TYPE & options,
         { "del"          , PY_DELETE         , LANGUAGE_PYTHON },
         { "elif"         , PY_ELIF           , LANGUAGE_PYTHON },
         { "except"       , PY_EXCEPT         , LANGUAGE_PYTHON },
+        { "exec"         , PY_2_EXEC         , LANGUAGE_PYTHON },
         { "False"        , LITERAL_FALSE     , LANGUAGE_PYTHON },
         { "finally"      , FINALLY           , LANGUAGE_PYTHON },
         { "from"         , PY_FROM           , LANGUAGE_PYTHON },
@@ -837,6 +840,7 @@ KeywordLexer(UTF8CharBuffer* pinput, int language, OPTION_TYPE & options,
         { "nonlocal"     , PY_NONLOCAL       , LANGUAGE_PYTHON },
         { "operator"     , NAME              , LANGUAGE_PYTHON },
         { "pass"         , PY_PASS           , LANGUAGE_PYTHON },
+        { "print"        , PY_2_PRINT        , LANGUAGE_PYTHON },
         { "raise"        , PY_RAISE          , LANGUAGE_PYTHON },
         { "True"         , LITERAL_TRUE      , LANGUAGE_PYTHON },
         { "type"         , PY_TYPE           , LANGUAGE_PYTHON },
