@@ -16363,18 +16363,6 @@ offside_dedent[] { ENTRY_DEBUG } :
                 return;
             }
 
-            // Ignore TERMINATE for one-line "if"/"elif"/"else", "for", "try", or "while" statements
-            if (
-                inLanguage(LANGUAGE_PYTHON)
-                && (
-                    inTransparentMode(MODE_IF_STATEMENT)
-                    || inTransparentMode(MODE_FOR_LOOP_PY)
-                    || inTransparentMode(MODE_TRY)
-                    || inTransparentMode(MODE_WHILE_LOOP_PY)
-                ) && LA(1) == TERMINATE
-            )
-                consume();
-
             // special case to ensure "if" encloses the entire "if..elif..else" block
             if (inLanguage(LANGUAGE_PYTHON)
                 && inTransparentMode(MODE_IF_STATEMENT)
