@@ -139,4 +139,20 @@
 </block_content></block></catch></try>
 </unit>
 
+<unit revision="1.1.0" language="Python">
+<try>try<block>:<block_content>
+    <expr_stmt><expr><literal type="number">1</literal><operator>/</operator><literal type="number">0</literal></expr></expr_stmt>
+</block_content></block><catch>except <alias><expr><tuple>(<expr><name>ZeroDivisionError</name></expr>, <expr><name>ValueError</name></expr>, <expr><name>TypeError</name></expr>)</tuple></expr>, <name>e</name></alias><block>:<block_content>
+    <print>print <expr><name>e</name></expr></print>
+</block_content></block></catch></try>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<try>try<block>:<block_content>
+    <expr_stmt><expr><literal type="number">1</literal><operator>/</operator><literal type="number">0</literal></expr></expr_stmt>
+</block_content></block><catch>except <alias><expr><operator>(</operator><name>ZeroDivisionError</name><operator>)</operator></expr>, <operator>(</operator><name>e</name><operator>)</operator></alias><block>:<block_content>
+    <print>print <expr><name>e</name></expr></print>
+</block_content></block></catch></try>
+</unit>
+
 </unit>

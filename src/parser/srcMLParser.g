@@ -1393,10 +1393,12 @@ start_python[] {
         }
 
         // special markup for a "from" that appears before an "import" statement
-        if (LA(1) == PY_FROM) {
-            if (perform_from_import_check())
-                from_import_py();
-        }
+        if (LA(1) == PY_FROM && perform_from_import_check())
+            from_import_py();
+
+        // special markup for a Python 2 "except" clause
+        if (LA(1) == PY_EXCEPT && perform_python_2_except_check())
+            python_2_except_py();
 
         // check if the current token starts a decorator that occurs before a keyword (or specifiers)
         // "@" is an operator in expressions, not a decorator
@@ -18038,3 +18040,103 @@ operator_parenthesis_complete_py[] {
             }
         }
 ;
+
+/*
+  python_2_except_py
+
+  Handles a Python 2 "except" clause (e.g., uses "Error, e" instead of "Error as e").
+*/
+python_2_except_py[] { ENTRY_DEBUG } :
+        {
+            startNewMode(MODE_STATEMENT | MODE_NEST | MODE_EXCLUDE_NO_PAREN_TUPLES_PY | MODE_EXCEPT_PY);
+
+            startElement(SCATCH_BLOCK);
+        }
+
+        PY_EXCEPT
+
+        {
+            startNewMode(MODE_EXCEPT_ALIAS_PY);
+
+            startElement(SALIAS);
+        }
+
+        (options { greedy = true; } :
+            { LA(1) == COMMA && inMode(MODE_EXPRESSION) }?
+            {
+                if (inTransparentMode(MODE_EXPRESSION)) {
+                    endDownToMode(MODE_EXPRESSION);
+                    endMode(MODE_EXPRESSION);
+                }
+
+                break;
+            } |
+
+            { inMode(MODE_ARGUMENT) }?
+            argument |
+
+            {
+                if (!inMode(MODE_EXPRESSION))
+                    startNewMode(MODE_EXPRESSION | MODE_EXPECT);
+            }
+            expression |
+
+            comma
+        )*
+
+        comma_marked[false]
+        (compound_name | operator_parenthesis_complete_py)
+
+        {
+            if (inTransparentMode(MODE_EXCEPT_ALIAS_PY)) {
+                endDownToMode(MODE_EXCEPT_ALIAS_PY);
+                endMode(MODE_EXCEPT_ALIAS_PY);
+            }
+        }
+;
+
+/*
+  perform_python_2_except_check
+
+  Determines if an "except" clause follows Python 2 syntax (e.g., "Error, e").
+*/
+perform_python_2_except_check returns [bool is_python_2] {
+        is_python_2 = false;
+        int num_brackets = 0;  // counts all "()", "{}", and "[]"
+        int last_consumed_current = last_consumed;
+        int start = mark();
+        inputState->guessing++;
+
+        try {
+            while (true) {
+                if (LA(1) == LPAREN || LA(1) == PY_LCURLY || LA(1) == LBRACKET)
+                    ++num_brackets;
+
+                if (LA(1) == RPAREN || LA(1) == PY_RCURLY || LA(1) == RBRACKET)
+                    --num_brackets;
+
+                // something went wrong if the number of brackets is 0 or less
+                if (num_brackets < 0)
+                    break;
+
+                // the except clause contains a comma not in any brackets
+                if (LA(1) == COMMA && num_brackets == 0) {
+                    is_python_2 = true;
+                    break;
+                }
+
+                if (LA(1) == INDENT || LA(1) == TERMINATE || LA(1) == 1 /* EOF */)
+                    break;
+
+                consume();
+            }
+        }
+        catch (...) {}
+
+        inputState->guessing--;
+        rewind(start);
+
+        last_consumed = last_consumed_current;
+
+        ENTRY_DEBUG
+} :;

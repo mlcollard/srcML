@@ -328,6 +328,8 @@ const static srcMLState::MODE_TYPE MODE_FOR_LOOP_PY;
 
 const static srcMLState::MODE_TYPE MODE_WHILE_LOOP_PY;
 
+const static srcMLState::MODE_TYPE MODE_EXCEPT_ALIAS_PY;
+
 const static srcMLState::MODE_TYPE MODE_DICTIONARY_PY;
 
 const static srcMLState::MODE_TYPE MODE_ASSERT_PY;
