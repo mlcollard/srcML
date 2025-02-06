@@ -155,4 +155,28 @@
 </block_content></block></catch></try>
 </unit>
 
+<unit revision="1.1.0" language="Python">
+<try>try<block>:<block_content> <expr_stmt><expr><name>result</name> <operator>=</operator> <name>x</name> <operator>/</operator> <name>y</name></expr></expr_stmt></block_content></block>
+<catch>except <expr><name>ZeroDivisionError</name></expr><block>:<block_content> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"ZeroDivisionError"</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></catch></try>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<try>try<block>:<block_content> <expr_stmt><expr><name>result</name> <operator>=</operator> <name>x</name> <operator>/</operator> <name>y</name></expr></expr_stmt></block_content></block>
+<catch>except <expr><name>ZeroDivisionError</name></expr><block>:<block_content> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"ZeroDivisionError"</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></catch>
+<else>else<block>:<block_content> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><name>result</name></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></else></try>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<try>try<block>:<block_content> <expr_stmt><expr><name>result</name> <operator>=</operator> <name>x</name> <operator>/</operator> <name>y</name></expr></expr_stmt></block_content></block>
+<catch>except <expr><name>ZeroDivisionError</name></expr><block>:<block_content> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"ZeroDivisionError"</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></catch>
+<finally>finally<block>:<block_content> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"finally"</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></finally></try>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<try>try<block>:<block_content> <expr_stmt><expr><name>result</name> <operator>=</operator> <name>x</name> <operator>/</operator> <name>y</name></expr></expr_stmt></block_content></block>
+<catch>except <expr><name>ZeroDivisionError</name></expr><block>:<block_content> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"ZeroDivisionError"</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></catch>
+<else>else<block>:<block_content> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><name>result</name></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></else>
+<finally>finally<block>:<block_content> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"finally"</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></finally></try>
+</unit>
+
 </unit>
