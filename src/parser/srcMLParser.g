@@ -12188,6 +12188,10 @@ expression_part[CALL_TYPE type = NOCALL, int call_count = 1] {
         { inLanguage(LANGUAGE_PYTHON) }?
         yield_expression_py |
 
+        // looking for a colon to start a Python type annotation
+        { inLanguage(LANGUAGE_PYTHON) && !inTransparentMode(MODE_EXCLUDE_NO_PAREN_TUPLES_PY) }?
+        type_alias_annotation_py |
+
         // do not mark JavaScript method blocks as objects (e.g., methodName() {})
         { inLanguage(LANGUAGE_JAVASCRIPT) && last_consumed == RPAREN }?
         lcurly[true] |
@@ -18140,3 +18144,31 @@ perform_python_2_except_check returns [bool is_python_2] {
 
         ENTRY_DEBUG
 } :;
+
+/*
+  type_alias_annotation_py
+
+  Handles a Python type alias annotation.
+*/
+type_alias_annotation_py[] { ENTRY_DEBUG } :
+        {
+            startNewMode(MODE_ANNOTATION_PY);
+
+            startElement(SANNOTATION);
+        }
+
+        PY_COLON
+
+        {
+            startNewMode(MODE_EXPRESSION | MODE_EXPECT);
+        }
+
+        expression
+
+        {
+            if (inTransparentMode(MODE_ANNOTATION_PY)) {
+                endDownToMode(MODE_ANNOTATION_PY);
+                endMode(MODE_ANNOTATION_PY);
+            }
+        }
+;

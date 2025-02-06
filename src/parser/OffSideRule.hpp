@@ -47,6 +47,7 @@ private:
 
     antlr::RefToken tempPostWSToken = srcMLToken::factory();
     antlr::RefToken tokenAfterIndent = srcMLToken::factory();
+    antlr::RefToken lineStartToken = srcMLToken::factory();
 
     int blockStartToken = -1;
     int numIndents = 0;
@@ -55,6 +56,7 @@ private:
 
     bool isOneLineStatement = false;
     bool checkOneLineStatement = false;
+    bool delayLineStartCheck = false;
     bool recordToken = false;
 };
 

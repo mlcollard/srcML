@@ -28,8 +28,26 @@ antlr::RefToken OffSideRule::nextToken() {
         // Detect if currently in/out of `()`, `{}`, or `[]`
         checkBracketToken(token);
 
+        // Record the first token found on a line
+        if (token->getColumn() == 1 || delayLineStartCheck) {
+            if (delayLineStartCheck)
+                delayLineStartCheck = false;
+
+            lineStartToken = token;
+
+            if (token->getType() == srcMLParser::WS)
+                delayLineStartCheck = true;
+        }
+
         // [INDENT] The token matches the token used to indicate the start of a block
-        if (token->getType() == blockStartToken && numBrackets == 0) {
+        if (
+            token->getType() == blockStartToken
+            && numBrackets == 0
+            && (
+                srcMLParser::keyword_token_set.member(lineStartToken->getType())
+                || srcMLParser::class_tokens_set.member(lineStartToken->getType())
+            )
+        ) {
             token->setType(srcMLParser::INDENT);
             ++numIndents;
             recordToken = true;
@@ -64,6 +82,17 @@ void OffSideRule::handleBlocks(antlr::RefToken token) {
 
         // Detect if currently in/out of `()`, `{}`, or `[]`
         checkBracketToken(nextToken);
+
+        // Record the first token found on a line
+        if (nextToken->getColumn() == 1 || delayLineStartCheck) {
+            if (delayLineStartCheck)
+                delayLineStartCheck = false;
+
+            lineStartToken = nextToken;
+
+            if (nextToken->getType() == srcMLParser::WS)
+                delayLineStartCheck = true;
+        }
 
         // [DEDENT] If the statement begins and ends on a single line, end it at EOL
         if (isOneLineStatement && nextToken->getType() == srcMLParser::EOL) {
@@ -115,7 +144,14 @@ void OffSideRule::handleBlocks(antlr::RefToken token) {
         }
 
         // [INDENT] The token matches the token used to indicate the start of a block
-        if (nextToken->getType() == blockStartToken && numBrackets == 0) {
+        if (
+            nextToken->getType() == blockStartToken
+            && numBrackets == 0
+            && (
+                srcMLParser::keyword_token_set.member(lineStartToken->getType())
+                || srcMLParser::class_tokens_set.member(lineStartToken->getType())
+            )
+        ) {
             nextToken->setType(srcMLParser::INDENT);
             ++numIndents;
             recordToken = true;
@@ -130,6 +166,17 @@ void OffSideRule::handleBlocks(antlr::RefToken token) {
 
                 // Detect if currently in/out of `()`, `{}`, or `[]`
                 checkBracketToken(postWSToken);
+
+                // Record the first token found on a line
+                if (postWSToken->getColumn() == 1 || delayLineStartCheck) {
+                    if (delayLineStartCheck)
+                        delayLineStartCheck = false;
+
+                    lineStartToken = postWSToken;
+
+                    if (postWSToken->getType() == srcMLParser::WS)
+                        delayLineStartCheck = true;
+                }
 
                 indentBuffer.emplace_back(postWSToken);
                 continue;
@@ -153,6 +200,17 @@ void OffSideRule::handleBlocks(antlr::RefToken token) {
 
                     // Detect if currently in/out of `()`, `{}`, or `[]`
                     checkBracketToken(tempPostWSToken);
+
+                    // Record the first token found on a line
+                    if (tempPostWSToken->getColumn() == 1 || delayLineStartCheck) {
+                        if (delayLineStartCheck)
+                            delayLineStartCheck = false;
+
+                        lineStartToken = tempPostWSToken;
+
+                        if (tempPostWSToken->getType() == srcMLParser::WS)
+                            delayLineStartCheck = true;
+                    }
 
                     tempPostWSToken = srcMLToken::factory();
                 }
@@ -186,6 +244,17 @@ void OffSideRule::handleBlocks(antlr::RefToken token) {
                 // Detect if currently in/out of `()`, `{}`, or `[]`
                 checkBracketToken(tempPostWSToken);
 
+                // Record the first token found on a line
+                if (tempPostWSToken->getColumn() == 1 || delayLineStartCheck) {
+                    if (delayLineStartCheck)
+                        delayLineStartCheck = false;
+
+                    lineStartToken = tempPostWSToken;
+
+                    if (tempPostWSToken->getType() == srcMLParser::WS)
+                        delayLineStartCheck = true;
+                }
+
                 tempPostWSToken = srcMLToken::factory();
             }
 
@@ -208,6 +277,17 @@ void OffSideRule::handleBlocks(antlr::RefToken token) {
 
                 // Detect if currently in/out of `()`, `{}`, or `[]`
                 checkBracketToken(tempPostWSToken);
+
+                // Record the first token found on a line
+                if (tempPostWSToken->getColumn() == 1 || delayLineStartCheck) {
+                    if (delayLineStartCheck)
+                        delayLineStartCheck = false;
+
+                    lineStartToken = tempPostWSToken;
+
+                    if (tempPostWSToken->getType() == srcMLParser::WS)
+                        delayLineStartCheck = true;
+                }
 
                 tempPostWSToken = srcMLToken::factory();
             }
@@ -234,6 +314,17 @@ void OffSideRule::handleBlocks(antlr::RefToken token) {
 
                     // Detect if currently in/out of `()`, `{}`, or `[]`
                     checkBracketToken(tempPostWSToken);
+
+                    // Record the first token found on a line
+                    if (tempPostWSToken->getColumn() == 1 || delayLineStartCheck) {
+                        if (delayLineStartCheck)
+                            delayLineStartCheck = false;
+
+                        lineStartToken = tempPostWSToken;
+
+                        if (tempPostWSToken->getType() == srcMLParser::WS)
+                            delayLineStartCheck = true;
+                    }
 
                     tempPostWSToken = srcMLToken::factory();
                 }
