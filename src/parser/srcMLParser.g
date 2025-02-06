@@ -1349,7 +1349,7 @@ start_python[] {
             temp_array[CASE]        = { SCASE, 0, MODE_STATEMENT | MODE_NEST | MODE_CASE_PY, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
             temp_array[CLASS]       = { SCLASS, 0, MODE_STATEMENT | MODE_NEST, MODE_SUPER_LIST_PY | MODE_PARAMETER_LIST_PY | MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, nullptr };
             temp_array[CONTINUE]    = { SCONTINUE_STATEMENT, 0, MODE_STATEMENT, 0, nullptr, nullptr };
-            temp_array[ELSE]        = { SELSE, 0, MODE_STATEMENT | MODE_NEST | MODE_ELSE, MODE_STATEMENT | MODE_NEST, &srcMLParser::if_statement_start, nullptr };
+            temp_array[ELSE]        = { SELSE, 0, MODE_STATEMENT | MODE_NEST, 0, &srcMLParser::if_statement_start, nullptr };
             temp_array[FINALLY]     = { SFINALLY_BLOCK, 0, MODE_STATEMENT | MODE_NEST, 0, nullptr, nullptr };
             temp_array[FOR]         = { SFOR_STATEMENT, 0, MODE_STATEMENT | MODE_NEST | MODE_FOR_LOOP_PY, MODE_CONTROL | MODE_EXPECT | MODE_FOR_CONTROL_PY, nullptr, nullptr };
             temp_array[IF]          = { SIF, 0, MODE_STATEMENT | MODE_NEST | MODE_IF | MODE_ELSE, MODE_CONDITION | MODE_EXPECT, &srcMLParser::if_statement_start, nullptr };
@@ -16362,6 +16362,18 @@ offside_dedent[] { ENTRY_DEBUG } :
                 endMode(MODE_IF);
                 return;
             }
+
+            // Ignore TERMINATE for one-line "if"/"elif"/"else", "for", "try", or "while" statements
+            if (
+                inLanguage(LANGUAGE_PYTHON)
+                && (
+                    inTransparentMode(MODE_IF_STATEMENT)
+                    || inTransparentMode(MODE_FOR_LOOP_PY)
+                    || inTransparentMode(MODE_TRY)
+                    || inTransparentMode(MODE_WHILE_LOOP_PY)
+                ) && LA(1) == TERMINATE
+            )
+                consume();
 
             // special case to ensure "if" encloses the entire "if..elif..else" block
             if (inLanguage(LANGUAGE_PYTHON)
