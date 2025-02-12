@@ -2,11 +2,11 @@
 <unit xmlns="http://www.srcML.org/srcML/src" language="Python" url="comprehension">
 
 <unit revision="1.1.0" language="Python">
-<expr_stmt><expr><operator>(</operator><comprehension><expr><name>x</name></expr> <for>for <control><name>x</name> <range>in <expr><call><name>range</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control></for></comprehension><operator>)</operator></expr></expr_stmt>
+<expr_stmt><expr><operator>(</operator><name>x</name> <comprehension><for>for <control><name>x</name> <range>in <expr><call><name>range</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control></for></comprehension><operator>)</operator></expr></expr_stmt>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<expr_stmt><expr><operator>(</operator><comprehension><expr><name>x</name></expr> <for><specifier>async</specifier> for <control><name>x</name> <range>in <expr><call><name>async_range</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control></for></comprehension><operator>)</operator></expr></expr_stmt>
+<expr_stmt><expr><operator>(</operator><name>x</name> <comprehension><for><specifier>async</specifier> for <control><name>x</name> <range>in <expr><call><name>async_range</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control></for></comprehension><operator>)</operator></expr></expr_stmt>
 </unit>
 
 <unit revision="1.1.0" language="Python">
@@ -59,6 +59,10 @@
 
 <unit revision="1.1.0" language="Python">
 <expr_stmt><expr><array>[<expr><name>x</name></expr> <comprehension><for>for <control><name>x</name> <range>in <expr><array>[<expr><name>a</name></expr> <comprehension><for>for <control><name>a</name> <range>in <expr><call><name>range</name><argument_list>(<argument><expr><literal type="number">100</literal></expr></argument>)</argument_list></call></expr></range></control></for> <if>if <condition><expr><name>a</name> <operator>&lt;</operator> <literal type="number">50</literal></expr></condition></if></comprehension>]</array></expr></range></control></for> <if>if <condition><expr><name>x</name> <operator>%</operator> <literal type="number">2</literal> <operator>==</operator> <literal type="number">0</literal></expr></condition></if></comprehension>]</array></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>result</name> <operator>=</operator> <array>[<expr><operator>(</operator><name>val</name> <operator>*</operator> <literal type="number">2</literal> <comprehension><for>for <control><name>val</name> <range>in <expr><name>array</name></expr></range></control></for></comprehension><operator>)</operator></expr>]</array></expr></expr_stmt>
 </unit>
 
 </unit>

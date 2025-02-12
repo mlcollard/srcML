@@ -114,7 +114,7 @@
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<expr_stmt><expr><lambda>lambda <parameter><name>x</name></parameter>, <parameter><name>y</name></parameter> <block>:<block_content> <expr><name>x</name> <operator>+</operator> <name>y</name></expr></block_content></block></lambda></expr></expr_stmt>
+<expr_stmt><expr><lambda>lambda <parameter><name>x</name></parameter>, <parameter><name>y</name></parameter> : <expr><name>x</name> <operator>+</operator> <name>y</name></expr></lambda></expr></expr_stmt>
 </unit>
 
 <unit revision="1.1.0" language="Python">

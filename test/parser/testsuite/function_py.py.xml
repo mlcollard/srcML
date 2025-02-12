@@ -52,6 +52,10 @@ def <name>func</name><parameter_list>()</parameter_list><block>:<block_content>
 </unit>
 
 <unit revision="1.1.0" language="Python">
+<function><specifier>async</specifier> def <name>async_loop</name><parameter_list>()</parameter_list><block>:<block_content> <expr_stmt><expr><operator>await</operator> <call><name>start_loop</name><argument_list>()</argument_list></call></expr></expr_stmt></block_content></block></function>
+</unit>
+
+<unit revision="1.1.0" language="Python">
 <function>def <name>bar</name><parameter_list>()</parameter_list><block>:<block_content> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="number">1</literal></expr></argument>,
                  <argument><expr><literal type="number">2</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></function>
 </unit>
