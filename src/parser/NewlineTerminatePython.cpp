@@ -19,13 +19,23 @@ antlr::RefToken NewlineTerminatePython::nextToken() {
         auto token = input.nextToken();
 
         // update the open parentheses count
-        if (token->getType() == srcMLParser::LPAREN)
+        if (token->getType() == srcMLParser::LPAREN ||
+            token->getType() == srcMLParser::LBRACKET ||
+            token->getType() == srcMLParser::PY_LCURLY)
             ++parenthesesCount;
-        else if (token->getType() == srcMLParser::RPAREN && parenthesesCount > 0)
+        else if (parenthesesCount > 0 &&
+            token->getType() == srcMLParser::RPAREN ||
+            token->getType() == srcMLParser::RBRACKET ||
+            token->getType() == srcMLParser::PY_RCURLY)
             --parenthesesCount;
 
         // For a newline, insert a TERMINATE in certain cases
-        if ((token->getType() == srcMLParser::EOL &&
+        if (((token->getType() == srcMLParser::EOL ||
+              token->getType() == srcMLParser::HASHTAG_COMMENT_START ||
+              token->getType() == srcMLParser::HASHBANG_COMMENT_START) &&
+
+            // not in parentheses
+            parenthesesCount == 0 &&
 
             // not an empty line
             !firstCharacter &&
