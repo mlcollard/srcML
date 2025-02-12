@@ -18,9 +18,11 @@ antlr::RefToken NewlineTerminatePython::nextToken() {
     if (buffer.empty()) {
         auto token = input.nextToken();
 
+        // buffer any non-EOL whitespace since this has to be after the
+        // inserted terminate
         std::deque<antlr::RefToken> wsBuffer;
         while (token->getType() == srcMLParser::WS) {
-            wsBuffer.push_back(token);
+            wsBuffer.emplace_back(token);
             token = input.nextToken();
         }
 
@@ -76,13 +78,6 @@ antlr::RefToken NewlineTerminatePython::nextToken() {
 
             // insert terminal token
             buffer.emplace_back(terminateToken);
-
-            // insert skipped whitespace
-            while (!wsBuffer.empty()) {
-                auto token = wsBuffer.front();
-                wsBuffer.pop_front();
-                buffer.emplace_back(token);
-            }
         }
 
         if (token->getType() == srcMLParser::EOL) {
@@ -98,9 +93,8 @@ antlr::RefToken NewlineTerminatePython::nextToken() {
 
         // insert skipped whitespace
         while (!wsBuffer.empty()) {
-            auto token = wsBuffer.front();
+            buffer.emplace_back(wsBuffer.front());
             wsBuffer.pop_front();
-            buffer.emplace_back(token);
         }
 
         // insert read token
