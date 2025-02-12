@@ -18,6 +18,12 @@ antlr::RefToken NewlineTerminatePython::nextToken() {
     if (buffer.empty()) {
         auto token = input.nextToken();
 
+        std::deque<antlr::RefToken> wsBuffer;
+        while (token->getType() == srcMLParser::WS) {
+            wsBuffer.push_back(token);
+            token = input.nextToken();
+        }
+
         // update the open parentheses count
         if (token->getType() == srcMLParser::LPAREN ||
             token->getType() == srcMLParser::LBRACKET ||
@@ -31,6 +37,7 @@ antlr::RefToken NewlineTerminatePython::nextToken() {
 
         // For a newline, insert a TERMINATE in certain cases
         if (((token->getType() == srcMLParser::EOL ||
+              token->getType() == srcMLParser::WS_EOL ||
               token->getType() == srcMLParser::HASHTAG_COMMENT_START ||
               token->getType() == srcMLParser::HASHBANG_COMMENT_START) &&
 
@@ -69,6 +76,13 @@ antlr::RefToken NewlineTerminatePython::nextToken() {
 
             // insert terminal token
             buffer.emplace_back(terminateToken);
+
+            // insert skipped whitespace
+            while (!wsBuffer.empty()) {
+                auto token = wsBuffer.front();
+                wsBuffer.pop_front();
+                buffer.emplace_back(token);
+            }
         }
 
         if (token->getType() == srcMLParser::EOL) {
@@ -81,6 +95,13 @@ antlr::RefToken NewlineTerminatePython::nextToken() {
 
         // record to check for previous INDENT
         lastToken = token;
+
+        // insert skipped whitespace
+        while (!wsBuffer.empty()) {
+            auto token = wsBuffer.front();
+            wsBuffer.pop_front();
+            buffer.emplace_back(token);
+        }
 
         // insert read token
         buffer.emplace_back(token);
