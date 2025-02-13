@@ -33,6 +33,8 @@ public:
 
     bool checkCommentToken(antlr::RefToken token);
 
+    void expectBlockCheck(antlr::RefToken token);
+
     void setBlockStartToken(int token);
 
     int getBlockStartToken() const;
@@ -47,7 +49,6 @@ private:
 
     antlr::RefToken tempPostWSToken = srcMLToken::factory();
     antlr::RefToken tokenAfterIndent = srcMLToken::factory();
-    antlr::RefToken lineStartToken = srcMLToken::factory();
 
     int blockStartToken = -1;
     int numIndents = 0;
@@ -55,8 +56,9 @@ private:
     int numSpacesPerIndent = -1;
 
     bool isOneLineStatement = false;
+    bool expectBlock = false;
+    bool delayExpectBlockCheck = false;
     bool checkOneLineStatement = false;
-    bool delayLineStartCheck = false;
     bool recordToken = false;
 };
 

@@ -25,16 +25,4 @@
 <expr_stmt><expr><call><call><name>get_func</name><argument_list>()</argument_list></call><argument_list>()</argument_list></call></expr></expr_stmt>
 </unit>
 
-<unit revision="1.1.0" language="Python">
-<expr_stmt><expr><call><name>print</name><argument_list>(
-)</argument_list></call></expr></expr_stmt>
-</unit>
-
-<unit revision="1.1.0" language="Python">
-<expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="number">1</literal></expr></argument>,
-      <argument><expr><literal type="number">2</literal></expr></argument>,
-      <argument><expr><literal type="number">3</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
-</unit>
-
-
 </unit>

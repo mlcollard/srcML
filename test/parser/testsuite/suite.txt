@@ -281,6 +281,7 @@ LANGUAGE_PYTHON if_py
 LANGUAGE_PYTHON import_py
 LANGUAGE_PYTHON lambda_py
 LANGUAGE_PYTHON literal_py
+LANGUAGE_PYTHON multiline_py
 LANGUAGE_PYTHON nonlocal_py
 LANGUAGE_PYTHON operator_py
 LANGUAGE_PYTHON parameter_py

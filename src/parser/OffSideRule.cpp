@@ -28,28 +28,14 @@ antlr::RefToken OffSideRule::nextToken() {
         // Detect if currently in/out of `()`, `{}`, or `[]`
         checkBracketToken(token);
 
-        // Record the first token found on a line
-        if (token->getColumn() == 1 || delayLineStartCheck) {
-            if (delayLineStartCheck)
-                delayLineStartCheck = false;
-
-            lineStartToken = token;
-
-            if (token->getType() == srcMLParser::WS)
-                delayLineStartCheck = true;
-        }
+        // Detect if the statement should have a block
+        expectBlockCheck(token);
 
         // [INDENT] The token matches the token used to indicate the start of a block
-        if (
-            token->getType() == blockStartToken
-            && numBrackets == 0
-            && (
-                srcMLParser::keyword_token_set.member(lineStartToken->getType())
-                || srcMLParser::class_tokens_set.member(lineStartToken->getType())
-            )
-        ) {
+        if (token->getType() == blockStartToken && expectBlock && numBrackets == 0) {
             token->setType(srcMLParser::INDENT);
             ++numIndents;
+            expectBlock = false;
             recordToken = true;
 
             handleBlocks(token);
@@ -83,19 +69,11 @@ void OffSideRule::handleBlocks(antlr::RefToken token) {
         // Detect if currently in/out of `()`, `{}`, or `[]`
         checkBracketToken(nextToken);
 
-        // Record the first token found on a line
-        if (nextToken->getColumn() == 1 || delayLineStartCheck) {
-            if (delayLineStartCheck)
-                delayLineStartCheck = false;
-
-            lineStartToken = nextToken;
-
-            if (nextToken->getType() == srcMLParser::WS)
-                delayLineStartCheck = true;
-        }
+        // Detect if the statement should have a block
+        expectBlockCheck(nextToken);
 
         // [DEDENT] If the statement begins and ends on a single line, end it at EOL
-        if (isOneLineStatement && nextToken->getType() == srcMLParser::EOL) {
+        if (isOneLineStatement && nextToken->getType() == srcMLParser::EOL && numBrackets == 0) {
             indentBuffer.emplace_back(nextToken);
 
             auto dedentToken = srcMLToken::factory();
@@ -144,21 +122,16 @@ void OffSideRule::handleBlocks(antlr::RefToken token) {
         }
 
         // [INDENT] The token matches the token used to indicate the start of a block
-        if (
-            nextToken->getType() == blockStartToken
-            && numBrackets == 0
-            && (
-                srcMLParser::keyword_token_set.member(lineStartToken->getType())
-                || srcMLParser::class_tokens_set.member(lineStartToken->getType())
-            )
-        ) {
+        if (nextToken->getType() == blockStartToken && expectBlock && numBrackets == 0) {
             nextToken->setType(srcMLParser::INDENT);
             ++numIndents;
+            expectBlock = false;
             recordToken = true;
         }
 
         // Record the indentation level at the start of a line (if in a block)
-        if (numIndents > 0 && nextToken->getColumn() == 1 && nextToken->getType() == srcMLParser::WS) {
+        // Do not record indentation level if the first statements are one-line statements
+        if (numIndents > 0 && nextToken->getColumn() == 1 && nextToken->getType() == srcMLParser::WS && !isOneLineStatement) {
             const auto& postWSToken = input.nextToken();  // reads in a token
 
             if (checkCommentToken(postWSToken)) {
@@ -167,16 +140,8 @@ void OffSideRule::handleBlocks(antlr::RefToken token) {
                 // Detect if currently in/out of `()`, `{}`, or `[]`
                 checkBracketToken(postWSToken);
 
-                // Record the first token found on a line
-                if (postWSToken->getColumn() == 1 || delayLineStartCheck) {
-                    if (delayLineStartCheck)
-                        delayLineStartCheck = false;
-
-                    lineStartToken = postWSToken;
-
-                    if (postWSToken->getType() == srcMLParser::WS)
-                        delayLineStartCheck = true;
-                }
+                // Detect if the statement should have a block
+                expectBlockCheck(postWSToken);
 
                 indentBuffer.emplace_back(postWSToken);
                 continue;
@@ -201,16 +166,8 @@ void OffSideRule::handleBlocks(antlr::RefToken token) {
                     // Detect if currently in/out of `()`, `{}`, or `[]`
                     checkBracketToken(tempPostWSToken);
 
-                    // Record the first token found on a line
-                    if (tempPostWSToken->getColumn() == 1 || delayLineStartCheck) {
-                        if (delayLineStartCheck)
-                            delayLineStartCheck = false;
-
-                        lineStartToken = tempPostWSToken;
-
-                        if (tempPostWSToken->getType() == srcMLParser::WS)
-                            delayLineStartCheck = true;
-                    }
+                    // Detect if the statement should have a block
+                    expectBlockCheck(tempPostWSToken);
 
                     tempPostWSToken = srcMLToken::factory();
                 }
@@ -229,6 +186,7 @@ void OffSideRule::handleBlocks(antlr::RefToken token) {
         // [DEDENT] Close any INDENT tokens if the start of the next non-EOL/WS/WS_EOL/Comment line is 1
         if (
             numIndents > 0
+            && !isOneLineStatement
             && nextToken->getColumn() == 1
             && nextToken->getType() != srcMLParser::EOL
             && nextToken->getType() != srcMLParser::WS
@@ -244,16 +202,8 @@ void OffSideRule::handleBlocks(antlr::RefToken token) {
                 // Detect if currently in/out of `()`, `{}`, or `[]`
                 checkBracketToken(tempPostWSToken);
 
-                // Record the first token found on a line
-                if (tempPostWSToken->getColumn() == 1 || delayLineStartCheck) {
-                    if (delayLineStartCheck)
-                        delayLineStartCheck = false;
-
-                    lineStartToken = tempPostWSToken;
-
-                    if (tempPostWSToken->getType() == srcMLParser::WS)
-                        delayLineStartCheck = true;
-                }
+                // Detect if the statement should have a block
+                expectBlockCheck(tempPostWSToken);
 
                 tempPostWSToken = srcMLToken::factory();
             }
@@ -278,16 +228,8 @@ void OffSideRule::handleBlocks(antlr::RefToken token) {
                 // Detect if currently in/out of `()`, `{}`, or `[]`
                 checkBracketToken(tempPostWSToken);
 
-                // Record the first token found on a line
-                if (tempPostWSToken->getColumn() == 1 || delayLineStartCheck) {
-                    if (delayLineStartCheck)
-                        delayLineStartCheck = false;
-
-                    lineStartToken = tempPostWSToken;
-
-                    if (tempPostWSToken->getType() == srcMLParser::WS)
-                        delayLineStartCheck = true;
-                }
+                // Detect if the statement should have a block
+                expectBlockCheck(tempPostWSToken);
 
                 tempPostWSToken = srcMLToken::factory();
             }
@@ -315,16 +257,8 @@ void OffSideRule::handleBlocks(antlr::RefToken token) {
                     // Detect if currently in/out of `()`, `{}`, or `[]`
                     checkBracketToken(tempPostWSToken);
 
-                    // Record the first token found on a line
-                    if (tempPostWSToken->getColumn() == 1 || delayLineStartCheck) {
-                        if (delayLineStartCheck)
-                            delayLineStartCheck = false;
-
-                        lineStartToken = tempPostWSToken;
-
-                        if (tempPostWSToken->getType() == srcMLParser::WS)
-                            delayLineStartCheck = true;
-                    }
+                    // Detect if the statement should have a block
+                    expectBlockCheck(tempPostWSToken);
 
                     tempPostWSToken = srcMLToken::factory();
                 }
@@ -498,6 +432,25 @@ bool OffSideRule::checkCommentToken(antlr::RefToken token) {
     }
 
     return isComment;
+}
+
+/**
+ * Checks if a block is expected because a line starts with `token` in Python.
+ * 
+ * Such tokens include keywords (e.g., `if`), specifiers (e.g., `async`), and attributes (e.g., `@`).
+ */
+void OffSideRule::expectBlockCheck(antlr::RefToken token) {
+    if ((token->getColumn() == 1 || delayExpectBlockCheck) && numBrackets == 0) {
+        if (delayExpectBlockCheck)
+            delayExpectBlockCheck = false;
+
+        if (srcMLParser::expect_blocks_token_set.member(token->getType()))
+            expectBlock = true;
+
+        // whitespace at column 1 is indentation
+        if (token->getType() == srcMLParser::WS)
+            delayExpectBlockCheck = true;
+    }
 }
 
 /**

@@ -184,4 +184,14 @@ token_set(srcMLParser, duplex_keyword_set,
     srcMLParser::PY_YIELD
 )
 
+token_set(srcMLParser, expect_blocks_token_set,
+    // Python keywords
+    srcMLParser::CASE, srcMLParser::CLASS, srcMLParser::ELSE, srcMLParser::FINALLY, srcMLParser::FOR,
+    srcMLParser::IF, srcMLParser::PY_ELIF, srcMLParser::PY_EXCEPT, srcMLParser::PY_FUNCTION,
+    srcMLParser::PY_MATCH, srcMLParser::PY_WITH, srcMLParser::TRY, srcMLParser::WHILE,
+
+    // Python attributes/specifiers
+    srcMLParser::PY_ASYNC, srcMLParser::PY_ATSIGN
+)
+
 #endif

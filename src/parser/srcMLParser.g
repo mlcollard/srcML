@@ -786,6 +786,7 @@ public:
     static const antlr::BitSet identifier_list_tokens_set;
     static const antlr::BitSet whitespace_token_set;
     static const antlr::BitSet duplex_keyword_set;
+    static const antlr::BitSet expect_blocks_token_set;
 
     // constructor
     srcMLParser(antlr::TokenStream& lexer, int lang, const OPTION_TYPE& options);
