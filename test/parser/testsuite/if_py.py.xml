@@ -55,13 +55,27 @@
 </unit>
 
 <unit revision="1.1.0" language="Python">
+<if_stmt><if>if <condition><expr><literal type="boolean">True</literal></expr></condition><block>:<block_content> <expr_stmt><expr><name>a</name> <operator>=</operator> <literal type="number">10</literal></expr>;</expr_stmt> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></if></if_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
 <if_stmt><if>if <condition><expr><name>x</name> <operator>&lt;</operator> <literal type="number">0</literal></expr></condition><block>:<block_content> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">'less than zero'</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></if>
 <if type="elseif">elif <condition><expr><name>x</name> <operator>==</operator> <literal type="number">0</literal></expr></condition><block>:<block_content> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">'zero'</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></if></if_stmt>
 </unit>
 
 <unit revision="1.1.0" language="Python">
+<if_stmt><if>if <condition><expr><name>a</name> <operator>&gt;</operator> <literal type="number">0</literal></expr></condition><block>:<block_content> <expr_stmt><expr><name>result</name> <operator>=</operator> <name>a</name></expr>;</expr_stmt> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"positive"</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></if>
+<if type="elseif">elif <condition><expr><name>a</name> <operator>==</operator> <literal type="number">0</literal></expr></condition><block>:<block_content> <expr_stmt><expr><name>result</name> <operator>=</operator> <name>a</name></expr>;</expr_stmt> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"zero"</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></if></if_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
 <if_stmt><if>if <condition><expr><name>x</name> <operator>&lt;</operator> <literal type="number">0</literal></expr></condition><block>:<block_content> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">'less than zero'</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></if>
 <else>else<block>:<block_content> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">'greater than one'</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></else></if_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<if_stmt><if>if <condition><expr><literal type="boolean">True</literal></expr></condition><block>:<block_content> <expr_stmt><expr><name>a</name> <operator>=</operator> <literal type="number">10</literal></expr>;</expr_stmt> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></if>
+<else>else<block>:<block_content> <expr_stmt><expr><name>a</name> <operator>=</operator> <literal type="number">0</literal></expr>;</expr_stmt> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="number">0</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></else></if_stmt>
 </unit>
 
 <unit revision="1.1.0" language="Python">
@@ -69,6 +83,13 @@
 <if type="elseif">elif <condition><expr><name>x</name> <operator>==</operator> <literal type="number">0</literal></expr></condition><block>:<block_content> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">'zero'</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></if>
 <if type="elseif">elif <condition><expr><name>x</name> <operator>==</operator> <literal type="number">1</literal></expr></condition><block>:<block_content> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">'one'</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></if>
 <else>else<block>:<block_content> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">'greater than one'</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></else></if_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<if_stmt><if>if <condition><expr><name>a</name> <operator>&lt;</operator> <literal type="number">0</literal></expr></condition><block>:<block_content> <expr_stmt><expr><name>result</name> <operator>=</operator> <name>a</name></expr>;</expr_stmt> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">'less than zero'</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></if>
+<if type="elseif">elif <condition><expr><name>a</name> <operator>==</operator> <literal type="number">0</literal></expr></condition><block>:<block_content> <expr_stmt><expr><name>result</name> <operator>=</operator> <name>a</name></expr>;</expr_stmt> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">'zero'</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></if>
+<if type="elseif">elif <condition><expr><name>a</name> <operator>==</operator> <literal type="number">1</literal></expr></condition><block>:<block_content> <expr_stmt><expr><name>result</name> <operator>=</operator> <name>a</name></expr>;</expr_stmt> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">'one'</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></if>
+<else>else<block>:<block_content> <expr_stmt><expr><name>result</name> <operator>=</operator> <name>a</name></expr>;</expr_stmt> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">'greater than one'</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></else></if_stmt>
 </unit>
 
 </unit>
