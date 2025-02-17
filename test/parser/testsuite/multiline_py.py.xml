@@ -842,44 +842,44 @@
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<function>def <name>max</name><parameter_list type="generic">[
+<function>def <name><name>max</name><parameter_list type="generic">[
     <parameter><name>T</name></parameter>,
     <parameter><name>U</name></parameter>
-]</parameter_list><parameter_list>(<parameter><name>args</name><annotation>: <expr><name><name>Iterable</name><index>[<expr><name>T</name></expr>]</index></name></expr></annotation></parameter>)</parameter_list> <annotation>-&gt; <expr><name>T</name></expr></annotation><block>:<block_content>
+]</parameter_list></name><parameter_list>(<parameter><name>args</name><annotation>: <expr><name><name>Iterable</name><index>[<expr><name>T</name></expr>]</index></name></expr></annotation></parameter>)</parameter_list> <annotation>-&gt; <expr><name>T</name></expr></annotation><block>:<block_content>
     <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"srcML"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
 </block_content></block></function>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<function>def <name>max</name><parameter_list type="generic">[
+<function>def <name><name>max</name><parameter_list type="generic">[
     <comment type="line"># Comment A</comment>
     <parameter><name>T</name></parameter>,
     <comment type="hashbang">#! Comment B</comment>
     <parameter><name>U</name></parameter>
     <comment type="line"># Comment C</comment>
-]</parameter_list><parameter_list>(<parameter><name>args</name><annotation>: <expr><name><name>Iterable</name><index>[<expr><name>T</name></expr>]</index></name></expr></annotation></parameter>)</parameter_list> <annotation>-&gt; <expr><name>T</name></expr></annotation><block>:<block_content>
+]</parameter_list></name><parameter_list>(<parameter><name>args</name><annotation>: <expr><name><name>Iterable</name><index>[<expr><name>T</name></expr>]</index></name></expr></annotation></parameter>)</parameter_list> <annotation>-&gt; <expr><name>T</name></expr></annotation><block>:<block_content>
     <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"srcML"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
 </block_content></block></function>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<class>class <name>list</name><parameter_list type="generic">[
+<class>class <name><name>list</name><parameter_list type="generic">[
     <parameter><name>T</name></parameter>,
     <parameter><name>U</name></parameter>
-]</parameter_list><block>:<block_content>
+]</parameter_list></name><block>:<block_content>
     <function>def <name>sample</name><parameter_list>(<parameter><name>self</name></parameter>, <parameter><name>element</name><annotation>: <expr><name>T</name></expr></annotation></parameter>)</parameter_list> <annotation>-&gt; <expr><name>T</name></expr></annotation><block>:<block_content>
         <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"srcML"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
 </block_content></block></function></block_content></block></class>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<class>class <name>list</name><parameter_list type="generic">[
+<class>class <name><name>list</name><parameter_list type="generic">[
     <comment type="line"># Comment A</comment>
     <parameter><name>T</name></parameter>,
     <comment type="hashbang">#! Comment B</comment>
     <parameter><name>U</name></parameter>
     <comment type="line"># Comment C</comment>
-]</parameter_list><block>:<block_content>
+]</parameter_list></name><block>:<block_content>
     <function>def <name>sample</name><parameter_list>(<parameter><name>self</name></parameter>, <parameter><name>element</name><annotation>: <expr><name>T</name></expr></annotation></parameter>)</parameter_list> <annotation>-&gt; <expr><name>T</name></expr></annotation><block>:<block_content>
         <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"srcML"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
 </block_content></block></function></block_content></block></class>
@@ -909,10 +909,10 @@
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<class>class <name>Box</name><parameter_list type="generic">[
+<class>class <name><name>Box</name><parameter_list type="generic">[
     <parameter><name>T</name></parameter>,
     <parameter><name>U</name></parameter>
-]</parameter_list><super_list>(
+]</parameter_list></name><super_list>(
     <super><expr><name><name>Generic</name><index>[<expr><name>T</name></expr>]</index></name></expr></super>,
     <super><expr><name><name>Generic</name><index>[<expr><name>U</name></expr>]</index></name></expr></super>
 )</super_list><block>:<block_content>
@@ -922,13 +922,13 @@
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<class>class <name>Box</name><parameter_list type="generic">[
+<class>class <name><name>Box</name><parameter_list type="generic">[
     <comment type="line"># Comment A</comment>
     <parameter><name>T</name></parameter>,
     <comment type="hashbang">#! Comment B</comment>
     <parameter><name>U</name></parameter>
     <comment type="line"># Comment C</comment>
-]</parameter_list><super_list>(
+]</parameter_list></name><super_list>(
     <comment type="hashbang">#! Comment D</comment>
     <super><expr><name><name>Generic</name><index>[<expr><name>T</name></expr>]</index></name></expr></super>,
     <comment type="line"># Comment E</comment>

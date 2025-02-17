@@ -1348,7 +1348,7 @@ start_python[] {
             temp_array[ASSERT]      = { SASSERT_STATEMENT, 0, MODE_STATEMENT | MODE_EXPRESSION | MODE_EXPECT | MODE_EXCLUDE_NO_PAREN_TUPLES_PY | MODE_ASSERT_PY, MODE_CONDITION | MODE_EXPECT, nullptr, nullptr };
             temp_array[BREAK]       = { SBREAK_STATEMENT, 0, MODE_STATEMENT, 0, nullptr, nullptr };
             temp_array[CASE]        = { SCASE, 0, MODE_STATEMENT | MODE_NEST | MODE_CASE_PY, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
-            temp_array[CLASS]       = { SCLASS, 0, MODE_STATEMENT | MODE_NEST, MODE_SUPER_LIST_PY | MODE_PARAMETER_LIST_PY | MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, nullptr };
+            temp_array[CLASS]       = { SCLASS, 0, MODE_STATEMENT | MODE_NEST, MODE_SUPER_LIST_PY | MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, nullptr };
             temp_array[CONTINUE]    = { SCONTINUE_STATEMENT, 0, MODE_STATEMENT, 0, nullptr, nullptr };
             temp_array[ELSE]        = { SELSE, 0, MODE_STATEMENT | MODE_NEST, 0, &srcMLParser::if_statement_start, nullptr };
             temp_array[FINALLY]     = { SFINALLY_BLOCK, 0, MODE_STATEMENT | MODE_NEST, 0, nullptr, nullptr };
@@ -1453,10 +1453,6 @@ start_python[] {
         // if an "if" is found in an expression, it must start a ternary (not an if-statement)
         { inMode(MODE_EXPRESSION) }?
         ternary_py[false] |
-
-        // looking for a name followed by lbracket so the following generic parameter list is detected correctly
-        { inMode(MODE_PARAMETER_LIST_PY) && next_token() == LBRACKET }?
-        function_name_before_generic_py |
 
         // looking for lparen while expecting a super list (only used for classes)
         { inMode(MODE_SUPER_LIST_PY) }?
@@ -8738,7 +8734,14 @@ compound_name[] { CompleteElement element(this); bool iscompound = false; ENTRY_
   (e.g., A::operator String // () {}).  Detecting before here means lookahead on all A::B::... names, causing a slowdown of
   almost 20%.  The solution ("hack") is to start all complex names as operator methods, then replace by NOP if not.
 */
-compound_name_inner[bool index] { CompleteElement element(this); TokenPosition tp; bool iscompound = false; ENTRY_DEBUG } :
+compound_name_inner[bool index] {
+        CompleteElement element(this);
+        TokenPosition tp;
+        bool iscompound = false;
+        bool islist = (inMode(MODE_VARIABLE_NAME | MODE_EXPECT));
+
+        ENTRY_DEBUG
+} :
         {
             // local mode that is automatically ended by leaving this function
             startNewMode(MODE_LOCAL);
@@ -8783,6 +8786,13 @@ compound_name_inner[bool index] { CompleteElement element(this); TokenPosition t
         )*
 
         (options { greedy = true; } :
+            // special markup for Python class/function/type statements
+            { inLanguage(LANGUAGE_PYTHON) && index && islist }?
+            python_generic_parameter_list
+            {
+                iscompound = true;
+            } |
+
             {
                 index
                 /* Commented-out code: && !inTransparentMode(MODE_EAT_TYPE) */
@@ -16786,20 +16796,6 @@ start_list_comprehension_if_py[] { ENTRY_DEBUG } :
 
             setMode(MODE_LIST | MODE_EXPRESSION | MODE_EXPECT);
         }
-;
-
-/*
-  function_name_before_generic_py
-
-  Handles a Python function name as a singular name (not a compound name).
-  Used to ensure the following generic parameter list is detected correctly.
-*/
-function_name_before_generic_py[] { SingleElement element(this); ENTRY_DEBUG } :
-        {
-            startElement(SNAME);
-        }
-
-        NAME
 ;
 
 /*

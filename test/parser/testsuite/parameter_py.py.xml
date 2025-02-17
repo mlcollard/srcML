@@ -133,7 +133,7 @@
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<function>def <name>max</name><parameter_list type="generic">[<parameter><name>T</name></parameter>]</parameter_list><parameter_list>(<parameter><name>args</name><annotation>: <expr><name><name>Iterable</name><index>[<expr><name>T</name></expr>]</index></name></expr></annotation></parameter>)</parameter_list> <annotation>-&gt; <expr><name>T</name></expr></annotation><block>:<block_content>
+<function>def <name><name>max</name><parameter_list type="generic">[<parameter><name>T</name></parameter>]</parameter_list></name><parameter_list>(<parameter><name>args</name><annotation>: <expr><name><name>Iterable</name><index>[<expr><name>T</name></expr>]</index></name></expr></annotation></parameter>)</parameter_list> <annotation>-&gt; <expr><name>T</name></expr></annotation><block>:<block_content>
     <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"srcML"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
 </block_content></block></function>
 </unit>
