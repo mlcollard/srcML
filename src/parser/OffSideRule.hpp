@@ -33,6 +33,8 @@ public:
 
     bool checkCommentToken(antlr::RefToken token);
 
+    void convertToDocstring(antlr::RefToken token);
+
     void expectBlockCheck(antlr::RefToken token);
 
     void setBlockStartToken(int token);
@@ -49,6 +51,7 @@ private:
 
     antlr::RefToken tempPostWSToken = srcMLToken::factory();
     antlr::RefToken tokenAfterIndent = srcMLToken::factory();
+    antlr::RefToken tempDocstringToken = srcMLToken::factory();
 
     int blockStartToken = -1;
     int numIndents = 0;
@@ -56,10 +59,12 @@ private:
     int numSpacesPerIndent = -1;
 
     bool isOneLineStatement = false;
+    bool isFunctionOrClass = false;
     bool expectBlock = false;
     bool delayExpectBlockCheck = false;
     bool checkOneLineStatement = false;
     bool recordToken = false;
+    bool checkDocstring = false;  // docstring check for classes/functions
 };
 
 #endif

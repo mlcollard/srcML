@@ -37,6 +37,7 @@ antlr::RefToken OffSideRule::nextToken() {
             ++numIndents;
             expectBlock = false;
             recordToken = true;
+            checkDocstring = true;
 
             handleBlocks(token);
         }
@@ -127,7 +128,12 @@ void OffSideRule::handleBlocks(antlr::RefToken token) {
             ++numIndents;
             expectBlock = false;
             recordToken = true;
+            checkDocstring = true;
         }
+
+        // Detect if a one-line function or class block starts with a string
+        if (isOneLineStatement && nextToken->getType() != srcMLParser::WS && checkDocstring)
+            convertToDocstring(nextToken);
 
         // Record the indentation level at the start of a line (if in a block)
         // Do not record indentation level if the first statements are one-line statements
@@ -146,8 +152,13 @@ void OffSideRule::handleBlocks(antlr::RefToken token) {
                 indentBuffer.emplace_back(postWSToken);
                 continue;
             }
-            else
+            else {
+                // Detect if a multi-line function or class block starts with a string
+                if (checkDocstring)
+                    convertToDocstring(postWSToken);
+
                 tempPostWSToken = postWSToken;
+            }
 
             // The number of spaces per indent was not initialized yet
             if (numSpacesPerIndent == -1)
@@ -435,6 +446,28 @@ bool OffSideRule::checkCommentToken(antlr::RefToken token) {
 }
 
 /**
+ * Checks if `token` is a Python docstring (or an orindary string).
+ * 
+ * Converts a `STRING_START` token's type to `DQUOTE_DOCSTRING_START`
+ * (or a `CHAR_START` token's type to `SQUOTE_DOCSTRING_START`) if
+ * `token` starts a docstring.
+ * 
+ * Python docstrings are supported if they appear directly beneath a
+ * class/function or if the it is the first non-EOL/WS/WS_EOL/Comment
+ * token in the file.
+ */
+void OffSideRule::convertToDocstring(antlr::RefToken token) {
+    if (isFunctionOrClass && token->getType() == srcMLParser::STRING_START)
+        token->setType(srcMLParser::DQUOTE_DOCSTRING_START);
+
+    if (isFunctionOrClass && token->getType() == srcMLParser::CHAR_START)
+        token->setType(srcMLParser::SQUOTE_DOCSTRING_START);
+
+    checkDocstring = false;
+    isFunctionOrClass = false;
+}
+
+/**
  * Checks if a block is expected because a line starts with `token` in Python.
  * 
  * Such tokens include keywords (e.g., `if`), specifiers (e.g., `async`), and attributes (e.g., `@`).
@@ -446,6 +479,9 @@ void OffSideRule::expectBlockCheck(antlr::RefToken token) {
 
         if (srcMLParser::expect_blocks_token_set.member(token->getType()))
             expectBlock = true;
+
+        if (token->getType() == srcMLParser::PY_FUNCTION || token->getType() == srcMLParser::CLASS)
+            isFunctionOrClass = true;
 
         // whitespace at column 1 is indentation
         if (token->getType() == srcMLParser::WS)

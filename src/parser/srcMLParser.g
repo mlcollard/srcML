@@ -717,6 +717,7 @@ tokens {
     // Python
     SDELETE;
     SDICTIONARY;
+    SDOCSTRING;
     SELLIPSIS;
     SEXEC_PYTHON2;
     SGLOBAL;
@@ -12453,11 +12454,18 @@ literals[] { ENTRY_DEBUG } :
 */
 string_literal[bool markup = true] { LightweightElement element(this); ENTRY_DEBUG } :
         {
-            if (markup)
-                startElement(SSTRING);
+            if (markup) {
+                if (LA(1) == DQUOTE_DOCSTRING_START)
+                    startElement(SDOCSTRING);
+                else
+                    startElement(SSTRING);
+            }
         }
 
-        (STRING_START (STRING_END | RAW_STRING_END))
+        (
+            (STRING_START | DQUOTE_DOCSTRING_START)
+            (STRING_END | RAW_STRING_END | DQUOTE_DOCSTRING_END)
+        )
 ;
 
 /*
@@ -12466,14 +12474,19 @@ string_literal[bool markup = true] { LightweightElement element(this); ENTRY_DEB
 char_literal[bool markup = true] { LightweightElement element(this); ENTRY_DEBUG } :
         {
             if (markup) {
-                if (inLanguage(LANGUAGE_JAVASCRIPT) || inLanguage(LANGUAGE_PYTHON))
+                if (LA(1) == SQUOTE_DOCSTRING_START)
+                    startElement(SDOCSTRING);
+                else if (inLanguage(LANGUAGE_JAVASCRIPT) || inLanguage(LANGUAGE_PYTHON))
                     startElement(SSTRING);
                 else
                     startElement(SCHAR);
             }
         }
 
-        (CHAR_START CHAR_END)
+        (
+            (CHAR_START | SQUOTE_DOCSTRING_START)
+            (CHAR_END | SQUOTE_DOCSTRING_END)
+        )
 ;
 
 /*

@@ -58,7 +58,9 @@ tokens {
     LINE_COMMENT_END;
     RAW_STRING_END;
     STRING_END;
+    DQUOTE_DOCSTRING_END;
     CHAR_END;
+    SQUOTE_DOCSTRING_END;
     BACKTICK_END;
     CONTROL_CHAR;
     LINE_DOXYGEN_COMMENT_END;
@@ -67,6 +69,7 @@ tokens {
     HASHBANG_COMMENT_END;
     HASHTAG_COMMENT_END;
     PY_STRING_START;
+    PY_DOCSTRING_START;
 }
 
 {
@@ -188,10 +191,21 @@ COMMENT_TEXT {
             || mode == LINE_DOXYGEN_COMMENT_END
             || mode == HASHBANG_COMMENT_END
             || mode == HASHTAG_COMMENT_END
-            || (((mode == STRING_END || mode == RAW_STRING_END) || mode == CHAR_END) && (onpreprocline /* || rawstring */))
+            || (
+                (
+                    (
+                        mode == STRING_END
+                        || mode == RAW_STRING_END
+                        || mode == DQUOTE_DOCSTRING_END
+                        || mode == SQUOTE_DOCSTRING_END
+                    )
+                    || mode == CHAR_END
+                )
+                && (onpreprocline /* || rawstring */)
+            )
         ) {
-          $setType(mode);
-          selector->pop();
+            $setType(mode);
+            selector->pop();
         }
     } |
 
@@ -212,15 +226,16 @@ COMMENT_TEXT {
                 ++dquote_count;
 
                 // 5 double quotes (+ 1 initial double quote) is an empty triple-quoted Python string
-                if (mode == PY_STRING_START && dquote_count == 5)
+                if ((mode == PY_STRING_START || mode == PY_DOCSTRING_START) && dquote_count == 5)
                     break;
             }
         )*
     {
         switch (mode) {
-            case PY_STRING_START: {
+            case PY_STRING_START:
+            case PY_DOCSTRING_START: {
                 dquote_count_py = dquote_count + 1;
-                mode = STRING_END;
+                mode = ((mode == PY_STRING_START) ? STRING_END : DQUOTE_DOCSTRING_END);
                 ismultiplequotes = true;
 
                 // special case for empty strings (e.g., "" and """""", """""""""""", etc.)
@@ -258,21 +273,22 @@ COMMENT_TEXT {
     '\047' /* '\'' */
         { squote_count = 1; }
         (options { greedy = true; } :
-            { (mode == PY_STRING_START || ismultiplequotes) && (prevLA != '\\' || noescape) }?
+            { (mode == PY_STRING_START || mode == PY_DOCSTRING_START || ismultiplequotes) && (prevLA != '\\' || noescape) }?
             '\047'
             {
                 ++squote_count;
 
                 // 5 single quotes (+ 1 initial single quote) is an empty triple-quoted Python string
-                if (mode == PY_STRING_START && squote_count == 5)
+                if ((mode == PY_STRING_START || mode == PY_DOCSTRING_START) && squote_count == 5)
                     break;
             }
         )*
     {
         switch (mode) {
-            case PY_STRING_START: {
+            case PY_STRING_START:
+            case PY_DOCSTRING_START: {
                 squote_count_py = squote_count + 1;
-                mode = CHAR_END;
+                mode = ((mode == PY_STRING_START) ? CHAR_END : SQUOTE_DOCSTRING_END);
                 ismultiplequotes = true;
 
                 // special case for empty strings (e.g., '' and '''''', '''''''''''', etc.)
@@ -356,11 +372,31 @@ COMMENT_TEXT {
             About to read a newline, or the EOF.  Line comments need
             to end before the newline is consumed. Strings and characters on a preprocessor line also need to end, even if unterminated
         */
-        if (_ttype == COMMENT_TEXT &&
-            ((LA(1) == '\n' && mode != RAW_STRING_END) || LA(1) == EOF_CHAR) &&
-            ((((mode == STRING_END || mode == RAW_STRING_END) || mode == CHAR_END) && (onpreprocline || mode == RAW_STRING_END))
-             || mode == LINE_COMMENT_END || mode == LINE_DOXYGEN_COMMENT_END || mode == HASHBANG_COMMENT_END || mode == HASHTAG_COMMENT_END)) {
-
+        if (
+            _ttype == COMMENT_TEXT
+            && (
+                (LA(1) == '\n' && mode != RAW_STRING_END)
+                || LA(1) == EOF_CHAR
+            )
+            && (
+                (
+                    (
+                        (
+                            mode == STRING_END
+                            || mode == RAW_STRING_END
+                            || mode == DQUOTE_DOCSTRING_END
+                            || mode == SQUOTE_DOCSTRING_END
+                        )
+                        || mode == CHAR_END
+                    )
+                    && (onpreprocline || mode == RAW_STRING_END)
+                )
+                || mode == LINE_COMMENT_END
+                || mode == LINE_DOXYGEN_COMMENT_END
+                || mode == HASHBANG_COMMENT_END
+                || mode == HASHTAG_COMMENT_END
+            )
+        ) {
             $setType(mode);
             selector->pop();
         }
