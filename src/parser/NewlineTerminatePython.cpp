@@ -18,10 +18,10 @@ antlr::RefToken NewlineTerminatePython::nextToken() {
     if (buffer.empty()) {
         auto token = input.nextToken();
 
-        // buffer any non-EOL whitespace since this has to be after the
-        // inserted terminate
+        // buffer any non-EOL whitespace or line continuation backslashes
+        // since these must be placed after the inserted terminate
         std::deque<antlr::RefToken> wsBuffer;
-        while (token->getType() == srcMLParser::WS) {
+        while (token->getType() == srcMLParser::WS || token->getType() == srcMLParser::EOL_BACKSLASH) {
             wsBuffer.emplace_back(token);
             token = input.nextToken();
         }

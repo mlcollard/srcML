@@ -1011,4 +1011,52 @@ ligula a lectus maximus mollis."</literal></expr></expr_stmt>
 
 </unit>
 
+<unit revision="1.1.0" language="Python">
+<assert>assert \
+       \
+       <condition><expr><literal type="number">4</literal>\
+       \
+       <operator>==</operator>\
+       \
+       <literal type="number">4</literal>\
+       \
+       \
+<operator>+</operator><literal type="number">0</literal></expr></condition></assert>
+
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<assert>assert \
+       \
+       <condition><expr><literal type="number">4</literal>\
+       \
+       <operator>==</operator>\
+       \
+       <literal type="number">4</literal></expr></condition></assert>\
+       \
+       \
+
+
+<function>def <name>sum</name><parameter_list>(<parameter><name>a</name></parameter>, <parameter><name>b</name></parameter>)</parameter_list><block>:<block_content>
+    <return>return <expr><operator>(</operator><name>a</name> <operator>+</operator> <name>b</name><operator>)</operator></expr></return>
+</block_content></block></function>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<assert>assert \
+       \
+       <condition><expr><literal type="number">4</literal>\
+       \
+       <operator>==</operator>\
+       \
+       <literal type="number">4</literal>\
+       \
+       \
+<operator>+</operator><literal type="number">0</literal></expr></condition></assert>
+
+<function>def <name>sum</name><parameter_list>(<parameter><name>a</name></parameter>, <parameter><name>b</name></parameter>)</parameter_list><block>:<block_content>
+    <return>return <expr><operator>(</operator><name>a</name> <operator>+</operator> <name>b</name><operator>)</operator></expr></return>
+</block_content></block></function>
+</unit>
+
 </unit>

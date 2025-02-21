@@ -191,7 +191,7 @@ OPERATORS options { testLiterals = true; } {
 
     '.' ({ inLanguage(LANGUAGE_C_FAMILY) }? '*' | '.' ('.')? | { $setType(CONSTANTS); } CONSTANTS )? |
 
-    '\\' ( EOL { $setType(EOL_BACKSLASH); } )*
+    '\\' ({ inLanguage(LANGUAGE_PYTHON) }? EOL { $setType(EOL_BACKSLASH); } | (EOL { $setType(EOL_BACKSLASH); })*)
     )
     { startline = false; lastpos = getColumn(); prev = start; }
 ;
