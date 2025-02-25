@@ -104,22 +104,6 @@ RSTRING_DELIMITER:
     (options { greedy = true; } : { delimiter += static_cast<char>(LA(1)); } ~('(' | ')' | '\\' | '\n' | ' ' | '\t' ))*
 ;
 
-protected
-DQUOTE_DOCSTRING_START :
-    { startline = false; }
-
-    // double quoted string in Python beneath a function or class
-    '"' {
-        // handle a potential triple-quoted string in Python
-        if (LA(1) == '"')
-            changetotextlexer(PY_DOCSTRING_START);
-        else
-            changetotextlexer(DQUOTE_DOCSTRING_END);
-
-        atstring = false;
-    }
-;
-
 CHAR_START :
     { startline = false; }
 
@@ -131,20 +115,6 @@ CHAR_START :
         else {
             $setType(CHAR_START); changetotextlexer(CHAR_END);
         }
-    }
-;
-
-protected
-SQUOTE_DOCSTRING_START :
-    { startline = false; }
-
-    // single quoted string in Python beneath a function or class
-    '\'' {
-        // handle a potential triple-quoted string in Python
-        if (LA(1) == '\'')
-            changetotextlexer(PY_DOCSTRING_START);
-        else
-            changetotextlexer(SQUOTE_DOCSTRING_END);
     }
 ;
 

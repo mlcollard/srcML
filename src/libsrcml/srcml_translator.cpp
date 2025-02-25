@@ -30,6 +30,7 @@
 #include <srcml_types.hpp>
 #include <unit_utilities.hpp>
 #include <srcMLOutput.hpp>
+#include <DocstringPython.hpp>
 #include <OffSideRule.hpp>
 #include <NewlineTerminatePython.hpp>
 
@@ -144,7 +145,11 @@ void srcml_translator::translate(UTF8CharBuffer* parser_input) {
 
         if (getLanguage() == LANGUAGE_PYTHON) {
             // intermediate token stage
-            OffSideRule offside(selector);
+            DocstringPython docstring(selector);
+            docstring.setBlockStartToken(srcMLParser::PY_COLON);
+
+            // intermediate token stage
+            OffSideRule offside(docstring);
             offside.setBlockStartToken(srcMLParser::PY_COLON);
 
             // intermediate token stage

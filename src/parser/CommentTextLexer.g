@@ -69,7 +69,6 @@ tokens {
     HASHBANG_COMMENT_END;
     HASHTAG_COMMENT_END;
     PY_STRING_START;
-    PY_DOCSTRING_START;
 }
 
 {
@@ -196,8 +195,6 @@ COMMENT_TEXT {
                     (
                         mode == STRING_END
                         || mode == RAW_STRING_END
-                        || mode == DQUOTE_DOCSTRING_END
-                        || mode == SQUOTE_DOCSTRING_END
                     )
                     || mode == CHAR_END
                 )
@@ -226,16 +223,15 @@ COMMENT_TEXT {
                 ++dquote_count;
 
                 // 5 double quotes (+ 1 initial double quote) is an empty triple-quoted Python string
-                if ((mode == PY_STRING_START || mode == PY_DOCSTRING_START) && dquote_count == 5)
+                if (mode == PY_STRING_START && dquote_count == 5)
                     break;
             }
         )*
     {
         switch (mode) {
-            case PY_STRING_START:
-            case PY_DOCSTRING_START: {
+            case PY_STRING_START: {
                 dquote_count_py = dquote_count + 1;
-                mode = ((mode == PY_STRING_START) ? STRING_END : DQUOTE_DOCSTRING_END);
+                mode = ((dquote_count_py == 3) ? DQUOTE_DOCSTRING_END : STRING_END);
                 ismultiplequotes = true;
 
                 // special case for empty strings (e.g., "" and """""", """""""""""", etc.)
@@ -273,22 +269,21 @@ COMMENT_TEXT {
     '\047' /* '\'' */
         { squote_count = 1; }
         (options { greedy = true; } :
-            { (mode == PY_STRING_START || mode == PY_DOCSTRING_START || ismultiplequotes) && (prevLA != '\\' || noescape) }?
+            { (mode == PY_STRING_START || ismultiplequotes) && (prevLA != '\\' || noescape) }?
             '\047'
             {
                 ++squote_count;
 
                 // 5 single quotes (+ 1 initial single quote) is an empty triple-quoted Python string
-                if ((mode == PY_STRING_START || mode == PY_DOCSTRING_START) && squote_count == 5)
+                if (mode == PY_STRING_START && squote_count == 5)
                     break;
             }
         )*
     {
         switch (mode) {
-            case PY_STRING_START:
-            case PY_DOCSTRING_START: {
+            case PY_STRING_START: {
                 squote_count_py = squote_count + 1;
-                mode = ((mode == PY_STRING_START) ? CHAR_END : SQUOTE_DOCSTRING_END);
+                mode = ((squote_count_py == 3) ? SQUOTE_DOCSTRING_END : CHAR_END);
                 ismultiplequotes = true;
 
                 // special case for empty strings (e.g., '' and '''''', '''''''''''', etc.)
@@ -384,8 +379,6 @@ COMMENT_TEXT {
                         (
                             mode == STRING_END
                             || mode == RAW_STRING_END
-                            || mode == DQUOTE_DOCSTRING_END
-                            || mode == SQUOTE_DOCSTRING_END
                         )
                         || mode == CHAR_END
                     )

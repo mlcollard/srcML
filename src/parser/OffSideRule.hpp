@@ -33,8 +33,6 @@ public:
 
     bool checkCommentToken(antlr::RefToken token);
 
-    void convertToDocstring(antlr::RefToken token);
-
     void expectBlockCheck(antlr::RefToken token);
 
     void setBlockStartToken(int token);
@@ -64,7 +62,6 @@ private:
     bool delayExpectBlockCheck = false;
     bool checkOneLineStatement = false;
     bool recordToken = false;
-    bool checkDocstring = false;  // docstring check for classes/functions
 };
 
 #endif
