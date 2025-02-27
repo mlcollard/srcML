@@ -16,6 +16,7 @@
 #include <srcMLToken.hpp>
 #include <srcMLParser.hpp>
 #include <deque>
+#include <algorithm>
 
 class DocstringPython : public antlr::TokenStream {
 
