@@ -39,6 +39,7 @@ private:
     bool isFunctionOrClass = false;
     bool isBlockStart = false;
 
+    int numBrackets = 0;  // encompasses (), {}, and []
     int blockStartToken = -1;
     int lineNumber = 1;
 };

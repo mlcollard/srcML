@@ -18,12 +18,18 @@ antlr::RefToken DocstringPython::nextToken() {
     if (buffer.empty()) {
         auto token = input.nextToken();
 
+        // check if at the start or end of a bracket (encompasses (), {}, and [])
+        if (srcMLParser::left_bracket_py_token_set.member(token->getType()))
+            ++numBrackets;
+        else if (numBrackets > 0 && srcMLParser::right_bracket_py_token_set.member(token->getType()))
+            --numBrackets;
+
         // check if at the start of a function or class
         if (token->getType() == srcMLParser::PY_FUNCTION || token->getType() == srcMLParser::CLASS)
             isFunctionOrClass = true;
 
         // check if at the start of a block
-        if (token->getType() == blockStartToken)
+        if (token->getType() == blockStartToken && numBrackets == 0)
             isBlockStart = true;
 
         // determine if the first non-WS/blockStartToken token in a function or class
