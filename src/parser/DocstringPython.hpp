@@ -25,9 +25,7 @@ public:
 
     antlr::RefToken nextToken();
 
-    void countWSNewlineTokens(antlr::RefToken token, bool isDocstringEnd);
-
-    bool checkCommentToken(antlr::RefToken token);
+    void countWSNewlineTokens(antlr::RefToken token);
 
     void setBlockStartToken(int token);
 

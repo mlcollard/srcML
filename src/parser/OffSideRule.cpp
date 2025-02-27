@@ -98,14 +98,14 @@ void OffSideRule::handleBlocks(antlr::RefToken token) {
                 // Whitespace alone is not enough to determine a one-line statement
                 case srcMLParser::WS: {
                     // WS + non-Comment token indicates a one-line statement
-                    if (!checkCommentToken(nextToken))
+                    if (!srcMLParser::comment_py_token_set.member(nextToken->getType()))
                         isOneLineStatement = true;
 
                     break;
                 }
                 // All other non-comment tokens indicate a one-line statement
                 default:
-                    if (!checkCommentToken(tokenAfterIndent))
+                    if (!srcMLParser::comment_py_token_set.member(tokenAfterIndent->getType()))
                         isOneLineStatement = true;
 
                     break;
@@ -134,7 +134,7 @@ void OffSideRule::handleBlocks(antlr::RefToken token) {
         if (numIndents > 0 && nextToken->getColumn() == 1 && nextToken->getType() == srcMLParser::WS && !isOneLineStatement) {
             const auto& postWSToken = input.nextToken();  // reads in a token
 
-            if (checkCommentToken(postWSToken)) {
+            if (srcMLParser::comment_py_token_set.member(postWSToken->getType())) {
                 indentBuffer.emplace_back(nextToken);
 
                 // Detect if currently in/out of `()`, `{}`, or `[]`
@@ -191,7 +191,7 @@ void OffSideRule::handleBlocks(antlr::RefToken token) {
             && nextToken->getType() != srcMLParser::EOL
             && nextToken->getType() != srcMLParser::WS
             && nextToken->getType() != srcMLParser::WS_EOL
-            && !checkCommentToken(nextToken)
+            && !srcMLParser::comment_py_token_set.member(nextToken->getType())
         ) {
             indentBuffer.emplace_back(nextToken);
 
@@ -303,7 +303,7 @@ void OffSideRule::arrangeBlockEnds() {
                     indentBuffer.back()->getType() == srcMLParser::EOL
                     || indentBuffer.back()->getType() == srcMLParser::WS
                     || indentBuffer.back()->getType() == srcMLParser::WS_EOL
-                    || checkCommentToken(indentBuffer.back())
+                    || srcMLParser::comment_py_token_set.member(indentBuffer.back()->getType())
                 ) {
                     tempBuffer.emplace_front(indentBuffer.back());
                     indentBuffer.pop_back();
@@ -389,49 +389,14 @@ void OffSideRule::arrangeBlockEnds() {
  * Operates under the assumption the code contains balanced brackets.
  */
 void OffSideRule::checkBracketToken(antlr::RefToken token) {
-    switch (token->getType()) {
-        case srcMLParser::LPAREN:
-        case srcMLParser::PY_LCURLY:
-        case srcMLParser::LBRACKET:
-            ++numBrackets;
-            bracketBuffer.emplace_front(token->getType());
-            break;
-
-        case srcMLParser::RPAREN:
-        case srcMLParser::PY_RCURLY:
-        case srcMLParser::RBRACKET:
-            if (!bracketBuffer.empty()) {
-                --numBrackets;
-                bracketBuffer.pop_front();
-            }
-            break;
-
-        default:
-            break;
+    if (srcMLParser::left_bracket_py_token_set.member(token->getType())) {
+        ++numBrackets;
+        bracketBuffer.emplace_front(token->getType());
     }
-}
-
-/**
- * Checks if `token` is a starting or ending comment token in Python.
- * 
- * Returns `true` if `token` is a comment token, `false` otherwise.
- */
-bool OffSideRule::checkCommentToken(antlr::RefToken token) {
-    bool isComment = false;
-
-    switch (token->getType()) {
-        case srcMLParser::HASHTAG_COMMENT_START:
-        case srcMLParser::HASHTAG_COMMENT_END:
-        case srcMLParser::HASHBANG_COMMENT_START:
-        case srcMLParser::HASHBANG_COMMENT_END:
-            isComment = true;
-            break;
-
-        default:
-            break;
+    else if (!bracketBuffer.empty() && srcMLParser::right_bracket_py_token_set.member(token->getType())) {
+        --numBrackets;
+        bracketBuffer.pop_front();
     }
-
-    return isComment;
 }
 
 /**
@@ -444,7 +409,7 @@ void OffSideRule::expectBlockCheck(antlr::RefToken token) {
         if (delayExpectBlockCheck)
             delayExpectBlockCheck = false;
 
-        if (srcMLParser::expect_blocks_token_set.member(token->getType()))
+        if (srcMLParser::expect_blocks_py_token_set.member(token->getType()))
             expectBlock = true;
 
         if (token->getType() == srcMLParser::PY_FUNCTION || token->getType() == srcMLParser::CLASS)

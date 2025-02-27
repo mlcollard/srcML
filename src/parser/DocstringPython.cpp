@@ -6,12 +6,13 @@
  *
  * This file is part of the srcML Toolkit.
  *
- * Alters string literals that should be docstrings in the token stream
+ * Alters string literals that should be docstrings in the token stream.
+ * As a consequence, it will fix any incorrect string literal line numbers.
  */
 
 #include <DocstringPython.hpp>
 
-// Converts STRING_START/CHAR_START to Python docstrings
+// Converts certain STRING_START/CHAR_START tokens to Python docstrings
 antlr::RefToken DocstringPython::nextToken() {
     // place all input tokens in the buffer so we can check for docstrings
     if (buffer.empty()) {
@@ -44,13 +45,12 @@ antlr::RefToken DocstringPython::nextToken() {
             isBlockStart = false;
         }
 
-        // increment the line number in comments
-        if (checkCommentToken(token))
-            countWSNewlineTokens(token, false);
-
-        // increment the line number in string literals
-        if (token->getType() == srcMLParser::DQUOTE_DOCSTRING_END || token->getType() == srcMLParser::SQUOTE_DOCSTRING_END)
-            countWSNewlineTokens(token, true);
+        // increment the line number in comments or multi-line string literals
+        if (
+            srcMLParser::comment_py_token_set.member(token->getType())
+            || srcMLParser::multiline_literals_py_token_set.member(token->getType())
+        )
+            countWSNewlineTokens(token);
 
         // increment the line number at the end of a line
         if (
@@ -74,41 +74,17 @@ antlr::RefToken DocstringPython::nextToken() {
  * Record end-of-line tokens in a whitespace `token`'s text.
  * 
  * @param token the whitespace token (e.g., comment, docstring, etc.) to analyze.
- * @param isDocstringEnd use `true` if `token` is `DQUOTE_DOCSTRING_END` or `SQUOTE_DOCSTRING_END`.
  */
-void DocstringPython::countWSNewlineTokens(antlr::RefToken token, bool isDocstringEnd) {
+void DocstringPython::countWSNewlineTokens(antlr::RefToken token) {
     std::string text = token->getText();
     int newlines = std::count(text.begin(), text.end(), '\n');
 
     for (int i = 0; i < newlines; ++i)
         ++lineNumber;
 
-    // ensure docstring end tokens have accurate line numbers
-    if (isDocstringEnd)
+    // ensure any multi-line string token has accurate line numbers
+    if (srcMLParser::multiline_literals_py_token_set.member(token->getType()))
         token->setLine(lineNumber);
-}
-
-/**
- * Checks if `token` is a starting or ending comment token in Python.
- * 
- * Returns `true` if `token` is a comment token, `false` otherwise.
- */
-bool DocstringPython::checkCommentToken(antlr::RefToken token) {
-    bool isComment = false;
-
-    switch (token->getType()) {
-        case srcMLParser::HASHTAG_COMMENT_START:
-        case srcMLParser::HASHTAG_COMMENT_END:
-        case srcMLParser::HASHBANG_COMMENT_START:
-        case srcMLParser::HASHBANG_COMMENT_END:
-            isComment = true;
-            break;
-
-        default:
-            break;
-    }
-
-    return isComment;
 }
 
 /**

@@ -717,7 +717,9 @@ tokens {
     // Python
     SDELETE;
     SDICTIONARY;
-    SDOCSTRING;
+    SDOCSTRING_PY;
+    SDOCSTRING_DOXYGEN_PY;
+    SDOXYGEN_PY;
     SELLIPSIS;
     SEXEC_PYTHON2;
     SGLOBAL;
@@ -787,7 +789,11 @@ public:
     static const antlr::BitSet identifier_list_tokens_set;
     static const antlr::BitSet whitespace_token_set;
     static const antlr::BitSet duplex_keyword_set;
-    static const antlr::BitSet expect_blocks_token_set;
+    static const antlr::BitSet expect_blocks_py_token_set;
+    static const antlr::BitSet left_bracket_py_token_set;
+    static const antlr::BitSet right_bracket_py_token_set;
+    static const antlr::BitSet comment_py_token_set;
+    static const antlr::BitSet multiline_literals_py_token_set;
 
     // constructor
     srcMLParser(antlr::TokenStream& lexer, int lang, const OPTION_TYPE& options);
@@ -1100,16 +1106,16 @@ catch[...] {
 start_javascript[] {
         ++start_count;
 
-        const int JS_CATCH_LPAREN = 600;
-        const int JS_ELSE_IF = 601;
-        const int JS_DEFAULT_COLON = 602;
-        const int JS_FUNCTION_MULTOPS = 603;
-        const int JS_YIELD_MULTOPS = 604;
-        const int JS_STATIC_LCURLY = 605;
-        const int JS_EXPORT_LCURLY = 606;
-        const int JS_EXPORT_MULTOPS = 607;
-        const int JS_IMPORT_MULTOPS = 608;
-        const int JS_WITH_LPAREN = 609;
+        const int JS_CATCH_LPAREN = 800;
+        const int JS_ELSE_IF = 801;
+        const int JS_DEFAULT_COLON = 802;
+        const int JS_FUNCTION_MULTOPS = 803;
+        const int JS_YIELD_MULTOPS = 804;
+        const int JS_STATIC_LCURLY = 805;
+        const int JS_EXPORT_LCURLY = 806;
+        const int JS_EXPORT_MULTOPS = 807;
+        const int JS_IMPORT_MULTOPS = 808;
+        const int JS_WITH_LPAREN = 809;
 
         // A duplex keyword is a pair of adjacent keywords
         static const std::array<int, 500 * 500> duplexKeywords = [this](){
@@ -1327,8 +1333,8 @@ catch[...] {
 start_python[] {
         ++start_count;
 
-        const int PY_EXCEPT_MULTOPS = 600;
-        const int PY_YIELD_PY_FROM = 601;
+        const int PY_EXCEPT_MULTOPS = 800;
+        const int PY_YIELD_PY_FROM = 801;
 
         // A duplex keyword is a pair of adjacent keywords
         static const std::array<int, 500 * 500> duplexKeywords = [this](){
@@ -12443,8 +12449,76 @@ expression_part[CALL_TYPE type = NOCALL, int call_count = 1] {
   Handles various rules for literals.
 */
 literals[] { ENTRY_DEBUG } :
+        { inLanguage(LANGUAGE_PYTHON) }?
+        dquote_literal_py |
+
+        { inLanguage(LANGUAGE_PYTHON) }?
+        squote_literal_py |
+
         string_literal | char_literal | backtick_literal | literal | boolean | null_literal |
         complex_literal | nil_literal | none_literal | ellipsis_literal
+;
+
+/*
+  dquote_literal_py
+
+  Handles double-quoted strings, docstrings, and doxygen strings in Python.
+  Only the start and the end of strings are put directly through the parser.  The contents of the string are handled as whitespace.
+*/
+dquote_literal_py[bool markup = true] {
+        LightweightElement element(this);
+        bool is_docstring = (LA(1) == DQUOTE_DOCSTRING_START);
+        bool is_doxygen = (next_token() == DQUOTE_DOXYGEN_END);
+
+        ENTRY_DEBUG
+} :
+        {
+            if (is_docstring && is_doxygen)
+                startElement(SDOCSTRING_DOXYGEN_PY);
+            else if (is_docstring)
+                startElement(SDOCSTRING_PY);
+            else if (is_doxygen)
+                startElement(SDOXYGEN_PY);
+            else
+                startElement(SSTRING);
+        }
+
+        (
+            (STRING_START | DQUOTE_DOCSTRING_START)
+            (STRING_END | RAW_STRING_END | DQUOTE_DOCSTRING_END | DQUOTE_DOXYGEN_END)
+        )
+;
+
+/*
+  squote_literal_py
+
+  Handles single-quoted strings, docstrings, and doxygen strings in Python.
+  Only the start and the end of strings are put directly through the parser.  The contents of the string are handled as whitespace.
+*/
+squote_literal_py[bool markup = true] {
+        LightweightElement element(this);
+        bool is_docstring = (LA(1) == SQUOTE_DOCSTRING_START);
+        bool is_doxygen = (next_token() == SQUOTE_DOXYGEN_END);
+
+        ENTRY_DEBUG
+} :
+        {
+            if (markup) {
+                if (is_docstring && is_doxygen)
+                    startElement(SDOCSTRING_DOXYGEN_PY);
+                else if (is_docstring)
+                    startElement(SDOCSTRING_PY);
+                else if (is_doxygen)
+                    startElement(SDOXYGEN_PY);
+                else
+                    startElement(SSTRING);
+            }
+        }
+
+        (
+            (CHAR_START | SQUOTE_DOCSTRING_START)
+            (CHAR_END | SQUOTE_DOCSTRING_END | SQUOTE_DOXYGEN_END)
+        )
 ;
 
 /*
@@ -12455,17 +12529,11 @@ literals[] { ENTRY_DEBUG } :
 string_literal[bool markup = true] { LightweightElement element(this); ENTRY_DEBUG } :
         {
             if (markup) {
-                if (LA(1) == DQUOTE_DOCSTRING_START)
-                    startElement(SDOCSTRING);
-                else
-                    startElement(SSTRING);
+                startElement(SSTRING);
             }
         }
 
-        (
-            (STRING_START | DQUOTE_DOCSTRING_START)
-            (STRING_END | RAW_STRING_END | DQUOTE_DOCSTRING_END)
-        )
+        (STRING_START (STRING_END | RAW_STRING_END))
 ;
 
 /*
@@ -12474,19 +12542,14 @@ string_literal[bool markup = true] { LightweightElement element(this); ENTRY_DEB
 char_literal[bool markup = true] { LightweightElement element(this); ENTRY_DEBUG } :
         {
             if (markup) {
-                if (LA(1) == SQUOTE_DOCSTRING_START)
-                    startElement(SDOCSTRING);
-                else if (inLanguage(LANGUAGE_JAVASCRIPT) || inLanguage(LANGUAGE_PYTHON))
+                if (inLanguage(LANGUAGE_JAVASCRIPT))
                     startElement(SSTRING);
                 else
                     startElement(SCHAR);
             }
         }
 
-        (
-            (CHAR_START | SQUOTE_DOCSTRING_START)
-            (CHAR_END | SQUOTE_DOCSTRING_END)
-        )
+        (CHAR_START CHAR_END)
 ;
 
 /*

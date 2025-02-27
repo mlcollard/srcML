@@ -31,8 +31,6 @@ public:
 
     void checkBracketToken(antlr::RefToken token);
 
-    bool checkCommentToken(antlr::RefToken token);
-
     void expectBlockCheck(antlr::RefToken token);
 
     void setBlockStartToken(int token);

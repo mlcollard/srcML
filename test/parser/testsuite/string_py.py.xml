@@ -10,6 +10,18 @@
 </unit>
 
 <unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>str</name> <operator>=</operator> <literal type="string">"\
+a\
+"</literal></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>str</name> <operator>=</operator> <literal type="string">"
+a
+"</literal></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
 <expr_stmt><expr><name>str</name> <operator>=</operator> <literal type="string">""""""</literal></expr></expr_stmt>
 </unit>
 
@@ -38,11 +50,30 @@ e
 </unit>
 
 <unit revision="1.1.0" language="Python">
+<expr_stmt><expr><literal type="string" format="doxygen">"""!
+This is a string literal,
+formatted as doxygen.
+"""</literal></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
 <expr_stmt><expr><name>str</name> <operator>=</operator> <literal type="string">''</literal></expr></expr_stmt>
 </unit>
 
 <unit revision="1.1.0" language="Python">
 <expr_stmt><expr><name>str</name> <operator>=</operator> <literal type="string">'a'</literal></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>str</name> <operator>=</operator> <literal type="string">'\
+a\
+'</literal></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>str</name> <operator>=</operator> <literal type="string">'
+a
+'</literal></expr></expr_stmt>
 </unit>
 
 <unit revision="1.1.0" language="Python">
@@ -70,6 +101,13 @@ a
 c
 ''d''
 e
+'''</literal></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><literal type="string" format="doxygen">'''!
+This is a string literal,
+formatted as doxygen.
 '''</literal></expr></expr_stmt>
 </unit>
 
@@ -108,9 +146,37 @@ e
 <unit revision="1.1.0" language="Python">
 <class>class <name>Car</name><block>:<block_content>
     <expr_stmt><expr><literal type="string" format="docstring">"""
+    This is a string literal,
+    formatted as a docstring.
+    """</literal></expr></expr_stmt>
+</block_content></block></class>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<class>class <name>Car</name><block>:<block_content>
+    <expr_stmt><expr><literal type="string" format="docstring">"""
     Docstring example.
     """</literal></expr></expr_stmt>
     <expr_stmt><expr><name>speed</name> <operator>=</operator> <literal type="number">50</literal></expr></expr_stmt>
+</block_content></block></class>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<class>class <name>Car</name><block>:<block_content>
+    <expr_stmt><expr><literal type="string" format="docstring doxygen">"""!
+    This is a string literal,
+    formatted as a docstring
+    and as doxygen.
+    """</literal></expr></expr_stmt>
+</block_content></block></class>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<class>class <name>Car</name><block>:<block_content>
+    <expr_stmt><expr><literal type="string" format="docstring">'''
+    This is a string literal,
+    formatted as a docstring.
+    '''</literal></expr></expr_stmt>
 </block_content></block></class>
 </unit>
 
@@ -120,6 +186,16 @@ e
     Docstring example.
     '''</literal></expr></expr_stmt>
     <expr_stmt><expr><name>speed</name> <operator>=</operator> <literal type="number">50</literal></expr></expr_stmt>
+</block_content></block></class>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<class>class <name>Car</name><block>:<block_content>
+    <expr_stmt><expr><literal type="string" format="docstring doxygen">'''!
+    This is a string literal,
+    formatted as a docstring
+    and as doxygen.
+    '''</literal></expr></expr_stmt>
 </block_content></block></class>
 </unit>
 
@@ -152,11 +228,28 @@ e
 </unit>
 
 <unit revision="1.1.0" language="Python">
+<class>class <name>Car</name><block>:<block_content> <expr_stmt><expr><literal type="string" format="docstring doxygen">"""!Docstring doxygen example."""</literal></expr>;</expr_stmt> <expr_stmt><expr><name>speed</name> <operator>=</operator> <literal type="number">50</literal></expr></expr_stmt></block_content></block></class>
+</unit>
+
+<unit revision="1.1.0" language="Python">
 <class>class <name>Car</name><block>:<block_content> <expr_stmt><expr><literal type="string" format="docstring">'''Docstring example.'''</literal></expr>;</expr_stmt> <expr_stmt><expr><name>speed</name> <operator>=</operator> <literal type="number">50</literal></expr></expr_stmt></block_content></block></class>
 </unit>
 
 <unit revision="1.1.0" language="Python">
 <class>class <name>Car</name><block>:<block_content> <expr_stmt><expr><literal type="string" format="docstring">'''This is the real docstring.'''</literal></expr>;</expr_stmt> <expr_stmt><expr><literal type="string">"srcML"</literal></expr>;</expr_stmt> <expr_stmt><expr><name>speed</name> <operator>=</operator> <literal type="number">50</literal></expr></expr_stmt></block_content></block></class>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<class>class <name>Car</name><block>:<block_content> <expr_stmt><expr><literal type="string" format="docstring doxygen">'''!Docstring doxygen example.'''</literal></expr>;</expr_stmt> <expr_stmt><expr><name>speed</name> <operator>=</operator> <literal type="number">50</literal></expr></expr_stmt></block_content></block></class>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<function>def <name>sum</name><parameter_list>(<parameter><name>a</name></parameter>, <parameter><name>b</name></parameter>)</parameter_list><block>:<block_content>
+    <expr_stmt><expr><literal type="string" format="docstring">"""
+    This is a string literal,
+    formatted as a docstring.
+    """</literal></expr></expr_stmt>
+</block_content></block></function>
 </unit>
 
 <unit revision="1.1.0" language="Python">
@@ -170,10 +263,39 @@ e
 
 <unit revision="1.1.0" language="Python">
 <function>def <name>sum</name><parameter_list>(<parameter><name>a</name></parameter>, <parameter><name>b</name></parameter>)</parameter_list><block>:<block_content>
+    <expr_stmt><expr><literal type="string" format="docstring doxygen">"""!
+    This is a string literal,
+    formatted as a docstring
+    and as doxygen.
+    """</literal></expr></expr_stmt>
+</block_content></block></function>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<function>def <name>sum</name><parameter_list>(<parameter><name>a</name></parameter>, <parameter><name>b</name></parameter>)</parameter_list><block>:<block_content>
+    <expr_stmt><expr><literal type="string" format="docstring">'''
+    This is a string literal,
+    formatted as a docstring.
+    '''</literal></expr></expr_stmt>
+</block_content></block></function>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<function>def <name>sum</name><parameter_list>(<parameter><name>a</name></parameter>, <parameter><name>b</name></parameter>)</parameter_list><block>:<block_content>
     <expr_stmt><expr><literal type="string" format="docstring">'''
     Docstring example.
     '''</literal></expr></expr_stmt>
     <return>return <expr><operator>(</operator><name>a</name> <operator>+</operator> <name>b</name><operator>)</operator></expr></return>
+</block_content></block></function>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<function>def <name>sum</name><parameter_list>(<parameter><name>a</name></parameter>, <parameter><name>b</name></parameter>)</parameter_list><block>:<block_content>
+    <expr_stmt><expr><literal type="string" format="docstring doxygen">'''!
+    This is a string literal,
+    formatted as a docstring
+    and as doxygen.
+    '''</literal></expr></expr_stmt>
 </block_content></block></function>
 </unit>
 
@@ -206,11 +328,19 @@ e
 </unit>
 
 <unit revision="1.1.0" language="Python">
+<function>def <name>sum</name><parameter_list>(<parameter><name>a</name></parameter>, <parameter><name>b</name></parameter>)</parameter_list><block>:<block_content> <expr_stmt><expr><literal type="string" format="docstring doxygen">"""!Docstring doxygen example."""</literal></expr>;</expr_stmt> <return>return <expr><operator>(</operator><name>a</name> <operator>+</operator> <name>b</name><operator>)</operator></expr></return></block_content></block></function>
+</unit>
+
+<unit revision="1.1.0" language="Python">
 <function>def <name>sum</name><parameter_list>(<parameter><name>a</name></parameter>, <parameter><name>b</name></parameter>)</parameter_list><block>:<block_content> <expr_stmt><expr><literal type="string" format="docstring">'''Docstring example.'''</literal></expr>;</expr_stmt> <return>return <expr><operator>(</operator><name>a</name> <operator>+</operator> <name>b</name><operator>)</operator></expr></return></block_content></block></function>
 </unit>
 
 <unit revision="1.1.0" language="Python">
 <function>def <name>sum</name><parameter_list>(<parameter><name>a</name></parameter>, <parameter><name>b</name></parameter>)</parameter_list><block>:<block_content> <expr_stmt><expr><literal type="string" format="docstring">'''This is the real docstring.'''</literal></expr>;</expr_stmt> <expr_stmt><expr><literal type="string">"srcML"</literal></expr>;</expr_stmt> <return>return <expr><operator>(</operator><name>a</name> <operator>+</operator> <name>b</name><operator>)</operator></expr></return></block_content></block></function>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<function>def <name>sum</name><parameter_list>(<parameter><name>a</name></parameter>, <parameter><name>b</name></parameter>)</parameter_list><block>:<block_content> <expr_stmt><expr><literal type="string" format="docstring doxygen">'''!Docstring doxygen example.'''</literal></expr>;</expr_stmt> <return>return <expr><operator>(</operator><name>a</name> <operator>+</operator> <name>b</name><operator>)</operator></expr></return></block_content></block></function>
 </unit>
 
 <unit revision="1.1.0" language="Python">

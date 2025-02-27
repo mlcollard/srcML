@@ -59,8 +59,10 @@ tokens {
     RAW_STRING_END;
     STRING_END;
     DQUOTE_DOCSTRING_END;
+    DQUOTE_DOXYGEN_END;
     CHAR_END;
     SQUOTE_DOCSTRING_END;
+    SQUOTE_DOXYGEN_END;
     BACKTICK_END;
     CONTROL_CHAR;
     LINE_DOXYGEN_COMMENT_END;
@@ -234,6 +236,9 @@ COMMENT_TEXT {
                 mode = ((dquote_count_py == 3) ? DQUOTE_DOCSTRING_END : STRING_END);
                 ismultiplequotes = true;
 
+                if (mode == DQUOTE_DOCSTRING_END && LA(1) == '\041')
+                    mode = DQUOTE_DOXYGEN_END;
+
                 // special case for empty strings (e.g., "" and """""", """""""""""", etc.)
                 if (dquote_count_py == 2 || dquote_count_py % 6 == 0) {
                     dquote_count_py = 0;
@@ -285,6 +290,9 @@ COMMENT_TEXT {
                 squote_count_py = squote_count + 1;
                 mode = ((squote_count_py == 3) ? SQUOTE_DOCSTRING_END : CHAR_END);
                 ismultiplequotes = true;
+
+                if (mode == SQUOTE_DOCSTRING_END && LA(1) == '\041')
+                    mode = SQUOTE_DOXYGEN_END;
 
                 // special case for empty strings (e.g., '' and '''''', '''''''''''', etc.)
                 if (squote_count_py == 2 || squote_count_py % 6 == 0) {

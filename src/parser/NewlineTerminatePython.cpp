@@ -27,14 +27,9 @@ antlr::RefToken NewlineTerminatePython::nextToken() {
         }
 
         // update the open parentheses count
-        if (token->getType() == srcMLParser::LPAREN ||
-            token->getType() == srcMLParser::LBRACKET ||
-            token->getType() == srcMLParser::PY_LCURLY)
+        if (srcMLParser::left_bracket_py_token_set.member(token->getType()))
             ++parenthesesCount;
-        else if (parenthesesCount > 0 &&
-            token->getType() == srcMLParser::RPAREN ||
-            token->getType() == srcMLParser::RBRACKET ||
-            token->getType() == srcMLParser::PY_RCURLY)
+        else if (parenthesesCount > 0 && srcMLParser::right_bracket_py_token_set.member(token->getType()))
             --parenthesesCount;
 
         // For a newline, insert a TERMINATE in certain cases

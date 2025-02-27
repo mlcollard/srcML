@@ -184,7 +184,7 @@ token_set(srcMLParser, duplex_keyword_set,
     srcMLParser::PY_YIELD
 )
 
-token_set(srcMLParser, expect_blocks_token_set,
+token_set(srcMLParser, expect_blocks_py_token_set,
     // Python keywords
     srcMLParser::CASE, srcMLParser::CLASS, srcMLParser::ELSE, srcMLParser::FINALLY, srcMLParser::FOR,
     srcMLParser::IF, srcMLParser::PY_ELIF, srcMLParser::PY_EXCEPT, srcMLParser::PY_FUNCTION,
@@ -192,6 +192,28 @@ token_set(srcMLParser, expect_blocks_token_set,
 
     // Python attributes/specifiers
     srcMLParser::PY_ASYNC, srcMLParser::PY_ATSIGN
+)
+
+token_set(srcMLParser, left_bracket_py_token_set,
+    srcMLParser::LPAREN, srcMLParser::LBRACKET, srcMLParser::PY_LCURLY
+)
+
+token_set(srcMLParser, right_bracket_py_token_set,
+    srcMLParser::RPAREN, srcMLParser::RBRACKET, srcMLParser::PY_RCURLY
+)
+
+token_set(srcMLParser, comment_py_token_set,
+    // Python comments
+    srcMLParser::HASHTAG_COMMENT_START, srcMLParser::HASHTAG_COMMENT_END,
+    srcMLParser::HASHBANG_COMMENT_START, srcMLParser::HASHBANG_COMMENT_END
+)
+
+token_set(srcMLParser, multiline_literals_py_token_set,
+    // Python string literals that can span multiple lines
+    srcMLParser::STRING_START, srcMLParser::STRING_END,
+    srcMLParser::CHAR_START, srcMLParser::CHAR_END,
+    srcMLParser::DQUOTE_DOCSTRING_END, srcMLParser::DQUOTE_DOXYGEN_END,
+    srcMLParser::SQUOTE_DOCSTRING_END, srcMLParser::SQUOTE_DOXYGEN_END
 )
 
 #endif
