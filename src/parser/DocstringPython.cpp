@@ -29,7 +29,7 @@ antlr::RefToken DocstringPython::nextToken() {
             isFunctionOrClass = true;
 
         // check if at the start of a block
-        if (token->getType() == blockStartToken && numBrackets == 0)
+        if (token->getType() == blockStartToken && isFunctionOrClass && numBrackets == 0)
             isBlockStart = true;
 
         // determine if the first non-WS/blockStartToken token in a function or class
