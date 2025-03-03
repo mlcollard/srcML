@@ -3192,7 +3192,7 @@ call_check_paren_pair[int& argumenttoken, int depth = 0] { int call_token = LA(1
             throw_exception[true] |
 
             // forbid parentheses (handled recursively) but allow "if"/"else" for Python ternaries,
-            // "lambda" for Python lambdas, and "for"/"in"/"if" for Python list comprehensions
+            // "lambda" for Python lambdas, and "async"/"for"/"in"/"if" for Python list comprehensions
             {
                 call_token == LPAREN
                 && inLanguage(LANGUAGE_PYTHON)
@@ -3200,7 +3200,7 @@ call_check_paren_pair[int& argumenttoken, int depth = 0] { int call_token = LA(1
                     !keyword_token_set.member(LA(1))
                     || LA(1) == IF || LA(1) == ELSE
                     || LA(1) == FOR || LA(1) == PY_IN
-                    || LA(1) == PY_LAMBDA
+                    || LA(1) == PY_ASYNC || LA(1) == PY_LAMBDA
                 )
             }?
             ~(LPAREN | RPAREN | TERMINATE)
@@ -17323,6 +17323,13 @@ attribute_py[] { ENTRY_DEBUG } :
         }
 
         (
+            {
+                start_list_comprehension_py();
+            }
+            specifier_py |
+
+            list_comprehension_py |
+
             // decorators can have arguments
             { inMode(MODE_ARGUMENT) }?
             argument |
@@ -17765,7 +17772,7 @@ tuple_py[] {
 */
 perform_tuple_check_py[] returns [bool is_tuple] {
         is_tuple = false;
-        int num_parens = 0;  // counts all LPAREN and RPAREN
+        int num_brackets = 0;  // counts all "()", "{}", and "[]"
         int last_consumed_current = last_consumed;
         int start = mark();
         inputState->guessing++;
@@ -17776,18 +17783,18 @@ perform_tuple_check_py[] returns [bool is_tuple] {
                 is_tuple = true;
             else {
                 while (true) {
-                    if (LA(1) == LPAREN)
-                        ++num_parens;
+                    if (LA(1) == LPAREN || LA(1) == PY_LCURLY || LA(1) == LBRACKET)
+                        ++num_brackets;
 
-                    if (LA(1) == RPAREN)
-                        --num_parens;
+                    if (LA(1) == RPAREN || LA(1) == PY_RCURLY || LA(1) == RBRACKET)
+                        --num_brackets;
 
                     // cannot be a parenthesized tuple if the number of parentheses is 0 or less
-                    if (num_parens < 1)
+                    if (num_brackets < 0)
                         break;
 
-                    // the tuple contains a comma (does not matter if calls, etc. contain a comma)
-                    if (LA(1) == COMMA && num_parens == 1 /* the outer-most LPAREN */) {
+                    // the expression contains a comma not in any brackets
+                    if (LA(1) == COMMA && num_brackets == 1) {
                         is_tuple = true;
                         break;
                     }
