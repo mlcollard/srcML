@@ -8601,8 +8601,8 @@ identifier_list[] { ENTRY_DEBUG } :
         JS_BREAK | JS_CATCH | JS_CONTINUE | JS_DO | JS_ELSE | JS_FINALLY | JS_ASYNC | JS_DEBUGGER | JS_DEFAULT | JS_EACH |
         JS_EXPORT | JS_FUNCTION | JS_IMPORT | JS_RANGE_IN | JS_WITH | JS_YIELD | JS_SWITCH | JS_TRY |
 
-        // Python 2
-        PY_2_EXEC | PY_2_PRINT
+        // Python
+        PY_2_EXEC | PY_2_PRINT | PY_TYPE
 ;
 
 /*
