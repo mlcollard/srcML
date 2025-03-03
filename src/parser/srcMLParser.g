@@ -1393,6 +1393,10 @@ start_python[] {
         if (lparen_types_py.empty())
             lparen_types_py.emplace_back('*');
 
+        // special markup for a list comprehensions "for" (not a "for" loop)
+        if (LA(1) == FOR && !inMode(MODE_STATEMENT))
+            list_comprehension_py();
+
         // special markup for an "if" that appears in a "case" statement
         if (LA(1) == IF && inTransparentMode(MODE_CASE_PY)) {
             endDownToMode(MODE_CASE_PY);
@@ -3187,15 +3191,15 @@ call_check_paren_pair[int& argumenttoken, int depth = 0] { int call_token = LA(1
             (identifier | generic_selection)
             throw_exception[true] |
 
-            // forbid parentheses (handled recursively) but allow "if"/"else"
-            // for Python ternaries and "lambda" for Python lambdas
+            // forbid parentheses (handled recursively) but allow "if"/"else" for Python ternaries,
+            // "lambda" for Python lambdas, and "for"/"in"/"if" for Python list comprehensions
             {
                 call_token == LPAREN
                 && inLanguage(LANGUAGE_PYTHON)
                 && (
                     !keyword_token_set.member(LA(1))
-                    || LA(1) == IF
-                    || LA(1) == ELSE
+                    || LA(1) == IF || LA(1) == ELSE
+                    || LA(1) == FOR || LA(1) == PY_IN
                     || LA(1) == PY_LAMBDA
                 )
             }?
@@ -16855,12 +16859,12 @@ list_comprehension_if_py[] { ENTRY_DEBUG } :
 start_list_comprehension_if_py[] { ENTRY_DEBUG } :
         {
             // end previous "if" to start a new "if"
-            if (inTransparentMode(MODE_IF)) {
-                endDownToMode(MODE_IF);
-                endMode(MODE_IF);
+            if (inTransparentMode(MODE_LIST_COMPREHENSION_IF_PY)) {
+                endDownToMode(MODE_LIST_COMPREHENSION_IF_PY);
+                endMode(MODE_LIST_COMPREHENSION_IF_PY);
             }
 
-            startNewMode(MODE_IF);
+            startNewMode(MODE_LIST_COMPREHENSION_IF_PY);
 
             startElement(SIF);
         }
