@@ -6004,8 +6004,35 @@ comma[] { bool markup_comma = true; ENTRY_DEBUG } :
                 endMode(MODE_PROPERTY_JS);
             }
 
+            // can only have one expression in a Python lambda
+            if (
+                inLanguage(LANGUAGE_PYTHON)
+                && inTransparentMode(MODE_LAMBDA_PY)
+                && inMode(MODE_EXPRESSION)
+                && !(
+                    inTransparentMode(MODE_ARRAY_PY)
+                    || inTransparentMode(MODE_DICTIONARY_PY)
+                    || inTransparentMode(MODE_SET_PY)
+                    || inTransparentMode(MODE_TUPLE_PY)
+                )
+            ) {
+                endDownToMode(MODE_LAMBDA_PY);
+                endMode(MODE_LAMBDA_PY);
+            }
+
             // comma ends the current condition in a Python assert
-            if (inLanguage(LANGUAGE_PYTHON) && inTransparentMode(MODE_ASSERT_PY) && inTransparentMode(MODE_CONDITION)) {
+            if (
+                inLanguage(LANGUAGE_PYTHON)
+                && inTransparentMode(MODE_ASSERT_PY)
+                && inTransparentMode(MODE_CONDITION)
+                && !(
+                    inTransparentMode(MODE_ARGUMENT)
+                    || inTransparentMode(MODE_ARRAY_PY)
+                    || inTransparentMode(MODE_DICTIONARY_PY)
+                    || inTransparentMode(MODE_SET_PY)
+                    || inTransparentMode(MODE_TUPLE_PY)
+                )
+            ) {
                 endDownToMode(MODE_CONDITION);
                 endMode(MODE_CONDITION);
             }
