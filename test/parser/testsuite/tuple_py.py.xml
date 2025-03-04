@@ -105,4 +105,16 @@
 <expr_stmt><expr><name>construct</name> <operator>=</operator> <operator>(</operator><tuple>(<expr><operator>(</operator><name>a</name><operator>)</operator></expr>, <expr><operator>(</operator><name>b</name><operator>)</operator></expr>, <expr><name>c</name></expr>)</tuple><operator>)</operator></expr></expr_stmt>
 </unit>
 
+<unit revision="1.1.0" language="Python">
+<function>def <name>keyword_arguments</name><parameter_list>(<parameter><name>a</name></parameter>, <parameter><name>b</name></parameter>, <parameter><name>c</name></parameter>, <parameter><name>d</name></parameter>)</parameter_list><block>:<block_content>
+    <return>return <expr><tuple><expr><call><name><name>a</name><operator>.</operator><name>sample</name></name><argument_list>(<argument><expr><name>b</name></expr></argument>, <argument><name>example</name>=<expr><name>c</name></expr></argument>)</argument_list></call></expr>, <expr><call><name><name>a</name><operator>.</operator><name>sample</name></name><argument_list>(<argument><expr><name>d</name></expr></argument>)</argument_list></call></expr></tuple></expr></return>
+</block_content></block></function>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<function>def <name>keyword_arguments</name><parameter_list>(<parameter><name>a</name></parameter>, <parameter><name>b</name></parameter>, <parameter><name>c</name></parameter>, <parameter><name>d</name></parameter>, <parameter><name>e</name></parameter>)</parameter_list><block>:<block_content>
+    <return>return <expr><tuple><expr><call><name><name>a</name><operator>.</operator><name>sample</name></name><argument_list>(<argument><expr><name>b</name></expr></argument>, <argument><name>example</name>=<expr><name>c</name></expr></argument>)</argument_list></call></expr>, <expr><call><name><name>a</name><operator>.</operator><name>sample</name></name><argument_list>(<argument><expr><name>d</name></expr></argument>, <argument><name>example</name>=<expr><name>e</name></expr></argument>)</argument_list></call></expr></tuple></expr></return>
+</block_content></block></function></unit>
+</unit>
+
 </unit>

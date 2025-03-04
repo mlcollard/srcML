@@ -17926,7 +17926,12 @@ perform_tuple_check_no_paren_py[] returns [bool is_tuple] {
                     break;
                 }
 
-                if (LA(1) == TERMINATE || LA(1) == INDENT || LA(1) == EQUAL || LA(1) == 1 /* EOF */)
+                if (
+                    (LA(1) == EQUAL && num_brackets == 0)
+                    || LA(1) == TERMINATE
+                    || LA(1) == INDENT
+                    || LA(1) == 1 /* EOF */
+                )
                     break;
 
                 consume();
