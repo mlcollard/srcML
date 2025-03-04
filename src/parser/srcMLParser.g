@@ -6012,6 +6012,7 @@ comma[] { bool markup_comma = true; ENTRY_DEBUG } :
                 && !(
                     inTransparentMode(MODE_ARRAY_PY)
                     || inTransparentMode(MODE_DICTIONARY_PY)
+                    || inTransparentMode(MODE_INDEX_PY)
                     || inTransparentMode(MODE_SET_PY)
                     || inTransparentMode(MODE_TUPLE_PY)
                 )
@@ -6029,6 +6030,7 @@ comma[] { bool markup_comma = true; ENTRY_DEBUG } :
                     inTransparentMode(MODE_ARGUMENT)
                     || inTransparentMode(MODE_ARRAY_PY)
                     || inTransparentMode(MODE_DICTIONARY_PY)
+                    || inTransparentMode(MODE_INDEX_PY)
                     || inTransparentMode(MODE_SET_PY)
                     || inTransparentMode(MODE_TUPLE_PY)
                 )
@@ -7921,7 +7923,7 @@ variable_identifier_array_grammar_sub[bool& iscomplex] { CompleteElement element
             )
                 startNewMode(MODE_LOCAL | MODE_TOP | MODE_LIST | MODE_END_AT_COMMA);
             else if (inLanguage(LANGUAGE_PYTHON))
-                startNewMode(MODE_EXCLUDE_NO_PAREN_TUPLES_PY | MODE_LOCAL | MODE_TOP | MODE_LIST);
+                startNewMode(MODE_EXCLUDE_NO_PAREN_TUPLES_PY | MODE_INDEX_PY | MODE_LOCAL | MODE_TOP | MODE_LIST);
             else
                 startNewMode(MODE_LOCAL | MODE_TOP | MODE_LIST);
 

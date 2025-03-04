@@ -360,4 +360,6 @@ const static srcMLState::MODE_TYPE MODE_YIELD_PY;
 
 const static srcMLState::MODE_TYPE MODE_SET_PY;
 
+const static srcMLState::MODE_TYPE MODE_INDEX_PY;
+
 #endif

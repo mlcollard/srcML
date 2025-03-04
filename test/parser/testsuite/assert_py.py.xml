@@ -34,6 +34,10 @@
 </unit>
 
 <unit revision="1.1.0" language="Python">
+<assert>assert <condition><expr><name><name>a</name><index>[<expr><name>b</name></expr>, <expr><name>c</name></expr>]</index></name></expr></condition>, <expr><literal type="string">"Fail Message"</literal></expr></assert>
+</unit>
+
+<unit revision="1.1.0" language="Python">
 <assert>assert <condition><expr><call><name>sample</name><argument_list>(<argument><expr><name>a</name></expr></argument>, <argument><expr><name>b</name></expr></argument>)</argument_list></call></expr></condition>, <expr><literal type="string">"Fail Message"</literal></expr></assert>
 </unit>
 
@@ -63,6 +67,10 @@
 
 <unit revision="1.1.0" language="Python">
 <assert>assert <condition><expr><call><name>list</name><argument_list>(<argument><expr><call><name>map</name><argument_list>(<argument><expr><lambda>lambda <parameter><name>x</name></parameter>: <expr><tuple>(<expr><name>x</name></expr>, <expr><name>x</name></expr>)</tuple></expr></lambda></expr></argument>, <argument><expr><name>numbers</name></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr></condition>, <expr><literal type="string">"Fail Message"</literal></expr></assert>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<assert>assert <condition><expr><call><name>list</name><argument_list>(<argument><expr><call><name>map</name><argument_list>(<argument><expr><lambda>lambda <parameter><name>x</name></parameter>: <expr><name><name>x</name><index>[<expr><name>x</name></expr>, <expr><name>x</name></expr>]</index></name></expr></lambda></expr></argument>, <argument><expr><name>numbers</name></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr></condition>, <expr><literal type="string">"Fail Message"</literal></expr></assert>
 </unit>
 
 </unit>
