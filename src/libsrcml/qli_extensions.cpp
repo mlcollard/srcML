@@ -178,6 +178,10 @@ void add_element(xmlXPathParserContext* ctxt, int nargs) {
             table->add_to_token_list(bucket, number, *(itpair.first), node_ptr);
         }
 
+        // std::cout << "Adding " << token << "to bucket " << bucket << "_" << number << ": " << valid << std::endl;
+        // std::cout << (*table) << std::endl;
+        // std::cout << "---------------------------------\n\n\n" << std::endl;
+
         isValid = isValid || valid;
     }
 
@@ -292,6 +296,7 @@ void clear_elements(xmlXPathParserContext* ctxt, int nargs) {
         // clear this bucket
         xmlChar* var = xmlXPathPopString(ctxt);
         table->empty_bucket((const char*) var);
+        //std::cout << "CLEARED " << (const char*) var << std::endl;
         xmlFree(var);
     }
 
@@ -347,9 +352,17 @@ void regex_match(xmlXPathParserContext* ctxt, int nargs) {
 }
 
 void debug_print(xmlXPathParserContext* ctxt, int nargs) {
-    if(nargs != 1) {
+    if(nargs > 2) {
         std::cerr << "Arg arity error" << std::endl;
         return;
+    }
+
+    std::string prefix = "";
+
+    if (nargs == 2) {
+        // clear this bucket
+        xmlChar* var = xmlXPathPopString(ctxt);
+        prefix = (const char*)var;
     }
 
 
@@ -362,7 +375,7 @@ void debug_print(xmlXPathParserContext* ctxt, int nargs) {
     for (int i = 0; i < set->nodeNr; ++i) {
         xmlNode* node = set->nodeTab[i];
         const std::string token(get_node_text(node));
-        std::cerr << "\t" << i << ": " << token << " | " << node << std::endl;
+        std::cerr << "\t" << prefix << i << ": " << token << " | " << node << std::endl;
     }
 
     xmlXPathReturnBoolean(ctxt, true);

@@ -662,6 +662,25 @@ std::string XPathGenerator::convert() {
     for(size_t i = 0; i < source_exprs.size(); ++i) {
         add_bucket_clears(source_exprs[i],i);
         number_add_calls(source_exprs[i],i);
+
+        // Combine predicate values
+        // Check if all the children are predicates (They should be?)
+        bool all_predicates = source_exprs[i]->get_children().size() != 0;
+        for(auto child : source_exprs[i]->get_children()) {
+            if(child->get_type() != PREDICATE) { all_predicates = false; break; }
+        }
+        if(all_predicates) {
+            XPathNode* and_predicate = new XPathNode("",PREDICATE);
+            while(source_exprs[i]->get_children().size() != 0) {
+                XPathNode* predicate = source_exprs[i]->pop_child_beginning();
+                predicate->set_type(NO_CONN);
+                and_predicate->add_child(predicate);
+                if(source_exprs[i]->get_children().size() != 0) {
+                    and_predicate->add_child(new XPathNode(" and ",NO_CONN));
+                }
+            }
+            source_exprs[i]->add_child(and_predicate);
+        }
     }
 
     /* FROM check
