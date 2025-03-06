@@ -1491,7 +1491,7 @@ start_python[] {
 
         // looking for a comma to start the message half of an "assert"
         { inMode(MODE_ASSERT_PY) }?
-        (COMMA expression) |
+        (comma expression) |
 
         // looking for an expression to mark as a condition
         { inMode(MODE_CONDITION | MODE_EXPECT) }?
@@ -6004,23 +6004,6 @@ comma[] { bool markup_comma = true; ENTRY_DEBUG } :
                 endMode(MODE_PROPERTY_JS);
             }
 
-            // can only have one expression in a Python lambda
-            if (
-                inLanguage(LANGUAGE_PYTHON)
-                && inTransparentMode(MODE_LAMBDA_PY)
-                && inMode(MODE_EXPRESSION)
-                && !(
-                    inTransparentMode(MODE_ARRAY_PY)
-                    || inTransparentMode(MODE_DICTIONARY_PY)
-                    || inTransparentMode(MODE_INDEX_PY)
-                    || inTransparentMode(MODE_SET_PY)
-                    || inTransparentMode(MODE_TUPLE_PY)
-                )
-            ) {
-                endDownToMode(MODE_LAMBDA_PY);
-                endMode(MODE_LAMBDA_PY);
-            }
-
             // comma ends the current condition in a Python assert
             if (
                 inLanguage(LANGUAGE_PYTHON)
@@ -6031,6 +6014,7 @@ comma[] { bool markup_comma = true; ENTRY_DEBUG } :
                     || inTransparentMode(MODE_ARRAY_PY)
                     || inTransparentMode(MODE_DICTIONARY_PY)
                     || inTransparentMode(MODE_INDEX_PY)
+                    || inTransparentMode(MODE_PARAMETER)
                     || inTransparentMode(MODE_SET_PY)
                     || inTransparentMode(MODE_TUPLE_PY)
                 )
@@ -11868,11 +11852,18 @@ rparen_operator[bool markup = true] { LightweightElement element(this); ENTRY_DE
 
   Handles right parenthesis processing.
 */
-rparen[bool markup = true, bool end_control_incr = false] { bool isempty = getParen() == 0; ENTRY_DEBUG } :
+rparen[bool markup = true, bool end_control_incr = false] {
+        bool isempty = getParen() == 0;
+        bool wascall = false;
+
+        ENTRY_DEBUG
+} :
         {
             // found Python rparen that ends a call
-            if (inLanguage(LANGUAGE_PYTHON) && lparen_types_py.back() == 'c')
+            if (inLanguage(LANGUAGE_PYTHON) && lparen_types_py.back() == 'c') {
                 lparen_types_py.pop_back();
+                wascall = true;
+            }
 
             if (isempty) {
                 // additional right parentheses indicates end of non-list modes
@@ -11993,6 +11984,19 @@ rparen[bool markup = true, bool end_control_incr = false] { bool isempty = getPa
                 if (inMode(MODE_LIST))
                     endMode(MODE_LIST);
                 }
+            }
+
+            // special case for a Python assert message that directly follows a call
+            if (
+                inLanguage(LANGUAGE_PYTHON)
+                && wascall
+                && LA(1) == COMMA
+                && inTransparentMode(MODE_ASSERT_PY)
+                && !inTransparentMode(MODE_ARGUMENT)
+                && !inTransparentMode(MODE_LAMBDA_CONTENT_PY)
+            ) {
+                comma();
+                expression();
             }
         }
 ;
@@ -17060,10 +17064,7 @@ complete_python_parameter[] {
                 || next_token() == RPAREN
                 || (
                     inTransparentMode(MODE_LAMBDA_PY)
-                    && (
-                        next_token() == PY_COLON
-                        || next_token() == INDENT
-                    )
+                    && next_token() == PY_COLON
                 )
             }?
             (MULTOPS | OPERATORS) |
@@ -17517,9 +17518,9 @@ start_list_comprehension_py[] { ENTRY_DEBUG } :
 
   Handles a Python lambda.  Not used directly, but can be called by expression_part.
 */
-lambda_py[] { ENTRY_DEBUG } :
+lambda_py[] { CompleteElement element(this); ENTRY_DEBUG } :
         {
-            startNewMode(MODE_LAMBDA_PY);
+            startNewMode(MODE_EXCLUDE_NO_PAREN_TUPLES_PY | MODE_LAMBDA_PY);
 
             startElement(SFUNCTION_LAMBDA);
         }
@@ -17531,7 +17532,7 @@ lambda_py[] { ENTRY_DEBUG } :
         }
 
         (options { greedy = true; } :
-            { (LA(1) == PY_COLON || LA(1) == INDENT) && inMode(MODE_LAMBDA_PY) }?
+            { LA(1) == PY_COLON && inTransparentMode(MODE_LAMBDA_PY) }?
             {
                 break;
             } |
@@ -17539,8 +17540,8 @@ lambda_py[] { ENTRY_DEBUG } :
             complete_python_parameter |
 
             {
-                if (inMode(MODE_PARAMETER))
-                    endMode(MODE_PARAMETER);
+                if (!inMode(MODE_PARAMETER | MODE_LIST | MODE_EXPECT))
+                    endMode();
             }
             comma
         )*
@@ -17553,10 +17554,61 @@ lambda_py[] { ENTRY_DEBUG } :
         }
 
         // Python lambdas do not contain blocks, so consume the colon (':')
-        (PY_COLON | INDENT)
+        PY_COLON
 
         {
-            startNewMode(MODE_EXPRESSION | MODE_EXPECT);
+            startNewMode(MODE_LAMBDA_CONTENT_PY);
+        }
+
+        (options { greedy = true; } :
+            {
+                start_list_comprehension_py();
+            }
+            specifier_py |
+
+            list_comprehension_py |
+
+            { inMode(MODE_ARGUMENT) }?
+            argument |
+
+            // do not accidentally consume the tuple-ending RPAREN or operator RPAREN
+            {
+                (
+                    !inTransparentMode(MODE_TUPLE_PY)
+                    || last_consumed != RPAREN
+                    || LA(1) != RPAREN
+                    || next_token() == RPAREN
+                )
+                && (LA(1) != RPAREN || lparen_types_py.back() != 'o')
+                && (LA(1) != RPAREN || lparen_types_py.back() != 't')
+            }?
+            {
+                if (!inMode(MODE_EXPRESSION))
+                    startNewMode(MODE_EXPRESSION | MODE_EXPECT);
+            }
+            expression
+            {
+                // ensure lambdas end correctly if used as an argument in a call
+                if (LA(1) == COMMA) {
+                    while (inMode(MODE_EXPRESSION)) {
+                        endDownToMode(MODE_EXPRESSION);
+                        endMode(MODE_EXPRESSION);
+                    }
+
+                    // end the lambda before processing the comma
+                    if (inMode(MODE_LAMBDA_CONTENT_PY))
+                        break;
+                }
+            } |
+
+            comma
+        )*
+
+        {
+            if (inTransparentMode(MODE_LAMBDA_PY)) {
+                endDownToMode(MODE_LAMBDA_PY);
+                endMode(MODE_LAMBDA_PY);
+            }
         }
 ;
 
@@ -17801,6 +17853,7 @@ tuple_py[] {
 */
 perform_tuple_check_py[] returns [bool is_tuple] {
         is_tuple = false;
+        bool is_lambda = false;
         int num_brackets = 0;  // counts all "()", "{}", and "[]"
         int last_consumed_current = last_consumed;
         int start = mark();
@@ -17818,12 +17871,20 @@ perform_tuple_check_py[] returns [bool is_tuple] {
                     if (LA(1) == RPAREN || LA(1) == PY_RCURLY || LA(1) == RBRACKET)
                         --num_brackets;
 
+                    // do not confuse (lambda a, b: a**b) for a tuple
+                    if (LA(1) == PY_LAMBDA)
+                        is_lambda = true;
+
+                    // end of lambda parameter(s)
+                    if (LA(1) == PY_COLON)
+                        is_lambda = false;
+
                     // cannot be a parenthesized tuple if the number of parentheses is 0 or less
                     if (num_brackets < 0)
                         break;
 
                     // the expression contains a comma not in any brackets
-                    if (LA(1) == COMMA && num_brackets == 1) {
+                    if (LA(1) == COMMA && num_brackets == 1 && !is_lambda) {
                         is_tuple = true;
                         break;
                     }
