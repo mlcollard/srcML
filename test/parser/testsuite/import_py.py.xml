@@ -77,4 +77,14 @@
 <import><from>from <name>..module</name></from> import <name>name</name></import>
 </unit>
 
+<unit revision="1.1.0" language="Python">
+<import><from>from <name>.module</name></from> import (
+    <name>a</name>,
+    <name>b</name>,
+    <name>c</name>,
+    <name>d</name>,
+    <name>e</name>,
+)</import>
+</unit>
+
 </unit>
