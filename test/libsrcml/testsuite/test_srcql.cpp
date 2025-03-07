@@ -5940,7 +5940,7 @@ int bar(char addr) { return id; }
         srcml_archive_free(iarchive);
     }
 
-    const std::string correct_clear_with_multiple_clears_at_different_levels = R"(
+    const std::string correct_clear_with_multiple_clears_at_different_levels_src = R"(
 class X {
     A1 foo(B1 p1) { return p2; }
 };
@@ -5967,7 +5967,7 @@ class Z {
 
         srcml_unit* unit = srcml_unit_create(oarchive);
         srcml_unit_set_language(unit,"C++");
-        srcml_unit_parse_memory(unit,correct_clear_with_multiple_clears_at_different_levels.c_str(),correct_clear_with_multiple_clears_at_different_levels.size());
+        srcml_unit_parse_memory(unit,correct_clear_with_multiple_clears_at_different_levels_src.c_str(),correct_clear_with_multiple_clears_at_different_levels_src.size());
         dassert(srcml_archive_write_unit(oarchive,unit), SRCML_STATUS_OK);
 
         srcml_unit_free(unit);
@@ -5986,6 +5986,74 @@ class Z {
         srcml_unit_apply_transforms(iarchive, unit, &result);
 
         dassert(srcml_transform_get_type(result), SRCML_RESULT_NONE);
+
+        srcml_unit_free(unit);
+        srcml_transform_free(result);
+        srcml_archive_close(iarchive);
+        srcml_archive_free(iarchive);
+    }
+
+    const std::string correct_clear_with_multiple_clears_and_multiple_contains_src = R"(
+int foo(int id) { 
+    int x = id;
+    if(a) {
+        return x;
+    }
+}
+
+int bar(char addr) { 
+    int y = addr;
+    if(a) {
+        return x;
+    }
+}
+)";
+
+    const std::vector<std::string> correct_clear_with_multiple_clears_and_multiple_contains_srcml {
+        R"(<function><type><name>int</name></type> <name>foo</name><parameter_list>(<parameter><decl><type><name>int</name></type> <name>id</name></decl></parameter>)</parameter_list> <block>{<block_content> 
+    <decl_stmt><decl><type><name>int</name></type> <name>x</name> <init>= <expr><name>id</name></expr></init></decl>;</decl_stmt>
+    <if_stmt><if>if<condition>(<expr><name>a</name></expr>)</condition> <block>{<block_content>
+        <return>return <expr><name>x</name></expr>;</return>
+    </block_content>}</block></if></if_stmt>
+</block_content>}</block></function>)",
+        R"(<function><type><name>int</name></type> <name>bar</name><parameter_list>(<parameter><decl><type><name>char</name></type> <name>addr</name></decl></parameter>)</parameter_list> <block>{<block_content> 
+    <decl_stmt><decl><type><name>int</name></type> <name>y</name> <init>= <expr><name>addr</name></expr></init></decl>;</decl_stmt>
+    <if_stmt><if>if<condition>(<expr><name>a</name></expr>)</condition> <block>{<block_content>
+        <return>return <expr><name>x</name></expr>;</return>
+    </block_content>}</block></if></if_stmt>
+</block_content>}</block></function>)"
+};
+
+    // FIND $FTYPE $FNAME($PTYPE $PARAM) {} CONTAINS int $VAR = $PARAM; CONTAINS if($COND) { return $VAR; }
+    {
+        char* s;
+        size_t size;
+
+        srcml_archive* oarchive = srcml_archive_create();
+        srcml_archive_write_open_memory(oarchive,&s, &size);
+
+        srcml_unit* unit = srcml_unit_create(oarchive);
+        srcml_unit_set_language(unit,"C++");
+        srcml_unit_parse_memory(unit,correct_clear_with_multiple_clears_and_multiple_contains_src.c_str(),correct_clear_with_multiple_clears_and_multiple_contains_src.size());
+        dassert(srcml_archive_write_unit(oarchive,unit), SRCML_STATUS_OK);
+
+        srcml_unit_free(unit);
+        srcml_archive_close(oarchive);
+        srcml_archive_free(oarchive);
+
+        std::string srcml_text = std::string(s, size);
+        free(s);
+
+        srcml_archive* iarchive = srcml_archive_create();
+        srcml_archive_read_open_memory(iarchive,srcml_text.c_str(),srcml_text.size());
+        dassert(srcml_append_transform_srcql(iarchive,"FIND $FTYPE $FNAME($PTYPE $PARAM) {} CONTAINS int $VAR = $PARAM; CONTAINS if($COND) { return $VAR; }"), SRCML_STATUS_OK);
+
+        unit = srcml_archive_read_unit(iarchive);
+        srcml_transform_result* result = nullptr;
+        srcml_unit_apply_transforms(iarchive, unit, &result);
+
+        dassert(srcml_transform_get_unit_size(result), 1);
+        dassert(srcml_unit_get_srcml_inner(srcml_transform_get_unit(result,0)), correct_clear_with_multiple_clears_and_multiple_contains_srcml[0]);
 
         srcml_unit_free(unit);
         srcml_transform_free(result);
