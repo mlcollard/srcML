@@ -118,7 +118,7 @@ void add_element(xmlXPathParserContext* ctxt, int nargs) {
 
     // token
     std::unique_ptr<xmlNodeSet> node_set(xmlXPathPopNodeSet(ctxt));
-    if(node_set.get() == NULL && xmlXPathCheckError(ctxt) == false) {
+    if (node_set.get() == NULL && xmlXPathCheckError(ctxt) == false) {
         node_set = std::unique_ptr<xmlNodeSet>(xmlXPathNodeSetCreate(NULL));
     }
 
@@ -178,10 +178,6 @@ void add_element(xmlXPathParserContext* ctxt, int nargs) {
             table->add_to_token_list(bucket, number, *(itpair.first), node_ptr);
         }
 
-        // std::cout << "Adding " << token << "to bucket " << bucket << "_" << number << ": " << valid << std::endl;
-        // std::cout << (*table) << std::endl;
-        // std::cout << "---------------------------------\n\n\n" << std::endl;
-
         isValid = isValid || valid;
     }
 
@@ -220,7 +216,7 @@ void match_element(xmlXPathParserContext* ctxt, int nargs) {
 
     // token
     std::unique_ptr<xmlNodeSet> node_set(xmlXPathPopNodeSet(ctxt));
-    if(node_set.get() == NULL && xmlXPathCheckError(ctxt) == false) {
+    if (node_set.get() == NULL && xmlXPathCheckError(ctxt) == false) {
         node_set = std::unique_ptr<xmlNodeSet>(xmlXPathNodeSetCreate(NULL));
     }
 
@@ -296,7 +292,6 @@ void clear_elements(xmlXPathParserContext* ctxt, int nargs) {
         // clear this bucket
         xmlChar* var = xmlXPathPopString(ctxt);
         table->empty_bucket((const char*) var);
-        //std::cout << "CLEARED " << (const char*) var << std::endl;
         xmlFree(var);
     }
 
@@ -312,7 +307,7 @@ void is_valid_element(xmlXPathParserContext* ctxt, int nargs) {
     }
 
     std::unique_ptr<xmlNodeSet> node_set(xmlXPathPopNodeSet(ctxt));
-    if(node_set.get() == NULL && xmlXPathCheckError(ctxt) == false) {
+    if (node_set.get() == NULL && xmlXPathCheckError(ctxt) == false) {
         node_set = std::unique_ptr<xmlNodeSet>(xmlXPathNodeSetCreate(NULL));
     }
 
@@ -335,7 +330,7 @@ void is_valid_element(xmlXPathParserContext* ctxt, int nargs) {
 }
 
 void regex_match(xmlXPathParserContext* ctxt, int nargs) {
-    if(nargs != 2) {
+    if (nargs != 2) {
         std::cerr << "Arg arity error" << std::endl;
         return;
     }
@@ -352,12 +347,12 @@ void regex_match(xmlXPathParserContext* ctxt, int nargs) {
 }
 
 void debug_print(xmlXPathParserContext* ctxt, int nargs) {
-    if(nargs > 2) {
+    if (nargs > 2) {
         std::cerr << "Arg arity error" << std::endl;
         return;
     }
 
-    std::string prefix = "";
+    std::string prefix;
 
     if (nargs == 2) {
         // clear this bucket
@@ -368,7 +363,7 @@ void debug_print(xmlXPathParserContext* ctxt, int nargs) {
 
     xmlNodeSet* set = xmlXPathPopNodeSet(ctxt);
 
-    if(set == NULL && xmlXPathCheckError(ctxt) == false) {
+    if (set == NULL && xmlXPathCheckError(ctxt) == false) {
         set = xmlXPathNodeSetCreate(NULL);
     }
 
