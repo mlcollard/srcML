@@ -5898,6 +5898,170 @@ void bar() {
         srcml_archive_free(iarchive);
     }
 
+
+    const std::string correct_clear_with_contains_functions_src = R"(
+int foo(int id) { return 1; }
+int bar(char addr) { return id; }
+)";
+
+    // FIND $FTYPE $FNAME($PTYPE $PARAM) {} CONTAINS return $PARAM;
+    {
+        char* s;
+        size_t size;
+
+        srcml_archive* oarchive = srcml_archive_create();
+        srcml_archive_write_open_memory(oarchive,&s, &size);
+
+        srcml_unit* unit = srcml_unit_create(oarchive);
+        srcml_unit_set_language(unit,"C++");
+        srcml_unit_parse_memory(unit,correct_clear_with_contains_functions_src.c_str(),correct_clear_with_contains_functions_src.size());
+        dassert(srcml_archive_write_unit(oarchive,unit), SRCML_STATUS_OK);
+
+        srcml_unit_free(unit);
+        srcml_archive_close(oarchive);
+        srcml_archive_free(oarchive);
+
+        std::string srcml_text = std::string(s, size);
+        free(s);
+
+        srcml_archive* iarchive = srcml_archive_create();
+        srcml_archive_read_open_memory(iarchive,srcml_text.c_str(),srcml_text.size());
+        dassert(srcml_append_transform_srcql(iarchive,"FIND $FTYPE $FNAME($PTYPE $PARAM) {} CONTAINS return $PARAM;"), SRCML_STATUS_OK);
+
+        unit = srcml_archive_read_unit(iarchive);
+        srcml_transform_result* result = nullptr;
+        srcml_unit_apply_transforms(iarchive, unit, &result);
+
+        dassert(srcml_transform_get_type(result), SRCML_RESULT_NONE);
+
+        srcml_unit_free(unit);
+        srcml_transform_free(result);
+        srcml_archive_close(iarchive);
+        srcml_archive_free(iarchive);
+    }
+
+    const std::string correct_clear_with_multiple_clears_at_different_levels_src = R"(
+class X {
+    A1 foo(B1 p1) { return p2; }
+};
+
+class Y {
+    A2 foo(B2 p3) { return p4; }
+};
+
+class Z {
+    X foo(Y p5) { return p5; }
+    Z bar(Y p6) { return p6; }
+    Y bax(Z p7) { return p7; }
+    Z baz(Z p8) { return p7; }
+};
+)";
+
+    // FIND class $CLS {}; CONTAINS return $PARAM; WITHIN $CLS $FNAME($CLS $PARAM) {}
+    {
+        char* s;
+        size_t size;
+
+        srcml_archive* oarchive = srcml_archive_create();
+        srcml_archive_write_open_memory(oarchive,&s, &size);
+
+        srcml_unit* unit = srcml_unit_create(oarchive);
+        srcml_unit_set_language(unit,"C++");
+        srcml_unit_parse_memory(unit,correct_clear_with_multiple_clears_at_different_levels_src.c_str(),correct_clear_with_multiple_clears_at_different_levels_src.size());
+        dassert(srcml_archive_write_unit(oarchive,unit), SRCML_STATUS_OK);
+
+        srcml_unit_free(unit);
+        srcml_archive_close(oarchive);
+        srcml_archive_free(oarchive);
+
+        std::string srcml_text = std::string(s, size);
+        free(s);
+
+        srcml_archive* iarchive = srcml_archive_create();
+        srcml_archive_read_open_memory(iarchive,srcml_text.c_str(),srcml_text.size());
+        dassert(srcml_append_transform_srcql(iarchive,"FIND class $CLS {}; CONTAINS return $PARAM; WITHIN $CLS $FNAME($CLS $PARAM) {}"), SRCML_STATUS_OK);
+
+        unit = srcml_archive_read_unit(iarchive);
+        srcml_transform_result* result = nullptr;
+        srcml_unit_apply_transforms(iarchive, unit, &result);
+
+        dassert(srcml_transform_get_type(result), SRCML_RESULT_NONE);
+
+        srcml_unit_free(unit);
+        srcml_transform_free(result);
+        srcml_archive_close(iarchive);
+        srcml_archive_free(iarchive);
+    }
+
+    const std::string correct_clear_with_multiple_clears_and_multiple_contains_src = R"(
+int foo(int id) { 
+    int x = id;
+    if(a) {
+        return x;
+    }
+}
+
+int bar(char addr) { 
+    int y = addr;
+    if(a) {
+        return x;
+    }
+}
+)";
+
+    const std::vector<std::string> correct_clear_with_multiple_clears_and_multiple_contains_srcml {
+        R"(<function><type><name>int</name></type> <name>foo</name><parameter_list>(<parameter><decl><type><name>int</name></type> <name>id</name></decl></parameter>)</parameter_list> <block>{<block_content> 
+    <decl_stmt><decl><type><name>int</name></type> <name>x</name> <init>= <expr><name>id</name></expr></init></decl>;</decl_stmt>
+    <if_stmt><if>if<condition>(<expr><name>a</name></expr>)</condition> <block>{<block_content>
+        <return>return <expr><name>x</name></expr>;</return>
+    </block_content>}</block></if></if_stmt>
+</block_content>}</block></function>)",
+        R"(<function><type><name>int</name></type> <name>bar</name><parameter_list>(<parameter><decl><type><name>char</name></type> <name>addr</name></decl></parameter>)</parameter_list> <block>{<block_content> 
+    <decl_stmt><decl><type><name>int</name></type> <name>y</name> <init>= <expr><name>addr</name></expr></init></decl>;</decl_stmt>
+    <if_stmt><if>if<condition>(<expr><name>a</name></expr>)</condition> <block>{<block_content>
+        <return>return <expr><name>x</name></expr>;</return>
+    </block_content>}</block></if></if_stmt>
+</block_content>}</block></function>)"
+};
+
+    // FIND $FTYPE $FNAME($PTYPE $PARAM) {} CONTAINS int $VAR = $PARAM; CONTAINS if($COND) { return $VAR; }
+    {
+        char* s;
+        size_t size;
+
+        srcml_archive* oarchive = srcml_archive_create();
+        srcml_archive_write_open_memory(oarchive,&s, &size);
+
+        srcml_unit* unit = srcml_unit_create(oarchive);
+        srcml_unit_set_language(unit,"C++");
+        srcml_unit_parse_memory(unit,correct_clear_with_multiple_clears_and_multiple_contains_src.c_str(),correct_clear_with_multiple_clears_and_multiple_contains_src.size());
+        dassert(srcml_archive_write_unit(oarchive,unit), SRCML_STATUS_OK);
+
+        srcml_unit_free(unit);
+        srcml_archive_close(oarchive);
+        srcml_archive_free(oarchive);
+
+        std::string srcml_text = std::string(s, size);
+        free(s);
+
+        srcml_archive* iarchive = srcml_archive_create();
+        srcml_archive_read_open_memory(iarchive,srcml_text.c_str(),srcml_text.size());
+        dassert(srcml_append_transform_srcql(iarchive,"FIND $FTYPE $FNAME($PTYPE $PARAM) {} CONTAINS int $VAR = $PARAM; CONTAINS if($COND) { return $VAR; }"), SRCML_STATUS_OK);
+
+        unit = srcml_archive_read_unit(iarchive);
+        srcml_transform_result* result = nullptr;
+        srcml_unit_apply_transforms(iarchive, unit, &result);
+
+        dassert(srcml_transform_get_unit_size(result), 1);
+        dassert(srcml_unit_get_srcml_inner(srcml_transform_get_unit(result,0)), correct_clear_with_multiple_clears_and_multiple_contains_srcml[0]);
+
+        srcml_unit_free(unit);
+        srcml_transform_free(result);
+        srcml_archive_close(iarchive);
+        srcml_archive_free(iarchive);
+    }
+
+
     const std::string various_contains_exprs_src = R"(
 void foo() {
     a;
@@ -8589,9 +8753,6 @@ float five(double b) {}
         srcml_unit_apply_transforms(iarchive, unit, &result);
 
         dassert(srcml_transform_get_type(result), SRCML_RESULT_UNITS);
-        // for(int i = 0; i < srcml_transform_get_unit_size(result); ++i) {
-        //     std::cout << "!!!!" << i << ": " << srcml_unit_get_srcml_inner(srcml_transform_get_unit(result,i)) << std::endl;
-        // }
         dassert(srcml_transform_get_unit_size(result), 14);
 
         dassert(srcml_unit_get_srcml_inner(srcml_transform_get_unit(result,0)), exprs_srcml[9]);
@@ -8957,7 +9118,6 @@ int PascalCase() { call(); }
     //// MATCH
     // FIND $TYPE $NAME() {} WHERE MATCH($NAME,"[a-z]+(?:_[a-z]+)*")
     {
-        std::cout << "-----------------------------------------------------" << std::endl;
         char* s;
         size_t size;
 
@@ -8985,7 +9145,6 @@ int PascalCase() { call(); }
         srcml_unit_apply_transforms(iarchive, unit, &result);
 
         dassert(srcml_transform_get_type(result), SRCML_RESULT_UNITS);
-        std::cout << "EX: " << srcml_unit_get_srcml_inner(srcml_transform_get_unit(result,0)) << std::endl;
         dassert(srcml_transform_get_unit_size(result), 3);
         dassert(srcml_unit_get_srcml_inner(srcml_transform_get_unit(result,0)), name_style_funcs_srcml[0]);
         dassert(srcml_unit_get_srcml_inner(srcml_transform_get_unit(result,1)), name_style_funcs_srcml[1]);
@@ -11264,7 +11423,6 @@ int static volatile n;
             
             dassert(srcml_unit_get_srcml_inner(srcml_transform_get_unit(result,i)), specifier_decls_srcml[i+2]);
             srcml_write_namespace(srcml_transform_get_unit(result,i),"test","https://test.org");
-            std::cout << ":: " << srcml_unit_get_srcml(srcml_transform_get_unit(result,i)) << std::endl;
         }
 
         srcml_unit_free(unit);

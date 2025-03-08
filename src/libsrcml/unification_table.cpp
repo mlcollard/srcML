@@ -150,11 +150,11 @@ bool UnificationTable::check_regex(std::string_view variable_identifier, std::st
 }
 
 std::ostream& operator<<(std::ostream& out, const UnificationTable& storage) {
-    for(auto const& variable : storage.bucket) {
+    for (auto const& variable : storage.bucket) {
         out << variable.first << std::endl;
-        for(auto const& order : variable.second) {
+        for (auto const& order : variable.second) {
             out << "\t" << order.first << std::endl;
-            for(auto element : order.second) {
+            for (auto element : order.second) {
                 out << "\t\t" << element.token << " | " << element.address << std::endl;
             }
         }
