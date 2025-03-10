@@ -34,6 +34,47 @@
 </unit>
 
 <unit revision="1.1.0" language="Python">
+<expr_stmt><expr><operator>(</operator>
+    <lambda>lambda <parameter><name>x</name></parameter>: <expr><call><name>sample</name><argument_list>(<argument><expr><tuple>(<expr><name>a</name></expr>, <expr><name>b</name></expr>)</tuple></expr></argument>)</argument_list></call></expr></lambda>
+<operator>)</operator></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><tuple>(
+    <expr><lambda>lambda <parameter><name>x</name></parameter>: <expr><call><name>sample</name><argument_list>(<argument><expr><tuple>(<expr><name>a</name></expr>, <expr><name>b</name></expr>)</tuple></expr></argument>)</argument_list></call></expr></lambda></expr>,
+    <expr><literal type="string">"default"</literal></expr>,
+)</tuple></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><array>[
+    <expr><lambda>lambda <parameter><name>x</name></parameter>: <expr><call><name>sample</name><argument_list>(<argument><expr><tuple>(<expr><name>a</name></expr>, <expr><name>b</name></expr>)</tuple></expr></argument>)</argument_list></call></expr></lambda></expr>,
+    <expr><literal type="string">"default"</literal></expr>,
+]</array></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><set>{
+    <expr><lambda>lambda <parameter><name>x</name></parameter>: <expr><call><name>sample</name><argument_list>(<argument><expr><tuple>(<expr><name>a</name></expr>, <expr><name>b</name></expr>)</tuple></expr></argument>)</argument_list></call></expr></lambda></expr>,
+    <expr><literal type="string">"default"</literal></expr>,
+}</set></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><set>{
+    <expr><lambda>lambda <parameter><name>x</name></parameter>: <expr><call><name>sample</name><argument_list>(<argument><expr><tuple>(<expr><lambda>lambda <parameter><name>y</name></parameter>: <expr><name>y</name><operator>**</operator><literal type="number">2</literal></expr></lambda></expr>, <expr><name>b</name></expr>)</tuple></expr></argument>)</argument_list></call></expr></lambda></expr>,
+    <expr><literal type="string">"default"</literal></expr>,
+}</set></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><dictionary>{
+    <expr><literal type="string">"x1"</literal></expr>: <expr><lambda>lambda <parameter><name>x</name></parameter>: <expr><call><name>sample</name><argument_list>(<argument><expr><tuple>(<expr><name>a</name></expr>, <expr><name>b</name></expr>)</tuple></expr></argument>)</argument_list></call></expr></lambda></expr>,
+    <expr><literal type="string">"x2"</literal></expr>: <expr><literal type="string">"default"</literal></expr>,
+}</dictionary></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
 <assert>assert <condition><expr><operator>(</operator><lambda>lambda <parameter><name>a</name></parameter>: <expr><name>a</name><operator>**</operator><literal type="number">2</literal></expr></lambda><operator>)</operator></expr></condition>, <expr><literal type="string">"Fail Message"</literal></expr></assert>
 </unit>
 

@@ -12220,7 +12220,7 @@ expression_part[CALL_TYPE type = NOCALL, int call_count = 1] {
         tuple_py |
 
         // if an "if" is found in an expression, it must start a ternary (not an if-statement)
-        { inMode(MODE_EXPRESSION) }?
+        { inLanguage(LANGUAGE_PYTHON) && inMode(MODE_EXPRESSION) }?
         ternary_py[false] |
 
         // looking for lbracket to start a Python array
@@ -13086,6 +13086,13 @@ argument[] { ENTRY_DEBUG } :
             (type_identifier) => expression_process
             type_identifier
         )
+
+        {
+            // Ensures a Python call ends correctly if it contains a collection
+            // (e.g., array, dictionary, etc.) and the call is inside a lambda.
+            if (inLanguage(LANGUAGE_PYTHON) && LA(1) == RPAREN && lparen_types_py.back() == 'c')
+                rparen();
+        }
 ;
 
 /*
@@ -17740,22 +17747,50 @@ dictionary_py[bool isempty = false] { CompleteElement element(this); ENTRY_DEBUG
 
   Differentiates a Python set and dictionary; the latter has entries with a colon.
 */
-perform_dictionary_check_py[] returns [int isdictionary] {
-        isdictionary = false;
+perform_dictionary_check_py[] returns [int is_dictionary] {
+        is_dictionary = false;
+        bool is_lambda = false;
+        int num_brackets = 0;  // counts all "()", "{}", and "[]"
         int last_consumed_current = last_consumed;
         int start = mark();
         inputState->guessing++;
 
         try {
             while (true) {
-                consume();
+                if (LA(1) == LPAREN || LA(1) == PY_LCURLY || LA(1) == LBRACKET)
+                    ++num_brackets;
 
-                if (LA(1) == PY_COLON || LA(1) == PY_RCURLY || LA(1) == COMMA || LA(1) == 1 /* EOF */)
+                if (LA(1) == RPAREN || LA(1) == PY_RCURLY || LA(1) == RBRACKET)
+                    --num_brackets;
+
+                // do not confuse {lambda a, b: a**b} for a dictionary
+                if (LA(1) == PY_LAMBDA)
+                    is_lambda = true;
+
+                // consumed PY_RCURLY (for initial PY_LCURLY) without finding a dictionary
+                if (num_brackets < 1)
                     break;
+
+                if (
+                    num_brackets == 1
+                    && (
+                        (LA(1) == PY_COLON && !is_lambda)
+                        || LA(1) == PY_RCURLY
+                        || LA(1) == COMMA
+                        || LA(1) == 1 /* EOF */
+                    )
+                )
+                    break;
+
+                // end of lambda parameter(s)
+                if (is_lambda && LA(1) == PY_COLON)
+                    is_lambda = false;
+
+                consume();
             }
 
             if (LA(1) == PY_COLON)
-                isdictionary = true;
+                is_dictionary = true;
         }
         catch (...) {}
 
@@ -17875,10 +17910,6 @@ perform_tuple_check_py[] returns [bool is_tuple] {
                     if (LA(1) == PY_LAMBDA)
                         is_lambda = true;
 
-                    // end of lambda parameter(s)
-                    if (LA(1) == PY_COLON)
-                        is_lambda = false;
-
                     // cannot be a parenthesized tuple if the number of parentheses is 0 or less
                     if (num_brackets < 0)
                         break;
@@ -17891,6 +17922,10 @@ perform_tuple_check_py[] returns [bool is_tuple] {
 
                     if (LA(1) == TERMINATE || LA(1) == INDENT || LA(1) == 1 /* EOF */)
                         break;
+
+                    // end of lambda parameter(s)
+                    if (is_lambda && LA(1) == PY_COLON)
+                        is_lambda = false;
 
                     consume();
                 }
