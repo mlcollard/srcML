@@ -25,4 +25,72 @@
 <expr_stmt><expr><call><call><name>get_func</name><argument_list>()</argument_list></call><argument_list>()</argument_list></call></expr></expr_stmt>
 </unit>
 
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><operator>(</operator>
+    <tuple>(<expr><lambda>lambda <parameter><name>x</name></parameter>: <expr><call><name>a</name><argument_list>(<argument><expr><call><name>b</name><argument_list>(<argument><expr><name>x</name><operator>**</operator><literal type="number">2</literal></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr></lambda></expr>, <expr><literal type="boolean">False</literal></expr>)</tuple>
+<operator>)</operator></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><operator>(</operator>
+    <tuple>(<expr><lambda>lambda <parameter><name>x</name></parameter>: <expr><call><name>a</name><argument_list>(<argument><expr><call><name>b</name><argument_list>(<argument><expr><tuple>(<expr><operator>(</operator><name>x</name><operator>)</operator></expr>, <expr><name>x</name><operator>**</operator><literal type="number">2</literal></expr>)</tuple></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr></lambda></expr>, <expr><literal type="boolean">False</literal></expr>)</tuple>
+<operator>)</operator></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><tuple>(
+    <expr><tuple>(<expr><lambda>lambda <parameter><name>x</name></parameter>: <expr><call><name>a</name><argument_list>(<argument><expr><call><name>b</name><argument_list>(<argument><expr><name>x</name><operator>**</operator><literal type="number">2</literal></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr></lambda></expr>, <expr><literal type="boolean">False</literal></expr>)</tuple></expr>,
+    <expr><literal type="boolean">True</literal></expr>
+)</tuple></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><tuple>(
+    <expr><tuple>(<expr><lambda>lambda <parameter><name>x</name></parameter>: <expr><call><name>a</name><argument_list>(<argument><expr><call><name>b</name><argument_list>(<argument><expr><tuple>(<expr><operator>(</operator><name>x</name><operator>)</operator></expr>, <expr><name>x</name><operator>**</operator><literal type="number">2</literal></expr>)</tuple></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr></lambda></expr>, <expr><literal type="boolean">False</literal></expr>)</tuple></expr>,
+    <expr><literal type="boolean">True</literal></expr>
+)</tuple></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><array>[
+    <expr><tuple>(<expr><lambda>lambda <parameter><name>x</name></parameter>: <expr><call><name>a</name><argument_list>(<argument><expr><call><name>b</name><argument_list>(<argument><expr><name>x</name><operator>**</operator><literal type="number">2</literal></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr></lambda></expr>, <expr><literal type="boolean">False</literal></expr>)</tuple></expr>,
+    <expr><literal type="boolean">True</literal></expr>
+]</array></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><array>[
+    <expr><tuple>(<expr><lambda>lambda <parameter><name>x</name></parameter>: <expr><call><name>a</name><argument_list>(<argument><expr><call><name>b</name><argument_list>(<argument><expr><tuple>(<expr><operator>(</operator><name>x</name><operator>)</operator></expr>, <expr><name>x</name><operator>**</operator><literal type="number">2</literal></expr>)</tuple></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr></lambda></expr>, <expr><literal type="boolean">False</literal></expr>)</tuple></expr>,
+    <expr><literal type="boolean">True</literal></expr>
+]</array></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><set>{
+    <expr><tuple>(<expr><lambda>lambda <parameter><name>x</name></parameter>: <expr><call><name>a</name><argument_list>(<argument><expr><call><name>b</name><argument_list>(<argument><expr><name>x</name><operator>**</operator><literal type="number">2</literal></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr></lambda></expr>, <expr><literal type="boolean">False</literal></expr>)</tuple></expr>,
+    <expr><literal type="boolean">True</literal></expr>
+}</set></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><set>{
+    <expr><tuple>(<expr><lambda>lambda <parameter><name>x</name></parameter>: <expr><call><name>a</name><argument_list>(<argument><expr><call><name>b</name><argument_list>(<argument><expr><tuple>(<expr><operator>(</operator><name>x</name><operator>)</operator></expr>, <expr><name>x</name><operator>**</operator><literal type="number">2</literal></expr>)</tuple></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr></lambda></expr>, <expr><literal type="boolean">False</literal></expr>)</tuple></expr>,
+    <expr><literal type="boolean">True</literal></expr>
+}</set></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><dictionary>{
+    <expr><literal type="string">"a"</literal></expr>: <expr><tuple>(<expr><lambda>lambda <parameter><name>x</name></parameter>: <expr><call><name>a</name><argument_list>(<argument><expr><call><name>b</name><argument_list>(<argument><expr><name>x</name><operator>**</operator><literal type="number">2</literal></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr></lambda></expr>, <expr><literal type="boolean">False</literal></expr>)</tuple></expr>,
+    <expr><literal type="string">"b"</literal></expr>: <expr><literal type="boolean">True</literal></expr>
+}</dictionary></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><dictionary>{
+    <expr><literal type="string">"a"</literal></expr>: <expr><tuple>(<expr><lambda>lambda <parameter><name>x</name></parameter>: <expr><call><name>a</name><argument_list>(<argument><expr><call><name>b</name><argument_list>(<argument><expr><tuple>(<expr><operator>(</operator><name>x</name><operator>)</operator></expr>, <expr><name>x</name><operator>**</operator><literal type="number">2</literal></expr>)</tuple></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr></lambda></expr>, <expr><literal type="boolean">False</literal></expr>)</tuple></expr>,
+    <expr><literal type="string">"b"</literal></expr>: <expr><literal type="boolean">True</literal></expr>
+}</dictionary></expr></expr_stmt>
+</unit>
+
 </unit>

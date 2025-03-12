@@ -9891,21 +9891,9 @@ expression_part_no_ternary[CALL_TYPE type = NOCALL, int call_count = 1] {
                     startNewMode(MODE_EXPRESSION | MODE_LIST | MODE_INTERNAL_END_PAREN);
                 } |
 
-                // right parentheses that only matches the left parentheses of an expression
+                // right parentheses that only match left parentheses in an expression
                 { inTransparentMode(MODE_INTERNAL_END_PAREN) }?
-                {
-                    end_control_incr = inTransparentMode(MODE_CONTROL_INCREMENT);
-
-                    // stop at this matching paren, or a preprocessor statement
-                    endDownToModeSet(MODE_INTERNAL_END_PAREN | MODE_PREPROC);
-
-                    if (inMode(MODE_EXPRESSION | MODE_LIST | MODE_INTERNAL_END_PAREN))
-                        endMode(MODE_EXPRESSION | MODE_LIST | MODE_INTERNAL_END_PAREN);
-
-                    end_control_incr = end_control_incr && !inTransparentMode(MODE_CONTROL_INCREMENT);
-                }
-                // treat as operator for operator markup
-                rparen[!end_control_incr, end_control_incr] |
+                rparen_expression |
 
                 // left curly brace
                 {
@@ -12194,7 +12182,6 @@ expression_part_plus_linq[CALL_TYPE type = NOCALL, int call_count = 1] { ENTRY_D
 expression_part[CALL_TYPE type = NOCALL, int call_count = 1] {
         bool flag;
         bool isempty = false;
-        bool end_control_incr = false;
 
         // special case: expression that starts a Python tuple without parentheses
         if (
@@ -12414,22 +12401,9 @@ expression_part[CALL_TYPE type = NOCALL, int call_count = 1] {
                 ternary_expression
             )* |
 
-            // right parentheses that only matches a left parentheses of an expression
+            // right parentheses that only match left parentheses in an expression
             { inTransparentMode(MODE_INTERNAL_END_PAREN) }?
-            {
-                end_control_incr = inTransparentMode(MODE_CONTROL_INCREMENT);
-
-                // stop at this matching parenthesis, or a preprocessor statement
-                endDownToModeSet(MODE_INTERNAL_END_PAREN | MODE_PREPROC);
-                
-                if (inMode(MODE_EXPRESSION | MODE_LIST | MODE_INTERNAL_END_PAREN))
-                    endMode(MODE_EXPRESSION | MODE_LIST | MODE_INTERNAL_END_PAREN);
-
-                end_control_incr = end_control_incr && !inTransparentMode(MODE_CONTROL_INCREMENT);
-            }
-
-            // treat as operator for operator markup
-            rparen[!end_control_incr, end_control_incr] |
+            rparen_expression |
 
             // left curly brace
             {
@@ -12478,6 +12452,48 @@ expression_part[CALL_TYPE type = NOCALL, int call_count = 1] {
         noexcept_list |
 
         variable_identifier_array_grammar_sub[flag]
+;
+
+/*
+  rparen_expression
+
+  Matches right parentheses to one left parentheses in an expression.
+  Contains logic to match consecutive right parentheses.
+*/
+rparen_expression[] { bool end_control_incr = false; ENTRY_DEBUG } :
+        {
+            end_control_incr = inTransparentMode(MODE_CONTROL_INCREMENT);
+
+            // stop at this matching parenthesis, or a preprocessor statement
+            endDownToModeSet(MODE_INTERNAL_END_PAREN | MODE_PREPROC);
+            
+            if (inMode(MODE_EXPRESSION | MODE_LIST | MODE_INTERNAL_END_PAREN))
+                endMode(MODE_EXPRESSION | MODE_LIST | MODE_INTERNAL_END_PAREN);
+
+            end_control_incr = end_control_incr && !inTransparentMode(MODE_CONTROL_INCREMENT);
+        }
+
+        // treat as an operator for operator markup
+        rparen[!end_control_incr, end_control_incr]
+
+        // handle consecutive right parentheses in Python
+        (options { greedy = true; } :
+            { inLanguage(LANGUAGE_PYTHON) && inTransparentMode(MODE_INTERNAL_END_PAREN) }?
+            {
+                end_control_incr = inTransparentMode(MODE_CONTROL_INCREMENT);
+
+                // stop at this matching parenthesis, or a preprocessor statement
+                endDownToModeSet(MODE_INTERNAL_END_PAREN | MODE_PREPROC);
+                
+                if (inMode(MODE_EXPRESSION | MODE_LIST | MODE_INTERNAL_END_PAREN))
+                    endMode(MODE_EXPRESSION | MODE_LIST | MODE_INTERNAL_END_PAREN);
+
+                end_control_incr = end_control_incr && !inTransparentMode(MODE_CONTROL_INCREMENT);
+            }
+
+            // treat as an operator for operator markup
+            rparen[!end_control_incr, end_control_incr]
+        )*
 ;
 
 /*
