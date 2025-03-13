@@ -12476,23 +12476,24 @@ rparen_expression[] { bool end_control_incr = false; ENTRY_DEBUG } :
         // treat as an operator for operator markup
         rparen[!end_control_incr, end_control_incr]
 
-        // handle consecutive right parentheses in Python
+        // handle consecutive right parentheses in a Python lambda
+        // whose single expression contains nested calls
         (options { greedy = true; } :
-            { inLanguage(LANGUAGE_PYTHON) && inTransparentMode(MODE_INTERNAL_END_PAREN) }?
             {
-                end_control_incr = inTransparentMode(MODE_CONTROL_INCREMENT);
+                inLanguage(LANGUAGE_PYTHON)
+                && lparen_types_py.back() == 'c'
+                && inTransparentMode(MODE_INTERNAL_END_PAREN)
+                && inTransparentMode(MODE_LAMBDA_CONTENT_PY)
+            }?
+            {
+                // stop at this matching parenthesis
+                endDownToMode(MODE_INTERNAL_END_PAREN);
 
-                // stop at this matching parenthesis, or a preprocessor statement
-                endDownToModeSet(MODE_INTERNAL_END_PAREN | MODE_PREPROC);
-                
                 if (inMode(MODE_EXPRESSION | MODE_LIST | MODE_INTERNAL_END_PAREN))
                     endMode(MODE_EXPRESSION | MODE_LIST | MODE_INTERNAL_END_PAREN);
-
-                end_control_incr = end_control_incr && !inTransparentMode(MODE_CONTROL_INCREMENT);
             }
 
-            // treat as an operator for operator markup
-            rparen[!end_control_incr, end_control_incr]
+            rparen
         )*
 ;
 
