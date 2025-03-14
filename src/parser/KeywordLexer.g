@@ -365,6 +365,7 @@ tokens {
     PY_ASYNC;
     PY_ATSIGN;
     PY_AWAIT;
+    PY_CASE;
     PY_COLON;
     PY_DELETE;
     PY_ELIF;
@@ -829,6 +830,7 @@ KeywordLexer(UTF8CharBuffer* pinput, int language, OPTION_TYPE & options,
         { "as"           , PY_ALIAS          , LANGUAGE_PYTHON },
         { "assert"       , ASSERT            , LANGUAGE_PYTHON },
         { "async"        , PY_ASYNC          , LANGUAGE_PYTHON },
+        { "case"         , PY_CASE           , LANGUAGE_PYTHON },
         { "def"          , PY_FUNCTION       , LANGUAGE_PYTHON },
         { "del"          , PY_DELETE         , LANGUAGE_PYTHON },
         { "elif"         , PY_ELIF           , LANGUAGE_PYTHON },

@@ -39,10 +39,10 @@ token_set(srcMLParser, keyword_token_set,
     srcMLParser::THROW, srcMLParser::ASSERT, srcMLParser::MACRO_CASE, srcMLParser::FOREVER, srcMLParser::STATIC_ASSERT,
     srcMLParser::CXX_CATCH, srcMLParser::CXX_TRY, srcMLParser::JS_CONSTRUCTOR, srcMLParser::JS_DEBUGGER, srcMLParser::JS_EXPORT,
     srcMLParser::JS_FROM, srcMLParser::JS_FUNCTION, srcMLParser::JS_GET, srcMLParser::JS_IMPORT, srcMLParser::JS_SET, srcMLParser::JS_WITH,
-    srcMLParser::JS_YIELD, srcMLParser::PY_2_EXEC, srcMLParser::PY_2_PRINT, srcMLParser::PY_ALIAS, srcMLParser::PY_ASYNC, srcMLParser::PY_FUNCTION,
-    srcMLParser::PY_DELETE, srcMLParser::PY_ELIF, srcMLParser::PY_EXCEPT, srcMLParser::PY_FROM, srcMLParser::PY_GLOBAL, srcMLParser::PY_IMPORT,
-    srcMLParser::PY_IN, srcMLParser::PY_LAMBDA, srcMLParser::PY_MATCH, srcMLParser::PY_NONLOCAL, srcMLParser::PY_PASS, srcMLParser::PY_RAISE,
-    srcMLParser::PY_TYPE, srcMLParser::PY_WITH, srcMLParser::PY_YIELD
+    srcMLParser::JS_YIELD, srcMLParser::PY_2_EXEC, srcMLParser::PY_2_PRINT, srcMLParser::PY_ALIAS, srcMLParser::PY_ASYNC, srcMLParser::PY_CASE,
+    srcMLParser::PY_FUNCTION, srcMLParser::PY_DELETE, srcMLParser::PY_ELIF, srcMLParser::PY_EXCEPT, srcMLParser::PY_FROM, srcMLParser::PY_GLOBAL,
+    srcMLParser::PY_IMPORT, srcMLParser::PY_IN, srcMLParser::PY_LAMBDA, srcMLParser::PY_MATCH, srcMLParser::PY_NONLOCAL, srcMLParser::PY_PASS,
+    srcMLParser::PY_RAISE, srcMLParser::PY_TYPE, srcMLParser::PY_WITH, srcMLParser::PY_YIELD
 )
 
 token_set(srcMLParser, macro_call_token_set,
@@ -186,8 +186,8 @@ token_set(srcMLParser, duplex_keyword_set,
 
 token_set(srcMLParser, expect_blocks_py_token_set,
     // Python keywords
-    srcMLParser::CASE, srcMLParser::CLASS, srcMLParser::ELSE, srcMLParser::FINALLY, srcMLParser::FOR,
-    srcMLParser::IF, srcMLParser::PY_ELIF, srcMLParser::PY_EXCEPT, srcMLParser::PY_FUNCTION,
+    srcMLParser::CLASS, srcMLParser::ELSE, srcMLParser::FINALLY, srcMLParser::FOR, srcMLParser::IF,
+    srcMLParser::PY_CASE, srcMLParser::PY_ELIF, srcMLParser::PY_EXCEPT, srcMLParser::PY_FUNCTION,
     srcMLParser::PY_MATCH, srcMLParser::PY_WITH, srcMLParser::TRY, srcMLParser::WHILE,
 
     // Python attributes/specifiers

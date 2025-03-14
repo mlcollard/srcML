@@ -105,15 +105,12 @@ def <name>sample</name><parameter_list>(<parameter><name>a</name></parameter>)</
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<function><attribute>@<expr><call><name><name>a</name><operator>.</operator><name>operator</name></name><argument_list>(<argument><name>main</name>=<expr><literal type="number">0</literal></expr></argument>)</argument_list></call></expr></attribute>
-def <name>default</name><parameter_list>(<parameter><name>new</name></parameter>)</parameter_list><block>:<block_content>
-    <pass>pass</pass>
-</block_content></block></function>
-</unit>
-
-<unit revision="1.1.0" language="Python">
-<function><attribute>@<expr><call><name><name>a</name><operator>.</operator><name>sample</name></name><argument_list>(<argument><name>default</name>=<expr><literal type="number">1</literal></expr></argument>, <argument><name>operator</name>=<expr><literal type="string">'+'</literal></expr></argument>, <argument><name>new</name>=<expr><literal type="boolean">False</literal></expr></argument>)</argument_list></call></expr></attribute>
-def <name>main</name><parameter_list>(<parameter><name>filename</name></parameter>)</parameter_list><block>:<block_content>
+<function><attribute>@<expr><call><name>parametrize</name><argument_list>(
+    <argument><name>main</name>=<expr><literal type="number">0</literal></expr></argument>,
+    <argument><name>operator</name>=<expr><literal type="string">'+'</literal></expr></argument>,
+    <argument><name>module</name>=<expr><lambda>lambda <parameter><name>case</name></parameter>, <parameter><name>match</name></parameter>: <expr><literal type="string">f"{case}_{match}"</literal></expr></lambda></expr></argument>,
+)</argument_list></call></expr></attribute>
+def <name>_</name><parameter_list>(<parameter><name>default</name></parameter>, <parameter><name>new</name></parameter>)</parameter_list><block>:<block_content>
     <pass>pass</pass>
 </block_content></block></function>
 </unit>
