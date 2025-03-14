@@ -819,6 +819,12 @@ KeywordLexer(UTF8CharBuffer* pinput, int language, OPTION_TYPE & options,
         { "not"          , PY_NOT            , LANGUAGE_PYTHON },
         { "or"           , PY_OR             , LANGUAGE_PYTHON },
 
+        // Existing keywords that are names in Python
+        { "default"      , NAME              , LANGUAGE_PYTHON },
+        { "main"         , NAME              , LANGUAGE_PYTHON },
+        { "new"          , NAME              , LANGUAGE_PYTHON },
+        { "operator"     , NAME              , LANGUAGE_PYTHON },
+
         // Python
         { "as"           , PY_ALIAS          , LANGUAGE_PYTHON },
         { "assert"       , ASSERT            , LANGUAGE_PYTHON },
@@ -835,10 +841,8 @@ KeywordLexer(UTF8CharBuffer* pinput, int language, OPTION_TYPE & options,
         { "import"       , PY_IMPORT         , LANGUAGE_PYTHON },
         { "lambda"       , PY_LAMBDA         , LANGUAGE_PYTHON },
         { "match"        , PY_MATCH          , LANGUAGE_PYTHON },
-        { "new"          , NAME              , LANGUAGE_PYTHON },
         { "None"         , LITERAL_NONE      , LANGUAGE_PYTHON },
         { "nonlocal"     , PY_NONLOCAL       , LANGUAGE_PYTHON },
-        { "operator"     , NAME              , LANGUAGE_PYTHON },
         { "pass"         , PY_PASS           , LANGUAGE_PYTHON },
         { "print"        , PY_2_PRINT        , LANGUAGE_PYTHON },
         { "raise"        , PY_RAISE          , LANGUAGE_PYTHON },
