@@ -105,6 +105,19 @@ def <name>sample</name><parameter_list>(<parameter><name>a</name></parameter>)</
 </unit>
 
 <unit revision="1.1.0" language="Python">
+<function><attribute>@<expr><call><name>parameterized</name><argument_list>(
+    <argument><expr><array>[
+        <expr><tuple>(<expr><name>a</name></expr>, <expr><name>b</name></expr>)</tuple></expr>
+        <comprehension><for>for <control><name>info</name> <range>in <expr><name>x</name></expr></range></control></for>
+        <if>if <condition><expr><call><name>sample</name><argument_list>(<argument><expr><name>y</name></expr></argument>, <argument><expr><name>z</name></expr></argument>)</argument_list></call></expr></condition></if></comprehension>
+    ]</array></expr></argument>,
+)</argument_list></call></expr></attribute>
+def <name>example</name><parameter_list>()</parameter_list><block>:<block_content>
+    <pass>pass</pass>
+</block_content></block></function>
+</unit>
+
+<unit revision="1.1.0" language="Python">
 <function><attribute>@<expr><call><name>parametrize</name><argument_list>(
     <argument><name>main</name>=<expr><literal type="number">0</literal></expr></argument>,
     <argument><name>operator</name>=<expr><literal type="string">'+'</literal></expr></argument>,

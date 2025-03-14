@@ -16918,6 +16918,9 @@ list_comprehension_if_py[] { ENTRY_DEBUG } :
             { getParen() == 0 }?
             start_list_comprehension_if_py |
 
+            { inMode(MODE_ARGUMENT) }?
+            argument |
+
             // do not accidentally consume the tuple-ending RPAREN or operator RPAREN
             {
                 (
@@ -16933,7 +16936,9 @@ list_comprehension_if_py[] { ENTRY_DEBUG } :
                 if (!inMode(MODE_EXPRESSION))
                     startNewMode(MODE_EXPRESSION | MODE_EXPECT);
             }
-            expression
+            expression |
+
+            comma
         )*
 ;
 
