@@ -1395,7 +1395,7 @@ start_python[] {
 
         // special markup for a list comprehensions "for" (not a "for" loop)
         if (LA(1) == FOR && !inMode(MODE_STATEMENT))
-            list_comprehension_py();
+            list_comprehension_py(false);
 
         // special markup for an "if" that appears in a "case" statement
         if (LA(1) == IF && inTransparentMode(MODE_CASE_PY)) {
@@ -13064,7 +13064,7 @@ argument[] { ENTRY_DEBUG } :
             // start the argument
             startElement(SARGUMENT);
 
-            // python has named arguments
+            // Python has named arguments
             if (inLanguage(LANGUAGE_PYTHON) && LA(1) == NAME && next_token() == EQUAL) {
                 startNewMode(MODE_VARIABLE_NAME | MODE_EXPECT);
 
@@ -13085,7 +13085,24 @@ argument[] { ENTRY_DEBUG } :
             argument_modifier_csharp
         )*
 
+        // match the argument expression
         (
+            { inLanguage(LANGUAGE_PYTHON) }?
+            {
+                startNewMode(MODE_EXPRESSION | MODE_EXPECT);
+                startElement(SEXPRESSION);
+
+                start_list_comprehension_py(true);
+            }
+            specifier_py |
+
+            { inLanguage(LANGUAGE_PYTHON) }?
+            {
+                startNewMode(MODE_EXPRESSION | MODE_EXPECT);
+                startElement(SEXPRESSION);
+            }
+            list_comprehension_py[true] |
+
             {
                 !(
                     (
@@ -13103,6 +13120,18 @@ argument[] { ENTRY_DEBUG } :
             (type_identifier) => expression_process
             type_identifier
         )
+
+        // possible if the argument does not start with a Python list comprehension
+        (options { greedy = true; } :
+            { inLanguage(LANGUAGE_PYTHON) }?
+            {
+                start_list_comprehension_py(true);
+            }
+            specifier_py |
+
+            { inLanguage(LANGUAGE_PYTHON) }?
+            list_comprehension_py[true]
+        )*
 
         {
             // Ensures a Python call ends correctly if it contains a collection
@@ -17377,12 +17406,14 @@ attribute_py[] { ENTRY_DEBUG } :
         }
 
         (
+            { !inMode(MODE_ARGUMENT) }?
             {
-                start_list_comprehension_py();
+                start_list_comprehension_py(false);
             }
             specifier_py |
 
-            list_comprehension_py |
+            { !inMode(MODE_ARGUMENT) }?
+            list_comprehension_py[false] |
 
             // decorators can have arguments
             { inMode(MODE_ARGUMENT) }?
@@ -17422,12 +17453,14 @@ array_py[] { CompleteElement element(this); ENTRY_DEBUG } :
         LBRACKET
 
         (
+            { !inMode(MODE_ARGUMENT) }?
             {
-                start_list_comprehension_py();
+                start_list_comprehension_py(false);
             }
             specifier_py |
 
-            list_comprehension_py |
+            { !inMode(MODE_ARGUMENT) }?
+            list_comprehension_py[false] |
 
             { inMode(MODE_ARGUMENT) }?
             argument |
@@ -17458,10 +17491,11 @@ array_py[] { CompleteElement element(this); ENTRY_DEBUG } :
   list_comprehension_py
 
   Handles Python list comprehensions.
+  If the list comprehension is in a call, do not end the current expression.
 */
-list_comprehension_py[] { ENTRY_DEBUG } :
+list_comprehension_py[bool in_call = false] { ENTRY_DEBUG } :
         {
-            start_list_comprehension_py();
+            start_list_comprehension_py(in_call);
         }
 
         FOR
@@ -17502,6 +17536,10 @@ list_comprehension_py[] { ENTRY_DEBUG } :
                 endDownToMode(MODE_LIST_COMPREHENSION_PY);
                 endMode(MODE_LIST_COMPREHENSION_PY);
             }
+
+            // ensure the list comprehension ends the current argument in a call
+            if (inMode(MODE_ARGUMENT) && LA(1) == RPAREN && lparen_types_py.back() == 'c')
+                endMode(MODE_ARGUMENT);
         }
 ;
 
@@ -17509,16 +17547,19 @@ list_comprehension_py[] { ENTRY_DEBUG } :
   start_list_comprehension_py
 
   Starts a Python list comprehension.  Used in multiple places.
+  If the list comprehension is in a call, do not end the current expression.
 */
-start_list_comprehension_py[] { ENTRY_DEBUG } :
+start_list_comprehension_py[bool in_call = false] { ENTRY_DEBUG } :
         {
             // end the current expression before starting a list comprehension
             if (
-                inMode(MODE_EXPRESSION)
+                !in_call
+                && inMode(MODE_EXPRESSION)
                 && (
                     inTransparentMode(MODE_ARRAY_PY)
                     || inTransparentMode(MODE_SET_PY)
                     || inTransparentMode(MODE_DICTIONARY_PY)
+                    || inTransparentMode(MODE_TUPLE_PY)
                 )
             )
                 endMode(MODE_EXPRESSION);
@@ -17580,17 +17621,20 @@ lambda_py[] { CompleteElement element(this); ENTRY_DEBUG } :
         // Python lambdas do not contain blocks, so consume the colon (':')
         PY_COLON
 
+        // only one expression is allowed, so enter a special mode
         {
             startNewMode(MODE_LAMBDA_CONTENT_PY);
         }
 
         (options { greedy = true; } :
+            { !inMode(MODE_ARGUMENT) }?
             {
-                start_list_comprehension_py();
+                start_list_comprehension_py(false);
             }
             specifier_py |
 
-            list_comprehension_py |
+            { !inMode(MODE_ARGUMENT) }?
+            list_comprehension_py[false] |
 
             { inMode(MODE_ARGUMENT) }?
             argument |
@@ -17658,12 +17702,14 @@ set_py[] { CompleteElement element(this); ENTRY_DEBUG } :
         PY_LCURLY
 
         (
+            { !inMode(MODE_ARGUMENT) }?
             {
-                start_list_comprehension_py();
+                start_list_comprehension_py(false);
             }
             specifier_py |
 
-            list_comprehension_py |
+            { !inMode(MODE_ARGUMENT) }?
+            list_comprehension_py[false] |
 
             { inMode(MODE_ARGUMENT) }?
             argument |
@@ -17720,12 +17766,14 @@ dictionary_py[bool isempty = false] { CompleteElement element(this); ENTRY_DEBUG
         }
 
         (options { greedy = true; } :
+            { !inMode(MODE_ARGUMENT) }?
             {
-                start_list_comprehension_py();
+                start_list_comprehension_py(false);
             }
             specifier_py |
 
-            list_comprehension_py |
+            { !inMode(MODE_ARGUMENT) }?
+            list_comprehension_py[false] |
 
             { inMode(MODE_ARGUMENT) }?
             argument |
@@ -17868,7 +17916,16 @@ tuple_py[] {
                 break;
             } |
 
-            list_comprehension_py | alias_py |
+            { !inMode(MODE_ARGUMENT) }?
+            {
+                start_list_comprehension_py(false);
+            }
+            specifier_py |
+
+            { !inMode(MODE_ARGUMENT) }?
+            list_comprehension_py[false] |
+
+            alias_py |
 
             { inMode(MODE_ARGUMENT) }?
             argument |
@@ -18117,6 +18174,11 @@ ternary_py[bool is_nested = false] { CompleteElement element(this); ENTRY_DEBUG 
 
         ELSE
 
+        // only one expression is allowed, so enter a special mode
+        {
+            startNewMode(MODE_TERNARY_CONTENT_PY);
+        }
+
         (options { greedy = true; } :
             // else clause ends if:
             // - at RPAREN in mode where it ends at internal parentheses (nested ternary)
@@ -18151,7 +18213,20 @@ ternary_py[bool is_nested = false] { CompleteElement element(this); ENTRY_DEBUG 
                 if (!inMode(MODE_EXPRESSION))
                     startNewMode(MODE_EXPRESSION | MODE_EXPECT);
             }
-            expression |
+            expression
+            {
+                // ensure ternaries end correctly if used as an argument in a call
+                if (LA(1) == COMMA) {
+                    while (inMode(MODE_EXPRESSION)) {
+                        endDownToMode(MODE_EXPRESSION);
+                        endMode(MODE_EXPRESSION);
+                    }
+
+                    // end the ternary before processing the comma
+                    if (inMode(MODE_TERNARY_CONTENT_PY))
+                        break;
+                }
+            } |
 
             comma
         )*
@@ -18243,12 +18318,16 @@ operator_parenthesis_complete_py[] {
             }
             rparen_operator |
 
+            { !inMode(MODE_ARGUMENT) }?
             {
-                start_list_comprehension_py();
+                start_list_comprehension_py(false);
             }
             specifier_py |
 
-            list_comprehension_py | alias_py |
+            { !inMode(MODE_ARGUMENT) }?
+            list_comprehension_py[false] |
+
+            alias_py |
 
             { inMode(MODE_ARGUMENT) }?
             argument |

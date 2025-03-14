@@ -308,6 +308,8 @@ const static srcMLState::MODE_TYPE MODE_LIST_COMPREHENSION_IF_PY;
 
 const static srcMLState::MODE_TYPE MODE_LIST_COMPREHENSION_PY;
 
+const static srcMLState::MODE_TYPE MODE_TERNARY_CONTENT_PY;
+
 const static srcMLState::MODE_TYPE MODE_LAMBDA_CONTENT_PY;
 
 const static srcMLState::MODE_TYPE MODE_TUPLE_NO_PAREN_PY;
