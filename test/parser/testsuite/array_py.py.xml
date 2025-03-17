@@ -73,4 +73,16 @@
 <expr_stmt><expr><name>empty</name> <operator>=</operator> <operator>(</operator><array>[]</array><operator>)</operator></expr></expr_stmt>
 </unit>
 
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><array>[
+    <expr><call><name>subtest</name><argument_list>(
+        <argument><expr><tuple>(
+            <expr><lambda>lambda <parameter><name>x</name></parameter>: <expr><call><name>a</name><argument_list>(<argument><expr><call><name>b</name><argument_list>(<argument><expr><name>x</name></expr></argument>, <argument><expr><literal type="number">0</literal></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr></lambda></expr>,
+            <expr><literal type="string">"c"</literal></expr>
+        )</tuple></expr></argument>,
+    )</argument_list></call></expr>,
+    <expr><literal type="string">"y"</literal></expr>
+]</array></expr></expr_stmt>
+</unit>
+
 </unit>

@@ -13089,7 +13089,7 @@ argument[] { ENTRY_DEBUG } :
         (
             { inLanguage(LANGUAGE_PYTHON) }?
             {
-                startNewMode(MODE_EXPRESSION | MODE_EXPECT);
+                startNewMode(MODE_EXPRESSION);
                 startElement(SEXPRESSION);
 
                 start_list_comprehension_py(true);
@@ -13098,7 +13098,7 @@ argument[] { ENTRY_DEBUG } :
 
             { inLanguage(LANGUAGE_PYTHON) }?
             {
-                startNewMode(MODE_EXPRESSION | MODE_EXPECT);
+                startNewMode(MODE_EXPRESSION);
                 startElement(SEXPRESSION);
             }
             list_comprehension_py[true] |
@@ -13136,7 +13136,12 @@ argument[] { ENTRY_DEBUG } :
         {
             // Ensures a Python call ends correctly if it contains a collection
             // (e.g., array, dictionary, etc.) and the call is inside a lambda.
-            if (inLanguage(LANGUAGE_PYTHON) && LA(1) == RPAREN && lparen_types_py.back() == 'c')
+            if (
+                inLanguage(LANGUAGE_PYTHON)
+                && LA(1) == RPAREN
+                && lparen_types_py.back() == 'c'
+                && next_token() == COMMA
+            )
                 rparen();
         }
 ;
