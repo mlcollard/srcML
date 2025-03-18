@@ -13121,14 +13121,19 @@ argument[] { ENTRY_DEBUG } :
             type_identifier
         )
 
-        // possible if the argument does not start with a Python list comprehension
         (options { greedy = true; } :
+            // Python arguments have optional syntax (e.g., starting with '*' or '**')
+            { inLanguage(LANGUAGE_PYTHON) && (last_consumed == MULTOPS || last_consumed == EXPONENTIATION) }?
+            expression |
+
+            // Python argument does not start with a list comprehension
             { inLanguage(LANGUAGE_PYTHON) }?
             {
                 start_list_comprehension_py(true);
             }
             specifier_py |
 
+            // Python argument does not start with a list comprehension
             { inLanguage(LANGUAGE_PYTHON) }?
             list_comprehension_py[true]
         )*

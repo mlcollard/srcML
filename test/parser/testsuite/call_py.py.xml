@@ -161,4 +161,68 @@
 </block_content></block></if></if_stmt>
 </unit>
 
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><call><name>example</name><argument_list>(
+    <argument><name>input</name>=<expr><operator>(</operator>
+        <name>a</name> <ternary>if <condition><expr><literal type="boolean">False</literal></expr></condition> <else>else <expr><call><name>sample</name><argument_list>(<argument><expr><operator>*</operator><call><name>create_array</name><argument_list>(<argument><expr><name>a</name></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr></else></ternary>
+    <operator>)</operator></expr></argument>
+)</argument_list></call></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><call><name>example</name><argument_list>(
+    <argument><name>input</name>=<expr><operator>(</operator>
+        <name>a</name> <ternary>if <condition><expr><literal type="boolean">False</literal></expr></condition> <else>else <expr><call><name>sample</name><argument_list>(<argument><expr><operator>*</operator><call><name>create_array</name><argument_list>(<argument><expr><operator>*</operator><name>a</name></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr></else></ternary>
+    <operator>)</operator></expr></argument>
+)</argument_list></call></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><call><name>example</name><argument_list>(
+    <argument><name>input</name>=<expr><operator>(</operator>
+        <name>a</name> <ternary>if <condition><expr><literal type="boolean">False</literal></expr></condition> <else>else <expr><call><name>sample</name><argument_list>(<argument><expr><operator>*</operator><name>a</name></expr></argument>)</argument_list></call></expr></else></ternary>
+    <operator>)</operator></expr></argument>
+)</argument_list></call></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><call><name>example</name><argument_list>(
+    <argument><name>input</name>=<expr><operator>(</operator>
+        <name>a</name> <ternary>if <condition><expr><literal type="boolean">False</literal></expr></condition> <else>else <expr><call><name>sample</name><argument_list>(<argument><expr><operator>*</operator><name>a</name></expr></argument>, <argument><expr><operator>*</operator><name>a</name></expr></argument>)</argument_list></call></expr></else></ternary>
+    <operator>)</operator></expr></argument>
+)</argument_list></call></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><call><name>example</name><argument_list>(
+    <argument><name>input</name>=<expr><operator>(</operator>
+        <name>d</name> <ternary>if <condition><expr><literal type="boolean">False</literal></expr></condition> <else>else <expr><call><name>sample</name><argument_list>(<argument><expr><operator>**</operator><call><name>create_dict</name><argument_list>(<argument><expr><name>d</name></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr></else></ternary>
+    <operator>)</operator></expr></argument>
+)</argument_list></call></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><call><name>example</name><argument_list>(
+    <argument><name>input</name>=<expr><operator>(</operator>
+        <name>d</name> <ternary>if <condition><expr><literal type="boolean">False</literal></expr></condition> <else>else <expr><call><name>sample</name><argument_list>(<argument><expr><operator>**</operator><call><name>create_dict</name><argument_list>(<argument><expr><operator>**</operator><name>d</name></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr></else></ternary>
+    <operator>)</operator></expr></argument>
+)</argument_list></call></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><call><name>example</name><argument_list>(
+    <argument><name>input</name>=<expr><operator>(</operator>
+        <name>d</name> <ternary>if <condition><expr><literal type="boolean">False</literal></expr></condition> <else>else <expr><call><name>sample</name><argument_list>(<argument><expr><operator>**</operator><name>d</name></expr></argument>)</argument_list></call></expr></else></ternary>
+    <operator>)</operator></expr></argument>
+)</argument_list></call></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><call><name>example</name><argument_list>(
+    <argument><name>input</name>=<expr><operator>(</operator>
+        <name>d</name> <ternary>if <condition><expr><literal type="boolean">False</literal></expr></condition> <else>else <expr><call><name>sample</name><argument_list>(<argument><expr><operator>**</operator><name>d</name></expr></argument>, <argument><expr><operator>**</operator><name>d</name></expr></argument>)</argument_list></call></expr></else></ternary>
+    <operator>)</operator></expr></argument>
+)</argument_list></call></expr></expr_stmt>
+</unit>
+
 </unit>

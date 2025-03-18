@@ -14,6 +14,14 @@
 </unit>
 
 <unit revision="1.1.0" language="Python">
+<expr_stmt><expr><lambda>lambda <parameter><name>x</name></parameter>: <expr><call><name>sample</name><argument_list>(<argument><expr><operator>*</operator><name>x</name></expr></argument>, <argument><expr><operator>**</operator><name>x</name></expr></argument>)</argument_list></call></expr></lambda></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><lambda>lambda <parameter><name>x</name></parameter>: <expr><call><name>sample</name><argument_list>(<argument><expr><operator>**</operator><name>x</name></expr></argument>, <argument><expr><operator>*</operator><name>x</name></expr></argument>)</argument_list></call></expr></lambda></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
 <expr_stmt><expr><name>simple_print</name> <operator>=</operator> <lambda>lambda <parameter><name>x</name></parameter> : <expr><call><name>print</name><argument_list>(<argument><expr><name>x</name></expr></argument>)</argument_list></call></expr></lambda></expr></expr_stmt>
 </unit>
 
@@ -31,6 +39,14 @@
 
 <unit revision="1.1.0" language="Python">
 <expr_stmt><expr><lambda>lambda <parameter><name>x</name></parameter>: <expr><call><name>sample</name><argument_list>(<argument><expr><lambda>lambda <parameter><name>x</name></parameter>: <expr><name>x</name><operator>**</operator><literal type="number">2</literal></expr></lambda></expr></argument>)</argument_list></call></expr></lambda></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><lambda>lambda <parameter><name>y</name></parameter>: <expr><call><name>sample</name><argument_list>(<argument><expr><lambda>lambda <parameter><name>x</name></parameter>: <expr><call><name>example</name><argument_list>(<argument><expr><operator>*</operator><name>x</name></expr></argument>)</argument_list></call></expr></lambda></expr></argument>, <argument><expr><operator>*</operator><name>y</name></expr></argument>)</argument_list></call></expr></lambda></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><lambda>lambda <parameter><name>y</name></parameter>: <expr><call><name>sample</name><argument_list>(<argument><expr><lambda>lambda <parameter><name>x</name></parameter>: <expr><call><name>example</name><argument_list>(<argument><expr><operator>**</operator><name>x</name></expr></argument>)</argument_list></call></expr></lambda></expr></argument>, <argument><expr><operator>**</operator><name>y</name></expr></argument>)</argument_list></call></expr></lambda></expr></expr_stmt>
 </unit>
 
 <unit revision="1.1.0" language="Python">
