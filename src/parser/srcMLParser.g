@@ -16918,10 +16918,24 @@ list_comprehension_range_py[] { ENTRY_DEBUG } :
 
   Handles an "if" in a Python list comprehension differently from other "if" expressions.
 */
-list_comprehension_if_py[] { ENTRY_DEBUG } :
+list_comprehension_if_py[] { bool multiple_ifs = false; ENTRY_DEBUG } :
         (options { greedy = true; } :
             { getParen() == 0 }?
-            start_list_comprehension_if_py |
+            start_list_comprehension_if_py[multiple_ifs]
+            {
+                multiple_ifs = true;
+            } |
+
+            // nested list comprehension
+            { !inMode(MODE_ARGUMENT) }?
+            {
+                start_list_comprehension_py(false);
+            }
+            specifier_py |
+
+            // nested list comprehension
+            { !inMode(MODE_ARGUMENT) }?
+            list_comprehension_py[false] |
 
             { inMode(MODE_ARGUMENT) }?
             argument |
@@ -16951,11 +16965,12 @@ list_comprehension_if_py[] { ENTRY_DEBUG } :
   start_list_comprehension_if_py
 
   Starts an "if" in a Python list comprehension.
+  Ends the previous "if" if there are multiple in a row.
 */
-start_list_comprehension_if_py[] { ENTRY_DEBUG } :
+start_list_comprehension_if_py[bool multiple_ifs = false] { ENTRY_DEBUG } :
         {
             // end previous "if" to start a new "if"
-            if (inTransparentMode(MODE_LIST_COMPREHENSION_IF_PY)) {
+            if (multiple_ifs) {
                 endDownToMode(MODE_LIST_COMPREHENSION_IF_PY);
                 endMode(MODE_LIST_COMPREHENSION_IF_PY);
             }
