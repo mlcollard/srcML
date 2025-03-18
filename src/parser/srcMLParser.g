@@ -13134,13 +13134,17 @@ argument[] { ENTRY_DEBUG } :
         )*
 
         {
-            // Ensures a Python call ends correctly if it contains a collection
-            // (e.g., array, dictionary, etc.) and the call is inside a lambda.
+            // Ensures a Python call ends correctly if nested and the call
+            // is inside a lambda or the "else" part of a ternary.
             if (
                 inLanguage(LANGUAGE_PYTHON)
+                && (
+                    (inTransparentMode(MODE_LAMBDA_CONTENT_PY) && next_token() == COMMA)
+                    || inTransparentMode(MODE_TERNARY_CONTENT_PY)
+                )
                 && LA(1) == RPAREN
                 && lparen_types_py.back() == 'c'
-                && next_token() == COMMA
+                && lparen_types_py.size() > 2  // '*' + at least two LPAREN
             )
                 rparen();
         }

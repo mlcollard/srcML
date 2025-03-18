@@ -61,4 +61,14 @@
 <expr_stmt><expr><name>result</name> <operator>=</operator> <array>[<expr><name>val</name></expr> <comprehension><for>for <control><name>val</name> <range>in <expr><operator>(</operator><name>array</name> <ternary>if <condition><expr><literal type="boolean">True</literal></expr></condition> <else>else <expr><literal type="boolean">False</literal></expr></else></ternary><operator>)</operator></expr></range></control></for> <if>if <condition><expr><operator>(</operator><literal type="boolean">True</literal> <ternary>if <condition><expr><name>val</name> <operator>%</operator> <literal type="number">2</literal> <operator>==</operator> <literal type="number">0</literal></expr></condition> <else>else <expr><literal type="boolean">False</literal></expr></else></ternary><operator>)</operator></expr></condition></if></comprehension>]</array></expr></expr_stmt>
 </unit>
 
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><call><name>example</name><argument_list>(
+    <argument><name>one</name>=<expr><literal type="number">1</literal></expr></argument>,
+    <argument><name>two</name>=<expr><operator>(</operator>
+        <literal type="number">2</literal> <ternary>if <condition><expr><operator>(</operator><literal type="boolean">True</literal><operator>)</operator></expr></condition> <else>else <expr><call><name>a</name><argument_list>(<argument><expr><literal type="number">2</literal></expr></argument>)</argument_list></call></expr></else></ternary>
+    <operator>)</operator></expr></argument>,
+    <argument><name>three</name>=<expr><literal type="number">3</literal></expr></argument>
+)</argument_list></call></expr></expr_stmt>
+</unit>
+
 </unit>
