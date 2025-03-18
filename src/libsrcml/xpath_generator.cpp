@@ -288,7 +288,7 @@ std::string XPathGenerator::convert() {
                     std::string attribute = build_expr.substr(0,word_selector_pos);
                     attribute = attribute.substr(attribute.find_first_not_of(" "),attribute.find_last_not_of(" ") - attribute.find_first_not_of(" ") + 1);
 
-                    std::string value = build_expr.substr(word_selector_pos+1,build_expr.size() - word_selector_pos);
+                    std::string value = build_expr.substr(word_selector_pos+2,build_expr.size() - word_selector_pos);
                     value = value.substr(value.find_first_not_of(" "),value.find_last_not_of(" ") - value.find_first_not_of(" ") + 1);
                     node = new XPathNode("contains(concat(' ', @"+attribute+", ' '), ' "+value+" ')");
                 }
