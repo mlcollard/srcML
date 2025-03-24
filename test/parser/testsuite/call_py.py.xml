@@ -136,13 +136,13 @@
 <unit revision="1.1.0" language="Python">
 <if_stmt><if>if <condition><expr><name>example</name> <operator>is not</operator> <literal type="null">None</literal></expr></condition><block>:<block_content>
     <expr_stmt><expr><name>example</name> <operator>=</operator> <literal type="string">"\n"</literal><operator>.</operator><call><name>join</name><argument_list>(
-        <argument><expr><name>line</name>
+        <argument><expr><name>line</name></expr>
         <comprehension><for>for <control><name>line</name> <range>in <expr><tuple>(
             <expr><literal type="string">"a"</literal></expr>,
             <expr><literal type="string">"b"</literal> <ternary>if <condition><expr><literal type="boolean">True</literal></expr></condition> <else>else <expr><literal type="string">""</literal></expr></else></ternary></expr>,
             <expr><literal type="string">"c"</literal></expr>,
         )</tuple></expr></range></control></for>
-        <if>if <condition><expr><name>line</name></expr></condition></if></comprehension></expr></argument>
+        <if>if <condition><expr><name>line</name></expr></condition></if></comprehension></argument>
     )</argument_list></call></expr></expr_stmt>
 </block_content></block></if></if_stmt>
 </unit>
@@ -150,13 +150,13 @@
 <unit revision="1.1.0" language="Python">
 <if_stmt><if>if <condition><expr><name>example</name> <operator>is not</operator> <literal type="null">None</literal></expr></condition><block>:<block_content>
     <expr_stmt><expr><name>example</name> <operator>=</operator> <literal type="string">"\n"</literal><operator>.</operator><call><name>join</name><argument_list>(
-        <argument><expr><name>line</name>
+        <argument><expr><name>line</name></expr>
         <comprehension><for><specifier>async</specifier> for <control><name>line</name> <range>in <expr><tuple>(
             <expr><literal type="string">"a"</literal></expr>,
             <expr><literal type="string">"b"</literal> <ternary>if <condition><expr><literal type="boolean">True</literal></expr></condition> <else>else <expr><literal type="string">""</literal></expr></else></ternary></expr>,
             <expr><literal type="string">"c"</literal></expr>,
         )</tuple></expr></range></control></for>
-        <if>if <condition><expr><name>line</name></expr></condition></if></comprehension></expr></argument>
+        <if>if <condition><expr><name>line</name></expr></condition></if></comprehension></argument>
     )</argument_list></call></expr></expr_stmt>
 </block_content></block></if></if_stmt>
 </unit>

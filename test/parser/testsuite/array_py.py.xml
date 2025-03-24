@@ -107,8 +107,8 @@
     <comprehension><for>for <control><name>a</name> <range>in <expr><name>array1</name></expr></range></control></for>
     <if>if <condition><expr><operator>(</operator>
         <call><name>sample</name><argument_list>(
-            <argument><expr><name>a</name>
-            <comprehension><for>for <control><name>b</name> <range>in <expr><name>array2</name></expr></range></control></for></comprehension></expr></argument>
+            <argument><expr><name>a</name></expr>
+            <comprehension><for>for <control><name>b</name> <range>in <expr><name>array2</name></expr></range></control></for></comprehension></argument>
         )</argument_list></call>
     <operator>)</operator></expr></condition></if></comprehension>
 ]</array></expr></expr_stmt>
@@ -120,8 +120,8 @@
     <comprehension><for><specifier>async</specifier> for <control><name>a</name> <range>in <expr><name>array1</name></expr></range></control></for>
     <if>if <condition><expr><operator>(</operator>
         <call><name>sample</name><argument_list>(
-            <argument><expr><name>a</name>
-            <comprehension><for><specifier>async</specifier> for <control><name>b</name> <range>in <expr><name>array2</name></expr></range></control></for></comprehension></expr></argument>
+            <argument><expr><name>a</name></expr>
+            <comprehension><for><specifier>async</specifier> for <control><name>b</name> <range>in <expr><name>array2</name></expr></range></control></for></comprehension></argument>
         )</argument_list></call>
     <operator>)</operator></expr></condition></if></comprehension>
 ]</array></expr></expr_stmt>
@@ -133,12 +133,12 @@
     <comprehension><for>for <control><name>a</name> <range>in <expr><name>array1</name></expr></range></control></for>
     <if>if <condition><expr><operator>(</operator>
         <call><name>sample</name><argument_list>(
-            <argument><expr><name>a</name>
+            <argument><expr><name>a</name></expr>
             <comprehension><for>for <control><name>b</name> <range>in <expr><name>array2</name></expr></range></control></for>
             <if>if <condition><expr><operator>(</operator>
                 <name>b</name>
                 <comprehension><for>for <control><name>c</name> <range>in <expr><name>array3</name></expr></range></control></for></comprehension>
-            <operator>)</operator></expr></condition></if></comprehension></expr></argument>
+            <operator>)</operator></expr></condition></if></comprehension></argument>
         )</argument_list></call>
     <operator>)</operator></expr></condition></if></comprehension>
 ]</array></expr></expr_stmt>
@@ -150,14 +150,28 @@
     <comprehension><for><specifier>async</specifier> for <control><name>a</name> <range>in <expr><name>array1</name></expr></range></control></for>
     <if>if <condition><expr><operator>(</operator>
         <call><name>sample</name><argument_list>(
-            <argument><expr><name>a</name>
+            <argument><expr><name>a</name></expr>
             <comprehension><for><specifier>async</specifier> for <control><name>b</name> <range>in <expr><name>array2</name></expr></range></control></for>
             <if>if <condition><expr><operator>(</operator>
                 <name>b</name>
                 <comprehension><for><specifier>async</specifier> for <control><name>c</name> <range>in <expr><name>array3</name></expr></range></control></for></comprehension>
-            <operator>)</operator></expr></condition></if></comprehension></expr></argument>
+            <operator>)</operator></expr></condition></if></comprehension></argument>
         )</argument_list></call>
     <operator>)</operator></expr></condition></if></comprehension>
+]</array></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><array>[
+    <expr><name>a</name></expr>
+    <comprehension><for>for <control><name>a</name> <range>in <expr><name>array1</name></expr></range></control></for>
+    <if>if <condition><expr><tuple>(
+        <expr><call><name>sample</name><argument_list>(
+            <argument><expr><name>a</name></expr>
+            <comprehension><for>for <control><name>b</name> <range>in <expr><name>array2</name></expr></range></control></for></comprehension></argument>
+        )</argument_list></call></expr>,
+        <expr><literal type="string">"a"</literal></expr>
+    )</tuple></expr></condition></if></comprehension>
 ]</array></expr></expr_stmt>
 </unit>
 

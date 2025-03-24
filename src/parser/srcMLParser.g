@@ -828,7 +828,8 @@ public:
     void endAllModes();
 
     virtual void consume() {
-        if (!skip_tokens_set.member((unsigned int) LA(1)))
+        // do not update last_consumed if in Python guessing mode or the token is in the skip_tokens_set
+        if ((!inLanguage(LANGUAGE_PYTHON) || inputState->guessing==0) && !skip_tokens_set.member((unsigned int) LA(1)))
             last_consumed = LA(1);
 
         LLkParser::consume();
@@ -1394,8 +1395,10 @@ start_python[] {
             lparen_types_py.emplace_back('*');
 
         // special markup for a list comprehensions "for" (not a "for" loop)
-        if (LA(1) == FOR && !inMode(MODE_STATEMENT))
-            list_comprehension_py(false);
+        if (LA(1) == FOR && !inMode(MODE_STATEMENT)) {
+            start_list_comprehension_py();
+            list_comprehension_py();
+        }
 
         // special markup for an "if" that appears in a "case" statement
         if (LA(1) == IF && inTransparentMode(MODE_CASE_PY)) {
@@ -1426,8 +1429,8 @@ start_python[] {
             }
         }
 
-        // check if the current token is a specifier that occurs before a keyword
-        if (check_valid_specifier_py()) {
+        // check if the current non-comment token is a specifier that occurs before a statement keyword
+        if (LA(1) != SNOP && inMode(MODE_STATEMENT) && check_valid_specifier_py()) {
             int post_specifier_token = perform_post_specifier_check_py();
 
             // looking for for-loops, functions, or with
@@ -12206,8 +12209,15 @@ expression_part[CALL_TYPE type = NOCALL, int call_count = 1] {
         { inLanguage(LANGUAGE_PYTHON) && last_consumed != NAME && perform_tuple_check_py() }?
         tuple_py |
 
-        // if an "if" is found in an expression, it must start a ternary (not an if-statement)
-        { inLanguage(LANGUAGE_PYTHON) && inMode(MODE_EXPRESSION) }?
+        // looking for "if" in a non-list-comprehension expression to start a Python ternary
+        {
+            inLanguage(LANGUAGE_PYTHON)
+            && inMode(MODE_EXPRESSION)
+            && (
+                !inTransparentMode(MODE_LIST_COMPREHENSION_PY)
+                || lparen_types_py.size() > 1
+            )
+        }?
         ternary_py[false] |
 
         // looking for lbracket to start a Python array
@@ -12221,6 +12231,17 @@ expression_part[CALL_TYPE type = NOCALL, int call_count = 1] {
         // looking for lcurly to start a Python set
         { inLanguage(LANGUAGE_PYTHON) }?
         set_py |
+
+        // looking for "async" + "for" (in an expression) to start a Python list comprehension
+        { inLanguage(LANGUAGE_PYTHON) }?
+        start_list_comprehension_py
+        specifier_py
+        list_comprehension_py |
+
+        // looking for "for" (in an expression) to start a Python list comprehension
+        { inLanguage(LANGUAGE_PYTHON) }?
+        start_list_comprehension_py
+        list_comprehension_py |
 
         // looking for "lambda" to start a Python lambda
         { inLanguage(LANGUAGE_PYTHON) }?
@@ -13087,22 +13108,6 @@ argument[] { ENTRY_DEBUG } :
 
         // match the argument expression
         (
-            { inLanguage(LANGUAGE_PYTHON) }?
-            {
-                startNewMode(MODE_EXPRESSION);
-                startElement(SEXPRESSION);
-
-                start_list_comprehension_py(true);
-            }
-            specifier_py |
-
-            { inLanguage(LANGUAGE_PYTHON) }?
-            {
-                startNewMode(MODE_EXPRESSION);
-                startElement(SEXPRESSION);
-            }
-            list_comprehension_py[true] |
-
             {
                 !(
                     (
@@ -13124,18 +13129,7 @@ argument[] { ENTRY_DEBUG } :
         (options { greedy = true; } :
             // Python arguments have optional syntax (e.g., starting with '*' or '**')
             { inLanguage(LANGUAGE_PYTHON) && (last_consumed == MULTOPS || last_consumed == EXPONENTIATION) }?
-            expression |
-
-            // Python argument does not start with a list comprehension
-            { inLanguage(LANGUAGE_PYTHON) }?
-            {
-                start_list_comprehension_py(true);
-            }
-            specifier_py |
-
-            // Python argument does not start with a list comprehension
-            { inLanguage(LANGUAGE_PYTHON) }?
-            list_comprehension_py[true]
+            expression
         )*
 
         {
@@ -16883,7 +16877,7 @@ list_comprehension_range_py[] { ENTRY_DEBUG } :
         }
 
         (options { greedy = true; } :
-            { LA(1) == IF && getParen() == 0 }?
+            { LA(1) == IF }?
             {
                 break;
             } |
@@ -16934,17 +16928,6 @@ list_comprehension_if_py[] { bool multiple_ifs = false; ENTRY_DEBUG } :
             {
                 multiple_ifs = true;
             } |
-
-            // nested list comprehension
-            { !inMode(MODE_ARGUMENT) }?
-            {
-                start_list_comprehension_py(false);
-            }
-            specifier_py |
-
-            // nested list comprehension
-            { !inMode(MODE_ARGUMENT) }?
-            list_comprehension_py[false] |
 
             { inMode(MODE_ARGUMENT) }?
             argument |
@@ -17440,15 +17423,6 @@ attribute_py[] { ENTRY_DEBUG } :
         }
 
         (
-            { !inMode(MODE_ARGUMENT) }?
-            {
-                start_list_comprehension_py(false);
-            }
-            specifier_py |
-
-            { !inMode(MODE_ARGUMENT) }?
-            list_comprehension_py[false] |
-
             // decorators can have arguments
             { inMode(MODE_ARGUMENT) }?
             argument |
@@ -17487,15 +17461,6 @@ array_py[] { CompleteElement element(this); ENTRY_DEBUG } :
         LBRACKET
 
         (
-            { !inMode(MODE_ARGUMENT) }?
-            {
-                start_list_comprehension_py(false);
-            }
-            specifier_py |
-
-            { !inMode(MODE_ARGUMENT) }?
-            list_comprehension_py[false] |
-
             { inMode(MODE_ARGUMENT) }?
             argument |
 
@@ -17516,7 +17481,7 @@ array_py[] { CompleteElement element(this); ENTRY_DEBUG } :
         RBRACKET
 
         {
-            if (inTransparentMode(MODE_ARRAY_PY))
+            if (inMode(MODE_ARRAY_PY))
                 endMode(MODE_ARRAY_PY);
         }
 ;
@@ -17525,13 +17490,8 @@ array_py[] { CompleteElement element(this); ENTRY_DEBUG } :
   list_comprehension_py
 
   Handles Python list comprehensions.
-  If the list comprehension is in a call, do not end the current expression.
 */
-list_comprehension_py[bool in_call = false] { ENTRY_DEBUG } :
-        {
-            start_list_comprehension_py(in_call);
-        }
-
+list_comprehension_py[] { ENTRY_DEBUG } :
         FOR
 
         {
@@ -17556,20 +17516,23 @@ list_comprehension_py[bool in_call = false] { ENTRY_DEBUG } :
             comma
         )*
 
-        list_comprehension_range_py
-
         {
+            // handle "in" portion of a list comprehension
+            if (LA(1) == PY_IN)
+                list_comprehension_range_py();
+
             if (inTransparentMode(MODE_LIST_COMPREHENSION_PY))
                 endDownToMode(MODE_LIST_COMPREHENSION_PY);
-        }
 
-        list_comprehension_if_py
+            // handle optional "if" portion of a list comprehension
+            if (LA(1) == IF)
+                list_comprehension_if_py();
 
-        {
-            if (inTransparentMode(MODE_LIST_COMPREHENSION_PY)) {
+            if (inTransparentMode(MODE_LIST_COMPREHENSION_PY))
                 endDownToMode(MODE_LIST_COMPREHENSION_PY);
+
+            if (inMode(MODE_LIST_COMPREHENSION_PY))
                 endMode(MODE_LIST_COMPREHENSION_PY);
-            }
 
             // ensure the list comprehension ends the current argument in a call
             if (inMode(MODE_ARGUMENT) && LA(1) == RPAREN && lparen_types_py.back() == 'c')
@@ -17581,34 +17544,20 @@ list_comprehension_py[bool in_call = false] { ENTRY_DEBUG } :
   start_list_comprehension_py
 
   Starts a Python list comprehension.  Used in multiple places.
-  If the list comprehension is in a call, do not end the current expression.
 */
-start_list_comprehension_py[bool in_call = false] { ENTRY_DEBUG } :
+start_list_comprehension_py[] { ENTRY_DEBUG } :
         {
             // end the current expression before starting a list comprehension
-            if (
-                !in_call
-                && inMode(MODE_EXPRESSION)
-                && (
-                    inTransparentMode(MODE_ARRAY_PY)
-                    || inTransparentMode(MODE_SET_PY)
-                    || inTransparentMode(MODE_DICTIONARY_PY)
-                    || inTransparentMode(MODE_TUPLE_PY)
-                )
-            )
+            // unless the list comprehension starts an argument in a call
+            if (inMode(MODE_EXPRESSION) && (last_consumed != LPAREN || lparen_types_py.back() != 'c'))
                 endMode(MODE_EXPRESSION);
 
-            // "comprehension" tag already started while processing previous specifier(s)
-            if (last_consumed != PY_ASYNC) {
-                startNewMode(MODE_LIST_COMPREHENSION_PY);
-                startElement(SLIST_COMPREHENSION);
-            }
+            startNewMode(MODE_LIST_COMPREHENSION_PY);
+            startElement(SLIST_COMPREHENSION);
 
-            // "for" tag already started while processing previous specifier(s)
-            if (last_consumed != PY_ASYNC) {
-                startNewMode(MODE_CONTROL | MODE_EXPECT | MODE_FOR_CONTROL_PY);
-                startElement(SFOR_STATEMENT);
-            }
+            startNewMode(MODE_CONTROL | MODE_EXPECT | MODE_FOR_CONTROL_PY);
+            startElement(SFOR_STATEMENT);
+
         }
 ;
 
@@ -17661,15 +17610,6 @@ lambda_py[] { CompleteElement element(this); ENTRY_DEBUG } :
         }
 
         (options { greedy = true; } :
-            { !inMode(MODE_ARGUMENT) }?
-            {
-                start_list_comprehension_py(false);
-            }
-            specifier_py |
-
-            { !inMode(MODE_ARGUMENT) }?
-            list_comprehension_py[false] |
-
             { inMode(MODE_ARGUMENT) }?
             argument |
 
@@ -17736,15 +17676,6 @@ set_py[] { CompleteElement element(this); ENTRY_DEBUG } :
         PY_LCURLY
 
         (
-            { !inMode(MODE_ARGUMENT) }?
-            {
-                start_list_comprehension_py(false);
-            }
-            specifier_py |
-
-            { !inMode(MODE_ARGUMENT) }?
-            list_comprehension_py[false] |
-
             { inMode(MODE_ARGUMENT) }?
             argument |
 
@@ -17800,15 +17731,6 @@ dictionary_py[bool isempty = false] { CompleteElement element(this); ENTRY_DEBUG
         }
 
         (options { greedy = true; } :
-            { !inMode(MODE_ARGUMENT) }?
-            {
-                start_list_comprehension_py(false);
-            }
-            specifier_py |
-
-            { !inMode(MODE_ARGUMENT) }?
-            list_comprehension_py[false] |
-
             { inMode(MODE_ARGUMENT) }?
             argument |
 
@@ -17949,15 +17871,6 @@ tuple_py[] {
             {
                 break;
             } |
-
-            { !inMode(MODE_ARGUMENT) }?
-            {
-                start_list_comprehension_py(false);
-            }
-            specifier_py |
-
-            { !inMode(MODE_ARGUMENT) }?
-            list_comprehension_py[false] |
 
             alias_py |
 
@@ -18352,15 +18265,6 @@ operator_parenthesis_complete_py[] {
             }
             rparen_operator |
 
-            { !inMode(MODE_ARGUMENT) }?
-            {
-                start_list_comprehension_py(false);
-            }
-            specifier_py |
-
-            { !inMode(MODE_ARGUMENT) }?
-            list_comprehension_py[false] |
-
             alias_py |
 
             { inMode(MODE_ARGUMENT) }?
@@ -18375,10 +18279,8 @@ operator_parenthesis_complete_py[] {
             // set the token to NOP to remove the "fake" expression
             tp.setType(SNOP);
 
-            if (inTransparentMode(MODE_OPERATOR_PAREN_PY)) {
+            if (inTransparentMode(MODE_OPERATOR_PAREN_PY))
                 endDownToMode(MODE_OPERATOR_PAREN_PY);
-                endMode(MODE_OPERATOR_PAREN_PY);
-            }
 
             // found an operator rparen to close the starting operator lparen
             if (LA(1) == RPAREN && lparen_types_py.back() == 'o' && lparen_types_py.size() == lparen_types_size) {
@@ -18386,6 +18288,9 @@ operator_parenthesis_complete_py[] {
                 lparen_types_py.pop_back();
                 rparen_operator();
             }
+
+            if (inMode(MODE_OPERATOR_PAREN_PY))
+                endMode(MODE_OPERATOR_PAREN_PY);
         }
 ;
 
