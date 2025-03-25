@@ -175,4 +175,30 @@
 ]</array></expr></expr_stmt>
 </unit>
 
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><operator>(</operator>
+    <name>a</name>
+    <comprehension><for>for <control><literal type="number">1</literal> <range>in <expr><literal type="number">2</literal></expr></range></control></for>
+    <if>if <condition><expr><operator>(</operator>
+        <call><name>sample</name><argument_list>(
+            <argument><expr><literal type="number">1</literal></expr>
+            <comprehension><for>for <control><literal type="number">1</literal> <range>in <expr><literal type="number">1</literal></expr></range></control></for></comprehension></argument>
+        )</argument_list></call>
+    <operator>)</operator></expr></condition></if></comprehension>
+<operator>)</operator></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><operator>(</operator>
+    <name>a</name>
+    <comprehension><for><specifier>async</specifier> for <control><literal type="number">1</literal> <range>in <expr><literal type="number">2</literal></expr></range></control></for>
+    <if>if <condition><expr><operator>(</operator>
+        <call><name>sample</name><argument_list>(
+            <argument><expr><literal type="number">1</literal></expr>
+            <comprehension><for><specifier>async</specifier> for <control><literal type="number">1</literal> <range>in <expr><literal type="number">1</literal></expr></range></control></for></comprehension></argument>
+        )</argument_list></call>
+    <operator>)</operator></expr></condition></if></comprehension>
+<operator>)</operator></expr></expr_stmt>
+</unit>
+
 </unit>

@@ -16863,7 +16863,7 @@ range_in_py[] { SingleElement element(this); ENTRY_DEBUG } :
   Handles a Python "in" expression in a list comprehension using the range tag.
   An "if" expression can appear after the "in" expression (only for list comprehensions).
 */
-list_comprehension_range_py[] { ENTRY_DEBUG } :
+list_comprehension_range_py[] { int lparen_types_size = 0; ENTRY_DEBUG } :
         {
             startNewMode(MODE_RANGE_IN_PY);
 
@@ -16873,11 +16873,20 @@ list_comprehension_range_py[] { ENTRY_DEBUG } :
         PY_IN
 
         {
+            lparen_types_size = lparen_types_py.size();  // do not end call RPAREN early
+
             startNewMode(MODE_EXPRESSION | MODE_EXPECT);
         }
 
         (options { greedy = true; } :
-            { LA(1) == IF }?
+            {
+                LA(1) == IF  // found the optional "if" part of a list comp.
+                || (
+                    LA(1) == RPAREN  // do not consume the call RPAREN that is not part of a list comp.
+                    && lparen_types_py.back() == 'c'
+                    && lparen_types_py.size() == lparen_types_size
+                )
+            }?
             {
                 break;
             } |
@@ -16921,8 +16930,18 @@ list_comprehension_range_py[] { ENTRY_DEBUG } :
 
   Handles an "if" in a Python list comprehension differently from other "if" expressions.
 */
-list_comprehension_if_py[] { bool multiple_ifs = false; ENTRY_DEBUG } :
+list_comprehension_if_py[] { bool multiple_ifs = false; int lparen_types_size = 0; ENTRY_DEBUG } :
+        {
+            lparen_types_size = lparen_types_py.size();  // do not end call RPAREN early
+        }
+
         (options { greedy = true; } :
+            // do not accidentally consume the call-ending RPAREN that is not part of a list comp.
+            { LA(1) == RPAREN && lparen_types_py.back() == 'c' && lparen_types_py.size() == lparen_types_size }?
+            {
+                break;
+            } |
+
             { getParen() == 0 }?
             start_list_comprehension_if_py[multiple_ifs]
             {
