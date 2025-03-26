@@ -264,7 +264,7 @@ void match_element(xmlXPathParserContext* ctxt, int nargs) {
 
         const auto itpair = tokens.insert(token.size() == tokenView.size() ? std::move(token) : std::string(tokenView));
 
-        const bool valid = table->is_element_in_bucket(bucket, table->size_of_variable_bucket(bucket), *(itpair.first), node_ptr);
+        const bool valid = table->is_element_in_bucket(bucket, *(itpair.first), node_ptr);
 
         isValid = isValid || valid;
     }
