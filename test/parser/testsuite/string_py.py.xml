@@ -144,6 +144,14 @@ formatted as doxygen.
 </unit>
 
 <unit revision="1.1.0" language="Python">
+<expr_stmt><expr><literal type="string">"""'''a'''"""</literal></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><literal type="string">'''"""b"""'''</literal></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
 <class>class <name>Car</name><block>:<block_content>
     <expr_stmt><expr><literal type="string" format="docstring">"""
     This is a string literal,
@@ -403,6 +411,62 @@ formatted as doxygen.
 
 <unit revision="1.1.0" language="Python">
 <function>def <name>sum</name><parameter_list>(<parameter><name>a</name><annotation>: <expr><name>int</name></expr></annotation></parameter>, <parameter><name>b</name><annotation>: <expr><name>int</name></expr></annotation></parameter>)</parameter_list><block>:<block_content> <expr_stmt><expr><literal type="string" format="docstring doxygen">'''!Docstring doxygen example.'''</literal></expr>;</expr_stmt> <return>return <expr><operator>(</operator><name>a</name> <operator>+</operator> <name>b</name><operator>)</operator></expr></return></block_content></block></function>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><call><name>print</name><argument_list>(
+    <argument><expr><literal type="string">"String 1 "</literal>
+    <literal type="string">"String 2 "</literal><literal type="string">"String 3"</literal></expr></argument>
+)</argument_list></call></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><call><name>print</name><argument_list>(
+    <argument><expr><literal type="string">"\"String 1\" "</literal>
+    <literal type="string">"\"String 2\" "</literal><literal type="string">"\"String 3\""</literal></expr></argument>
+)</argument_list></call></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><call><name>print</name><argument_list>(
+    <argument><expr><literal type="string">"""String 1 """</literal>
+    <literal type="string">"""String 2 """</literal><literal type="string">"""String 3"""</literal></expr></argument>
+)</argument_list></call></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><call><name>print</name><argument_list>(
+    <argument><expr><literal type="string">"""\"String 1\" """</literal>
+    <literal type="string">"""\"String 2\" """</literal><literal type="string">"""\"String 3\""""</literal></expr></argument>
+)</argument_list></call></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><call><name>print</name><argument_list>(
+    <argument><expr><literal type="string">'String 1 '</literal>
+    <literal type="string">'String 2 '</literal><literal type="string">'String 3'</literal></expr></argument>
+)</argument_list></call></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><call><name>print</name><argument_list>(
+    <argument><expr><literal type="string">'\'String 1\' '</literal>
+    <literal type="string">'\'String 2\' '</literal><literal type="string">'\'String 3\''</literal></expr></argument>
+)</argument_list></call></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><call><name>print</name><argument_list>(
+    <argument><expr><literal type="string">'''String 1 '''</literal>
+    <literal type="string">'''String 2 '''</literal><literal type="string">'''String 3'''</literal></expr></argument>
+)</argument_list></call></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><call><name>print</name><argument_list>(
+    <argument><expr><literal type="string">'''\'String 1\' '''</literal>
+    <literal type="string">'''\'String 2\' '''</literal><literal type="string">'''\'String 3\''''</literal></expr></argument>
+)</argument_list></call></expr></expr_stmt>
 </unit>
 
 <unit revision="1.1.0" language="Python">

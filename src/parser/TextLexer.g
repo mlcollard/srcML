@@ -72,7 +72,10 @@ STRING_START :
     '"' {
         // handle a potential triple-quoted string in Python
         if (inLanguage(LANGUAGE_PYTHON) && LA(1) == '"')
-            changetotextlexer(PY_STRING_START);
+            changetotextlexer(PY_DQUOTE_STRING_START);
+        // handle a string that starts/ends with one double-quote in Python
+        else if (inLanguage(LANGUAGE_PYTHON))
+            changetotextlexer(PY_SIMPLE_DQUOTE_STRING_END);
         else
             changetotextlexer(STRING_END);
 
@@ -111,7 +114,10 @@ CHAR_START :
     '\'' {
         // handle a potential triple-quoted string in Python
         if (inLanguage(LANGUAGE_PYTHON) && LA(1) == '\'')
-            changetotextlexer(PY_STRING_START);
+            changetotextlexer(PY_SQUOTE_STRING_START);
+        // handle a string that starts/ends with one single-quote in Python
+        else if (inLanguage(LANGUAGE_PYTHON))
+            changetotextlexer(PY_SIMPLE_SQUOTE_STRING_END);
         else {
             $setType(CHAR_START); changetotextlexer(CHAR_END);
         }
