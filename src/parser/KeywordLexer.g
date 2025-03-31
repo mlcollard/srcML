@@ -757,14 +757,13 @@ KeywordLexer(UTF8CharBuffer* pinput, int language, OPTION_TYPE & options,
         { "__strong"        , STRONG           , LANGUAGE_CXX | LANGUAGE_C | LANGUAGE_OBJECTIVE_C },
 
 
-        // Combined C/C++ Mode  at end so overrides defaults
+        // Combined C/C++ Mode at end so overrides defaults
         { "restrict"     , CRESTRICT         , LANGUAGE_CXX },
         { "try"          , CXX_TRY           , LANGUAGE_CXX },
         { "catch"        , CXX_CATCH         , LANGUAGE_CXX },
         { "class"        , CXX_CLASS         , LANGUAGE_CXX },
 
         // OpenMp
-        { "omp"          , OMP_OMP           , LANGUAGE_C_FAMILY },
         { "omp"          , OMP_OMP           , LANGUAGE_C_FAMILY },
 
         // JavaScript
@@ -820,11 +819,36 @@ KeywordLexer(UTF8CharBuffer* pinput, int language, OPTION_TYPE & options,
         { "not"          , PY_NOT            , LANGUAGE_PYTHON },
         { "or"           , PY_OR             , LANGUAGE_PYTHON },
 
-        // Existing keywords that are names in Python
+        // Existing language keywords that are names in Python
+        { "__asm"        , NAME              , LANGUAGE_PYTHON },
+        { "__volatile__" , NAME              , LANGUAGE_PYTHON },
+        { "catch"        , NAME              , LANGUAGE_PYTHON },
+        { "const"        , NAME              , LANGUAGE_PYTHON },
         { "default"      , NAME              , LANGUAGE_PYTHON },
+        { "enum"         , NAME              , LANGUAGE_PYTHON },
+        { "extern"       , NAME              , LANGUAGE_PYTHON },
+        { "explicit"     , NAME              , LANGUAGE_PYTHON },
+        { "false"        , NAME              , LANGUAGE_PYTHON },
+        { "goto"         , NAME              , LANGUAGE_PYTHON },
+        { "inline"       , NAME              , LANGUAGE_PYTHON },
         { "main"         , NAME              , LANGUAGE_PYTHON },
+        { "namespace"    , NAME              , LANGUAGE_PYTHON },
         { "new"          , NAME              , LANGUAGE_PYTHON },
+        { "omp"          , NAME              , LANGUAGE_PYTHON },
         { "operator"     , NAME              , LANGUAGE_PYTHON },
+        { "private"      , NAME              , LANGUAGE_PYTHON },
+        { "protected"    , NAME              , LANGUAGE_PYTHON },
+        { "public"       , NAME              , LANGUAGE_PYTHON },
+        { "sizeof"       , NAME              , LANGUAGE_PYTHON },
+        { "static"       , NAME              , LANGUAGE_PYTHON },
+        { "struct"       , NAME              , LANGUAGE_PYTHON },
+        { "switch"       , NAME              , LANGUAGE_PYTHON },
+        { "throw"        , NAME              , LANGUAGE_PYTHON },
+        { "true"         , NAME              , LANGUAGE_PYTHON },
+        { "typedef"      , NAME              , LANGUAGE_PYTHON },
+        { "using"        , NAME              , LANGUAGE_PYTHON },
+        { "virtual"      , NAME              , LANGUAGE_PYTHON },
+        { "volatile"     , NAME              , LANGUAGE_PYTHON },
 
         // Python
         { "as"           , PY_ALIAS          , LANGUAGE_PYTHON },

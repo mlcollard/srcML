@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.srcML.org/srcML/src" language="Python" url="keyword_as_name">
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>__asm</name> <operator>=</operator> <literal type="string">"__asm"</literal></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>__volatile__</name> <operator>=</operator> <literal type="string">"__volatile__"</literal></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>catch</name> <operator>=</operator> <literal type="string">"catch"</literal></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>const</name> <operator>=</operator> <literal type="string">"const"</literal></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>default</name> <operator>=</operator> <literal type="string">"default"</literal></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>enum</name> <operator>=</operator> <literal type="string">"enum"</literal></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>extern</name> <operator>=</operator> <literal type="string">"extern"</literal></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>explicit</name> <operator>=</operator> <literal type="string">"explicit"</literal></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>false</name> <operator>=</operator> <literal type="boolean">False</literal></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>goto</name> <operator>=</operator> <literal type="string">"goto"</literal></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>inline</name> <operator>=</operator> <literal type="string">"inline"</literal></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>main</name> <operator>=</operator> <literal type="string">"main"</literal></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>namespace</name> <operator>=</operator> <literal type="string">"namespace"</literal></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>new</name> <operator>=</operator> <literal type="string">"new"</literal></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>omp</name> <operator>=</operator> <literal type="string">"omp"</literal></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>operator</name> <operator>=</operator> <literal type="string">"operator"</literal></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>private</name> <operator>=</operator> <literal type="string">"private"</literal></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>protected</name> <operator>=</operator> <literal type="string">"protected"</literal></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>public</name> <operator>=</operator> <literal type="string">"public"</literal></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>sizeof</name> <operator>=</operator> <literal type="string">"sizeof"</literal></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>static</name> <operator>=</operator> <literal type="string">"static"</literal></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>struct</name> <operator>=</operator> <literal type="string">"struct"</literal></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>switch</name> <operator>=</operator> <literal type="string">"switch"</literal></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>throw</name> <operator>=</operator> <literal type="string">"throw"</literal></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>true</name> <operator>=</operator> <literal type="boolean">True</literal></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>typedef</name> <operator>=</operator> <literal type="string">"typedef"</literal></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>using</name> <operator>=</operator> <literal type="string">"using"</literal></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>virtual</name> <operator>=</operator> <literal type="string">"virtual"</literal></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>volatile</name> <operator>=</operator> <literal type="string">"volatile"</literal></expr></expr_stmt>
+</unit>
+
+
+</unit>
