@@ -122,13 +122,13 @@ token_set(srcMLParser, decl_specifier_tokens_set,
 
 token_set(srcMLParser, identifier_list_tokens_set,
 
-    srcMLParser::NAME, srcMLParser::INCLUDE, srcMLParser::DEFINE, srcMLParser::ELIF, srcMLParser::ENDIF, srcMLParser::ERRORPREC, srcMLParser::IFDEF, srcMLParser::IFNDEF, srcMLParser::LINE, srcMLParser::PRAGMA, srcMLParser::UNDEF |
-    srcMLParser::WARNING, srcMLParser::SUPER, srcMLParser::REGION, srcMLParser::ENDREGION, srcMLParser::GET, srcMLParser::SET, srcMLParser::ADD, srcMLParser::REMOVE, srcMLParser::ASYNC, srcMLParser::YIELD |
-    srcMLParser::SIGNAL, srcMLParser::FINAL, srcMLParser::OVERRIDE, srcMLParser::VOID, srcMLParser::ASM,
+    srcMLParser::NAME, srcMLParser::INCLUDE, srcMLParser::DEFINE, srcMLParser::ELIF, srcMLParser::ENDIF, srcMLParser::ERRORPREC, srcMLParser::IFDEF, srcMLParser::IFNDEF, srcMLParser::LINE,
+    srcMLParser::PRAGMA, srcMLParser::UNDEF, srcMLParser::WARNING, srcMLParser::SUPER, srcMLParser::REGION, srcMLParser::ENDREGION, srcMLParser::GET, srcMLParser::SET, srcMLParser::ADD,
+    srcMLParser::REMOVE, srcMLParser::ASYNC, srcMLParser::YIELD, srcMLParser::FINAL, srcMLParser::OVERRIDE, srcMLParser::VOID, srcMLParser::ASM,
 
     // C# linq
-    srcMLParser::FROM, srcMLParser::WHERE, srcMLParser::SELECT, srcMLParser::LET, srcMLParser::ORDERBY, srcMLParser::ASCENDING, srcMLParser::DESCENDING, srcMLParser::GROUP, srcMLParser::BY, srcMLParser::JOIN, srcMLParser::ON, srcMLParser::EQUALS,
-        srcMLParser::INTO, srcMLParser::THIS, srcMLParser::ALIAS,
+    srcMLParser::FROM, srcMLParser::WHERE, srcMLParser::SELECT, srcMLParser::LET, srcMLParser::ORDERBY, srcMLParser::ASCENDING, srcMLParser::DESCENDING, srcMLParser::GROUP, srcMLParser::BY,
+    srcMLParser::JOIN, srcMLParser::ON, srcMLParser::EQUALS, srcMLParser::INTO, srcMLParser::THIS, srcMLParser::ALIAS,
 
     // Objective-C
     srcMLParser::IMPORT, srcMLParser::ATPROTOCOL,
@@ -136,12 +136,18 @@ token_set(srcMLParser, identifier_list_tokens_set,
     // C
     srcMLParser::CRESTRICT, srcMLParser::MUTABLE, srcMLParser::CXX_TRY, srcMLParser::CXX_CATCH,
 
+    // Java
+    srcMLParser::RECORD,
+
     // Qt
-    srcMLParser::EMIT,
+    srcMLParser::EMIT, srcMLParser::FOREACH, srcMLParser::SIGNAL, srcMLParser::FOREVER,
 
     // JavaScript
     srcMLParser::JS_BREAK, srcMLParser::JS_CATCH, srcMLParser::JS_CONTINUE, srcMLParser::JS_DO, srcMLParser::JS_ELSE, srcMLParser::JS_FINALLY, srcMLParser::JS_ASYNC, srcMLParser::JS_DEBUGGER, srcMLParser::JS_DEFAULT,
-    srcMLParser::JS_EACH, srcMLParser::JS_EXPORT, srcMLParser::JS_FUNCTION, srcMLParser::JS_IMPORT, srcMLParser::JS_RANGE_IN, srcMLParser::JS_WITH, srcMLParser::JS_YIELD, srcMLParser::JS_SWITCH, srcMLParser::JS_TRY
+    srcMLParser::JS_EACH, srcMLParser::JS_EXPORT, srcMLParser::JS_FUNCTION, srcMLParser::JS_IMPORT, srcMLParser::JS_RANGE_IN, srcMLParser::JS_WITH, srcMLParser::JS_YIELD, srcMLParser::JS_SWITCH, srcMLParser::JS_TRY,
+
+    // Python
+    srcMLParser::PY_2_EXEC, srcMLParser::PY_2_PRINT, srcMLParser::PY_CASE, srcMLParser::PY_MATCH, srcMLParser::PY_TYPE
 )
 
 token_set(srcMLParser, whitespace_token_set,

@@ -33,6 +33,7 @@
 #include <DocstringPython.hpp>
 #include <OffSideRule.hpp>
 #include <NewlineTerminatePython.hpp>
+#include <NameDifferentiatorPython.hpp>
 
 using namespace ::std::literals::string_view_literals;
 
@@ -149,7 +150,11 @@ void srcml_translator::translate(UTF8CharBuffer* parser_input) {
             docstring.setBlockStartToken(srcMLParser::PY_COLON);
 
             // intermediate token stage
-            OffSideRule offside(docstring);
+            NameDifferentiatorPython differentiator(docstring);
+            differentiator.setBlockStartToken(srcMLParser::PY_COLON);
+
+            // intermediate token stage
+            OffSideRule offside(differentiator);
             offside.setBlockStartToken(srcMLParser::PY_COLON);
 
             // intermediate token stage
