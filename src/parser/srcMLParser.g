@@ -1445,19 +1445,15 @@ start_python[] {
         // invoke the table to handle keywords and duplex keywords
         if (inMode(MODE_STATEMENT)) {
             auto token = LA(1);
+            if (duplex_keyword_set.member((unsigned int) LA(1))) {
+                const auto lookup = duplexKeywords[token + (next_token() << 8)];
+                if (lookup)
+                    token = lookup;
+            }
 
-            // differentiate "exec" and "print" calls from Python 2 statements
-            if ((token != PY_2_EXEC && token != PY_2_PRINT) || next_token() != LPAREN) {
-                if (duplex_keyword_set.member((unsigned int) LA(1))) {
-                    const auto lookup = duplexKeywords[token + (next_token() << 8)];
-                    if (lookup)
-                        token = lookup;
-                }
-
-                const auto& rule = python_rules[token];
-                if (rule.elementToken && processRule(rule)) {
-                    return;
-                }
+            const auto& rule = python_rules[token];
+            if (rule.elementToken && processRule(rule)) {
+                return;
             }
         }
 
