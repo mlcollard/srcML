@@ -46,6 +46,7 @@ RUN dnf install -y \
     ninja-build \
     openssl-devel \
     rpm-build \
+    rpm-sign \
     tree \
     valgrind \
     zip \
