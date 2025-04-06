@@ -83,5 +83,5 @@ RUN if [ "$CMAKE_BINARY" != "ON" ]; then apt-get update && \
 RUN sed -i '/path-exclude=\/usr\/share\/man\/*/c\#path-exclude=\/usr\/share\/man\/*' /etc/dpkg/dpkg.cfg.d/excludes
 
 # Put ccache into the path
-ENV PATH /usr/lib/ccache:$PATH
+ENV PATH=/usr/lib/ccache:$PATH
 RUN export PATH=/usr/lib/ccache/:$PATH

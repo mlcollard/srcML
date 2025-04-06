@@ -63,5 +63,5 @@ RUN case "${TARGETPLATFORM}" in \
     curl --insecure -L "https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}-linux-${ARCHITECTURE}.tar.gz" | tar xz --strip-components=1 -C /usr/local
 
 # Put ccache into the path
-ENV PATH /usr/lib/ccache:$PATH
+ENV PATH=/usr/lib/ccache:$PATH
 RUN export PATH=/usr/lib/ccache/:$PATH
