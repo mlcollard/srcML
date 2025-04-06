@@ -1,4 +1,4 @@
-ARG TAG=38
+ARG TAG=42
 FROM fedora:${TAG} AS fedora
 
 # Generate lightweight jre
