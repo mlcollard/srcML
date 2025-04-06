@@ -54,12 +54,13 @@ RUN dnf install -y \
 
 # CMake
 ARG TARGETPLATFORM
+ARG CMAKE_VERSION=4.0.0
 RUN case "${TARGETPLATFORM}" in \
          "linux/amd64")  ARCHITECTURE="x86_64"   ;; \
          "linux/arm64")  ARCHITECTURE="aarch64"  ;; \
          *)  exit 1 ;; \
     esac; \
-    curl --insecure -L "https://github.com/Kitware/CMake/releases/download/v3.30.4/cmake-3.30.4-linux-${ARCHITECTURE}.tar.gz" | tar xz --strip-components=1 -C /usr/local
+    curl --insecure -L "https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}-linux-${ARCHITECTURE}.tar.gz" | tar xz --strip-components=1 -C /usr/local
 
 # Put ccache into the path
 ENV PATH /usr/lib/ccache:$PATH
