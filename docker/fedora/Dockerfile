@@ -22,7 +22,7 @@ LABEL org.srcml.distro="fedora"
 LABEL org.srcml.osversion="${TAG}"
 
 # Copy lightweight jre install
-COPY --from=java /opt/java /opt/java
+COPY --link --from=java /opt/java /opt/java
 ENV JAVA_HOME=/opt/java
 
 # Avoid prompts for timezone
