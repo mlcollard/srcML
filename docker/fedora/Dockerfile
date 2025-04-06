@@ -1,12 +1,14 @@
 ARG TAG=42
+ARG JAVA_VERSION=latest
 FROM fedora:${TAG} AS fedora
 
 # Generate lightweight jre
 FROM fedora AS java
+ARG JAVA_VERSION
 RUN dnf install -y \
         binutils \
-        java-11-openjdk-headless \
-        java-11-openjdk-jmods
+        java-${JAVA_VERSION}-openjdk-headless \
+        java-${JAVA_VERSION}-openjdk-jmods
 
 RUN jlink --compress=2 --strip-debug --add-modules=java.base --output /opt/java \
     && strip -p --strip-unneeded /opt/java/lib/server/*.so \
