@@ -14,6 +14,7 @@ RUN jlink --compress=2 --strip-debug --add-modules=java.base --output /opt/java 
     && strip -p --strip-unneeded /opt/java/lib/*.so
 
 FROM ubuntu
+ARG TAG
 LABEL org.srcml.email="srcmldev@gmail.com"
 LABEL org.srcml.url="srcml.org"
 LABEL org.srcml.distro="ubuntu"
@@ -53,7 +54,6 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 
 # Install cmake
 # Install direct binary for Ubuntu 20.04
-ARG TAG
 ENV TAG=$TAG
 ARG CMAKE_BINARY
 ARG TARGETPLATFORM

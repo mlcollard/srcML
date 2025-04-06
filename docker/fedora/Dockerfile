@@ -15,6 +15,7 @@ RUN jlink --compress=2 --strip-debug --add-modules=java.base --output /opt/java 
     && strip -p --strip-unneeded /opt/java/lib/*.so
 
 FROM fedora
+ARG TAG
 LABEL org.srcml.email="srcmldev@gmail.com"
 LABEL org.srcml.url="srcml.org"
 LABEL org.srcml.distro="fedora"
