@@ -134,6 +134,25 @@ void OffSideRule::handleBlocks(antlr::RefToken token) {
         if (numIndents > 0 && nextToken->getColumn() == 1 && nextToken->getType() == srcMLParser::WS && !isOneLineStatement) {
             const auto& postWSToken = input.nextToken();  // reads in a token
 
+            // found WS + EOF_; ensure any DEDENT tokens are placed before WS + EOF_
+            if (postWSToken->getType() == srcMLParser::EOF_) {
+                // this WS functions as WS_EOL, so change it to WS_EOL
+                nextToken->setType(srcMLParser::WS_EOL);
+
+                indentBuffer.emplace_back(nextToken);
+
+                for (int i = 0; i < numIndents; ++i) {
+                    auto dedentToken = srcMLToken::factory();
+                    dedentToken->setType(srcMLParser::DEDENT);
+                    indentBuffer.emplace_back(dedentToken);
+                }
+
+                indentBuffer.emplace_back(postWSToken);
+    
+                numIndents = 0;
+                break;
+            }
+
             if (srcMLParser::comment_py_token_set.member(postWSToken->getType())) {
                 indentBuffer.emplace_back(nextToken);
 
