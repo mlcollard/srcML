@@ -17711,7 +17711,7 @@ set_py[] { CompleteElement element(this); ENTRY_DEBUG } :
         PY_RCURLY
 
         {
-            if (inTransparentMode(MODE_SET_PY))
+            if (inMode(MODE_SET_PY))
                 endMode(MODE_SET_PY);
         }
 ;
@@ -17773,7 +17773,7 @@ dictionary_py[bool isempty = false] { CompleteElement element(this); ENTRY_DEBUG
         PY_RCURLY
 
         {
-            if (inTransparentMode(MODE_DICTIONARY_PY))
+            if (inMode(MODE_DICTIONARY_PY))
                 endMode(MODE_DICTIONARY_PY);
         }
 ;
@@ -17912,7 +17912,7 @@ tuple_py[] {
         RPAREN
 
         {
-            if (inTransparentMode(MODE_TUPLE_PY))
+            if (inMode(MODE_TUPLE_PY))
                 endMode(MODE_TUPLE_PY);
         }
 ;
