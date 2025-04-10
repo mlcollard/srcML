@@ -14,6 +14,10 @@
 </unit>
 
 <unit revision="1.1.0" language="Python">
+<expr_stmt><expr><lambda>lambda <parameter><name>value</name> <init>= <expr><dictionary>{<expr><literal type="null">None</literal></expr>: <expr><literal type="null">None</literal></expr>}</dictionary></expr></init></parameter> : <expr><call><name>str</name><argument_list>(<argument><expr><name>value</name></expr></argument>)</argument_list></call></expr></lambda></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
 <expr_stmt><expr><lambda>lambda <parameter><name>x</name></parameter>: <expr><call><name>sample</name><argument_list>(<argument><expr><operator>*</operator><name>x</name></expr></argument>, <argument><expr><operator>**</operator><name>x</name></expr></argument>)</argument_list></call></expr></lambda></expr></expr_stmt>
 </unit>
 

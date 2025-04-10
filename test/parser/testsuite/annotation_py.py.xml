@@ -26,6 +26,15 @@
 </unit>
 
 <unit revision="1.1.0" language="Python">
+<function>def <name>example</name><parameter_list>(
+    <parameter><name>a</name><annotation>: <expr><name>int</name></expr></annotation></parameter>,
+    <parameter><name>b</name><annotation>: <expr><name>int</name></expr></annotation></parameter>,
+)</parameter_list> <annotation>-&gt; <expr><name>int</name> <operator>|</operator> <name><name>Sequence</name><index>[<expr><name>int</name> <operator>|</operator> <literal type="null">None</literal></expr>]</index></name> <operator>|</operator> <literal type="null">None</literal></expr></annotation><block>:<block_content>
+    <pass>pass</pass>
+</block_content></block></function>
+</unit>
+
+<unit revision="1.1.0" language="Python">
 <expr_stmt><expr><name>a</name> <annotation>: <expr><literal type="number">10</literal></expr></annotation></expr></expr_stmt>
 </unit>
 

@@ -17132,8 +17132,7 @@ complete_python_parameter[] {
             // annotation (with optional initialization)
             { next_token() == PY_COLON }?
             compound_name
-            parameter_annotation_py
-            parameter_init_py |
+            parameter_annotation_py |
 
             // initialization
             { next_token() == EQUAL }?
@@ -17149,7 +17148,7 @@ complete_python_parameter[] {
 
   Handles a Python parameter annotation.
 */
-parameter_annotation_py[] { ENTRY_DEBUG } :
+parameter_annotation_py[] { bool found_init = false; ENTRY_DEBUG } :
         {
             // This is possible if called after handling an arbitrary positional parameter
             // or arbitrary keyword parameter in complete_python_parameter.  In a Python
@@ -17168,13 +17167,33 @@ parameter_annotation_py[] { ENTRY_DEBUG } :
             startNewMode(MODE_EXPRESSION | MODE_EXPECT);
         }
 
-        expression
+        (options { greedy = true; } :
+            // do not consume the ending RPAREN for a parameter list or EQUAL for an init
+            { (LA(1) == RPAREN || LA(1) == EQUAL) && lparen_types_py.back() == '*' }?
+            {
+                if (LA(1) == EQUAL)
+                    found_init = true;
+
+                break;
+            } |
+
+            { inMode(MODE_ARGUMENT) }?
+            argument |
+
+            { inMode(MODE_EXPRESSION) }?
+            parameter_init_py |
+
+            expression
+        )*
 
         {
             if (inTransparentMode(MODE_ANNOTATION_PY)) {
                 endDownToMode(MODE_ANNOTATION_PY);
                 endMode(MODE_ANNOTATION_PY);
             }
+
+            if (found_init)
+                parameter_init_py();
         }
 ;
 
@@ -17185,10 +17204,6 @@ parameter_annotation_py[] { ENTRY_DEBUG } :
 */
 parameter_init_py[] { SingleElement element(this); ENTRY_DEBUG } :
         {
-            // possible if called after parameter_annotation_py in complete_python_parameter
-            if (LA(1) != EQUAL)
-                return;
-
             startElement(SINIT);
         }
 
@@ -17198,7 +17213,25 @@ parameter_init_py[] { SingleElement element(this); ENTRY_DEBUG } :
             startNewMode(MODE_EXPRESSION | MODE_EXPECT);
         }
 
-        expression
+        (options { greedy = true; } :
+            // do not consume the lambda's PY_COLON or ending RPAREN for a parameter list
+            {
+                (LA(1) == RPAREN && lparen_types_py.back() == '*')
+                || (LA(1) == PY_COLON && inTransparentMode(MODE_LAMBDA_PY))
+            }?
+            {
+                break;
+            } |
+
+            { inMode(MODE_ARGUMENT) }?
+            argument |
+
+            // consume commas for calls, but not for parameters
+            { lparen_types_py.back() == 'c' }?
+            comma |
+
+            expression
+        )*
 ;
 
 /*
@@ -17219,7 +17252,14 @@ function_annotation_py[] { ENTRY_DEBUG } :
             startNewMode(MODE_EXPRESSION | MODE_EXPECT);
         }
 
-        expression
+        (options { greedy = true; } :
+            { LA(1) == INDENT }?
+            {
+                break;
+            } |
+
+            expression
+        )*
 
         {
             if (inTransparentMode(MODE_ANNOTATION_PY)) {

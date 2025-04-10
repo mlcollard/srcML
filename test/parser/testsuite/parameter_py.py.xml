@@ -80,6 +80,12 @@
 </unit>
 
 <unit revision="1.1.0" language="Python">
+<function>def <name>example</name><parameter_list>(<parameter><name>x</name><init>=<expr><name>x</name></expr></init></parameter>, <parameter><name>y</name><init>=<expr><call><name><name>y</name><operator>.</operator><name>transpose</name></name><argument_list>(<argument><expr><operator>-</operator><literal type="number">2</literal></expr></argument>, <argument><expr><operator>-</operator><literal type="number">1</literal></expr></argument>)</argument_list></call></expr></init></parameter>)</parameter_list><block>:<block_content>
+    <pass>pass</pass>
+</block_content></block></function>
+</unit>
+
+<unit revision="1.1.0" language="Python">
 <function>def <name>add</name><parameter_list>(<parameter type="args">*<name>b</name><annotation>: <expr><name>int</name></expr></annotation></parameter>)</parameter_list><block>:<block_content>
     <expr_stmt><expr><name>result</name> <operator>=</operator> <literal type="number">0</literal></expr></expr_stmt>
     <for>for <control><name>i</name> <range>in <expr><name>b</name></expr></range></control><block>:<block_content>
@@ -143,6 +149,16 @@
     <parameter><name>a</name></parameter>,
     <parameter><name>b</name></parameter>,
     <parameter><name>c</name></parameter>,
+)</parameter_list><block>:<block_content>
+    <pass>pass</pass>
+</block_content></block></function>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<function>def <name>example</name><parameter_list>(
+    <parameter><name>a</name></parameter>,
+    <parameter><name>b</name><annotation>: <expr><name><name>dict</name><index>[<expr><name>str</name></expr>, <expr><name>str</name></expr>]</index></name> <operator>|</operator> <literal type="null">None</literal></expr></annotation> <init>= <expr><literal type="null">None</literal></expr></init></parameter>,
+    <parameter><name>c</name> <init>= <expr><literal type="number">1</literal> <operator>|</operator> <literal type="number">1</literal></expr></init></parameter>,
 )</parameter_list><block>:<block_content>
     <pass>pass</pass>
 </block_content></block></function>
