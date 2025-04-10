@@ -17934,6 +17934,7 @@ tuple_py[] {
 perform_tuple_check_py[] returns [bool is_tuple] {
         is_tuple = false;
         bool is_lambda = false;
+        bool is_list_comp = false;
         int num_brackets = 0;  // counts all "()", "{}", and "[]"
         int last_consumed_current = last_consumed;
         int start = mark();
@@ -17955,12 +17956,16 @@ perform_tuple_check_py[] returns [bool is_tuple] {
                     if (LA(1) == PY_LAMBDA)
                         is_lambda = true;
 
+                    // do not confuse list comprehension name list (for a, b in c) for a tuple
+                    if (LA(1) == FOR)
+                        is_list_comp = true;
+
                     // cannot be a parenthesized tuple if the number of parentheses is 0 or less
                     if (num_brackets < 0)
                         break;
 
                     // the expression contains a comma not in any brackets
-                    if (LA(1) == COMMA && num_brackets == 1 && !is_lambda) {
+                    if (LA(1) == COMMA && num_brackets == 1 && !is_lambda && !is_list_comp) {
                         is_tuple = true;
                         break;
                     }
@@ -17971,6 +17976,10 @@ perform_tuple_check_py[] returns [bool is_tuple] {
                     // end of lambda parameter(s)
                     if (is_lambda && LA(1) == PY_COLON)
                         is_lambda = false;
+
+                    // end of list comprehension name(s)
+                    if (is_list_comp && LA(1) == PY_IN)
+                        is_list_comp = false;
 
                     consume();
                 }

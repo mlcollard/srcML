@@ -66,6 +66,15 @@
 </unit>
 
 <unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>options</name> <operator>=</operator> <operator>(</operator>
+    <name>a</name>
+    <comprehension><for>for <control><name>_</name>, <name>a</name>, <name>_</name> <range>in <expr><call><name>example</name><argument_list>(
+        <argument><expr><name>a</name></expr></argument>, <argument><expr><call><name>sample</name><argument_list>(<argument><expr><array>[]</array></expr></argument>)</argument_list></call></expr></argument>
+    )</argument_list></call></expr></range></control></for></comprehension>
+<operator>)</operator></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
 <if_stmt><if>if <condition><expr><literal type="boolean">True</literal></expr></condition><block>:<block_content>
     <expr_stmt><expr><call><name>next</name><argument_list>(<argument><expr><name>a</name></expr> <comprehension><for>for <control><name>a</name> <range>in <expr><name>b</name></expr></range></control></for> <if>if <condition><expr><literal type="boolean">True</literal></expr></condition></if></comprehension></argument>)</argument_list></call></expr></expr_stmt>
 </block_content></block></if></if_stmt>
