@@ -138,4 +138,24 @@
 </block_content></block></function>
 </unit>
 
+<unit revision="1.1.0" language="Python">
+<function>def <name>example</name><parameter_list>(
+    <parameter><name>a</name></parameter>,
+    <parameter><name>b</name></parameter>,
+    <parameter><name>c</name></parameter>,
+)</parameter_list><block>:<block_content>
+    <pass>pass</pass>
+</block_content></block></function>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<function>def <name><name>example</name><parameter_list type="generic">[<parameter><name>T</name></parameter>, <parameter><name>U</name></parameter>, <parameter><name>V</name></parameter>,]</parameter_list></name><parameter_list>(
+    <parameter><name>a</name></parameter>,
+    <parameter><name>b</name></parameter>,
+    <parameter><name>c</name></parameter>,
+)</parameter_list><block>:<block_content>
+    <pass>pass</pass>
+</block_content></block></function>
+</unit>
+
 </unit>

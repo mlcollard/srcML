@@ -17001,7 +17001,7 @@ start_list_comprehension_if_py[bool multiple_ifs = false] { ENTRY_DEBUG } :
 
   Handles a Python parameter list.
 */
-python_parameter_list[] { CompleteElement element(this); bool lastwasparam = false; bool foundparam = false; ENTRY_DEBUG } :
+python_parameter_list[] { CompleteElement element(this); ENTRY_DEBUG } :
         {
             // list of parameters
             startNewMode(MODE_EXCLUDE_NO_PAREN_TUPLES_PY | MODE_PARAMETER | MODE_LIST | MODE_EXPECT);
@@ -17015,30 +17015,15 @@ python_parameter_list[] { CompleteElement element(this); bool lastwasparam = fal
 
         (
             {
-                foundparam = true;
-
-                if (!lastwasparam)
-                    empty_element(SPARAMETER, !lastwasparam);
-
-                lastwasparam = false;
-            }
-
-            {
-                // we are in a parameter list; we must end it down to the start of the parameter list
+                // we are in a parameter list; we must end the current parameter
                 if (!inMode(MODE_PARAMETER | MODE_LIST | MODE_EXPECT))
                     endMode();
             }
-
             comma |
 
             complete_python_parameter
-
-            {
-                foundparam = lastwasparam = true;
-            }
         )*
 
-        empty_element[SPARAMETER, !lastwasparam && foundparam]
         rparen[false]
 ;
 
@@ -17047,7 +17032,7 @@ python_parameter_list[] { CompleteElement element(this); bool lastwasparam = fal
 
   Handles a Python generic parameter list.
 */
-python_generic_parameter_list[] { CompleteElement element(this); bool lastwasparam = false; bool foundparam = false; ENTRY_DEBUG } :
+python_generic_parameter_list[] { CompleteElement element(this); ENTRY_DEBUG } :
         {
             // list of parameters
             startNewMode(MODE_EXCLUDE_NO_PAREN_TUPLES_PY | MODE_PARAMETER | MODE_LIST | MODE_EXPECT);
@@ -17061,33 +17046,17 @@ python_generic_parameter_list[] { CompleteElement element(this); bool lastwaspar
 
         (
             {
-                foundparam = true;
-
-                if (!lastwasparam)
-                    empty_element(SPARAMETER, !lastwasparam);
-
-                lastwasparam = false;
-            }
-
-            {
-                // we are in a generic parameter list; we must end it down to the start of the generic parameter list
+                // we are in a generic parameter list; we must end the current parameter
                 if (!inMode(MODE_PARAMETER | MODE_LIST | MODE_EXPECT))
                     endMode();
             }
-
             comma |
 
             complete_python_parameter
-
-            {
-                foundparam = lastwasparam = true;
-            }
         )*
 
-        empty_element[SPARAMETER, !lastwasparam && foundparam]
-
         {
-            if (inMode(MODE_PARAMETER))
+            if (inMode(MODE_PARAMETER) && last_consumed != COMMA)
                 endMode(MODE_PARAMETER);
         }
 
