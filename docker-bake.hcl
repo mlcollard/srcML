@@ -2,6 +2,7 @@
 # docker-bake.hcl
 #
 # Defines how the srcml Linux distribution Docker images are built. It builds images to:
+#
 # * Provide a build environment
 # * Create and package installers
 # * Test the installers
@@ -21,70 +22,80 @@
 # In addition to the default build environment, there are specific targets for the following:
 #
 # * `build` - Build srcML and create the package installer
-# * `image` - Create an image with only the installer files
+# * `image` - Create an image with only the installer files (no o.s.)
 # * `files` - Download the installer files to a host directory
 # * `logs`  - Download the test logs to a host directory
 
 # Override using the environment variable BAKE_SRC. E.g.,
-#
 #   BAKE_SRC="."
 #   BAKE_SRC="srcml.tar.gz"
 #   BAKE_SRC="https://github.com/srcML/srcML.git"
 #   BAKE_SRC="https://github.com/srcML/srcML.git#develop"
-#
 variable "BAKE_SRC" {
-  default = "."
   # description = "Location of the source code"
+  default = "."
 }
 
 # Override using the environment variable BAKE_PRESET_SUFFIX
 # E.g., BAKE_PRESET_SUFFIX="-fast"
 variable "BAKE_PRESET_SUFFIX" {
-  default = ""
   # description = "Suffix for the workflow preset"
+  default = ""
 }
 
-# Override using the environment variable BAKE_PLATFORMS
-# E.g., BAKE_PLATFORMS="linux/arm64"
-variable "BAKE_PLATFORMS" {
-  default = "linux/amd64,linux/arm64"
+# Override using the environment variable BAKE_ARCHITECTURES
+# E.g., BAKE_ARCHITECTURES="linux/arm64"
+variable "BAKE_ARCHITECTURES" {
   # description = "Architectures to build on"
+  default = "linux/amd64,linux/arm64"
 }
 
 # Override using the environment variable BAKE_DESTINATION_DIR
-# E.g., BAKE_DESTINATION_DIR="~/srcML"
+# E.g., BAKE_DESTINATION_DIR="../dists"
 variable "BAKE_DESTINATION_DIR" {
-  default = "./dist_packages"
   # description = "Local directory for export of packages"
+  default = "./dist_packages"
 }
 
 # Override using the environment variable BAKE_CONTEXT_DIR
 # E.g., BAKE_CONTEXT_DIR="~/srcML/docker"
 variable "BAKE_CONTEXT_DIR" {
-  default = "./docker"
   # description = "Directory of context files"
+  default = "./docker"
 }
 
 # Override using the environment variable BAKE_REGISTRY. E.g.,
 #   BAKE_REGISTRY=""         docker buildx bake # Docker Hub
 #   BAKE_REGISTRY="ghcr.io"  docker buildx bake # GitHub Container Registry
 variable "BAKE_REGISTRY" {
-  default = ""
   # description = "Registry domain for default build environments"
+  default = ""
 }
 
 # Override using the environment variable BAKE_PACKAGE_REGISTRY. E.g.,
 #   BAKE_PACKAGE_REGISTRY=""         docker buildx bake # Docker Hub
 #   BAKE_PACKAGE_REGISTRY="ghcr.io"  docker buildx bake # GitHub Container Registry
 variable "BAKE_PACKAGE_REGISTRY" {
-  default = "ghcr.io"
   # description = "Registry domain for the package targets, package and log"
+  default = "ghcr.io"
+}
+
+# Placeholder to redefine in docker-bake.override.hcl
+variable "BAKE_SRCML_VERSION" {
+  # description = "srcML version to embed in image data"
+  default = ""
+}
+
+# Placeholder to redefine in docker-bake.override.hcl
+variable "BAKE_CMAKE_VERSION" {
+  # description = "CMake version"
+  default = ""
 }
 
 # Placeholder for distributions. See docker-bake.override.hcl for configured
 # Linux distributions and distribution-specific groups and targets
 variable "distributions" {
-  default = [ { id = "", version_id = "", workflow = "", tag = "" } ]
+  default = [ { id = "ubuntu", version_id = "24.04", name = "Ubuntu 24.04", workflow = "ubuntu", java = "latest" } ]
 }
 
 # Default is to only create the build environment
@@ -106,14 +117,25 @@ function "workflowPreset" {
 
 # Base target for common settings
 target "base" {
-  platforms = split(",", BAKE_PLATFORMS)
+  platforms = split(",", BAKE_ARCHITECTURES)
+  labels = {
+    "org.opencontainers.image.version"  = BAKE_SRCML_VERSION
+    "org.opencontainers.image.licenses" = "GPL-3.0-only"
+  }
   pull = true
 }
 
 # Build images for all Linux distributions
 target "default" {
   name = targetName(dist)
-  description = "srcML build environment for ${descriptiveName(dist)}"
+  description = "srcML build environment for ${dist.name}"
+  labels = {
+    "org.opencontainers.image.title" = "srcML ${dist.name} Build Environment"
+    "org.opencontainers.image.description" = <<EOF
+The srcML build environment for ${dist.name}.
+It includes the dependencies for building, packaging, and testing srcML on this platform.
+EOF
+  }
   matrix = {
     dist = distributions
   }
@@ -121,6 +143,7 @@ target "default" {
   args = {
     TAG          = dist.version_id,
     CMAKE_BINARY = try(dist.cmake, "")
+    CMAKE_VERSION = BAKE_CMAKE_VERSION
     JAVA_VERSION = try(dist.java, "")
     OPENSUSE     = try(dist.opensuse, "")
   }
@@ -132,7 +155,7 @@ target "default" {
 function "builderStage" {
   params = [dist]
   result = <<EOF
-FROM "${tagName(dist)}" AS builder
+FROM ${tagName(dist)} AS builder
 WORKDIR /src
 ADD --link ["${BAKE_SRC}", "."]
 RUN cmake --workflow --preset ${workflowPreset(dist)}
@@ -144,14 +167,21 @@ EOF
 # Create image whose only contents are the package
 target "build" {
   name = categoryTarget(dist, "build")
-  description = "srcML build for ${descriptiveName(dist)}"
+  description = "srcML build for ${dist.name}"
+  labels = {
+    "org.opencontainers.image.title" = "srcML ${dist.name} Build"
+    "org.opencontainers.image.description" = <<EOF
+The srcML build and package for ${dist.name}.
+EOF
+    "org.opencontainers.image.source" = BAKE_SRC
+  }
   push = true
   matrix = {
     dist = distributions
   }
   dockerfile-inline = builderStage(dist)
   tags     = [categoryTagName(dist, "build")]
-  output   = ["type=docker"]
+  # output   = ["type=docker"]
   inherits = ["base"]
 }
 
@@ -174,7 +204,13 @@ EOF
 # Create image whose only contents are the package
 target "files" {
   name = categoryTarget(dist, "files")
-  description = "srcML package for ${descriptiveName(dist)}"
+  description = "srcML package for ${dist.name}"
+  labels = {
+    "org.opencontainers.image.title" = "srcML ${dist.name} Package Files"
+    "org.opencontainers.image.description" = <<EOF
+The srcML package files for ${dist.name}.
+EOF
+  }
   matrix = {
     dist = distributions
   }
@@ -189,7 +225,13 @@ EOF
 
 target "image" {
   name = categoryTarget(dist, "image")
-  description = "srcML package image for ${descriptiveName(dist)}"
+  description = "srcML package image for ${dist.name}"
+  labels = {
+    "org.opencontainers.image.title" = "srcML ${dist.name} Package Image"
+    "org.opencontainers.image.description" = <<EOF
+The srcML package image for ${dist.name}.
+EOF
+  }
   matrix = {
     dist = distributions
   }
@@ -198,7 +240,7 @@ ${builderStage(dist)}
 ${installerStage()}
 EOF
   tags     = [categoryTagName(dist, "image")]
-  output   = ["type=docker"]
+  # output   = ["type=registry"]
   inherits = ["base"]
 }
 
@@ -206,12 +248,19 @@ EOF
 # Output to host directory ${BAKE_DESTINATION_DIR}
 target "logs" {
   name = categoryTarget(dist, "logs")
-  description = "srcML package logs for ${descriptiveName(dist)}"
+  description = "srcML package logs for ${dist.name}"
+  labels = {
+    "org.opencontainers.image.title" = "srcML ${dist.name} Test Logs"
+    "org.opencontainers.image.description" = <<EOF
+The srcML test logs for ${dist.name}.
+EOF
+  }
   matrix = {
     dist = distributions
   }
   dockerfile-inline = <<EOF
 ${builderStage(dist)}
+FROM scratch AS dist
 COPY --from=builder /src-build/dist/*.log /
 EOF
   tags      = [categoryTagName(dist, "logs")]
@@ -237,7 +286,7 @@ function "categoryTarget" {
   result = baseTargetName(item.id, appendCategory(item.version_id, category))
 }
 
-# Tag name with a category
+# Target name utility
 function "baseTargetName" {
   params = [id, version_id]
   result = format("%s_%s", id, sanitize(version_id))
@@ -265,10 +314,4 @@ function "baseTagName" {
 function "appendCategory" {
   params = [id, category]
   result = format("%s_%s", id, category)
-}
-
-# Placeholder for creating proper distribution name
-function "makeName" {
-  params = [item]
-  result = ""
 }

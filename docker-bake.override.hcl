@@ -22,35 +22,40 @@
 variable "distributions" {
   # description = "Table of supported Linux distributions (see docker-bake.override.hcl)"
   default = [
-    { id = "ubuntu",   version_id = "25.04",      workflow = "ubuntu", java = "latest", tag = "latest" },
-    { id = "ubuntu",   version_id = "24.10",      workflow = "ubuntu", java = "latest"},
-    { id = "ubuntu",   version_id = "24.04",      workflow = "ubuntu", java = "latest"},
-    { id = "ubuntu",   version_id = "22.04",      workflow = "ubuntu" },
-    { id = "ubuntu",   version_id = "20.04",      workflow = "ubuntu", cmake = "ON", tag = "earliest" },
-    { id = "fedora",   version_id = "43",         workflow = "rpm",    java = "latest", tag = "latest" },
-    { id = "fedora",   version_id = "42",         workflow = "rpm",    java = "latest" },
-    { id = "fedora",   version_id = "41",         workflow = "rpm",    java = "17" },
-    { id = "fedora",   version_id = "40",         workflow = "rpm",    java = "17" },
-    { id = "fedora",   version_id = "39",         workflow = "rpm",    java = "17" },
-    { id = "fedora",   version_id = "38",         workflow = "rpm",    java = "17", tag = "earliest" },
-    { id = "opensuse", version_id = "15.6",       workflow = "rpm",    opensuse="leap", tag = "latest" },
-    { id = "opensuse", version_id = "15.5",       workflow = "rpm",    opensuse="leap" },
-    { id = "opensuse", version_id = "15.4",       workflow = "rpm",    opensuse="leap" },
-    { id = "opensuse", version_id = "15.3",       workflow = "rpm",    opensuse="leap" },
-    { id = "opensuse", version_id = "15.2",       workflow = "rpm",    opensuse="leap" },
-    { id = "opensuse", version_id = "15.1",       workflow = "rpm",    opensuse="leap", tag = "earliest" },
-    { id = "opensuse", version_id = "15",         workflow = "rpm",    opensuse="leap" },
-    { id = "opensuse", version_id = "tumbleweed", workflow = "rpm",    opensuse="tumbleweed", tag = "latest" }
+    { id = "ubuntu",   version_id = "25.04",      name = "Ubuntu 25.04", workflow = "ubuntu", java = "latest", tag = "latest" },
+    { id = "ubuntu",   version_id = "24.10",      name = "Ubuntu 24.10", workflow = "ubuntu", java = "latest"},
+    { id = "ubuntu",   version_id = "24.04",      name = "Ubuntu 24.04", workflow = "ubuntu", java = "latest"},
+    { id = "ubuntu",   version_id = "22.04",      name = "Ubuntu 22.04", workflow = "ubuntu" },
+    { id = "ubuntu",   version_id = "20.04",      name = "Ubuntu 20.04", workflow = "ubuntu", cmake = "ON", tag = "earliest" },
+    { id = "fedora",   version_id = "43",         name = "Fedora 43", workflow = "rpm",    java = "latest", tag = "latest" },
+    { id = "fedora",   version_id = "42",         name = "Fedora 42", workflow = "rpm",    java = "latest" },
+    { id = "fedora",   version_id = "41",         name = "Fedora 41", workflow = "rpm",    java = "17" },
+    { id = "fedora",   version_id = "40",         name = "Fedora 40", workflow = "rpm",    java = "17" },
+    { id = "fedora",   version_id = "39",         name = "Fedora 39", workflow = "rpm",    java = "17" },
+    { id = "fedora",   version_id = "38",         name = "Fedora 38", workflow = "rpm",    java = "17", tag = "earliest" },
+    { id = "opensuse", version_id = "15.6",       name = "OpenSUSE 15.6", workflow = "rpm",    opensuse="leap", tag = "latest" },
+    { id = "opensuse", version_id = "15.5",       name = "OpenSUSE 15.5", workflow = "rpm",    opensuse="leap" },
+    { id = "opensuse", version_id = "15.4",       name = "OpenSUSE 15.4", workflow = "rpm",    opensuse="leap" },
+    { id = "opensuse", version_id = "15.3",       name = "OpenSUSE 15.3", workflow = "rpm",    opensuse="leap" },
+    { id = "opensuse", version_id = "15.2",       name = "OpenSUSE 15.2", workflow = "rpm",    opensuse="leap" },
+    { id = "opensuse", version_id = "15.1",       name = "OpenSUSE 15.1", workflow = "rpm",    opensuse="leap", tag = "earliest" },
+    { id = "opensuse", version_id = "15",         name = "OpenSUSE 15", workflow = "rpm",    opensuse="leap" },
+    { id = "opensuse", version_id = "tumbleweed", name = "OpenSUSE Tumbleweed", workflow = "rpm",    opensuse="tumbleweed", tag = "latest" }
   ]
 }
 
-# General name
-function "descriptiveName" {
-  params = [item]
-  result = format("%s %s%s",
-    lookup({ opensuse = "OpenSUSE", fedora = "Fedora", ubuntu = "Ubuntu" }, item.id, item.id),
-    can(item.opensuse) ? "${title(item.opensuse)} ": "",
-    item.version_id == "tumbleweed" ? "" : item.version_id)
+# Override using the environment variable BAKE_CMAKE_VERSION
+# E.g., BAKE_CMAKE_VERSION="3.31.6"
+variable "BAKE_CMAKE_VERSION" {
+  # description = "CMake version"
+  default = "4.0.0"
+}
+
+# Override using the environment variable BAKE_SRCML_VERSION
+# E.g., BAKE_SRCML_VERSION="1.1.0"
+variable "BAKE_SRCML_VERSION" {
+  # description = "srcML version to embed in image data"
+  default = "1.0.0"
 }
 
 # Ubuntu build images
@@ -120,7 +125,7 @@ group "fedora_logs" { targets = categoryDistributionTarget("fedora", "logs") }
 # Tumbleweed target name: opensuse_tumbleweed Tumbleweed tag: srcml/opensuse:tumbleweed
 group "opensuse_logs" { targets = categoryDistributionTarget("opensuse", "logs") }
 
-# Specfic distribution with category
+# Specific distribution with category
 function "distributionTarget" {
   params = [id]
   result = [ for item in distribution(id) : targetName(item) ]
