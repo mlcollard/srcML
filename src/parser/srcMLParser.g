@@ -724,7 +724,7 @@ tokens {
     SEXEC_PYTHON2;
     SGLOBAL;
     SHASHTAG_COMMENT;
-    SLIST_COMPREHENSION;
+    SCOMPREHENSION;
     SNONLOCAL;
     SPARAMETER_ARGUMENT;
     SPARAMETER_KEYWORD_ARGUMENT;
@@ -1394,10 +1394,10 @@ start_python[] {
         if (lparen_types_py.empty())
             lparen_types_py.emplace_back('*');
 
-        // special markup for a list comprehensions "for" (not a "for" loop)
+        // special markup for a comprehension "for" (not a "for" loop)
         if (LA(1) == FOR && !inMode(MODE_STATEMENT)) {
-            start_list_comprehension_py();
-            list_comprehension_py();
+            start_comprehension_py();
+            comprehension_py();
         }
 
         // special markup for an "if" that appears in a "case" statement
@@ -1484,7 +1484,7 @@ start_python[] {
         }
         control_initialization |
 
-        // range-based "in" only occurs in for-loops and list comprehensions
+        // range-based "in" only occurs in for-loops and comprehensions
         { inTransparentMode(MODE_FOR_CONTROL_PY) }?
         range_in_py |
 
@@ -3192,7 +3192,7 @@ call_check_paren_pair[int& argumenttoken, int depth = 0] { int call_token = LA(1
             throw_exception[true] |
 
             // forbid parentheses (handled recursively) but allow "if"/"else" for Python ternaries,
-            // "lambda" for Python lambdas, and "async"/"for"/"in"/"if" for Python list comprehensions
+            // "lambda" for Python lambdas, and "async"/"for"/"in"/"if" for Python comprehensions
             {
                 call_token == LPAREN
                 && inLanguage(LANGUAGE_PYTHON)
@@ -12220,12 +12220,12 @@ expression_part[CALL_TYPE type = NOCALL, int call_count = 1] {
         { inLanguage(LANGUAGE_PYTHON) && last_consumed != NAME && perform_tuple_check_py() }?
         tuple_py |
 
-        // looking for "if" in a non-list-comprehension expression to start a Python ternary
+        // looking for "if" in a non-comprehension expression to start a Python ternary
         {
             inLanguage(LANGUAGE_PYTHON)
             && inMode(MODE_EXPRESSION)
             && (
-                !inTransparentMode(MODE_LIST_COMPREHENSION_PY)
+                !inTransparentMode(MODE_COMPREHENSION_PY)
                 || lparen_types_py.size() > 1
             )
         }?
@@ -12243,16 +12243,16 @@ expression_part[CALL_TYPE type = NOCALL, int call_count = 1] {
         { inLanguage(LANGUAGE_PYTHON) }?
         set_py |
 
-        // looking for "async" + "for" (in an expression) to start a Python list comprehension
+        // looking for "async" + "for" (in an expression) to start a Python comprehension
         { inLanguage(LANGUAGE_PYTHON) }?
-        start_list_comprehension_py
+        start_comprehension_py
         specifier_py
-        list_comprehension_py |
+        comprehension_py |
 
-        // looking for "for" (in an expression) to start a Python list comprehension
+        // looking for "for" (in an expression) to start a Python comprehension
         { inLanguage(LANGUAGE_PYTHON) }?
-        start_list_comprehension_py
-        list_comprehension_py |
+        start_comprehension_py
+        comprehension_py |
 
         // looking for "lambda" to start a Python lambda
         { inLanguage(LANGUAGE_PYTHON) }?
@@ -16869,12 +16869,12 @@ range_in_py[] { SingleElement element(this); ENTRY_DEBUG } :
 ;
 
 /*
-  list_comprehension_range_py
+  comprehension_range_py
 
-  Handles a Python "in" expression in a list comprehension using the range tag.
-  An "if" expression can appear after the "in" expression (only for list comprehensions).
+  Handles a Python "in" expression in a comprehension using the range tag.
+  An "if" expression can appear after the "in" expression (only for comprehensions).
 */
-list_comprehension_range_py[] { int lparen_types_size = 0; ENTRY_DEBUG } :
+comprehension_range_py[] { int lparen_types_size = 0; ENTRY_DEBUG } :
         {
             startNewMode(MODE_RANGE_IN_PY);
 
@@ -16937,11 +16937,11 @@ list_comprehension_range_py[] { int lparen_types_size = 0; ENTRY_DEBUG } :
 ;
 
 /*
-  list_comprehension_if_py
+  comprehension_if_py
 
-  Handles an "if" in a Python list comprehension differently from other "if" expressions.
+  Handles an "if" in a Python comprehension differently from other "if" expressions.
 */
-list_comprehension_if_py[] { bool multiple_ifs = false; int lparen_types_size = 0; ENTRY_DEBUG } :
+comprehension_if_py[] { bool multiple_ifs = false; int lparen_types_size = 0; ENTRY_DEBUG } :
         {
             lparen_types_size = lparen_types_py.size();  // do not end call RPAREN early
         }
@@ -16954,7 +16954,7 @@ list_comprehension_if_py[] { bool multiple_ifs = false; int lparen_types_size = 
             } |
 
             { getParen() == 0 }?
-            start_list_comprehension_if_py[multiple_ifs]
+            start_comprehension_if_py[multiple_ifs]
             {
                 multiple_ifs = true;
             } |
@@ -16984,20 +16984,20 @@ list_comprehension_if_py[] { bool multiple_ifs = false; int lparen_types_size = 
 ;
 
 /*
-  start_list_comprehension_if_py
+  start_comprehension_if_py
 
-  Starts an "if" in a Python list comprehension.
+  Starts an "if" in a Python comprehension.
   Ends the previous "if" if there are multiple in a row.
 */
-start_list_comprehension_if_py[bool multiple_ifs = false] { ENTRY_DEBUG } :
+start_comprehension_if_py[bool multiple_ifs = false] { ENTRY_DEBUG } :
         {
             // end previous "if" to start a new "if"
             if (multiple_ifs) {
-                endDownToMode(MODE_LIST_COMPREHENSION_IF_PY);
-                endMode(MODE_LIST_COMPREHENSION_IF_PY);
+                endDownToMode(MODE_COMPREHENSION_IF_PY);
+                endMode(MODE_COMPREHENSION_IF_PY);
             }
 
-            startNewMode(MODE_LIST_COMPREHENSION_IF_PY);
+            startNewMode(MODE_COMPREHENSION_IF_PY);
 
             startElement(SIF);
         }
@@ -17391,7 +17391,7 @@ perform_post_specifier_check_py[] returns [int keyword] {
 /*
   specifier_py
 
-  Used to mark "async" as a specifier in Python for-loops and list comprehensions.
+  Used to mark "async" as a specifier in Python for-loops and comprehensions.
 */
 specifier_py[] { ENTRY_DEBUG } :
         {
@@ -17526,11 +17526,11 @@ array_py[] { CompleteElement element(this); ENTRY_DEBUG } :
 ;
 
 /*
-  list_comprehension_py
+  comprehension_py
 
-  Handles Python list comprehensions.
+  Handles Python comprehensions.
 */
-list_comprehension_py[] { ENTRY_DEBUG } :
+comprehension_py[] { ENTRY_DEBUG } :
         FOR
 
         {
@@ -17556,43 +17556,43 @@ list_comprehension_py[] { ENTRY_DEBUG } :
         )*
 
         {
-            // handle "in" portion of a list comprehension
+            // handle "in" portion of a comprehension
             if (LA(1) == PY_IN)
-                list_comprehension_range_py();
+                comprehension_range_py();
 
-            if (inTransparentMode(MODE_LIST_COMPREHENSION_PY))
-                endDownToMode(MODE_LIST_COMPREHENSION_PY);
+            if (inTransparentMode(MODE_COMPREHENSION_PY))
+                endDownToMode(MODE_COMPREHENSION_PY);
 
-            // handle optional "if" portion of a list comprehension
+            // handle optional "if" portion of a comprehension
             if (LA(1) == IF)
-                list_comprehension_if_py();
+                comprehension_if_py();
 
-            if (inTransparentMode(MODE_LIST_COMPREHENSION_PY))
-                endDownToMode(MODE_LIST_COMPREHENSION_PY);
+            if (inTransparentMode(MODE_COMPREHENSION_PY))
+                endDownToMode(MODE_COMPREHENSION_PY);
 
-            if (inMode(MODE_LIST_COMPREHENSION_PY))
-                endMode(MODE_LIST_COMPREHENSION_PY);
+            if (inMode(MODE_COMPREHENSION_PY))
+                endMode(MODE_COMPREHENSION_PY);
 
-            // ensure the list comprehension ends the current argument in a call
+            // ensure the comprehension ends the current argument in a call
             if (inMode(MODE_ARGUMENT) && LA(1) == RPAREN && lparen_types_py.back() == 'c')
                 endMode(MODE_ARGUMENT);
         }
 ;
 
 /*
-  start_list_comprehension_py
+  start_comprehension_py
 
-  Starts a Python list comprehension.  Used in multiple places.
+  Starts a Python comprehension.  Used in multiple places.
 */
-start_list_comprehension_py[] { ENTRY_DEBUG } :
+start_comprehension_py[] { ENTRY_DEBUG } :
         {
-            // end the current expression before starting a list comprehension
-            // unless the list comprehension starts an argument in a call
+            // end the current expression before starting a comprehension
+            // unless the comprehension starts an argument in a call
             if (inMode(MODE_EXPRESSION) && (last_consumed != LPAREN || lparen_types_py.back() != 'c'))
                 endMode(MODE_EXPRESSION);
 
-            startNewMode(MODE_LIST_COMPREHENSION_PY);
-            startElement(SLIST_COMPREHENSION);
+            startNewMode(MODE_COMPREHENSION_PY);
+            startElement(SCOMPREHENSION);
 
             startNewMode(MODE_CONTROL | MODE_EXPECT | MODE_FOR_CONTROL_PY);
             startElement(SFOR_STATEMENT);
@@ -17890,7 +17890,7 @@ tuple_py[] {
             // - last token consumed was LPAREN (e.g., an empty tuple)
             // - next token is COMMA, EQUAL, INDENT, RPAREN, SNOP, or TERMINATE
             // - LPAREN deque has a tuple parenthesis at the back
-            // - next token is a comment or non-alias keyword (e.g., "in" for list comprehensions)
+            // - next token is a comment or non-alias keyword (e.g., "in" for comprehensions)
             {
                 LA(1) == RPAREN
                 && lparen_types_py.back() != 'c'
@@ -17949,7 +17949,7 @@ tuple_py[] {
 perform_tuple_check_py[] returns [bool is_tuple] {
         is_tuple = false;
         bool is_lambda = false;
-        bool is_list_comp = false;
+        bool is_comprehension = false;
         int num_brackets = 0;  // counts all "()", "{}", and "[]"
         int last_consumed_current = last_consumed;
         int start = mark();
@@ -17971,16 +17971,16 @@ perform_tuple_check_py[] returns [bool is_tuple] {
                     if (LA(1) == PY_LAMBDA)
                         is_lambda = true;
 
-                    // do not confuse list comprehension name list (for a, b in c) for a tuple
+                    // do not confuse comprehension name list (for a, b in c) for a tuple
                     if (LA(1) == FOR)
-                        is_list_comp = true;
+                        is_comprehension = true;
 
                     // cannot be a parenthesized tuple if the number of parentheses is 0 or less
                     if (num_brackets < 0)
                         break;
 
                     // the expression contains a comma not in any brackets
-                    if (LA(1) == COMMA && num_brackets == 1 && !is_lambda && !is_list_comp) {
+                    if (LA(1) == COMMA && num_brackets == 1 && !is_lambda && !is_comprehension) {
                         is_tuple = true;
                         break;
                     }
@@ -17992,9 +17992,9 @@ perform_tuple_check_py[] returns [bool is_tuple] {
                     if (is_lambda && LA(1) == PY_COLON)
                         is_lambda = false;
 
-                    // end of list comprehension name(s)
-                    if (is_list_comp && LA(1) == PY_IN)
-                        is_list_comp = false;
+                    // end of comprehension name(s)
+                    if (is_comprehension && LA(1) == PY_IN)
+                        is_comprehension = false;
 
                     consume();
                 }
