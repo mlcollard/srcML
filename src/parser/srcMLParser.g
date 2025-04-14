@@ -3178,6 +3178,7 @@ call_check_paren_pair[int& argumenttoken, int depth = 0] { int call_token = LA(1
             { next_token_check(LCURLY, LPAREN) }?
             lambda_anonymous |
 
+            { !inLanguage(LANGUAGE_PYTHON) }?
             (LBRACKET (~RBRACKET)* RBRACKET (LPAREN | LCURLY)) => lambda_expression_full_cpp |
 
             (block_lambda_expression_full) => block_lambda_expression_full |
@@ -9593,6 +9594,10 @@ call[int call_count = 1] { ENTRY_DEBUG } :
             { inLanguage(LANGUAGE_OBJECTIVE_C) }?
             objective_c_call |
 
+            { inLanguage(LANGUAGE_PYTHON) }?
+            compound_name
+            call_argument_list |
+
             function_identifier
             call_argument_list
         )
@@ -12197,6 +12202,16 @@ expression_part[CALL_TYPE type = NOCALL, int call_count = 1] {
 
         ENTRY_DEBUG
 } :
+        // looking for name to start a Python subscriptable function call (e.g., a[]())
+        {
+            inLanguage(LANGUAGE_PYTHON)
+            && LA(1) == NAME
+            && next_token() == LBRACKET
+            && perform_subscriptable_function_call_check_py()
+        }?
+        call[call_count]
+        argument |
+
         // looking for a Python operator lparen (which indicates the lparen does not start a call or tuple)
         { inLanguage(LANGUAGE_PYTHON) && !perform_tuple_check_py() }?
         operator_parenthesis_complete_py |
@@ -18425,6 +18440,60 @@ perform_python_2_except_check returns [bool is_python_2] {
         last_consumed = last_consumed_current;
 
         ENTRY_DEBUG
+} :;
+
+/*
+  perform_subscriptable_function_call_check_py
+
+  Determines if a subscript is a compound name that is part of a function call (e.g., a[]()).
+*/
+perform_subscriptable_function_call_check_py returns [bool is_call] {
+    is_call = false;
+    int num_square_brackets = 0;
+    int last_consumed_current = last_consumed;
+    int start = mark();
+    inputState->guessing++;
+
+    try {
+        while (true) {
+            if (LA(1) == LBRACKET)
+                ++num_square_brackets;
+
+            if (LA(1) == RBRACKET)
+                --num_square_brackets;
+
+            // something went wrong if the number of square brackets is 0 or less
+            if (num_square_brackets < 0)
+                break;
+
+            // check if RBRACKET follows the end of a subscript
+            if (num_square_brackets == 0 && LA(1) == RBRACKET) {
+                consume();
+
+                if (LA(1) == LPAREN)
+                    is_call = true;
+
+                // allow accessing nested elements (e.g., a[][]())
+                if (LA(1) != LBRACKET)
+                    break;
+                else
+                    ++num_square_brackets;
+            }
+
+            if ((num_square_brackets == 0 && LA(1) == TERMINATE) || LA(1) == 1 /* EOF */)
+                break;
+
+            consume();
+        }
+    }
+    catch (...) {}
+
+    inputState->guessing--;
+    rewind(start);
+
+    last_consumed = last_consumed_current;
+
+    ENTRY_DEBUG
 } :;
 
 /*
