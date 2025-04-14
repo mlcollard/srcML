@@ -83,6 +83,28 @@
 </unit>
 
 <unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>result</name> <operator>=</operator> <call><name>a</name><argument_list>(
+    <argument><expr><name>b</name></expr></argument>,
+    <argument><expr><lambda>lambda <parameter><name>c</name></parameter>: <expr><call><name>d</name><argument_list>(
+        <argument><expr><name>e</name></expr></argument>,
+        <argument><expr><name>f</name></expr></argument>,
+    )</argument_list></call></expr></lambda></expr></argument>,
+    <argument><expr><literal type="number">2</literal> <operator>*</operator> <name>g</name></expr></argument>,
+)</argument_list></call></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>result</name> <operator>=</operator> <call><name>a</name><argument_list>(
+    <argument><expr><name>b</name></expr></argument>,
+    <argument><expr><lambda>lambda <parameter><name>c</name></parameter>: <expr><call><name>d</name><argument_list>(
+        <argument><expr><call><name>sample</name><argument_list>(<argument><expr><literal type="number">1</literal></expr></argument>, <argument><expr><literal type="number">2</literal></expr></argument>)</argument_list></call></expr></argument>,
+        <argument><expr><call><name>sample</name><argument_list>(<argument><expr><literal type="number">3</literal></expr></argument>, <argument><expr><literal type="number">4</literal></expr></argument>)</argument_list></call></expr></argument>,
+    )</argument_list></call></expr></lambda></expr></argument>,
+    <argument><expr><literal type="number">2</literal> <operator>*</operator> <name>g</name></expr></argument>,
+)</argument_list></call></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
 <function>def <name>bar</name><parameter_list>()</parameter_list><block>:<block_content> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="number">1</literal></expr></argument>,
                  <argument><expr><literal type="number">2</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></function>
 </unit>

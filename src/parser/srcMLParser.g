@@ -17605,7 +17605,7 @@ start_list_comprehension_py[] { ENTRY_DEBUG } :
 
   Handles a Python lambda.  Not used directly, but can be called by expression_part.
 */
-lambda_py[] { CompleteElement element(this); ENTRY_DEBUG } :
+lambda_py[] { CompleteElement element(this); int lparen_types_size = 0; ENTRY_DEBUG } :
         {
             startNewMode(MODE_EXCLUDE_NO_PAREN_TUPLES_PY | MODE_LAMBDA_PY);
 
@@ -17646,9 +17646,22 @@ lambda_py[] { CompleteElement element(this); ENTRY_DEBUG } :
         // only one expression is allowed, so enter a special mode
         {
             startNewMode(MODE_LAMBDA_CONTENT_PY);
+
+            lparen_types_size = lparen_types_py.size();
         }
 
         (options { greedy = true; } :
+            // ensure lambdas end correctly if used as an argument in a call
+            { LA(1) == COMMA && lparen_types_size == lparen_types_py.size() }?
+            {
+                while (inMode(MODE_EXPRESSION)) {
+                    endDownToMode(MODE_EXPRESSION);
+                    endMode(MODE_EXPRESSION);
+                }
+
+                break;
+            } |
+
             { inMode(MODE_ARGUMENT) }?
             argument |
 
@@ -17667,20 +17680,7 @@ lambda_py[] { CompleteElement element(this); ENTRY_DEBUG } :
                 if (!inMode(MODE_EXPRESSION))
                     startNewMode(MODE_EXPRESSION | MODE_EXPECT);
             }
-            expression
-            {
-                // ensure lambdas end correctly if used as an argument in a call
-                if (LA(1) == COMMA) {
-                    while (inMode(MODE_EXPRESSION)) {
-                        endDownToMode(MODE_EXPRESSION);
-                        endMode(MODE_EXPRESSION);
-                    }
-
-                    // end the lambda before processing the comma
-                    if (inMode(MODE_LAMBDA_CONTENT_PY))
-                        break;
-                }
-            } |
+            expression |
 
             comma
         )*
