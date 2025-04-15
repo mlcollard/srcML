@@ -98,6 +98,10 @@
 </unit>
 
 <unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>result</name> <operator>=</operator> <tuple>(<expr><name>a</name></expr>, <expr><operator>*</operator><array>[<expr><name>b</name></expr> <comprehension><for>for <control><name>_</name> <range>in <expr><call><name>c</name><argument_list>(<argument><expr><call><name>d</name><argument_list>(<argument><expr><name>e</name></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr></range></control></for></comprehension>]</array></expr>)</tuple></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
 <expr_stmt><expr><name>construct</name> <operator>=</operator> <operator>(</operator><operator>(</operator><tuple>(<expr><call><name>a</name><argument_list>()</argument_list></call></expr>, <expr><call><name>b</name><argument_list>()</argument_list></call></expr>)</tuple><operator>)</operator><operator>)</operator></expr></expr_stmt>
 </unit>
 

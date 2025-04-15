@@ -16905,10 +16905,14 @@ comprehension_range_py[] { int lparen_types_size = 0; ENTRY_DEBUG } :
             { inMode(MODE_ARGUMENT) }?
             argument |
 
-            // do not accidentally consume the tuple-ending RPAREN or operator RPAREN
+            // do not accidentally consume the tuple-ending RPAREN or operator RPAREN;
+            // only applies if the tuple/operator RPAREN is part of the comprehension
             {
                 (
-                    !inTransparentMode(MODE_TUPLE_PY)
+                    (
+                        !inTransparentMode(MODE_TUPLE_PY)
+                        || lparen_types_size != lparen_types_py.size()
+                    )
                     || last_consumed != RPAREN
                     || LA(1) != RPAREN
                     || next_token() == RPAREN
