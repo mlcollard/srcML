@@ -304,6 +304,8 @@ const static srcMLState::MODE_TYPE MODE_ARRAY_JS;
 // Python modes
 const static srcMLState::MODE_TYPE MODE_EXCLUDE_NO_PAREN_TUPLES_PY;
 
+const static srcMLState::MODE_TYPE MODE_TUPLE_OF_NAMES_PY;
+
 const static srcMLState::MODE_TYPE MODE_COMPREHENSION_IF_PY;
 
 const static srcMLState::MODE_TYPE MODE_COMPREHENSION_PY;
