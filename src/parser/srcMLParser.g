@@ -17635,7 +17635,13 @@ lambda_py[] { CompleteElement element(this); int lparen_types_size = 0; ENTRY_DE
 
         (options { greedy = true; } :
             // ensure lambdas end correctly if used as an argument in a call
-            { LA(1) == COMMA && lparen_types_size == lparen_types_py.size() }?
+            {
+                (
+                    LA(1) == COMMA
+                    || (LA(1) == RPAREN && lparen_types_py.back() == 'c')
+                )
+                && lparen_types_size == lparen_types_py.size()
+            }?
             {
                 while (inMode(MODE_EXPRESSION)) {
                     endDownToMode(MODE_EXPRESSION);

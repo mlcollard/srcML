@@ -95,6 +95,17 @@
 </unit>
 
 <unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>sample</name> <operator>=</operator> <array>[
+    <expr><tuple>(
+        <expr><lambda>lambda: <expr><call><name><name>a</name><operator>.</operator><name>example</name></name><argument_list>(
+            <argument><expr><lambda>lambda <parameter><name>_</name></parameter>: <expr><literal type="boolean">True</literal></expr></lambda></expr></argument>
+        )</argument_list></call><operator>.</operator><call><name>b</name><argument_list>(<argument><expr><name>c</name></expr></argument>, <argument><expr><array>[]</array></expr></argument>)</argument_list></call></expr></lambda></expr>,
+        <expr><name>d</name></expr>
+    )</tuple></expr>
+]</array></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
 <assert>assert <condition><expr><operator>(</operator><lambda>lambda <parameter><name>a</name></parameter>: <expr><name>a</name><operator>**</operator><literal type="number">2</literal></expr></lambda><operator>)</operator></expr></condition>, <expr><literal type="string">"Fail Message"</literal></expr></assert>
 </unit>
 
