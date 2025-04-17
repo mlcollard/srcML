@@ -17651,7 +17651,7 @@ lambda_py[] { CompleteElement element(this); int lparen_types_size = 0; ENTRY_DE
             // do not accidentally consume the tuple-ending RPAREN or operator RPAREN
             {
                 (
-                    !inTransparentMode(MODE_TUPLE_PY)
+                    (!inTransparentMode(MODE_TUPLE_PY) || lparen_types_size != lparen_types_py.size())
                     || last_consumed != RPAREN
                     || LA(1) != RPAREN
                     || next_token() == RPAREN
