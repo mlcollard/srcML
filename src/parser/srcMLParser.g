@@ -18431,52 +18431,52 @@ perform_python_2_except_check returns [bool is_python_2] {
   Determines if a subscript is a compound name that is part of a function call (e.g., a[]()).
 */
 perform_subscriptable_function_call_check_py returns [bool is_call] {
-    is_call = false;
-    int num_square_brackets = 0;
-    int last_consumed_current = last_consumed;
-    int start = mark();
-    inputState->guessing++;
+        is_call = false;
+        int num_square_brackets = 0;
+        int last_consumed_current = last_consumed;
+        int start = mark();
+        inputState->guessing++;
 
-    try {
-        while (true) {
-            if (LA(1) == LBRACKET)
-                ++num_square_brackets;
-
-            if (LA(1) == RBRACKET)
-                --num_square_brackets;
-
-            // something went wrong if the number of square brackets is 0 or less
-            if (num_square_brackets < 0)
-                break;
-
-            // check if RBRACKET follows the end of a subscript
-            if (num_square_brackets == 0 && LA(1) == RBRACKET) {
-                consume();
-
-                if (LA(1) == LPAREN)
-                    is_call = true;
-
-                // allow accessing nested elements (e.g., a[][]())
-                if (LA(1) != LBRACKET)
-                    break;
-                else
+        try {
+            while (true) {
+                if (LA(1) == LBRACKET)
                     ++num_square_brackets;
+
+                if (LA(1) == RBRACKET)
+                    --num_square_brackets;
+
+                // something went wrong if the number of square brackets is 0 or less
+                if (num_square_brackets < 0)
+                    break;
+
+                // check if RBRACKET follows the end of a subscript
+                if (num_square_brackets == 0 && LA(1) == RBRACKET) {
+                    consume();
+
+                    if (LA(1) == LPAREN)
+                        is_call = true;
+
+                    // allow accessing nested elements (e.g., a[][]())
+                    if (LA(1) != LBRACKET)
+                        break;
+                    else
+                        ++num_square_brackets;
+                }
+
+                if ((num_square_brackets == 0 && LA(1) == TERMINATE) || LA(1) == 1 /* EOF */)
+                    break;
+
+                consume();
             }
-
-            if ((num_square_brackets == 0 && LA(1) == TERMINATE) || LA(1) == 1 /* EOF */)
-                break;
-
-            consume();
         }
-    }
-    catch (...) {}
+        catch (...) {}
 
-    inputState->guessing--;
-    rewind(start);
+        inputState->guessing--;
+        rewind(start);
 
-    last_consumed = last_consumed_current;
+        last_consumed = last_consumed_current;
 
-    ENTRY_DEBUG
+        ENTRY_DEBUG
 } :;
 
 /*
@@ -18539,7 +18539,7 @@ control_initialization_py[] { ENTRY_DEBUG } :
             { perform_tuple_names_check_py() }?
             tuple_names_py |
 
-            parenthesized_name_py | compound_name | comma
+            parenthesized_name_py | array_names_py | compound_name | comma
         )*
 
         {
@@ -18559,6 +18559,7 @@ control_initialization_py[] { ENTRY_DEBUG } :
 perform_tuple_names_check_py[] returns [bool is_tuple] {
         is_tuple = false;
         int num_parens = 0;
+        int num_square_brackets = 0;
         int last_consumed_current = last_consumed;
         int start = mark();
         inputState->guessing++;
@@ -18575,12 +18576,18 @@ perform_tuple_names_check_py[] returns [bool is_tuple] {
                     if (LA(1) == RPAREN)
                         --num_parens;
 
-                    // something went wrong if the number of parentheses is less than zero
-                    if (num_parens < 0)
+                    if (LA(1) == LBRACKET)
+                        ++num_square_brackets;
+
+                    if (LA(1) == RBRACKET)
+                        --num_square_brackets;
+
+                    // something went wrong if the number of parentheses or square brackets is less than zero
+                    if (num_parens < 0 || num_square_brackets < 0)
                         break;
 
                     // there is a comma in the first set of parentheses
-                    if (LA(1) == COMMA && num_parens == 1) {
+                    if (LA(1) == COMMA && num_parens == 1 && num_square_brackets == 0) {
                         is_tuple = true;
                         break;
                     }
@@ -18643,7 +18650,7 @@ tuple_names_py[] { CompleteElement element(this); ENTRY_DEBUG } :
             { perform_tuple_names_check_py() }?
             tuple_names_py |
 
-            parenthesized_name_py | compound_name | comma
+            parenthesized_name_py | array_names_py | compound_name | comma
         )*
 
         {
@@ -18671,6 +18678,7 @@ tuple_names_py[] { CompleteElement element(this); ENTRY_DEBUG } :
 perform_tuple_names_check_no_paren_py[] returns [bool is_tuple] {
         is_tuple = false;
         int num_parens = 0;
+        int num_square_brackets = 0;
         int last_consumed_current = last_consumed;
         int start = mark();
         inputState->guessing++;
@@ -18683,12 +18691,18 @@ perform_tuple_names_check_no_paren_py[] returns [bool is_tuple] {
                 if (LA(1) == RPAREN)
                     --num_parens;
 
-                // something went wrong if the number of parentheses is less than zero
-                if (num_parens < 0)
+                if (LA(1) == LBRACKET)
+                    ++num_square_brackets;
+
+                if (LA(1) == RBRACKET)
+                    --num_square_brackets;
+
+                // something went wrong if the number of parentheses or square brackets is less than zero
+                if (num_parens < 0 || num_square_brackets < 0)
                     break;
 
-                // there is a comma not in any parentheses
-                if (LA(1) == COMMA && num_parens == 0) {
+                // there is a comma not in any parentheses or square brackets
+                if (LA(1) == COMMA && num_parens == 0 && num_square_brackets == 0) {
                     is_tuple = true;
                     break;
                 }
@@ -18735,7 +18749,7 @@ parenthesized_name_py[] { CompleteElement element(this); int lparen_count = 1; E
             { perform_tuple_names_check_py() }?
             tuple_names_py |
 
-            compound_name
+            array_names_py | compound_name
         )*
 
         {
@@ -18744,5 +18758,40 @@ parenthesized_name_py[] { CompleteElement element(this); int lparen_count = 1; E
                 if (LA(1) == RPAREN)
                     consume();
             }
+        }
+;
+
+/*
+  array_names_py
+
+  Handles Python lists that can only contain names (in for-loops or comprehensions).
+  Not used directly, but can be called by control_initialization_py.
+*/
+array_names_py[] { CompleteElement element(this); ENTRY_DEBUG } :
+        {
+            startNewMode(MODE_LOCAL | MODE_TOP | MODE_LIST | MODE_ARRAY_OF_NAMES_PY);
+
+            startElement(SARRAY);
+        }
+
+        LBRACKET
+
+        (options { greedy = true; } :
+            { perform_tuple_names_check_py() }?
+            tuple_names_py |
+
+            parenthesized_name_py | array_names_py | compound_name | comma
+        )*
+
+        {
+            if (inTransparentMode(MODE_ARRAY_OF_NAMES_PY))
+                endDownToMode(MODE_ARRAY_OF_NAMES_PY);
+        }
+
+        RBRACKET
+
+        {
+            if (inMode(MODE_ARRAY_OF_NAMES_PY))
+                endMode(MODE_ARRAY_OF_NAMES_PY);
         }
 ;

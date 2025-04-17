@@ -115,4 +115,58 @@
 </block_content></block></for>
 </unit>
 
+<unit revision="1.1.0" language="Python">
+<for>for <control><array>[<name>b</name>]</array> <range>in <expr><call><name>enumerate</name><argument_list>(<argument><expr><name>c</name></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
+    <pass>pass</pass>
+</block_content></block></for>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<for>for <control><array>[<name>b</name>, <name>c</name>]</array> <range>in <expr><call><name>enumerate</name><argument_list>(<argument><expr><name>d</name></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
+    <pass>pass</pass>
+</block_content></block></for>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<for>for <control><array>[(<name>b</name>)]</array> <range>in <expr><call><name>enumerate</name><argument_list>(<argument><expr><name>c</name></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
+    <pass>pass</pass>
+</block_content></block></for>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<for>for <control><array>[(<name>b</name>), (<name>c</name>)]</array> <range>in <expr><call><name>enumerate</name><argument_list>(<argument><expr><name>d</name></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
+    <pass>pass</pass>
+</block_content></block></for>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<for>for <control>(<array>[<name>b</name>, <name>c</name>]</array>) <range>in <expr><call><name>enumerate</name><argument_list>(<argument><expr><name>d</name></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
+    <pass>pass</pass>
+</block_content></block></for>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<for>for <control><array>[<tuple>(<name>b</name>, <name>c</name>)</tuple>, <tuple>(<name>d</name>, <name>e</name>)</tuple>]</array> <range>in <expr><call><name>enumerate</name><argument_list>(<argument><expr><name>f</name></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
+    <pass>pass</pass>
+</block_content></block></for>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<for>for <control>(<array>[<tuple>(<name>b</name>, <name>c</name>)</tuple>, <tuple>(<name>d</name>, <name>e</name>)</tuple>]</array>) <range>in <expr><call><name>enumerate</name><argument_list>(<argument><expr><name>f</name></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
+    <pass>pass</pass>
+</block_content></block></for>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<for>for <control><array>[<array>[<name>b</name>, <name>c</name>]</array>, <array>[<name>d</name>, <name>e</name>]</array>]</array> <range>in <expr><call><name>enumerate</name><argument_list>(<argument><expr><name>f</name></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
+    <pass>pass</pass>
+</block_content></block></for>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<for>for <control><tuple>(<array>[<array>[<name>b</name>, <name>c</name>]</array>, <array>[<name>d</name>, <name>e</name>]</array>]</array>, <array>[<array>[<name>f</name>, <name>g</name>]</array>, <array>[<name>h</name>, <name>i</name>]</array>]</array>)</tuple> <range>in <expr><call><name>enumerate</name><argument_list>(<argument><expr><name>j</name></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
+    <pass>pass</pass>
+</block_content></block></for>
+</unit>
+
 </unit>
