@@ -16697,13 +16697,49 @@ name_as_alias_py[] { SingleElement element(this); ENTRY_DEBUG } :
 
   Handles a Python "as" expression on its own.
 */
-alias_py[] { SingleElement element(this); ENTRY_DEBUG } :
+alias_py[] { SingleElement element(this); int lparen_types_size = 0; ENTRY_DEBUG } :
         {
             startElement(SALIAS);
+
+            lparen_types_size = lparen_types_py.size();
         }
 
         PY_ALIAS
-        compound_name
+
+        (options { greedy = true; } :
+            { LA(1) == INDENT }?
+            {
+                break;
+            } |
+
+            // surround the outer non-parenthesized tuple with a tag
+            {
+                (LA(1) != LPAREN && LA(1) != LBRACKET && LA(1) != COMMA)
+                && !inTransparentMode(MODE_TUPLE_OF_NAMES_PY)
+                && !inTransparentMode(MODE_EXCLUDE_NO_PAREN_TUPLES_PY)
+                && perform_tuple_names_check_no_paren_py()
+            }?
+            {
+                startNewMode(MODE_LIST | MODE_TUPLE_OF_NAMES_PY);
+                startElement(STUPLE);
+            } |
+
+            { perform_tuple_names_check_py() }?
+            tuple_names_py |
+
+            parenthesized_name_py | array_names_py | compound_name |
+
+            { lparen_types_size < lparen_types_py.size() }?
+            comma
+        )*
+
+        {
+            // close any non-parenthesized tuples before the alias ends
+            while (inTransparentMode(MODE_TUPLE_OF_NAMES_PY)) {
+                endDownToMode(MODE_TUPLE_OF_NAMES_PY);
+                endMode(MODE_TUPLE_OF_NAMES_PY);
+            }
+        }
 ;
 
 /*
@@ -18602,7 +18638,7 @@ perform_tuple_names_check_py[] returns [bool is_tuple] {
                     if (LA(1) == COMMA && num_parens == 0)
                         break;
 
-                    if (LA(1) == PY_IN || LA(1) == 1 /* EOF */)
+                    if (LA(1) == PY_IN || LA(1) == INDENT || LA(1) == TERMINATE || LA(1) == 1 /* EOF */)
                         break;
 
                     consume();
@@ -18713,7 +18749,7 @@ perform_tuple_names_check_no_paren_py[] returns [bool is_tuple] {
                     break;
                 }
 
-                if (LA(1) == PY_IN || LA(1) == 1 /* EOF */)
+                if (LA(1) == PY_IN || LA(1) == INDENT || LA(1) == TERMINATE || LA(1) == 1 /* EOF */)
                     break;
 
                 consume();
