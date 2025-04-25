@@ -13148,7 +13148,10 @@ argument[] { ENTRY_DEBUG } :
                 )
                 && LA(1) == RPAREN
                 && lparen_types_py.back() == 'c'
-                && lparen_types_py.size() > 2  // '*' + at least two LPAREN
+                && (
+                    lparen_types_py.size() > 2  // '*' + at least two LPAREN
+                    || next_token() == TERMINATE  // '*' + one LPAREN
+                )
             )
                 rparen();
         }
@@ -18142,7 +18145,7 @@ perform_tuple_check_no_paren_py[] returns [bool is_tuple] {
 
   Handles Python ternaries.  Used in multiple places.
 */
-ternary_py[bool is_nested = false] { CompleteElement element(this); ENTRY_DEBUG } :
+ternary_py[bool is_nested = false] { CompleteElement element(this); int lparen_types_size = 0; ENTRY_DEBUG } :
         {
             startNewMode(MODE_TERNARY);
             startElement(STERNARY);
@@ -18197,26 +18200,32 @@ ternary_py[bool is_nested = false] { CompleteElement element(this); ENTRY_DEBUG 
         // only one expression is allowed, so enter a special mode
         {
             startNewMode(MODE_TERNARY_CONTENT_PY);
+
+            lparen_types_size = lparen_types_py.size();
         }
 
         (options { greedy = true; } :
             // else clause ends if:
-            // - at RPAREN in mode where it ends at internal parentheses (nested ternary)
-            // - at RPAREN in a tuple
-            // - at RPAREN and the next token is IF (special case)
-            // - at RPAREN and the current mode has no parentheses
+            // - at RPAREN where next token is not a PERIOD (or the ternary is in operator parentheses) and...
+            //     - in mode where it ends at internal parentheses (nested ternary) or...
+            //     - in a tuple or...
+            //     - the next token is IF (special case) or...
+            //     - the current mode has no new parentheses
             // - last consumed token was COMMA in a tuple
+            // - ternary must end before the start of a FOR comprehension ("top-level")
             {
                 (
                     LA(1) == RPAREN
+                    && (next_token() != PERIOD || lparen_types_py.back() == 'o')
                     && (
                         inTransparentMode(MODE_INTERNAL_END_PAREN)
                         || inTransparentMode(MODE_TUPLE_PY)
                         || next_token() == IF
-                        || getParen() == 0
+                        || lparen_types_size == lparen_types_py.size()
                     )
                 )
                 || (last_consumed == COMMA && inTransparentMode(MODE_TUPLE_PY))
+                || (LA(1) == FOR && lparen_types_size == lparen_types_py.size())
             }?
             {
                 break;
