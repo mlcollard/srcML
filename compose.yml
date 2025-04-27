@@ -61,10 +61,18 @@ services:
       - WORKFLOW=ubuntu
     <<: *CONFIGURATION
 
+  fedora_43:
+    image: srcml/fedora:43
+    platform: ${PLATFORM}
+    profiles: [fedora, package, latest]
+    environment:
+      - WORKFLOW=rpm
+    <<: *CONFIGURATION
+
   fedora_42:
     image: srcml/fedora:42
     platform: ${PLATFORM}
-    profiles: [fedora, package, latest]
+    profiles: [fedora, package]
     environment:
       - WORKFLOW=rpm
     <<: *CONFIGURATION
