@@ -11,6 +11,7 @@ x-configuration: &CONFIGURATION
     - dist:/Builds
   working_dir: /srcML
   command: bash -c "${COMPOSE_COMMAND-cmake --workflow --preset ci-$$WORKFLOW}"
+  pull_policy: always
 
 x-utilities: &UTILITIES
   image: srcml/utility
