@@ -18,6 +18,11 @@ foreach(LIB_TEST IN ITEMS ${LIB_TESTS})
     target_link_libraries(${TEST_NAME} PRIVATE srcML::LibsrcML)
     set_target_properties(${TEST_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+    # Due to large amounts of string literals, some of the tests take a long time to compile
+    # with any sort of optimization. Turn the optimization off for tests.
+    set(SRCML_LIBSRCML_TEST_COMPILE_OPTIONS -O0 -g0 -fno-inline -fno-inline-functions -fno-exceptions -fno-rtti)
+    target_compile_options(${TEST_NAME} PRIVATE ${SRCML_LIBSRCML_TEST_COMPILE_OPTIONS})
+
     # Add the test
     set(TEST_DIR ${CMAKE_BINARY_DIR}/bin/tmp/${TEST_NAME})
     add_test(NAME libsrcml.${TEST_NAME} COMMAND $<TARGET_FILE:${TEST_NAME}>
