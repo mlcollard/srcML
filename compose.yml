@@ -25,7 +25,7 @@ x-utilities: &UTILITIES
 
 services:
 
-  ubuntu_24.04:
+  ubuntu_24_04:
     image: srcml/ubuntu:24.04
     platform: ${PLATFORM}
     profiles: [ubuntu, package, latest]
@@ -38,7 +38,7 @@ services:
       - WORKFLOW=ubuntu
     <<: *CONFIGURATION
 
-  ubuntu_23.10:
+  ubuntu_23_10:
     image: srcml/ubuntu:23.10
     platform: ${PLATFORM}
     profiles: [ubuntu, package]
@@ -51,7 +51,7 @@ services:
       - WORKFLOW=ubuntu
     <<: *CONFIGURATION
 
-  ubuntu_22.04:
+  ubuntu_22_04:
     image: srcml/ubuntu:22.04
     platform: ${PLATFORM}
     profiles: [ubuntu, package]
@@ -64,7 +64,7 @@ services:
       - WORKFLOW=ubuntu
     <<: *CONFIGURATION
 
-  ubuntu_20.04:
+  ubuntu_20_04:
     image: srcml/ubuntu:20.04
     platform: ${PLATFORM}
     profiles: [ubuntu, package, oldest]
@@ -144,7 +144,7 @@ services:
       - WORKFLOW=rpm
     <<: *CONFIGURATION
 
-  opensuse_15.5:
+  opensuse_15_5:
     image: srcml/opensuse:15.5
     platform: ${PLATFORM}
     profiles: [opensuse, package, latest]
@@ -158,7 +158,7 @@ services:
       - WORKFLOW=rpm
     <<: *CONFIGURATION
 
-  opensuse_15.4:
+  opensuse_15_4:
     image: srcml/opensuse:15.4
     platform: ${PLATFORM}
     profiles: [opensuse, package]
@@ -172,7 +172,7 @@ services:
       - WORKFLOW=rpm
     <<: *CONFIGURATION
 
-  opensuse_15.3:
+  opensuse_15_3:
     image: srcml/opensuse:15.3
     platform: ${PLATFORM}
     profiles: [opensuse, package]
@@ -186,7 +186,7 @@ services:
       - WORKFLOW=rpm
     <<: *CONFIGURATION
 
-  opensuse_15.2:
+  opensuse_15_2:
     image: srcml/opensuse:15.2
     platform: ${PLATFORM}
     profiles: [opensuse, package, oldest]
