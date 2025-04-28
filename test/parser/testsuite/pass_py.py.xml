@@ -28,7 +28,7 @@
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<with>with <expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">"test.txt"</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call> <alias>as <name>file</name></alias></expr><block>:<block_content>
+<with>with <expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">"test.txt"</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call></expr> <alias>as <name>file</name></alias><block>:<block_content>
     <pass>pass</pass>
 </block_content></block></with>
 </unit>

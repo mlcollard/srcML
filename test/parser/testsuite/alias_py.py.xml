@@ -2,23 +2,23 @@
 <unit xmlns="http://www.srcML.org/srcML/src" language="Python" url="alias">
 
 <unit revision="1.1.0" language="Python">
-<import>import <name><name>random</name> <alias>as <name>rnd</name></alias></name></import>
+<import>import <name>random</name> <alias>as <name>rnd</name></alias></import>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<import>import <name><name>os</name> <alias>as <name>OS</name></alias></name>, <name><name>threading</name> <alias>as <name>thrd</name></alias></name></import>
+<import>import <name>os</name> <alias>as <name>OS</name></alias>, <name>threading</name> <alias>as <name>thrd</name></alias></import>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<import><from>from <name>sys</name></from> import <name><name>audit</name> <alias>as <name>ad</name></alias></name></import>
+<import><from>from <name>sys</name></from> import <name>audit</name> <alias>as <name>ad</name></alias></import>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<import><from>from <name>math</name></from> import <name><name>pi</name> <alias>as <name>PI</name></alias></name>, <name><name>sin</name> <alias>as <name>sine</name></alias></name></import>
+<import><from>from <name>math</name></from> import <name>pi</name> <alias>as <name>PI</name></alias>, <name>sin</name> <alias>as <name>sine</name></alias></import>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<with>with <expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">"text.txt"</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call> <alias>as <name>file</name></alias></expr><block>:<block_content>
+<with>with <expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">"text.txt"</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call></expr> <alias>as <name>file</name></alias><block>:<block_content>
     <expr_stmt><expr><call><name><name>file</name><operator>.</operator><name>write</name></name><argument_list>(<argument><expr><literal type="string">"Hello World"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
 </block_content></block></with>
 </unit>

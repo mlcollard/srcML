@@ -1374,7 +1374,7 @@ start_python[] {
             temp_array[PY_EXCEPT]   = { SCATCH_BLOCK, 0, MODE_STATEMENT | MODE_NEST | MODE_EXCEPT_PY, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
             temp_array[PY_FUNCTION] = { SFUNCTION_STATEMENT, 0, MODE_STATEMENT | MODE_NEST, MODE_PARAMETER_LIST_PY | MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, nullptr };
             temp_array[PY_GLOBAL]   = { SGLOBAL, 0, MODE_STATEMENT, MODE_VARIABLE_NAME | MODE_LIST, nullptr, nullptr };
-            temp_array[PY_IMPORT]   = { SIMPORT_STATEMENT, 0, MODE_STATEMENT, MODE_VARIABLE_NAME | MODE_LIST, nullptr, nullptr };
+            temp_array[PY_IMPORT]   = { SIMPORT_STATEMENT, 0, MODE_STATEMENT | MODE_EXCLUDE_NO_PAREN_TUPLES_PY, MODE_VARIABLE_NAME | MODE_LIST, nullptr, nullptr };
             temp_array[PY_MATCH]    = { SSWITCH, 0, MODE_STATEMENT | MODE_NEST, MODE_CONDITION | MODE_EXPECT, nullptr, nullptr };
             temp_array[PY_NONLOCAL] = { SNONLOCAL, 0, MODE_STATEMENT, MODE_VARIABLE_NAME | MODE_LIST, nullptr, nullptr };
             temp_array[PY_PASS]     = { SPASS, 0, MODE_STATEMENT, 0, nullptr, nullptr };
@@ -1495,10 +1495,6 @@ start_python[] {
         // looking for an expression to mark as a condition
         { inMode(MODE_CONDITION | MODE_EXPECT) }?
         condition_py |
-
-        // looking for a name followed by "as"
-        { next_token() == PY_ALIAS }?
-        name_as_alias_py |
 
         // looking for "=" in a type statement
         { inTransparentMode(MODE_TYPEDEF) }?
@@ -16655,53 +16651,18 @@ condition_py[] { ENTRY_DEBUG } :
 ;
 
 /*
-  name_as_alias_py
-
-  Handles a Python name followed by an "as" expression.
-  Wraps everything in an extra name tag.
-*/
-name_as_alias_py[] { SingleElement element(this); ENTRY_DEBUG } :
-        {
-            // possible if called after "except"/"except*" via the table
-            if (inMode(MODE_EXPRESSION))
-                startElement(SEXPRESSION);
-
-            startNewMode(MODE_VARIABLE_NAME);
-
-            // start outer name
-            startElement(SNAME);
-
-            startNewMode(MODE_VARIABLE_NAME);
-
-            // start inner name
-            startElement(SCNAME);
-        }
-
-        NAME
-
-        {
-            // end inner name
-            endMode(MODE_VARIABLE_NAME);
-
-            startElement(SALIAS);
-        }
-
-        PY_ALIAS
-        compound_name
-
-        {
-            // end outer name
-            endMode(MODE_VARIABLE_NAME);
-        }
-;
-
-/*
   alias_py
 
   Handles a Python "as" expression on its own.
 */
 alias_py[] { SingleElement element(this); int lparen_types_size = 0; ENTRY_DEBUG } :
         {
+            // end the current expression before starting the alias
+            if (inTransparentMode(MODE_EXPRESSION)) {
+                endDownToMode(MODE_EXPRESSION);
+                endMode(MODE_EXPRESSION);
+            }
+
             startElement(SALIAS);
 
             lparen_types_size = lparen_types_py.size();
@@ -16727,7 +16688,7 @@ alias_py[] { SingleElement element(this); int lparen_types_size = 0; ENTRY_DEBUG
                 startElement(STUPLE);
             } |
 
-            { perform_tuple_names_check_py() }?
+            { !inTransparentMode(MODE_EXCLUDE_NO_PAREN_TUPLES_PY) && perform_tuple_names_check_py() }?
             tuple_names_py |
 
             parenthesized_name_py | array_names_py | compound_name |
@@ -16753,7 +16714,7 @@ alias_py[] { SingleElement element(this); int lparen_types_size = 0; ENTRY_DEBUG
 */
 from_import_py[] { ENTRY_DEBUG } :
         {
-            startNewMode(MODE_STATEMENT);
+            startNewMode(MODE_STATEMENT | MODE_EXCLUDE_NO_PAREN_TUPLES_PY);
             startElement(SIMPORT_STATEMENT);
 
             startNewMode(MODE_FROM_PY);
@@ -16850,14 +16811,11 @@ perform_from_import_check[] returns [bool isimport] {
         inputState->guessing++;
 
         try {
-            int token = LA(1);
-
             while (true) {
-                consume();
-                token = LA(1);
-
-                if (token == PY_IMPORT || token == TERMINATE || token == 1 /* EOF */)
+                if (LA(1) == PY_IMPORT || LA(1) == TERMINATE || LA(1) == 1 /* EOF */)
                     break;
+
+                consume();
             }
 
             if (LA(1) == PY_IMPORT)
