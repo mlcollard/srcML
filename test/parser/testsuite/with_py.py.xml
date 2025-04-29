@@ -8,7 +8,7 @@
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<with>with <expr><tuple><expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test1.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call></expr>, <expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test2.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call></expr></tuple></expr><block>:<block_content>
+<with>with <expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test1.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call></expr>, <expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test2.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call></expr><block>:<block_content>
     <pass>pass</pass>
 </block_content></block></with>
 </unit>
@@ -20,20 +20,20 @@
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<with>with <expr><tuple><expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test1.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call></expr> <alias>as <name>file1</name></alias>, <expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test2.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call></expr> <alias>as <name>file2</name></alias></tuple></expr><block>:<block_content>
+<with>with <expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test1.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call></expr> <alias>as <name>file1</name></alias>, <expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test2.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call></expr> <alias>as <name>file2</name></alias><block>:<block_content>
     <expr_stmt><expr><call><name><name>file1</name><operator>.</operator><name>write</name></name><argument_list>(<argument><expr><literal type="string">"Hello"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
     <expr_stmt><expr><call><name><name>file2</name><operator>.</operator><name>write</name></name><argument_list>(<argument><expr><literal type="string">"World"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
 </block_content></block></with>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<with>with <expr><tuple><expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test1.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call></expr> <alias>as <name>file1</name></alias>, <expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test2.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call></expr></tuple></expr><block>:<block_content>
+<with>with <expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test1.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call></expr> <alias>as <name>file1</name></alias>, <expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test2.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call></expr><block>:<block_content>
     <expr_stmt><expr><call><name><name>file1</name><operator>.</operator><name>write</name></name><argument_list>(<argument><expr><literal type="string">"Hello"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
 </block_content></block></with>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<with>with <expr><tuple><expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test1.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call></expr>, <expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test2.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call></expr> <alias>as <name>file2</name></alias></tuple></expr><block>:<block_content>
+<with>with <expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test1.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call></expr>, <expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test2.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call></expr> <alias>as <name>file2</name></alias><block>:<block_content>
     <expr_stmt><expr><call><name><name>file2</name><operator>.</operator><name>write</name></name><argument_list>(<argument><expr><literal type="string">"World"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
 </block_content></block></with>
 </unit>
@@ -57,7 +57,7 @@
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<with>with <expr><tuple>(<expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test1.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call></expr> <alias>as <name>file1</name></alias>, <expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test2.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call></expr> <alias>as <name>file2</name></alias></expr>)</tuple><block>:<block_content>
+<with>with <expr><tuple>(<expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test1.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call></expr> <alias>as <name>file1</name></alias>, <expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test2.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call></expr> <alias>as <name>file2</name></alias>)</tuple></expr><block>:<block_content>
     <expr_stmt><expr><call><name><name>file1</name><operator>.</operator><name>write</name></name><argument_list>(<argument><expr><literal type="string">"Hello"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
     <expr_stmt><expr><call><name><name>file2</name><operator>.</operator><name>write</name></name><argument_list>(<argument><expr><literal type="string">"World"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
 </block_content></block></with>
@@ -116,19 +116,19 @@
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<with>with <expr><tuple><expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test1.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call></expr> <alias>as <name>file1</name></alias>, <expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test2.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call></expr> <alias>as <name>file2</name></alias></tuple></expr><block>:<block_content>
+<with>with <expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test1.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call></expr> <alias>as <name>file1</name></alias>, <expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test2.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call></expr> <alias>as <name>file2</name></alias><block>:<block_content>
     <pass>pass</pass>
 </block_content></block></with>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<with>with <expr><tuple><expr><call><name><name>joblib</name><operator>.</operator><name>parallel_backend</name></name><argument_list>(<argument><expr><literal type="string">"testing"</literal></expr></argument>)</argument_list></call></expr> <alias>as <tuple>(<name>a</name>, <name>b</name>)</tuple></alias>, <expr><call><name><name>joblib</name><operator>.</operator><name>parallel_backend</name></name><argument_list>(<argument><expr><literal type="string">"testing"</literal></expr></argument>)</argument_list></call></expr> <alias>as <tuple>(<name>c</name>, <name>d</name>)</tuple></alias></tuple></expr><block>:<block_content>
+<with>with <expr><call><name><name>joblib</name><operator>.</operator><name>parallel_backend</name></name><argument_list>(<argument><expr><literal type="string">"testing"</literal></expr></argument>)</argument_list></call></expr> <alias>as <tuple>(<name>a</name>, <name>b</name>)</tuple></alias>, <expr><call><name><name>joblib</name><operator>.</operator><name>parallel_backend</name></name><argument_list>(<argument><expr><literal type="string">"testing"</literal></expr></argument>)</argument_list></call></expr> <alias>as <tuple>(<name>c</name>, <name>d</name>)</tuple></alias><block>:<block_content>
     <pass>pass</pass>
 </block_content></block></with>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<with>with <expr><tuple><expr><call><name><name>joblib</name><operator>.</operator><name>parallel_backend</name></name><argument_list>(<argument><expr><literal type="string">"testing"</literal></expr></argument>)</argument_list></call></expr> <alias>as <array>[<name>a</name>, <name>b</name>]</array></alias>, <expr><call><name><name>joblib</name><operator>.</operator><name>parallel_backend</name></name><argument_list>(<argument><expr><literal type="string">"testing"</literal></expr></argument>)</argument_list></call></expr> <alias>as <array>[<name>c</name>, <name>d</name>]</array></alias></tuple></expr><block>:<block_content>
+<with>with <expr><call><name><name>joblib</name><operator>.</operator><name>parallel_backend</name></name><argument_list>(<argument><expr><literal type="string">"testing"</literal></expr></argument>)</argument_list></call></expr> <alias>as <array>[<name>a</name>, <name>b</name>]</array></alias>, <expr><call><name><name>joblib</name><operator>.</operator><name>parallel_backend</name></name><argument_list>(<argument><expr><literal type="string">"testing"</literal></expr></argument>)</argument_list></call></expr> <alias>as <array>[<name>c</name>, <name>d</name>]</array></alias><block>:<block_content>
     <pass>pass</pass>
 </block_content></block></with>
 </unit>
@@ -146,19 +146,103 @@
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<with><specifier>async</specifier> with <expr><tuple><expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test1.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call></expr> <alias>as <name>file1</name></alias>, <expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test2.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call></expr> <alias>as <name>file2</name></alias></tuple></expr><block>:<block_content>
+<with><specifier>async</specifier> with <expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test1.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call></expr> <alias>as <name>file1</name></alias>, <expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test2.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call></expr> <alias>as <name>file2</name></alias><block>:<block_content>
     <pass>pass</pass>
 </block_content></block></with>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<with><specifier>async</specifier> with <expr><tuple><expr><call><name><name>joblib</name><operator>.</operator><name>parallel_backend</name></name><argument_list>(<argument><expr><literal type="string">"testing"</literal></expr></argument>)</argument_list></call></expr> <alias>as <tuple>(<name>a</name>, <name>b</name>)</tuple></alias>, <expr><call><name><name>joblib</name><operator>.</operator><name>parallel_backend</name></name><argument_list>(<argument><expr><literal type="string">"testing"</literal></expr></argument>)</argument_list></call></expr> <alias>as <tuple>(<name>c</name>, <name>d</name>)</tuple></alias></tuple></expr><block>:<block_content>
+<with><specifier>async</specifier> with <expr><call><name><name>joblib</name><operator>.</operator><name>parallel_backend</name></name><argument_list>(<argument><expr><literal type="string">"testing"</literal></expr></argument>)</argument_list></call></expr> <alias>as <tuple>(<name>a</name>, <name>b</name>)</tuple></alias>, <expr><call><name><name>joblib</name><operator>.</operator><name>parallel_backend</name></name><argument_list>(<argument><expr><literal type="string">"testing"</literal></expr></argument>)</argument_list></call></expr> <alias>as <tuple>(<name>c</name>, <name>d</name>)</tuple></alias><block>:<block_content>
     <pass>pass</pass>
 </block_content></block></with>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<with><specifier>async</specifier> with <expr><tuple><expr><call><name><name>joblib</name><operator>.</operator><name>parallel_backend</name></name><argument_list>(<argument><expr><literal type="string">"testing"</literal></expr></argument>)</argument_list></call></expr> <alias>as <array>[<name>a</name>, <name>b</name>]</array></alias>, <expr><call><name><name>joblib</name><operator>.</operator><name>parallel_backend</name></name><argument_list>(<argument><expr><literal type="string">"testing"</literal></expr></argument>)</argument_list></call></expr> <alias>as <array>[<name>c</name>, <name>d</name>]</array></alias></tuple></expr><block>:<block_content>
+<with><specifier>async</specifier> with <expr><call><name><name>joblib</name><operator>.</operator><name>parallel_backend</name></name><argument_list>(<argument><expr><literal type="string">"testing"</literal></expr></argument>)</argument_list></call></expr> <alias>as <array>[<name>a</name>, <name>b</name>]</array></alias>, <expr><call><name><name>joblib</name><operator>.</operator><name>parallel_backend</name></name><argument_list>(<argument><expr><literal type="string">"testing"</literal></expr></argument>)</argument_list></call></expr> <alias>as <array>[<name>c</name>, <name>d</name>]</array></alias><block>:<block_content>
+    <pass>pass</pass>
+</block_content></block></with>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<with>with <expr><name><name>f</name><operator>.</operator><name>g</name><operator>.</operator><name>h</name></name></expr> <alias>as <tuple>(<name><name>a</name><operator>.</operator><name>a1</name></name>, <name><name>b</name><operator>.</operator><name>b1</name></name>)</tuple></alias><block>:<block_content>
+    <pass>pass</pass>
+</block_content></block></with>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<with>with <expr><name><name>f</name><operator>.</operator><name>g</name><operator>.</operator><name>h</name></name></expr> <alias>as <array>[<name><name>a</name><operator>.</operator><name>a1</name></name>, <name><name>b</name><operator>.</operator><name>b1</name></name>]</array></alias><block>:<block_content>
+    <pass>pass</pass>
+</block_content></block></with>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<with>with <expr><name><name>f</name><operator>.</operator><name>g</name><operator>.</operator><name>h</name></name></expr> <alias>as <name><name>a</name><operator>.</operator><name>a1</name></name></alias>, <expr><name><name>f</name><operator>.</operator><name>i</name><operator>.</operator><name>j</name></name></expr> <alias>as <name><name>b</name><operator>.</operator><name>b1</name></name></alias><block>:<block_content>
+    <pass>pass</pass>
+</block_content></block></with>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<with>with <expr><name><name>f</name><operator>.</operator><name>g</name><operator>.</operator><name>h</name></name></expr> <alias>as <tuple>(<name><name>a</name><operator>.</operator><name>a1</name></name>, <name><name>b</name><operator>.</operator><name>b1</name></name>)</tuple></alias>, <expr><name><name>f</name><operator>.</operator><name>i</name><operator>.</operator><name>j</name></name></expr> <alias>as <tuple>(<name><name>c</name><operator>.</operator><name>c1</name></name>, <name><name>d</name><operator>.</operator><name>d1</name></name>)</tuple></alias><block>:<block_content>
+    <pass>pass</pass>
+</block_content></block></with>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<with>with <expr><name><name>f</name><operator>.</operator><name>g</name><operator>.</operator><name>h</name></name></expr> <alias>as <array>[<name><name>a</name><operator>.</operator><name>a1</name></name>, <name><name>b</name><operator>.</operator><name>b1</name></name>]</array></alias>, <expr><name><name>f</name><operator>.</operator><name>i</name><operator>.</operator><name>j</name></name></expr> <alias>as <array>[<name><name>c</name><operator>.</operator><name>c1</name></name>, <name><name>d</name><operator>.</operator><name>d1</name></name>]</array></alias><block>:<block_content>
+    <pass>pass</pass>
+</block_content></block></with>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<with><specifier>async</specifier> with <expr><name><name>f</name><operator>.</operator><name>g</name><operator>.</operator><name>h</name></name></expr> <alias>as <tuple>(<name><name>a</name><operator>.</operator><name>a1</name></name>, <name><name>b</name><operator>.</operator><name>b1</name></name>)</tuple></alias><block>:<block_content>
+    <pass>pass</pass>
+</block_content></block></with>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<with><specifier>async</specifier> with <expr><name><name>f</name><operator>.</operator><name>g</name><operator>.</operator><name>h</name></name></expr> <alias>as <array>[<name><name>a</name><operator>.</operator><name>a1</name></name>, <name><name>b</name><operator>.</operator><name>b1</name></name>]</array></alias><block>:<block_content>
+    <pass>pass</pass>
+</block_content></block></with>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<with><specifier>async</specifier> with <expr><name><name>f</name><operator>.</operator><name>g</name><operator>.</operator><name>h</name></name></expr> <alias>as <name><name>a</name><operator>.</operator><name>a1</name></name></alias>, <expr><name><name>f</name><operator>.</operator><name>i</name><operator>.</operator><name>j</name></name></expr> <alias>as <name><name>b</name><operator>.</operator><name>b1</name></name></alias><block>:<block_content>
+    <pass>pass</pass>
+</block_content></block></with>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<with><specifier>async</specifier> with <expr><name><name>f</name><operator>.</operator><name>g</name><operator>.</operator><name>h</name></name></expr> <alias>as <tuple>(<name><name>a</name><operator>.</operator><name>a1</name></name>, <name><name>b</name><operator>.</operator><name>b1</name></name>)</tuple></alias>, <expr><name><name>f</name><operator>.</operator><name>i</name><operator>.</operator><name>j</name></name></expr> <alias>as <tuple>(<name><name>c</name><operator>.</operator><name>c1</name></name>, <name><name>d</name><operator>.</operator><name>d1</name></name>)</tuple></alias><block>:<block_content>
+    <pass>pass</pass>
+</block_content></block></with>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<with><specifier>async</specifier> with <expr><name><name>f</name><operator>.</operator><name>g</name><operator>.</operator><name>h</name></name></expr> <alias>as <array>[<name><name>a</name><operator>.</operator><name>a1</name></name>, <name><name>b</name><operator>.</operator><name>b1</name></name>]</array></alias>, <expr><name><name>f</name><operator>.</operator><name>i</name><operator>.</operator><name>j</name></name></expr> <alias>as <array>[<name><name>c</name><operator>.</operator><name>c1</name></name>, <name><name>d</name><operator>.</operator><name>d1</name></name>]</array></alias><block>:<block_content>
+    <pass>pass</pass>
+</block_content></block></with>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<with>with <expr><name>example</name></expr><block>:<block_content>
+    <expr_stmt><expr><tuple><expr><name>a</name></expr>, <expr><name>b</name></expr></tuple> <operator>=</operator> <tuple><expr><literal type="number">1</literal></expr>, <expr><literal type="number">2</literal></expr></tuple></expr></expr_stmt>
+</block_content></block></with>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<with>with <expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call></expr> <alias>as (<name>a</name>)</alias><block>:<block_content>
+    <pass>pass</pass>
+</block_content></block></with>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<with><specifier>async</specifier> with <expr><name>example</name></expr><block>:<block_content>
+    <expr_stmt><expr><tuple><expr><name>a</name></expr>, <expr><name>b</name></expr></tuple> <operator>=</operator> <tuple><expr><literal type="number">1</literal></expr>, <expr><literal type="number">2</literal></expr></tuple></expr></expr_stmt>
+</block_content></block></with>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<with><specifier>async</specifier> with <expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call></expr> <alias>as (<name>a</name>)</alias><block>:<block_content>
     <pass>pass</pass>
 </block_content></block></with>
 </unit>

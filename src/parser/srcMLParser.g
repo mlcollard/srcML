@@ -1380,7 +1380,7 @@ start_python[] {
             temp_array[PY_PASS]     = { SPASS, 0, MODE_STATEMENT, 0, nullptr, nullptr };
             temp_array[PY_RAISE]    = { STHROW_STATEMENT, 0, MODE_STATEMENT | MODE_RAISE_PY, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
             temp_array[PY_TYPE]     = { STYPEDEF, 0, MODE_STATEMENT | MODE_TYPEDEF, MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, nullptr };
-            temp_array[PY_WITH]     = { SWITH_STATEMENT, 0, MODE_STATEMENT | MODE_NEST | MODE_WITH_PY, MODE_EXPRESSION | MODE_EXPECT | MODE_LIST, nullptr, nullptr };
+            temp_array[PY_WITH]     = { SWITH_STATEMENT, 0, MODE_STATEMENT | MODE_NEST | MODE_WITH_PY, MODE_EXPRESSION | MODE_EXPECT | MODE_LIST | MODE_EXCLUDE_NO_PAREN_TUPLES_PY | MODE_WITH_EXPRESSION_PY, nullptr, nullptr };
             temp_array[PY_YIELD]    = { SYIELD_STATEMENT, 0, MODE_STATEMENT, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
 
             /* DUPLEX KEYWORDS */
@@ -16490,9 +16490,9 @@ offside_indent[bool content = true] { ENTRY_DEBUG } :
             }
 
             // ensure the expression following a Python "with" ends before the block begins
-            if (inLanguage(LANGUAGE_PYTHON) && inTransparentMode(MODE_WITH_PY) && inMode(MODE_EXPRESSION)) {
-                endDownToMode(MODE_EXPRESSION);
-                endMode(MODE_EXPRESSION);
+            if (inLanguage(LANGUAGE_PYTHON) && inTransparentMode(MODE_WITH_EXPRESSION_PY)) {
+                endDownToMode(MODE_WITH_EXPRESSION_PY);
+                endMode(MODE_WITH_EXPRESSION_PY);
             }
 
             startNewMode(MODE_BLOCK);
@@ -16688,7 +16688,7 @@ alias_py[] { SingleElement element(this); int lparen_types_size = 0; ENTRY_DEBUG
                 startElement(STUPLE);
             } |
 
-            { !inTransparentMode(MODE_EXCLUDE_NO_PAREN_TUPLES_PY) && perform_tuple_names_check_py() }?
+            { perform_tuple_names_check_py() }?
             tuple_names_py |
 
             parenthesized_name_py | array_names_py | compound_name |

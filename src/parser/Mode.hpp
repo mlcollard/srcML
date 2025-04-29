@@ -368,4 +368,6 @@ const static srcMLState::MODE_TYPE MODE_SET_PY;
 
 const static srcMLState::MODE_TYPE MODE_INDEX_PY;
 
+const static srcMLState::MODE_TYPE MODE_WITH_EXPRESSION_PY;
+
 #endif
