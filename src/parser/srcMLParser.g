@@ -1334,8 +1334,13 @@ catch[...] {
 start_python[] {
         ++start_count;
 
+        // May need to increase these numbers in the future as more tokens are added
+        // Refer to the largest value in `srcMLParserTokenTypes.txt` in the build directory
         const int PY_EXCEPT_MULTOPS = 800;
         const int PY_YIELD_PY_FROM = 801;
+
+        // The number of elements must be greater than the duplex keyword integers above
+        const size_t PYTHON_RULES_SIZE = 900;
 
         // A duplex keyword is a pair of adjacent keywords
         static const std::array<int, 500 * 500> duplexKeywords = [this](){
@@ -1349,8 +1354,8 @@ start_python[] {
 
         // Python rules adhere to the following form:
         // START_TOKEN, MODE_NOT_IN, MODE_TO_START, MODE_FOLLOWING_KEYWORD, pre(), post()
-        static const std::array<Rule, 700> python_rules = [this](){
-            std::array<Rule, 700> temp_array;
+        static const std::array<Rule, PYTHON_RULES_SIZE> python_rules = [this](){
+            std::array<Rule, PYTHON_RULES_SIZE> temp_array;
 
             /* GENERIC STATEMENTS */
             temp_array[ASSERT]      = { SASSERT_STATEMENT, 0, MODE_STATEMENT | MODE_EXPRESSION | MODE_EXPECT | MODE_EXCLUDE_NO_PAREN_TUPLES_PY | MODE_ASSERT_PY, MODE_CONDITION | MODE_EXPECT, nullptr, nullptr };
