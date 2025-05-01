@@ -1335,17 +1335,25 @@ catch[...] {
 start_python[] {
         ++start_count;
 
-        // May need to increase these numbers in the future as more tokens are added
-        // Refer to the largest value in `srcMLParserTokenTypes.txt` in the build directory
-        const int PY_EXCEPT_MULTOPS = 800;
-        const int PY_YIELD_PY_FROM = 801;
+        /*
+          May need to increase these constants in the future as more tokens are added
+        */
 
-        // The number of elements must be greater than the duplex keyword integers above
-        const size_t PYTHON_RULES_SIZE = 900;
+        // The number of tokens is the next highest "hundred" in `srcMLParserTokenTypes.txt` in the build directory
+        const size_t DUPLEX_RULES_SIZE = 700;
+
+        // The duplex keyword values must start at a value 100 greater than the duplex rule size directly above
+        // Increment each new duplex keyword token by an additional one (except the first)
+        const int PY_EXCEPT_MULTOPS = DUPLEX_RULES_SIZE + 100;
+        const int PY_YIELD_PY_FROM = DUPLEX_RULES_SIZE + 101;
+
+        // The Python rule size must be 200 greater than the duplex rule size
+        // If there are ever more than 100 duplex keywords, this has to change
+        const size_t PYTHON_RULES_SIZE = DUPLEX_RULES_SIZE + 200;
 
         // A duplex keyword is a pair of adjacent keywords
-        static const std::array<int, 500 * 500> duplexKeywords = [this](){
-            std::array<int, 500 * 500> temp_array;
+        static const std::array<int, DUPLEX_RULES_SIZE * DUPLEX_RULES_SIZE> duplexKeywords = [this](){
+            std::array<int, DUPLEX_RULES_SIZE * DUPLEX_RULES_SIZE> temp_array;
 
             temp_array[PY_EXCEPT + (MULTOPS << 8)] = PY_EXCEPT_MULTOPS;
             temp_array[PY_YIELD + (PY_FROM << 8)] = PY_YIELD_PY_FROM;

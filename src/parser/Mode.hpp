@@ -304,70 +304,70 @@ const static srcMLState::MODE_TYPE MODE_ARRAY_JS;
 // Python modes
 const static srcMLState::MODE_TYPE MODE_EXCLUDE_NO_PAREN_TUPLES_PY;
 
-const static srcMLState::MODE_TYPE MODE_TUPLE_OF_NAMES_PY;
-
-const static srcMLState::MODE_TYPE MODE_ARRAY_OF_NAMES_PY;
-
 const static srcMLState::MODE_TYPE MODE_COMPREHENSION_IF_PY;
-
-const static srcMLState::MODE_TYPE MODE_COMPREHENSION_PY;
 
 const static srcMLState::MODE_TYPE MODE_TERNARY_CONTENT_PY;
 
-const static srcMLState::MODE_TYPE MODE_LAMBDA_CONTENT_PY;
+const static srcMLState::MODE_TYPE MODE_WITH_EXPRESSION_PY;
 
-const static srcMLState::MODE_TYPE MODE_TUPLE_NO_PAREN_PY;
+const static srcMLState::MODE_TYPE MODE_ARRAY_OF_NAMES_PY;
+
+const static srcMLState::MODE_TYPE MODE_LAMBDA_CONTENT_PY;
 
 const static srcMLState::MODE_TYPE MODE_OPERATOR_PAREN_PY;
 
 const static srcMLState::MODE_TYPE MODE_PARAMETER_LIST_PY;
 
-const static srcMLState::MODE_TYPE MODE_SUPER_LIST_PY;
+const static srcMLState::MODE_TYPE MODE_TUPLE_NO_PAREN_PY;
+
+const static srcMLState::MODE_TYPE MODE_TUPLE_OF_NAMES_PY;
+
+const static srcMLState::MODE_TYPE MODE_COMPREHENSION_PY;
+
+const static srcMLState::MODE_TYPE MODE_EXCEPT_ALIAS_PY;
+
+const static srcMLState::MODE_TYPE MODE_FOR_CONTROL_PY;
 
 const static srcMLState::MODE_TYPE MODE_ANNOTATION_PY;
+
+const static srcMLState::MODE_TYPE MODE_DICTIONARY_PY;
+
+const static srcMLState::MODE_TYPE MODE_SUPER_LIST_PY;
+
+const static srcMLState::MODE_TYPE MODE_WHILE_LOOP_PY;
 
 const static srcMLState::MODE_TYPE MODE_DECORATOR_PY;
 
 const static srcMLState::MODE_TYPE MODE_SPECIFIER_PY;
 
-const static srcMLState::MODE_TYPE MODE_RANGE_IN_PY;
-
-const static srcMLState::MODE_TYPE MODE_FOR_CONTROL_PY;
-
 const static srcMLState::MODE_TYPE MODE_FOR_LOOP_PY;
 
-const static srcMLState::MODE_TYPE MODE_WHILE_LOOP_PY;
-
-const static srcMLState::MODE_TYPE MODE_EXCEPT_ALIAS_PY;
-
-const static srcMLState::MODE_TYPE MODE_DICTIONARY_PY;
+const static srcMLState::MODE_TYPE MODE_RANGE_IN_PY;
 
 const static srcMLState::MODE_TYPE MODE_ASSERT_PY;
 
 const static srcMLState::MODE_TYPE MODE_EXCEPT_PY;
 
-const static srcMLState::MODE_TYPE MODE_CASE_PY;
-
-const static srcMLState::MODE_TYPE MODE_RAISE_PY;
-
-const static srcMLState::MODE_TYPE MODE_FROM_PY;
-
-const static srcMLState::MODE_TYPE MODE_WITH_PY;
-
-const static srcMLState::MODE_TYPE MODE_SUPER_PY;
+const static srcMLState::MODE_TYPE MODE_LAMBDA_PY;
 
 const static srcMLState::MODE_TYPE MODE_ARRAY_PY;
 
-const static srcMLState::MODE_TYPE MODE_LAMBDA_PY;
+const static srcMLState::MODE_TYPE MODE_INDEX_PY;
+
+const static srcMLState::MODE_TYPE MODE_RAISE_PY;
+
+const static srcMLState::MODE_TYPE MODE_SUPER_PY;
 
 const static srcMLState::MODE_TYPE MODE_TUPLE_PY;
 
 const static srcMLState::MODE_TYPE MODE_YIELD_PY;
 
+const static srcMLState::MODE_TYPE MODE_CASE_PY;
+
+const static srcMLState::MODE_TYPE MODE_FROM_PY;
+
+const static srcMLState::MODE_TYPE MODE_WITH_PY;
+
 const static srcMLState::MODE_TYPE MODE_SET_PY;
-
-const static srcMLState::MODE_TYPE MODE_INDEX_PY;
-
-const static srcMLState::MODE_TYPE MODE_WITH_EXPRESSION_PY;
 
 #endif
