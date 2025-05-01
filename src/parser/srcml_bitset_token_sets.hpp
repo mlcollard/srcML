@@ -190,6 +190,16 @@ token_set(srcMLParser, duplex_keyword_set,
     srcMLParser::PY_YIELD
 )
 
+token_set(srcMLParser, keyword_name_token_set_py,
+    srcMLParser::BAR, srcMLParser::DESTOP, srcMLParser::DOTDEREF, srcMLParser::ELSE, srcMLParser::EQUAL,
+    srcMLParser::EXPONENTIATION, srcMLParser::IF, srcMLParser::LBRACKET, srcMLParser::LITERAL_ELLIPSIS,
+    srcMLParser::LPAREN, srcMLParser::MULTOPS, srcMLParser::OPERATORS, srcMLParser::PERIOD, srcMLParser::PY_AND,
+    srcMLParser::PY_ARROW, srcMLParser::PY_ATSIGN, srcMLParser::PY_AWAIT, srcMLParser::PY_COLON, srcMLParser::PY_IN,
+    srcMLParser::PY_IS, srcMLParser::PY_LCURLY, srcMLParser::PY_NOT, srcMLParser::PY_OR, srcMLParser::PY_RCURLY,
+    srcMLParser::QMARK, srcMLParser::RBRACKET, srcMLParser::REFOPS, srcMLParser::RVALUEREF, srcMLParser::TEMPOPE,
+    srcMLParser::TEMPOPS
+)
+
 token_set(srcMLParser, expect_blocks_py_token_set,
     // Python keywords
     srcMLParser::CLASS, srcMLParser::ELSE, srcMLParser::FINALLY, srcMLParser::FOR, srcMLParser::IF,

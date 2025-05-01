@@ -789,6 +789,7 @@ public:
     static const antlr::BitSet identifier_list_tokens_set;
     static const antlr::BitSet whitespace_token_set;
     static const antlr::BitSet duplex_keyword_set;
+    static const antlr::BitSet keyword_name_token_set_py;
     static const antlr::BitSet expect_blocks_py_token_set;
     static const antlr::BitSet left_bracket_py_token_set;
     static const antlr::BitSet right_bracket_py_token_set;
@@ -17640,15 +17641,35 @@ lambda_py[] { CompleteElement element(this); int lparen_types_size = 0; ENTRY_DE
             {
                 (
                     LA(1) == COMMA
-                    || (LA(1) == RPAREN && lparen_types_py.back() == 'c')
+                    && lparen_types_size == lparen_types_py.size()
                 )
-                && lparen_types_size == lparen_types_py.size()
+                || (
+                    LA(1) == RPAREN
+                    && lparen_types_py.back() == 'c'
+                    && (
+                        lparen_types_size == lparen_types_py.size()
+                        || (
+                            !inTransparentMode(MODE_TUPLE_PY)
+                            && lparen_types_size == (lparen_types_py.size() - 1)
+                            && !keyword_name_token_set_py.member(next_token())
+                        )
+                    )
+                )
             }?
             {
+                // end the current expression(s)
                 while (inMode(MODE_EXPRESSION)) {
                     endDownToMode(MODE_EXPRESSION);
                     endMode(MODE_EXPRESSION);
                 }
+
+                // manually end call RPAREN if it is the last token included in the lambda
+                if (
+                    LA(1) == RPAREN
+                    && (lparen_types_size == (lparen_types_py.size() - 1))
+                    && !inTransparentMode(MODE_TUPLE_PY)
+                )
+                    rparen();
 
                 break;
             } |
