@@ -11990,9 +11990,15 @@ rparen[bool markup = true, bool end_control_incr = false] {
                 && inTransparentMode(MODE_ASSERT_PY)
                 && !inTransparentMode(MODE_ARGUMENT)
                 && !inTransparentMode(MODE_LAMBDA_CONTENT_PY)
+                && (
+                    next_token() != RPAREN
+                    || lparen_types_py.back() != 't'
+                )
             ) {
                 comma();
-                expression();
+
+                if (!inMode(MODE_EXPRESSION))
+                    startNewMode(MODE_EXPRESSION | MODE_EXPECT);
             }
         }
 ;

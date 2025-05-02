@@ -73,4 +73,12 @@
 <assert>assert <condition><expr><call><name>list</name><argument_list>(<argument><expr><call><name>map</name><argument_list>(<argument><expr><lambda>lambda <parameter><name>x</name></parameter>: <expr><name><name>x</name><index>[<expr><name>x</name></expr>, <expr><name>x</name></expr>]</index></name></expr></lambda></expr></argument>, <argument><expr><name>numbers</name></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr></condition>, <expr><literal type="string">"Fail Message"</literal></expr></assert>
 </unit>
 
+<unit revision="1.1.0" language="Python">
+<assert>assert <condition><expr><call><name><name>a</name><operator>.</operator><name>call_one</name></name><argument_list>(<argument><expr><name>b</name></expr></argument>)</argument_list></call><operator>.</operator><name>c</name> <operator>==</operator> <tuple>(<expr><call><name>len</name><argument_list>(<argument><expr><name>b</name></expr></argument>)</argument_list></call></expr>,)</tuple></expr></condition></assert>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<assert>assert <condition><expr><call><name><name>a</name><operator>.</operator><name>call_one</name></name><argument_list>(<argument><expr><name>b</name></expr></argument>)</argument_list></call><operator>.</operator><name>c</name> <operator>==</operator> <tuple>(<expr><call><name>len</name><argument_list>(<argument><expr><name>b</name></expr></argument>)</argument_list></call></expr>, <expr><literal type="number">2</literal></expr>)</tuple></expr></condition></assert>
+</unit>
+
 </unit>
