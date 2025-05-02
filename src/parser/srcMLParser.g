@@ -18204,7 +18204,7 @@ ternary_py[bool is_nested = false] { CompleteElement element(this); int lparen_t
             //     - in a tuple or...
             //     - the next token is IF (special case) or...
             //     - the current mode has no new parentheses
-            // - last consumed token was COMMA in a tuple
+            // - last consumed token was COMMA in a tuple ("top-level")
             // - ternary must end before the start of a FOR comprehension ("top-level")
             {
                 (
@@ -18216,7 +18216,11 @@ ternary_py[bool is_nested = false] { CompleteElement element(this); int lparen_t
                         || lparen_types_size == lparen_types_py.size()
                     )
                 )
-                || (last_consumed == COMMA && inTransparentMode(MODE_TUPLE_PY))
+                || (
+                    last_consumed == COMMA
+                    && inTransparentMode(MODE_TUPLE_PY)
+                    && lparen_types_size == lparen_types_py.size()
+                )
                 || (LA(1) == FOR && lparen_types_size == lparen_types_py.size())
             }?
             {
