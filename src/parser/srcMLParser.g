@@ -17552,18 +17552,20 @@ comprehension_py[] { ENTRY_DEBUG } :
 
         {
             // handle "in" portion of a comprehension
-            if (LA(1) == PY_IN)
+            if (LA(1) == PY_IN) {
                 comprehension_range_py();
 
-            if (inTransparentMode(MODE_COMPREHENSION_PY))
-                endDownToMode(MODE_COMPREHENSION_PY);
+                if (inTransparentMode(MODE_COMPREHENSION_PY))
+                    endDownToMode(MODE_COMPREHENSION_PY);
+            }
 
             // handle optional "if" portion of a comprehension
-            if (LA(1) == IF)
+            if (LA(1) == IF) {
                 comprehension_if_py();
 
-            if (inTransparentMode(MODE_COMPREHENSION_PY))
-                endDownToMode(MODE_COMPREHENSION_PY);
+                if (inTransparentMode(MODE_COMPREHENSION_PY))
+                    endDownToMode(MODE_COMPREHENSION_PY);
+            }
 
             if (inMode(MODE_COMPREHENSION_PY))
                 endMode(MODE_COMPREHENSION_PY);
@@ -18199,7 +18201,6 @@ ternary_py[bool is_nested = false] { CompleteElement element(this); int lparen_t
         (options { greedy = true; } :
             // else clause ends if:
             // - at RPAREN where next token is not a PERIOD (or the ternary is in operator parentheses) and...
-            //     - in mode where it ends at internal parentheses (nested ternary) or...
             //     - in a tuple or...
             //     - the next token is IF (special case) or...
             //     - the current mode has no new parentheses
@@ -18210,8 +18211,7 @@ ternary_py[bool is_nested = false] { CompleteElement element(this); int lparen_t
                     LA(1) == RPAREN
                     && (next_token() != PERIOD || lparen_types_py.back() == 'o')
                     && (
-                        inTransparentMode(MODE_INTERNAL_END_PAREN)
-                        || inTransparentMode(MODE_TUPLE_PY)
+                        inTransparentMode(MODE_TUPLE_PY)
                         || next_token() == IF
                         || lparen_types_size == lparen_types_py.size()
                     )
