@@ -17998,7 +17998,7 @@ perform_tuple_check_py[] returns [bool is_tuple] {
                         is_comprehension = true;
 
                     // cannot be a parenthesized tuple if the number of parentheses is 0 or less
-                    if (num_brackets < 0)
+                    if (num_brackets <= 0)
                         break;
 
                     // the expression contains a comma not in any brackets
@@ -18103,7 +18103,7 @@ perform_tuple_check_no_paren_py[] returns [bool is_tuple] {
                 if (LA(1) == RPAREN || LA(1) == PY_RCURLY || LA(1) == RBRACKET)
                     --num_brackets;
 
-                // something went wrong if the number of brackets is 0 or less
+                // something went wrong if the number of brackets is negative
                 if (num_brackets < 0)
                     break;
 
@@ -18442,7 +18442,7 @@ perform_python_2_except_check returns [bool is_python_2] {
                 if (LA(1) == RPAREN || LA(1) == PY_RCURLY || LA(1) == RBRACKET)
                     --num_brackets;
 
-                // something went wrong if the number of brackets is 0 or less
+                // something went wrong if the number of brackets is negative
                 if (num_brackets < 0)
                     break;
 
@@ -18488,7 +18488,7 @@ perform_subscriptable_function_call_check_py returns [bool is_call] {
                 if (LA(1) == RBRACKET)
                     --num_square_brackets;
 
-                // something went wrong if the number of square brackets is 0 or less
+                // something went wrong if the number of square brackets is negative
                 if (num_square_brackets < 0)
                     break;
 
