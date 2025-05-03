@@ -7,7 +7,7 @@
 # CMake files for the srcML client
 
 # if(NOT srcML::LibsrcML)
-#     find_package(srcml REQUIRED)
+#     find_package(srcML REQUIRED)
 # endif()
 
 # Configure libarchive on macOS
