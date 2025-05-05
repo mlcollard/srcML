@@ -11855,10 +11855,22 @@ rparen[bool markup = true, bool end_control_incr = false] {
         ENTRY_DEBUG
 } :
         {
-            // found Python rparen that ends a call
-            if (inLanguage(LANGUAGE_PYTHON) && lparen_types_py.back() == 'c') {
-                lparen_types_py.pop_back();
-                wascall = true;
+            if (inLanguage(LANGUAGE_PYTHON)) {
+                switch (lparen_types_py.back()) {
+                    // found Python rparen that ends a call
+                    case 'c':
+                        lparen_types_py.pop_back();
+                        wascall = true;
+                        break;
+    
+                    // found Python rparen that ends a parameter list
+                    case 'p':
+                        lparen_types_py.pop_back();
+                        break;
+    
+                    default:
+                        break;
+                }
             }
 
             if (isempty) {
@@ -17038,6 +17050,8 @@ python_parameter_list[] { CompleteElement element(this); ENTRY_DEBUG } :
 
             // start the parameter list statement
             startElement(SPARAMETER_LIST);
+
+            lparen_types_py.emplace_back('p');  // parameter list LPAREN
         }
 
         // parameter list must include all possible parts since it is part of a function detection
@@ -17199,7 +17213,7 @@ parameter_annotation_py[] { bool found_init = false; ENTRY_DEBUG } :
 
         (options { greedy = true; } :
             // do not consume the ending RPAREN for a parameter list or EQUAL for an init
-            { (LA(1) == RPAREN || LA(1) == EQUAL) && lparen_types_py.back() == '*' }?
+            { (LA(1) == RPAREN || LA(1) == EQUAL) && lparen_types_py.back() == 'p' }?
             {
                 if (LA(1) == EQUAL)
                     found_init = true;
@@ -17246,7 +17260,7 @@ parameter_init_py[] { SingleElement element(this); ENTRY_DEBUG } :
         (options { greedy = true; } :
             // do not consume the lambda's PY_COLON or ending RPAREN for a parameter list
             {
-                (LA(1) == RPAREN && lparen_types_py.back() == '*')
+                (LA(1) == RPAREN && lparen_types_py.back() == 'p')
                 || (LA(1) == PY_COLON && inTransparentMode(MODE_LAMBDA_PY))
             }?
             {
@@ -17653,7 +17667,7 @@ lambda_py[] { CompleteElement element(this); int lparen_types_size = 0; ENTRY_DE
         }
 
         (options { greedy = true; } :
-            // ensure lambdas end correctly if used as an argument in a call
+            // ensure lambdas end correctly if used as an argument in a call or parameter in a parameter list
             {
                 (
                     LA(1) == COMMA
@@ -17661,7 +17675,7 @@ lambda_py[] { CompleteElement element(this); int lparen_types_size = 0; ENTRY_DE
                 )
                 || (
                     LA(1) == RPAREN
-                    && lparen_types_py.back() == 'c'
+                    && (lparen_types_py.back() == 'c' || lparen_types_py.back() == 'p')
                     && (
                         lparen_types_size == lparen_types_py.size()
                         || (
