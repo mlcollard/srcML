@@ -33,7 +33,7 @@
 #   BAKE_SRC="https://github.com/srcML/srcML.git#develop"
 variable "BAKE_SRC" {
   # description = "Location of the source code"
-  default = "."
+  default = "https://github.com/srcML/srcML.git#develop"
 }
 
 # Override using the environment variable BAKE_PRESET_SUFFIX
@@ -43,9 +43,9 @@ variable "BAKE_PRESET_SUFFIX" {
   default = ""
 }
 
-# Override using the environment variable BAKE_ARCHITECTURES
-# E.g., BAKE_ARCHITECTURES="linux/arm64"
-variable "BAKE_ARCHITECTURES" {
+# Override using the environment variable BAKE_ARCHITECTURE
+# E.g., BAKE_ARCHITECTURE="linux/arm64"
+variable "BAKE_ARCHITECTURE" {
   # description = "Architectures to build on"
   default = "linux/amd64,linux/arm64"
 }
@@ -92,10 +92,18 @@ variable "BAKE_CMAKE_VERSION" {
   default = ""
 }
 
+# Override using the environment variable BAKE_CACHE
+# E.g., BAKE_CACHE=type=local,src=bake_cache,dest=bake_cache
+# E.g., BAKE_CACHE=""
+variable "BAKE_CACHE" {
+  # description = "Cache for build layers"
+  default = ""
+}
+
 # Placeholder for distributions. See docker-bake.override.hcl for configured
 # Linux distributions and distribution-specific groups and targets
 variable "distributions" {
-  default = [ { id = "ubuntu", version_id = "24.04", name = "Ubuntu 24.04", workflow = "ubuntu", java = "latest" } ]
+  default = [ { id = "ubuntu", version_id = "24.04", java_version_id = "22.04", name = "Ubuntu 24.04", workflow = "ubuntu", java = "latest" } ]
 }
 
 # Default is to only create the build environment
@@ -117,12 +125,14 @@ function "workflowPreset" {
 
 # Base target for common settings
 target "base" {
-  platforms = split(",", BAKE_ARCHITECTURES)
+  platforms = split(",", BAKE_ARCHITECTURE)
   labels = {
     "org.opencontainers.image.version"  = BAKE_SRCML_VERSION
     "org.opencontainers.image.licenses" = "GPL-3.0-only"
   }
   pull = true
+  cache-to = [ BAKE_CACHE ]
+  cache-from = [ BAKE_CACHE ]
 }
 
 # Build images for all Linux distributions
@@ -141,24 +151,42 @@ EOF
   }
   context = context(dist.id)
   args = {
-    TAG          = dist.version_id,
-    CMAKE_BINARY = try(dist.cmake, "")
+    TAG          = dist.version_id
+    JAVA_TAG     = dist.java_version_id
     CMAKE_VERSION = BAKE_CMAKE_VERSION
+    CMAKE_BINARY = try(dist.cmake, "")
     JAVA_VERSION = try(dist.java, "")
     OPENSUSE     = try(dist.opensuse, "")
   }
-  tags     = [tagName(dist)]
+  tags     = concat([tagName(dist), tagNameAlias(dist)])
   inherits = ["base"]
+  # cache-from = ["type=local,src=./.docker-build-cache/${targetName(dist)}"]
+  # cache-to   = ["type=local,dest=./.docker-build-cache/${targetName(dist)},mode=max"]
 }
 
 # Dockerfile to build the package
+# The overall workflow preset is separated into the various stages. That way if the cache
+# for a layer is invalidated, it is not the entire workflow. The three testing stages all
+# are from the result of the package and install, and can be done in parallel.
+# The use of multiple stages allows for fine-grained cache invalidation
 function "builderStage" {
   params = [dist]
   result = <<EOF
 FROM ${tagName(dist)} AS builder
 WORKDIR /src
 ADD --link ["${BAKE_SRC}", "."]
-RUN cmake --workflow --preset ${workflowPreset(dist)}
+# RUN cmake --workflow --preset ${workflowPreset(dist)}
+RUN cmake --preset ${workflowPreset(dist)}
+RUN cmake --build --preset ${workflowPreset(dist)}
+FROM builder AS packager
+RUN cpack --preset ${workflowPreset(dist)}
+RUN cmake --build --preset ci-install-package-${dist.workflow}
+FROM packager AS test_client
+RUN cmake --build --preset ci-test-client-${dist.workflow}
+# FROM packager AS test_libsrcml
+# RUN cmake --build --preset ci-test-libsrcml-${dist.workflow}
+FROM packager AS setup_parser_tests
+RUN cmake --build --preset ci-test-parser-${dist.workflow}
 EOF
 }
 
@@ -190,7 +218,7 @@ function "installerStage" {
   params = []
   result = <<EOF
 FROM scratch AS dist
-COPY --from="builder" \
+COPY --from="packager" \
   /src-build/dist/*.rpm \
   /src-build/dist/*.deb \
   /src-build/dist/*.tar.gz \
@@ -261,18 +289,41 @@ EOF
   dockerfile-inline = <<EOF
 ${builderStage(dist)}
 FROM scratch AS dist
-COPY --from=builder /src-build/dist/*.log /
+COPY --from=packager /src-build/dist/*.log /
 EOF
   tags      = [categoryTagName(dist, "logs")]
   output    = ["type=local,dest=${BAKE_DESTINATION_DIR}"]
   inherits  = ["base"]
 }
 
-# Specific distribution
-function "distribution" {
-  params = [id]
-  result = [ for item in distributions : item if item.id == id ]
+target "examples" {
+  name = categoryTarget(dist, "examples")
+  description = "srcML package for ${dist.name}"
+  labels = {
+    "org.opencontainers.image.title" = "srcML ${dist.name} Package Files"
+    "org.opencontainers.image.description" = <<EOF
+The srcML package files for ${dist.name}.
+EOF
+  }
+  matrix = {
+    dist = distributions
+  }
+  dockerfile-inline = <<EOF
+${builderStage(dist)}
+FROM ${tagName(dist)} AS examples
+COPY --from="packager" \
+  /src-build/dist/*.rpm \
+  /src-build/dist/*.deb \
+  /src-build/dist/*.tar.gz \
+  /src-build/dist/*.bz2 \
+  /
+RUN apt-get install /*.deb
+EOF
+  tags     = [categoryTagName(dist, "examples")]
+  # output   = ["type=local,dest=${BAKE_DESTINATION_DIR}"]
+  inherits = ["base"]
 }
+
 
 # Target name
 function "targetName" {
@@ -308,6 +359,12 @@ function "categoryTagName" {
 function "baseTagName" {
   params = [registry, id, version_id]
   result = format("${registry != "" ? "${registry}/" : ""}srcml/%s:%s", id, version_id)
+}
+
+# Tag name
+function "tagNameAlias" {
+  params = [item]
+  result = baseTagName(BAKE_REGISTRY, item.id, try(item.tag, item.version_id))
 }
 
 # Add a category to the id
