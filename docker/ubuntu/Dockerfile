@@ -1,8 +1,8 @@
 ARG TAG=22.04
-FROM ubuntu:${TAG} AS ubuntu
+ARG JAVA_TAG=${TAG}
 
 # Generate lightweight jre
-FROM ubuntu AS java
+FROM ubuntu:${JAVA_TAG} AS java
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -q && apt-get install -q -y \
     binutils openjdk-11-jdk-headless \
@@ -13,7 +13,7 @@ RUN jlink --compress=2 --strip-debug --add-modules=java.base --output /opt/java 
     && strip -p --strip-unneeded /opt/java/lib/server/*.so \
     && strip -p --strip-unneeded /opt/java/lib/*.so
 
-FROM ubuntu
+FROM ubuntu:${TAG}
 ARG TAG
 LABEL org.srcml.email="srcmldev@gmail.com"
 LABEL org.srcml.url="srcml.org"

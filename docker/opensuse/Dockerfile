@@ -1,9 +1,11 @@
 ARG OPENSUSE=leap
 ARG TAG=15
+ARG JAVA_TAG=${TAG}
 FROM opensuse/$OPENSUSE:${TAG} AS opensuse
 
 # Generate lightweight jre
-FROM opensuse AS java
+FROM opensuse/${OPENSUSE}:${JAVA_TAG} AS java
+
 RUN zypper --non-interactive install --no-recommends \
     binutils \
     java-11-openjdk-devel \
@@ -13,7 +15,7 @@ RUN jlink --compress=2 --strip-debug --add-modules=java.base --output /opt/java 
     && strip -p --strip-unneeded /opt/java/lib/server/*.so \
     && strip -p --strip-unneeded /opt/java/lib/*.so
 
-FROM opensuse
+FROM opensuse/${OPENSUSE}:${TAG}
 ARG TAG
 LABEL org.srcml.email="srcmldev@gmail.com"
 LABEL org.srcml.url="srcml.org"

@@ -1,9 +1,9 @@
 ARG TAG=42
+ARG JAVA_TAG=${TAG}
 ARG JAVA_VERSION=latest
-FROM fedora:${TAG} AS fedora
 
 # Generate lightweight jre
-FROM fedora AS java
+FROM fedora:${JAVA_TAG} AS java
 ARG JAVA_VERSION
 RUN dnf install -y \
         binutils \
@@ -14,7 +14,7 @@ RUN jlink --compress=2 --strip-debug --add-modules=java.base --output /opt/java 
     && strip -p --strip-unneeded /opt/java/lib/server/*.so \
     && strip -p --strip-unneeded /opt/java/lib/*.so
 
-FROM fedora
+FROM fedora:${TAG}
 ARG TAG
 LABEL org.srcml.email="srcmldev@gmail.com"
 LABEL org.srcml.url="srcml.org"
