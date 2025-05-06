@@ -29,7 +29,7 @@ endif()
 
 include(FetchContent)
 FetchContent_Declare(cli11
-  URL https://github.com/CLIUtils/CLI11/releases/download/v2.3.2/CLI11.hpp
+  URL https://github.com/CLIUtils/CLI11/releases/download/v2.5.0/CLI11.hpp
   DOWNLOAD_NO_EXTRACT TRUE
 )
 FetchContent_MakeAvailable(cli11)
