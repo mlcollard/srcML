@@ -33,6 +33,22 @@
 </unit>
 
 <unit revision="1.1.0" language="Python">
+<class>class <name>Example</name><super_list>(<super><expr><name>a</name></expr></super>, <super><expr><name>b</name></expr></super>, <super><expr><name>metaclass</name><operator>=</operator><name>Sample</name></expr></super>)</super_list><block>:<block_content>
+    <pass>pass</pass>
+</block_content></block></class>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<class>class <name>Example</name><super_list>(
+    <super><expr><call><name>namedtuple</name><argument_list>(
+        <argument><expr><literal type="string">"Example"</literal></expr></argument>, <argument><expr><tuple>(<expr><literal type="string">"a"</literal></expr>, <expr><literal type="string">"b"</literal></expr>, <expr><literal type="string">"c"</literal></expr>)</tuple></expr></argument>
+    )</argument_list></call></expr></super>
+)</super_list><block>:<block_content>
+    <pass>pass</pass>
+</block_content></block></class>
+</unit>
+
+<unit revision="1.1.0" language="Python">
 <class>class <name>Box</name><super_list>(<super><expr><name><name>Generic</name><index>[<expr><name>T</name></expr>]</index></name></expr></super>)</super_list><block>:<block_content>
     <pass>pass</pass>
 </block_content></block></class>

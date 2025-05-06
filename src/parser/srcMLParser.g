@@ -17317,44 +17317,66 @@ function_annotation_py[] { ENTRY_DEBUG } :
   python_super_list
 
   Handles a Python super list, used primarily with classes.
-  Operates under the assumption MODE_SUPER_LIST_PY is the current mode.
+  Operates under the assumption MODE_SUPER_LIST_PY is one of the current modes.
 */
-python_super_list[] { CompleteElement element(this); ENTRY_DEBUG } :
+python_super_list[] { CompleteElement element(this); int lparen_types_size = 0; ENTRY_DEBUG } :
         {
-            startNewMode(MODE_EXCLUDE_NO_PAREN_TUPLES_PY);
+            assertMode(MODE_SUPER_LIST_PY);
+
+            // a class can contain non-parenthesized tuples, but a super list cannot
+            replaceMode(MODE_SUPER_LIST_PY, MODE_SUPER_LIST_PY | MODE_EXCLUDE_NO_PAREN_TUPLES_PY);
 
             // start the super list
             startElement(SDERIVATION_LIST);
+
+            lparen_types_py.emplace_back('s');  // super list LPAREN
+
+            lparen_types_size = lparen_types_py.size();
         }
 
         LPAREN
 
         (options { greedy = true; } :
-            { LA(1) != COMMA && LA(1) != RPAREN }?
+            { LA(1) == RPAREN && lparen_types_py.back() == 's' }?
             {
-                startNewMode(MODE_SUPER_PY | MODE_LIST | MODE_EXPECT);
+                break;
+            } |
 
-                // start the super, which contains an expression
-                startElement(SDERIVATION);
+            { inMode(MODE_ARGUMENT) }?
+            argument |
 
-                startNewMode(MODE_EXPRESSION | MODE_EXPECT);
+            {
+                if (!inTransparentMode(MODE_SUPER_PY)) {
+                    startNewMode(MODE_SUPER_PY | MODE_LIST | MODE_EXPECT);
+
+                    // start the super, which contains an expression
+                    startElement(SDERIVATION);
+
+                    startNewMode(MODE_EXPRESSION | MODE_EXPECT);
+                }
             }
             expression |
 
             {
-                if (inTransparentMode(MODE_SUPER_PY)) {
-                    endDownToMode(MODE_SUPER_PY);
-                    endMode(MODE_SUPER_PY);
+                // ensure arguments end correctly at a comma
+                if (lparen_types_size < lparen_types_py.size() && inTransparentMode(MODE_ARGUMENT)) {
+                    endDownToMode(MODE_ARGUMENT);
+                    endMode(MODE_ARGUMENT);
                 }
+
+                // ensure the super ends correctly at a comma
+                if (lparen_types_py.back() == 's' && inTransparentMode(MODE_SUPER_LIST_PY))
+                    endDownToMode(MODE_SUPER_LIST_PY);
             }
             COMMA
         )*
 
         {
-            if (inTransparentMode(MODE_SUPER_PY)) {
-                endDownToMode(MODE_SUPER_PY);
-                endMode(MODE_SUPER_PY);
-            }
+            if (inTransparentMode(MODE_SUPER_LIST_PY))
+                endDownToMode(MODE_SUPER_LIST_PY);
+
+            if (lparen_types_py.back() == 's')
+                lparen_types_py.pop_back();
         }
 
         RPAREN
