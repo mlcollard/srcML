@@ -129,6 +129,12 @@
 </unit>
 
 <unit revision="1.1.0" language="Python">
+<function>def <name>named_arguments</name><parameter_list>(<parameter><name>a</name></parameter>, <parameter><name>b</name></parameter>)</parameter_list><block>:<block_content>
+    <return>return <expr><tuple><expr><call><name>call_one</name><argument_list>(<argument><expr><name>type</name><operator>=</operator><name>a</name></expr></argument>)</argument_list></call></expr>, <expr><call><name>call_one</name><argument_list>(<argument><expr><name>type</name><operator>=</operator><name>b</name></expr></argument>)</argument_list></call></expr></tuple></expr></return>
+</block_content></block></function>
+</unit>
+
+<unit revision="1.1.0" language="Python">
 <with>with <expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call></expr> <alias>as <name>a</name></alias><block>:<block_content>
     <expr_stmt><expr><tuple><expr><name>indices</name></expr>, <expr><name>values</name></expr></tuple> <operator>=</operator> <call><name><name>a</name><operator>.</operator><name>zip</name></name><argument_list>()</argument_list></call></expr></expr_stmt>
 </block_content></block></with>

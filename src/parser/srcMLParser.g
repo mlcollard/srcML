@@ -18132,11 +18132,13 @@ perform_tuple_check_py[] returns [bool is_tuple] {
   Handles Python tuples that do not use parentheses.
   Not used directly, but can be called by expression_part.
 */
-tuple_no_paren_py[] { CompleteElement element(this); ENTRY_DEBUG } :
+tuple_no_paren_py[] { CompleteElement element(this); int lparen_types_size = 0; ENTRY_DEBUG } :
         {
             startNewMode(MODE_EXCLUDE_NO_PAREN_TUPLES_PY | MODE_LOCAL | MODE_TOP | MODE_LIST | MODE_TUPLE_NO_PAREN_PY);
 
             startElement(STUPLE);
+
+            lparen_types_size = lparen_types_py.size();
         }
 
         (options { greedy = true; } :
@@ -18147,8 +18149,9 @@ tuple_no_paren_py[] { CompleteElement element(this); ENTRY_DEBUG } :
                 LA(1) == INDENT
                 || LA(1) == TERMINATE
                 || (
-                    inTransparentMode(MODE_TUPLE_NO_PAREN_PY)
-                    && LA(1) == EQUAL
+                    LA(1) == EQUAL
+                    && lparen_types_size == lparen_types_py.size()
+                    && inTransparentMode(MODE_TUPLE_NO_PAREN_PY)
                 )
             }?
             {
