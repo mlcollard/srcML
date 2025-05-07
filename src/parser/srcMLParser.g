@@ -18650,20 +18650,39 @@ perform_subscriptable_function_call_check_py returns [bool is_call] {
 
   Handles a Python type alias annotation.
 */
-type_alias_annotation_py[] { ENTRY_DEBUG } :
+type_alias_annotation_py[] { int lparen_types_size = 0; ENTRY_DEBUG } :
         {
             startNewMode(MODE_ANNOTATION_PY);
 
             startElement(SANNOTATION);
+
+            lparen_types_size = lparen_types_py.size();
         }
 
         PY_COLON
 
-        {
-            startNewMode(MODE_EXPRESSION | MODE_EXPECT);
-        }
+        (options { greedy = true; } :
+            // the annotation ends before a top-level equal sign ("=")
+            { LA(1) == EQUAL && lparen_types_size == lparen_types_py.size() }?
+            {
+                break;
+            } |
 
-        expression
+            // ensure compound calls are marked correctly (e.g., "a(b)(c)")
+            { inMode(MODE_FUNCTION_CALL) && last_consumed == RPAREN && LA(1) == LPAREN }?
+            call_argument_list |
+
+            { inMode(MODE_ARGUMENT) }?
+            argument |
+
+            {
+                if (!inMode(MODE_EXPRESSION))
+                    startNewMode(MODE_EXPRESSION | MODE_EXPECT);
+            }
+            expression |
+
+            comma
+        )*
 
         {
             if (inTransparentMode(MODE_ANNOTATION_PY)) {

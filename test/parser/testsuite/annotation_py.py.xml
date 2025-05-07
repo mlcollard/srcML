@@ -42,4 +42,12 @@
 <expr_stmt><expr><name>Vector</name> <annotation>: <expr><name>TypeAlias</name></expr></annotation> <operator>=</operator> <name><name>list</name><index>[<expr><name>float</name></expr>]</index></name></expr></expr_stmt>
 </unit>
 
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>out</name><annotation>: <expr><call><name>CustomType</name><argument_list>(<argument><expr><tuple>(<expr><name>a</name></expr>, <expr><name>b</name></expr>, <expr><name>c</name></expr>)</tuple></expr></argument>)</argument_list></call></expr></annotation> <operator>=</operator> <call><name>call_one</name><argument_list>(<argument><expr><name>d</name></expr></argument>)</argument_list></call></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>out</name><annotation>: <expr><call><call><name>CustomType</name><argument_list>(<argument><expr><name>a</name></expr></argument>)</argument_list></call><argument_list>(<argument><expr><name>b</name></expr></argument>)</argument_list></call></expr></annotation> <operator>=</operator> <call><name>call_one</name><argument_list>(<argument><expr><name>c</name></expr></argument>)</argument_list></call></expr></expr_stmt>
+</unit>
+
 </unit>
