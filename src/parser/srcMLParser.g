@@ -16805,6 +16805,10 @@ from_py[] { ENTRY_DEBUG } :
         PY_FROM
 
         (options { greedy = true; } :
+            // ensure compound calls are marked correctly (e.g., "a(b)(c)")
+            { inMode(MODE_FUNCTION_CALL) && last_consumed == RPAREN && LA(1) == LPAREN }?
+            call_argument_list |
+
             { inMode(MODE_ARGUMENT) }?
             argument |
 
@@ -16878,6 +16882,10 @@ range_in_py[] { SingleElement element(this); ENTRY_DEBUG } :
         PY_IN
 
         (options { greedy = true; } :
+            // ensure compound calls are marked correctly (e.g., "a(b)(c)")
+            { inMode(MODE_FUNCTION_CALL) && last_consumed == RPAREN && LA(1) == LPAREN }?
+            call_argument_list |
+
             { inMode(MODE_ARGUMENT) }?
             argument |
 
@@ -16924,6 +16932,10 @@ comprehension_range_py[] { int lparen_types_size = 0; ENTRY_DEBUG } :
             {
                 break;
             } |
+
+            // ensure compound calls are marked correctly (e.g., "a(b)(c)")
+            { inMode(MODE_FUNCTION_CALL) && last_consumed == RPAREN && LA(1) == LPAREN }?
+            call_argument_list |
 
             { inMode(MODE_ARGUMENT) }?
             argument |
@@ -16985,6 +16997,10 @@ comprehension_if_py[] { bool multiple_ifs = false; int lparen_types_size = 0; EN
             {
                 multiple_ifs = true;
             } |
+
+            // ensure compound calls are marked correctly (e.g., "a(b)(c)")
+            { inMode(MODE_FUNCTION_CALL) && last_consumed == RPAREN && LA(1) == LPAREN }?
+            call_argument_list |
 
             { inMode(MODE_ARGUMENT) }?
             argument |
@@ -17221,6 +17237,10 @@ parameter_annotation_py[] { bool found_init = false; ENTRY_DEBUG } :
                 break;
             } |
 
+            // ensure compound calls are marked correctly (e.g., "a(b)(c)")
+            { inMode(MODE_FUNCTION_CALL) && last_consumed == RPAREN && LA(1) == LPAREN }?
+            call_argument_list |
+
             { inMode(MODE_ARGUMENT) }?
             argument |
 
@@ -17266,6 +17286,10 @@ parameter_init_py[] { SingleElement element(this); ENTRY_DEBUG } :
             {
                 break;
             } |
+
+            // ensure compound calls are marked correctly (e.g., "a(b)(c)")
+            { inMode(MODE_FUNCTION_CALL) && last_consumed == RPAREN && LA(1) == LPAREN }?
+            call_argument_list |
 
             { inMode(MODE_ARGUMENT) }?
             argument |
@@ -17341,6 +17365,10 @@ python_super_list[] { CompleteElement element(this); int lparen_types_size = 0; 
             {
                 break;
             } |
+
+            // ensure compound calls are marked correctly (e.g., "a(b)(c)")
+            { inMode(MODE_FUNCTION_CALL) && last_consumed == RPAREN && LA(1) == LPAREN }?
+            call_argument_list |
 
             { inMode(MODE_ARGUMENT) }?
             argument |
@@ -17513,6 +17541,10 @@ attribute_py[] { ENTRY_DEBUG } :
         }
 
         (
+            // ensure compound calls are marked correctly (e.g., "a(b)(c)")
+            { inMode(MODE_FUNCTION_CALL) && last_consumed == RPAREN && LA(1) == LPAREN }?
+            call_argument_list |
+
             // decorators can have arguments
             { inMode(MODE_ARGUMENT) }?
             argument |
@@ -17551,6 +17583,10 @@ array_py[] { CompleteElement element(this); ENTRY_DEBUG } :
         LBRACKET
 
         (
+            // ensure compound calls are marked correctly (e.g., "a(b)(c)")
+            { inMode(MODE_FUNCTION_CALL) && last_consumed == RPAREN && LA(1) == LPAREN }?
+            call_argument_list |
+
             { inMode(MODE_ARGUMENT) }?
             argument |
 
@@ -17726,6 +17762,10 @@ lambda_py[] { CompleteElement element(this); int lparen_types_size = 0; ENTRY_DE
                 break;
             } |
 
+            // ensure compound calls are marked correctly (e.g., "a(b)(c)")
+            { inMode(MODE_FUNCTION_CALL) && last_consumed == RPAREN && LA(1) == LPAREN }?
+            call_argument_list |
+
             { inMode(MODE_ARGUMENT) }?
             argument |
 
@@ -17779,6 +17819,10 @@ set_py[] { CompleteElement element(this); ENTRY_DEBUG } :
         PY_LCURLY
 
         (
+            // ensure compound calls are marked correctly (e.g., "a(b)(c)")
+            { inMode(MODE_FUNCTION_CALL) && last_consumed == RPAREN && LA(1) == LPAREN }?
+            call_argument_list |
+
             { inMode(MODE_ARGUMENT) }?
             argument |
 
@@ -17834,6 +17878,10 @@ dictionary_py[bool isempty = false] { CompleteElement element(this); ENTRY_DEBUG
         }
 
         (options { greedy = true; } :
+            // ensure compound calls are marked correctly (e.g., "a(b)(c)")
+            { inMode(MODE_FUNCTION_CALL) && last_consumed == RPAREN && LA(1) == LPAREN }?
+            call_argument_list |
+
             { inMode(MODE_ARGUMENT) }?
             argument |
 
@@ -17977,6 +18025,10 @@ tuple_py[] {
 
             alias_py |
 
+            // ensure compound calls are marked correctly (e.g., "a(b)(c)")
+            { inMode(MODE_FUNCTION_CALL) && last_consumed == RPAREN && LA(1) == LPAREN }?
+            call_argument_list |
+
             { inMode(MODE_ARGUMENT) }?
             argument |
 
@@ -18105,6 +18157,10 @@ tuple_no_paren_py[] { CompleteElement element(this); ENTRY_DEBUG } :
 
             alias_py |
 
+            // ensure compound calls are marked correctly (e.g., "a(b)(c)")
+            { inMode(MODE_FUNCTION_CALL) && last_consumed == RPAREN && LA(1) == LPAREN }?
+            call_argument_list |
+
             { inMode(MODE_ARGUMENT) }?
             argument |
 
@@ -18206,6 +18262,10 @@ ternary_py[bool is_nested = false] { CompleteElement element(this); int lparen_t
             { LA(1) == IF && inTransparentMode(MODE_TERNARY) }?
             ternary_py[true] |
 
+            // ensure compound calls are marked correctly (e.g., "a(b)(c)")
+            { inMode(MODE_FUNCTION_CALL) && last_consumed == RPAREN && LA(1) == LPAREN }?
+            call_argument_list |
+
             { inMode(MODE_ARGUMENT) }?
             argument |
 
@@ -18272,6 +18332,10 @@ ternary_py[bool is_nested = false] { CompleteElement element(this); int lparen_t
             // found a nested ternary
             { LA(1) == IF && inTransparentMode(MODE_TERNARY) }?
             ternary_py[true] |
+
+            // ensure compound calls are marked correctly (e.g., "a(b)(c)")
+            { inMode(MODE_FUNCTION_CALL) && last_consumed == RPAREN && LA(1) == LPAREN }?
+            call_argument_list |
 
             { inMode(MODE_ARGUMENT) }?
             argument |
@@ -18387,6 +18451,10 @@ operator_parenthesis_complete_py[] {
 
             alias_py |
 
+            // ensure compound calls are marked correctly (e.g., "a(b)(c)")
+            { inMode(MODE_FUNCTION_CALL) && last_consumed == RPAREN && LA(1) == LPAREN }?
+            call_argument_list |
+
             { inMode(MODE_ARGUMENT) }?
             argument |
 
@@ -18444,6 +18512,10 @@ python_2_except_py[] { ENTRY_DEBUG } :
 
                 break;
             } |
+
+            // ensure compound calls are marked correctly (e.g., "a(b)(c)")
+            { inMode(MODE_FUNCTION_CALL) && last_consumed == RPAREN && LA(1) == LPAREN }?
+            call_argument_list |
 
             { inMode(MODE_ARGUMENT) }?
             argument |

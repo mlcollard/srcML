@@ -271,4 +271,121 @@
 )</argument_list></call></expr></expr_stmt>
 </unit>
 
+<unit revision="1.1.0" language="Python">
+<try>try<block>:<block_content>
+    <throw>raise <expr><name>ValueError</name></expr></throw>
+</block_content></block><catch>except <expr><call><call><name>call_one</name><argument_list>(<argument><expr><literal type="number">1</literal></expr></argument>)</argument_list></call><argument_list>(<argument><expr><literal type="number">2</literal></expr></argument>)</argument_list></call></expr> <alias>as <name>e</name></alias><block>:<block_content>
+    <throw>raise <expr><name>IndexError</name></expr> <from>from <expr><call><call><name>call_two</name><argument_list>(<argument><expr><name>e</name></expr></argument>)</argument_list></call><argument_list>(<argument><expr><name>e</name></expr></argument>)</argument_list></call></expr></from></throw>
+</block_content></block></catch></try>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<try>try<block>:<block_content>
+    <throw>raise <expr><name>ValueError</name></expr></throw>
+</block_content></block><catch>except <alias><expr><call><call><name>call_one</name><argument_list>(<argument><expr><literal type="number">1</literal></expr></argument>)</argument_list></call><argument_list>(<argument><expr><literal type="number">2</literal></expr></argument>)</argument_list></call></expr>, <name>e</name></alias><block>:<block_content>
+    <throw>raise <expr><name>IndexError</name></expr> <from>from <expr><call><call><name>call_two</name><argument_list>(<argument><expr><name>e</name></expr></argument>)</argument_list></call><argument_list>(<argument><expr><name>e</name></expr></argument>)</argument_list></call></expr></from></throw>
+</block_content></block></catch></try>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<for>for <control><name>a</name> <range>in <expr><call><call><name>call_one</name><argument_list>(<argument><expr><name>b</name></expr></argument>)</argument_list></call><argument_list>(<argument><expr><name>c</name></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
+    <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><name>a</name></expr></argument>)</argument_list></call></expr></expr_stmt>
+</block_content></block></for>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<for><specifier>async</specifier> for <control><name>a</name> <range>in <expr><call><call><name>call_one</name><argument_list>(<argument><expr><name>b</name></expr></argument>)</argument_list></call><argument_list>(<argument><expr><name>c</name></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
+    <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><name>a</name></expr></argument>)</argument_list></call></expr></expr_stmt>
+</block_content></block></for>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<function>def <name>call_parameter_annotation</name><parameter_list>(<parameter><name>a</name></parameter>, <parameter><name>b</name><annotation>: <expr><call><call><name>call_one</name><argument_list>(<argument><expr><literal type="number">1</literal></expr></argument>)</argument_list></call><argument_list>(<argument><expr><literal type="number">2</literal></expr></argument>)</argument_list></call></expr></annotation></parameter>, <parameter><name>c</name></parameter>)</parameter_list><block>:<block_content>
+    <pass>pass</pass>
+</block_content></block></function>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<function>def <name>call_parameter_init</name><parameter_list>(<parameter><name>a</name></parameter>, <parameter><name>b</name><init>=<expr><call><call><name>call_one</name><argument_list>(<argument><expr><literal type="number">1</literal></expr></argument>)</argument_list></call><argument_list>(<argument><expr><literal type="number">2</literal></expr></argument>)</argument_list></call></expr></init></parameter>, <parameter><name>c</name></parameter>)</parameter_list><block>:<block_content>
+    <pass>pass</pass>
+</block_content></block></function>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<function><attribute>@<expr><call><name>example</name><argument_list>(<argument><name>x</name> = <expr><call><call><name>call_one</name><argument_list>(<argument><expr><literal type="number">0</literal></expr></argument>)</argument_list></call><argument_list>(<argument><expr><literal type="number">1</literal></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr></attribute>
+def <name>call_function</name><parameter_list>(<parameter><name>a</name></parameter>, <parameter><name>b</name></parameter>)</parameter_list><block>:<block_content>
+    <return>return <expr><call><call><name>call_one</name><argument_list>(<argument><expr><name>a</name></expr></argument>)</argument_list></call><argument_list>(<argument><expr><name>b</name></expr></argument>)</argument_list></call></expr></return>
+</block_content></block></function>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<class>class <name>CallSuper</name><super_list>(<super><expr><name>A</name></expr></super>, <super><expr><call><call><name>call_one</name><argument_list>(<argument><expr><literal type="number">1</literal></expr></argument>)</argument_list></call><argument_list>(<argument><expr><literal type="number">2</literal></expr></argument>)</argument_list></call></expr></super>, <super><expr><name>B</name></expr></super>)</super_list><block>:<block_content>
+    <pass>pass</pass>
+</block_content></block></class>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>call_comprehension</name> <operator>=</operator> <operator>(</operator><name>a</name> <comprehension><for>for <control><name>a</name> <range>in <expr><call><call><name>call_one</name><argument_list>(<argument><expr><name>a</name></expr></argument>)</argument_list></call><argument_list>(<argument><expr><name>b</name></expr></argument>)</argument_list></call></expr></range></control></for></comprehension><operator>)</operator></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>call_comprehension_if</name> <operator>=</operator> <operator>(</operator>
+    <name>a</name>
+    <comprehension><for>for <control><name>a</name> <range>in <expr><call><call><name>call_one</name><argument_list>(<argument><expr><name>a</name></expr></argument>)</argument_list></call><argument_list>(<argument><expr><name>b</name></expr></argument>)</argument_list></call></expr></range></control></for>
+    <if>if <condition><expr><call><call><name>call_two</name><argument_list>(<argument><expr><name>a</name></expr></argument>)</argument_list></call><argument_list>(<argument><expr><name>b</name></expr></argument>)</argument_list></call></expr></condition></if></comprehension>
+<operator>)</operator></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>call_list</name> <operator>=</operator> <array>[
+    <expr><call><call><name>call_one</name><argument_list>(<argument><expr><name>a</name></expr></argument>)</argument_list></call><argument_list>(<argument><expr><name>b</name></expr></argument>)</argument_list></call></expr>,
+    <expr><name>c</name></expr>
+]</array></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>call_lambda</name> <operator>=</operator> <call><name>example</name><argument_list>(<argument><expr><array>[
+    <expr><call><name>dict</name><argument_list>(
+        <argument><name>a</name>=<expr><lambda>lambda <parameter><name>b</name></parameter>: <expr><call><call><name>call_one</name><argument_list>(<argument><expr><name>b</name></expr></argument>)</argument_list></call><argument_list>(<argument><expr><name>c</name></expr></argument>)</argument_list></call></expr></lambda></expr></argument>
+    )</argument_list></call></expr>,
+    <expr><call><name>dict</name><argument_list>()</argument_list></call></expr>
+]</array></expr></argument>)</argument_list></call></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>call_set</name> <operator>=</operator> <set>{
+    <expr><name>a</name></expr>,
+    <expr><call><call><name>call_one</name><argument_list>(<argument><expr><literal type="number">1</literal></expr></argument>)</argument_list></call><argument_list>(<argument><expr><literal type="number">2</literal></expr></argument>)</argument_list></call></expr>,
+    <expr><name>b</name></expr>
+}</set></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>call_dictionary</name> <operator>=</operator> <dictionary>{
+    <expr><literal type="string">"a"</literal></expr>: <expr><name>a</name></expr>,
+    <expr><literal type="string">"b"</literal></expr>: <expr><call><call><name>call_one</name><argument_list>(<argument><expr><literal type="number">1</literal></expr></argument>)</argument_list></call><argument_list>(<argument><expr><literal type="number">2</literal></expr></argument>)</argument_list></call></expr>,
+    <expr><literal type="string">"c"</literal></expr>: <expr><name>c</name></expr>
+}</dictionary></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>call_tuple</name> <operator>=</operator> <tuple>(
+    <expr><name>a</name></expr>,
+    <expr><call><call><name>call_one</name><argument_list>(<argument><expr><literal type="number">1</literal></expr></argument>)</argument_list></call><argument_list>(<argument><expr><literal type="number">2</literal></expr></argument>)</argument_list></call></expr>,
+    <expr><name>b</name></expr>
+)</tuple></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><tuple><expr><name>no_paren</name></expr>, <expr><name>call_tuple</name></expr></tuple> <operator>=</operator> <tuple><expr><call><call><name>call_one</name><argument_list>(<argument><expr><literal type="number">1</literal></expr></argument>)</argument_list></call><argument_list>(<argument><expr><literal type="number">2</literal></expr></argument>)</argument_list></call></expr>, <expr><call><call><name>call_two</name><argument_list>(<argument><expr><literal type="number">3</literal></expr></argument>)</argument_list></call><argument_list>(<argument><expr><literal type="number">4</literal></expr></argument>)</argument_list></call></expr></tuple></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>call_ternary</name> <operator>=</operator> <operator>(</operator><name>a</name> <ternary>if <condition><expr><call><call><name>call_one</name><argument_list>(<argument><expr><literal type="number">1</literal></expr></argument>)</argument_list></call><argument_list>(<argument><expr><literal type="number">2</literal></expr></argument>)</argument_list></call></expr></condition> <else>else <expr><call><call><name>call_two</name><argument_list>(<argument><expr><literal type="number">3</literal></expr></argument>)</argument_list></call><argument_list>(<argument><expr><literal type="number">4</literal></expr></argument>)</argument_list></call></expr></else></ternary><operator>)</operator></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>call_op_paren</name> <operator>=</operator> <operator>(</operator><operator>(</operator><operator>(</operator><call><call><name>call_one</name><argument_list>(<argument><expr><literal type="number">1</literal></expr></argument>)</argument_list></call><argument_list>(<argument><expr><literal type="number">2</literal></expr></argument>)</argument_list></call><operator>)</operator><operator>)</operator><operator>)</operator></expr></expr_stmt>
+</unit>
+
 </unit>
