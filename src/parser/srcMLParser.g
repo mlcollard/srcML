@@ -18314,7 +18314,9 @@ ternary_py[bool is_nested = false] { CompleteElement element(this); int lparen_t
             {
                 (
                     LA(1) == RPAREN
-                    && (next_token() != PERIOD || lparen_types_py.back() == 'o')
+                    && (
+                        (next_token() != PERIOD || lparen_types_size == lparen_types_py.size())
+                        || lparen_types_py.back() == 'o')
                     && (
                         inTransparentMode(MODE_TUPLE_PY)
                         || next_token() == IF

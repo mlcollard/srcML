@@ -152,4 +152,12 @@
 </block_content></block></catch></try>
 </unit>
 
+<unit revision="1.1.0" language="Python">
+<if_stmt><if>if <condition><expr><name>a</name></expr></condition><block>:<block_content>
+    <expr_stmt><expr><call><name>call_one</name><argument_list>()</argument_list></call><operator>.</operator><call><name>check</name><argument_list>(<argument><expr><literal type="string">"1"</literal></expr></argument>)</argument_list></call><operator>.</operator><call><name>check</name><argument_list>(<argument><expr><literal type="string">"2"</literal></expr></argument>)</argument_list></call><operator>.</operator><call><name>check</name><argument_list>(
+        <argument><expr><literal type="string">"3"</literal> <ternary>if <condition><expr><operator>not</operator> <name>b</name></expr></condition> <else>else <expr><literal type="string">"4"</literal></expr></else></ternary></expr></argument>
+    )</argument_list></call><operator>.</operator><call><name>call_two</name><argument_list>(<argument><expr><name>c</name></expr></argument>)</argument_list></call></expr></expr_stmt>
+</block_content></block></if></if_stmt>
+</unit>
+
 </unit>
