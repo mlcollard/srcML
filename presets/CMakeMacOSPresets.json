@@ -42,8 +42,8 @@
         // Making the exported_symbols_list an empty file reduces size of executable, as strip does not work
         "SRCML_CLIENT_LINK_FLAGS": "-exported_symbols_list /dev/null",
         "CMAKE_BUILD_TYPE": "Release",
-        "SRCML_GLOBAL_COMPILE_OPTIONS": "-flto",
-        "SRCML_GLOBAL_LINK_OPTIONS": "-flto;-dead_strip",
+        "CMAKE_INTERPROCEDURAL_OPTIMIZATION": "ON",
+        "SRCML_GLOBAL_LINK_OPTIONS": "-dead_strip",
         "SRCML_LIBSRCML_LINK_FLAGS": "-Wl,-exported_symbols_list ${sourceDir}/src/libsrcml/export_list"
       }
     }
