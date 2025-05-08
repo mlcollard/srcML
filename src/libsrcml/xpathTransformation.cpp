@@ -72,7 +72,7 @@ xpathTransformation::xpathTransformation(srcml_archive* /* oarchive */, const ch
 xpathTransformation::~xpathTransformation() {
 
     // free the compiled xpath
-    if (!compiled_xpath)
+    if (compiled_xpath)
         xmlXPathFreeCompExpr(compiled_xpath);
 
     // free the namespace for any added attributes
@@ -228,16 +228,28 @@ TransformationResult xpathTransformation::apply(xmlDocPtr doc, int position) con
     context.get()->userData = (void*)(table);
 
     auto localCompiledXPath = compiled_xpath;
+    bool is_srcql_query = false;
     // process srcQL query
     if (!localCompiledXPath) {
         std::string_view srcql_string(xpath);
         srcql_string.remove_prefix("srcql:"sv.size());
         const auto srcqlXPath = srcql_convert_query_to_xpath(srcql_string.data(), Language(position).getLanguageString());
         localCompiledXPath = xmlXPathCompile(BAD_CAST srcqlXPath);
+        delete[] srcqlXPath;
+        is_srcql_query = true;
     }
 
     // evaluate the xpath
     std::unique_ptr<xmlXPathObject> result_nodes(xmlXPathCompiledEval(localCompiledXPath, context.get()));
+
+    // free unification table after evaluation is done
+    delete table;
+
+    // free locally compiled xpath
+    if(is_srcql_query) {
+        xmlXPathFreeCompExpr(localCompiledXPath);
+    }
+
     if (!result_nodes) {
         fprintf(stderr, "%s: Error in executing xpath\n", "libsrcml");
         return TransformationResult();
