@@ -272,6 +272,25 @@
 </unit>
 
 <unit revision="1.1.0" language="Python">
+<if_stmt><if>if <condition><expr><name>objects</name></expr></condition><block>:<block_content>
+    <expr_stmt><expr><name><name>objects</name><index>[<expr><literal type="number">0</literal></expr>]</index></name> <operator>=</operator> <call><name>call_one</name><argument_list>(
+        <argument><expr><lambda>lambda <parameter><name>a</name></parameter>: <expr><name>a</name> <ternary>if <condition><expr><name>b</name></expr></condition> <else>else <expr><call><name>call_two</name><argument_list>(<argument><expr><name>a</name></expr></argument>, <argument><expr><name>b</name></expr></argument>)</argument_list></call></expr></else></ternary></expr></lambda></expr></argument>,
+        <argument><expr><name>c</name></expr></argument>,
+    )</argument_list></call></expr></expr_stmt>
+</block_content></block></if></if_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<function>def <name>sample</name><parameter_list>(<parameter><name>a</name></parameter>, <parameter><name>b</name></parameter>, <parameter><name>c</name></parameter>, <parameter><name>d</name></parameter>)</parameter_list><block>:<block_content>
+    <if_stmt><if>if <condition><expr><name>a</name></expr></condition><block>:<block_content>
+        <return>return <expr><call><name><name>a</name><operator>.</operator><name>call_one</name></name><argument_list>(
+            <argument><expr><name>b</name></expr></argument>,
+            <argument><expr><call><name>call_two</name><argument_list>(<argument><expr><name>c</name></expr></argument>, <argument><expr><literal type="boolean">True</literal></expr></argument>)</argument_list></call> <ternary>if <condition><expr><name>d</name></expr></condition> <else>else <expr><call><name>call_two</name><argument_list>(<argument><expr><name>c</name></expr></argument>, <argument><expr><literal type="boolean">False</literal></expr></argument>)</argument_list></call></expr></else></ternary></expr></argument>,
+        )</argument_list></call></expr></return>
+</block_content></block></if></if_stmt></block_content></block></function>
+</unit>
+
+<unit revision="1.1.0" language="Python">
 <try>try<block>:<block_content>
     <throw>raise <expr><name>ValueError</name></expr></throw>
 </block_content></block><catch>except <expr><call><call><name>call_one</name><argument_list>(<argument><expr><literal type="number">1</literal></expr></argument>)</argument_list></call><argument_list>(<argument><expr><literal type="number">2</literal></expr></argument>)</argument_list></call></expr> <alias>as <name>e</name></alias><block>:<block_content>
