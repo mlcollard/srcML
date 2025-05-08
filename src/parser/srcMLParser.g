@@ -13164,25 +13164,6 @@ argument[] { ENTRY_DEBUG } :
             { inLanguage(LANGUAGE_PYTHON) && (last_consumed == MULTOPS || last_consumed == EXPONENTIATION) }?
             expression
         )*
-
-        {
-            // Ensures a Python call ends correctly if nested and the call
-            // is inside a lambda or the "else" part of a ternary.
-            if (
-                inLanguage(LANGUAGE_PYTHON)
-                && (
-                    (inTransparentMode(MODE_LAMBDA_CONTENT_PY) && next_token() == COMMA)
-                    || inTransparentMode(MODE_TERNARY_CONTENT_PY)
-                )
-                && LA(1) == RPAREN
-                && lparen_types_py.back() == 'c'
-                && (
-                    lparen_types_py.size() > 2  // '*' + at least two LPAREN
-                    || next_token() == TERMINATE  // '*' + one LPAREN
-                )
-            )
-                rparen();
-        }
 ;
 
 /*
@@ -18304,37 +18285,31 @@ ternary_py[bool is_nested = false] { CompleteElement element(this); int lparen_t
         }
 
         (options { greedy = true; } :
-            // else clause ends if:
-            // - at RPAREN where next token is not a PERIOD (or the ternary is in operator parentheses) and...
-            //     - in a tuple or...
-            //     - the next token is IF (special case) or...
-            //     - the current mode has no new parentheses
-            // - last consumed token was COMMA in a tuple ("top-level")
-            // - at COMMA at the end of an argument in a call ("top-level")
-            // - ternary must end before the start of a FOR comprehension ("top-level")
+            // else clause ends if the current mode has no new parentheses and any one of these four:
+            // 1. at RPAREN and...
+            //     - the next token is not PERIOD or...
+            //     - latest LPAREN is an operator parentheses or...
+            //     - latest LPAREN is for a call
+            // 2. last consumed token is COMMA and...
+            //     - anywhere in a tuple
+            // 3. at COMMA and...
+            //     - latest LPAREN is for a call
+            // 4. at FOR
             {
-                (
-                    LA(1) == RPAREN
-                    && (
-                        (next_token() != PERIOD || lparen_types_size == lparen_types_py.size())
-                        || lparen_types_py.back() == 'o')
-                    && (
-                        inTransparentMode(MODE_TUPLE_PY)
-                        || next_token() == IF
-                        || lparen_types_size == lparen_types_py.size()
+                lparen_types_size == lparen_types_py.size()
+                && (
+                    (
+                        LA(1) == RPAREN
+                        && (
+                            next_token() != PERIOD
+                            || lparen_types_py.back() == 'o'
+                            || lparen_types_py.back() == 'c'
+                        )
                     )
+                    || (last_consumed == COMMA && inTransparentMode(MODE_TUPLE_PY))
+                    || (LA(1) == COMMA && lparen_types_py.back() == 'c')
+                    || LA(1) == FOR
                 )
-                || (
-                    last_consumed == COMMA
-                    && inTransparentMode(MODE_TUPLE_PY)
-                    && lparen_types_size == lparen_types_py.size()
-                )
-                || (
-                    LA(1) == COMMA
-                    && lparen_types_py.back() == 'c'
-                    && lparen_types_size == lparen_types_py.size()
-                )
-                || (LA(1) == FOR && lparen_types_size == lparen_types_py.size())
             }?
             {
                 break;

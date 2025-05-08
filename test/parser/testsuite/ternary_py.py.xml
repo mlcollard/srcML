@@ -160,4 +160,27 @@
 </block_content></block></if></if_stmt>
 </unit>
 
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>expected</name> <operator>=</operator> <operator>(</operator>
+    <name>a</name>
+    <ternary>if <condition><expr><literal type="boolean">True</literal></expr></condition>
+    <else>else <expr><call><name>call_one</name><argument_list>(<argument><expr><operator>*</operator><operator>(</operator><name>b</name> <operator>*</operator> <name>c</name><operator>)</operator></expr></argument>)</argument_list></call></expr></else></ternary>
+<operator>)</operator></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>inputs</name> <operator>=</operator> <name>a</name> <ternary>if <condition><expr><literal type="boolean">True</literal></expr></condition> <else>else <expr><call><name>call_one</name><argument_list>(<argument><expr><operator>*</operator><operator>(</operator><name>b</name> <operator>*</operator> <name>c</name><operator>)</operator></expr></argument>)</argument_list></call></expr></else></ternary></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>inputs</name> <operator>=</operator> <tuple>(
+    <expr><name>a</name> <ternary>if <condition><expr><literal type="boolean">True</literal></expr></condition> <else>else <expr><call><name>call_one</name><argument_list>(<argument><expr><operator>*</operator><operator>(</operator><name>b</name> <operator>*</operator> <name>c</name><operator>)</operator></expr></argument>)</argument_list></call></expr></else></ternary></expr>,
+    <expr><name>d</name></expr>
+)</tuple></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><call><name><name>a</name><operator>.</operator><name>call_one</name></name><argument_list>(<argument><expr><literal type="null">None</literal> <ternary>if <condition><expr><name>b</name></expr></condition> <else>else <expr><call><name>call_two</name><argument_list>(<argument><expr><name>c</name></expr></argument>, <argument><expr><call><name><name>d</name><operator>.</operator><name>pop</name></name><argument_list>()</argument_list></call></expr></argument>)</argument_list></call> <ternary>if <condition><expr><name>e</name></expr></condition> <else>else <expr><literal type="number">1</literal></expr></else></ternary></expr></else></ternary></expr></argument>)</argument_list></call></expr></expr_stmt>
+</unit>
+
 </unit>
