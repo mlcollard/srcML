@@ -158,4 +158,24 @@
 <expr_stmt><expr><name>result</name> <operator>=</operator> <array>[<expr><name>a</name></expr> <comprehension><for>for <control><tuple>(<array>[<array>[<name>b</name>, <name>c</name>]</array>, <array>[<name>d</name>, <name>e</name>]</array>]</array>, <array>[<array>[<name>f</name>, <name>g</name>]</array>, <array>[<name>h</name>, <name>i</name>]</array>]</array>)</tuple> <range>in <expr><call><name>enumerate</name><argument_list>(<argument><expr><name>j</name></expr></argument>)</argument_list></call></expr></range></control></for></comprehension>]</array></expr></expr_stmt>
 </unit>
 
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>types</name> <operator>=</operator> <set>{ <expr><call><name>type</name><argument_list>(<argument><expr><name>a</name></expr></argument>)</argument_list></call></expr> <comprehension><for>for <control><name><operator>*</operator><name>_</name></name> <range>in <expr><name>a</name></expr></range></control></for></comprehension> }</set></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>types</name> <operator>=</operator> <set>{ <expr><call><name>type</name><argument_list>(<argument><expr><name>a</name></expr></argument>)</argument_list></call></expr> <comprehension><for>for <control>(<name><operator>*</operator><name>_</name></name>) <range>in <expr><name>a</name></expr></range></control></for></comprehension> }</set></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>types</name> <operator>=</operator> <set>{ <expr><call><name>type</name><argument_list>(<argument><expr><name>a</name></expr></argument>)</argument_list></call></expr> <comprehension><for>for <control><tuple><name>a</name>, <name><operator>*</operator><name>_</name></name></tuple> <range>in <expr><name>b</name></expr></range></control></for></comprehension> }</set></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>types</name> <operator>=</operator> <set>{ <expr><call><name>type</name><argument_list>(<argument><expr><name>a</name></expr></argument>)</argument_list></call></expr> <comprehension><for>for <control><tuple>(<name><operator>*</operator><name>_</name></name>, <name>a</name>)</tuple> <range>in <expr><name>b</name></expr></range></control></for></comprehension> }</set></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>types</name> <operator>=</operator> <set>{ <expr><call><name>type</name><argument_list>(<argument><expr><name>a</name></expr></argument>)</argument_list></call></expr> <comprehension><for>for <control><array>[<name><operator>*</operator><name>_</name></name>, <name>a</name>]</array> <range>in <expr><name>b</name></expr></range></control></for></comprehension> }</set></expr></expr_stmt>
+</unit>
+
 </unit>

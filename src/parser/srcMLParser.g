@@ -18705,7 +18705,7 @@ control_initialization_py[] { ENTRY_DEBUG } :
             { perform_tuple_names_check_py() }?
             tuple_names_py |
 
-            parenthesized_name_py | array_names_py | compound_name | comma
+            parenthesized_name_py | array_names_py | star_name_py | compound_name | comma
         )*
 
         {
@@ -18816,7 +18816,7 @@ tuple_names_py[] { CompleteElement element(this); ENTRY_DEBUG } :
             { perform_tuple_names_check_py() }?
             tuple_names_py |
 
-            parenthesized_name_py | array_names_py | compound_name | comma
+            parenthesized_name_py | array_names_py | star_name_py | compound_name | comma
         )*
 
         {
@@ -18915,7 +18915,7 @@ parenthesized_name_py[] { CompleteElement element(this); int lparen_count = 1; E
             { perform_tuple_names_check_py() }?
             tuple_names_py |
 
-            array_names_py | compound_name
+            array_names_py | star_name_py | compound_name
         )*
 
         {
@@ -18946,7 +18946,7 @@ array_names_py[] { CompleteElement element(this); ENTRY_DEBUG } :
             { perform_tuple_names_check_py() }?
             tuple_names_py |
 
-            parenthesized_name_py | array_names_py | compound_name | comma
+            parenthesized_name_py | array_names_py | star_name_py | compound_name | comma
         )*
 
         {
@@ -18960,4 +18960,30 @@ array_names_py[] { CompleteElement element(this); ENTRY_DEBUG } :
             if (inMode(MODE_ARRAY_OF_NAMES_PY))
                 endMode(MODE_ARRAY_OF_NAMES_PY);
         }
+;
+
+/*
+  star_name_py
+
+  Used to mark MULTOPS + NAME as a name in Python tuple/array of names (e.g., "*_").
+*/
+star_name_py[] { CompleteElement element(this); ENTRY_DEBUG } :
+        {
+            // start the outer name tag
+            startNewMode(MODE_LOCAL);
+            startElement(SCNAME);
+
+            // start the inner operator tag
+            startNewMode(MODE_LOCAL);
+            startElement(SOPERATOR);
+        }
+
+        MULTOPS
+
+        {
+            // close the inner operator tag
+            endMode(MODE_LOCAL);
+        }
+
+        compound_name
 ;
