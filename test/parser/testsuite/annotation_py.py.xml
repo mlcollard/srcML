@@ -8,6 +8,39 @@
 </unit>
 
 <unit revision="1.1.0" language="Python">
+<function>def <name>annotation</name><parameter_list>(<parameter><name>a</name></parameter>, <parameter><name>b</name></parameter>)</parameter_list> <annotation>-&gt; <expr><literal type="string">"srcML"</literal></expr></annotation><block>:<block_content>
+    <return>return <expr><literal type="string">"srcML"</literal></expr></return>
+</block_content></block></function>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<function>def <name>annotation</name><parameter_list>(<parameter><name>a</name></parameter>, <parameter><name>b</name></parameter>)</parameter_list> <annotation>-&gt; <expr><array>[<expr><literal type="number">1</literal></expr>, <expr><literal type="number">2</literal></expr>]</array></expr></annotation><block>:<block_content>
+    <return>return <expr><array>[<expr><literal type="number">1</literal></expr>, <expr><literal type="number">2</literal></expr>]</array></expr></return>
+</block_content></block></function>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<function>def <name>annotation</name><parameter_list>(<parameter><name>a</name></parameter>, <parameter><name>b</name></parameter>)</parameter_list> <annotation>-&gt; <expr><call><name>call_one</name><argument_list>(<argument><expr><literal type="number">1</literal></expr></argument>, <argument><expr><literal type="number">2</literal></expr></argument>)</argument_list></call></expr></annotation><block>:<block_content>
+    <return>return <expr><call><name>call_one</name><argument_list>(<argument><expr><literal type="number">1</literal></expr></argument>, <argument><expr><literal type="number">2</literal></expr></argument>)</argument_list></call></expr></return>
+</block_content></block></function>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<function>def <name>annotation</name><parameter_list>(<parameter><name>a</name></parameter>, <parameter><name>b</name></parameter>)</parameter_list> <annotation>-&gt; <expr><call><call><name>call_one</name><argument_list>(<argument><expr><literal type="number">1</literal></expr></argument>, <argument><expr><literal type="number">2</literal></expr></argument>)</argument_list></call><argument_list>()</argument_list></call></expr></annotation><block>:<block_content>
+    <return>return <expr><call><call><name>call_one</name><argument_list>(<argument><expr><literal type="number">1</literal></expr></argument>, <argument><expr><literal type="number">2</literal></expr></argument>)</argument_list></call><argument_list>()</argument_list></call></expr></return>
+</block_content></block></function>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<function>def <name>example</name><parameter_list>(
+    <parameter><name>a</name><annotation>: <expr><name>int</name></expr></annotation></parameter>,
+    <parameter><name>b</name><annotation>: <expr><name>int</name></expr></annotation></parameter>,
+)</parameter_list> <annotation>-&gt; <expr><name>int</name> <operator>|</operator> <name><name>Sequence</name><index>[<expr><name>int</name> <operator>|</operator> <literal type="null">None</literal></expr>]</index></name> <operator>|</operator> <literal type="null">None</literal></expr></annotation><block>:<block_content>
+    <pass>pass</pass>
+</block_content></block></function>
+</unit>
+
+<unit revision="1.1.0" language="Python">
 <function>def <name>print_square</name><parameter_list>(<parameter><name>x</name><annotation>: <expr><name>int</name></expr></annotation></parameter>)</parameter_list><block>:<block_content>
     <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><name>x</name><operator>**</operator><literal type="number">2</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
 </block_content></block></function>
@@ -22,15 +55,6 @@
 <unit revision="1.1.0" language="Python">
 <function>def <name>printf</name><parameter_list>(<parameter type="args">*<name>args</name><annotation>: <expr><name>tuple</name></expr></annotation></parameter>, <parameter type="kwargs">**<name>kwargs</name><annotation>: <expr><name>dict</name></expr></annotation></parameter>)</parameter_list><block>:<block_content>
     <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><name>args</name></expr></argument>,<argument><expr><name>kwargs</name></expr></argument>)</argument_list></call></expr></expr_stmt>
-</block_content></block></function>
-</unit>
-
-<unit revision="1.1.0" language="Python">
-<function>def <name>example</name><parameter_list>(
-    <parameter><name>a</name><annotation>: <expr><name>int</name></expr></annotation></parameter>,
-    <parameter><name>b</name><annotation>: <expr><name>int</name></expr></annotation></parameter>,
-)</parameter_list> <annotation>-&gt; <expr><name>int</name> <operator>|</operator> <name><name>Sequence</name><index>[<expr><name>int</name> <operator>|</operator> <literal type="null">None</literal></expr>]</index></name> <operator>|</operator> <literal type="null">None</literal></expr></annotation><block>:<block_content>
-    <pass>pass</pass>
 </block_content></block></function>
 </unit>
 

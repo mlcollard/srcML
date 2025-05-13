@@ -17297,17 +17297,26 @@ function_annotation_py[] { ENTRY_DEBUG } :
 
         PY_ARROW
 
-        {
-            startNewMode(MODE_EXPRESSION | MODE_EXPECT);
-        }
-
         (options { greedy = true; } :
             { LA(1) == INDENT }?
             {
                 break;
             } |
 
-            expression
+            // ensure compound calls are marked correctly (e.g., "a(b)(c)")
+            { inMode(MODE_FUNCTION_CALL) && last_consumed == RPAREN && LA(1) == LPAREN }?
+            call_argument_list |
+
+            { inMode(MODE_ARGUMENT) }?
+            argument |
+
+            {
+                if (!inMode(MODE_EXPRESSION))
+                    startNewMode(MODE_EXPRESSION | MODE_EXPECT);
+            }
+            expression |
+
+            comma
         )*
 
         {
