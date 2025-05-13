@@ -18965,7 +18965,8 @@ array_names_py[] { CompleteElement element(this); ENTRY_DEBUG } :
 /*
   star_name_py
 
-  Used to mark MULTOPS + NAME as a name in Python tuple/array of names (e.g., "*_").
+  Used to mark "*" + NAME (or "**" + NAME) as a compound name (e.g., "*_").
+  Only applicable in Python a tuple of names/array of names.
 */
 star_name_py[] { CompleteElement element(this); ENTRY_DEBUG } :
         {
@@ -18978,7 +18979,7 @@ star_name_py[] { CompleteElement element(this); ENTRY_DEBUG } :
             startElement(SOPERATOR);
         }
 
-        MULTOPS
+        (MULTOPS | EXPONENTIATION)
 
         {
             // close the inner operator tag

@@ -178,4 +178,24 @@
 <expr_stmt><expr><name>types</name> <operator>=</operator> <set>{ <expr><call><name>type</name><argument_list>(<argument><expr><name>a</name></expr></argument>)</argument_list></call></expr> <comprehension><for>for <control><array>[<name><operator>*</operator><name>_</name></name>, <name>a</name>]</array> <range>in <expr><name>b</name></expr></range></control></for></comprehension> }</set></expr></expr_stmt>
 </unit>
 
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>types</name> <operator>=</operator> <set>{ <expr><call><name>type</name><argument_list>(<argument><expr><name>a</name></expr></argument>)</argument_list></call></expr> <comprehension><for>for <control><name><operator>**</operator><name>_</name></name> <range>in <expr><name>a</name></expr></range></control></for></comprehension> }</set></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>types</name> <operator>=</operator> <set>{ <expr><call><name>type</name><argument_list>(<argument><expr><name>a</name></expr></argument>)</argument_list></call></expr> <comprehension><for>for <control>(<name><operator>**</operator><name>_</name></name>) <range>in <expr><name>a</name></expr></range></control></for></comprehension> }</set></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>types</name> <operator>=</operator> <set>{ <expr><call><name>type</name><argument_list>(<argument><expr><name>a</name></expr></argument>)</argument_list></call></expr> <comprehension><for>for <control><tuple><name>a</name>, <name><operator>**</operator><name>_</name></name></tuple> <range>in <expr><name>b</name></expr></range></control></for></comprehension> }</set></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>types</name> <operator>=</operator> <set>{ <expr><call><name>type</name><argument_list>(<argument><expr><name>a</name></expr></argument>)</argument_list></call></expr> <comprehension><for>for <control><tuple>(<name><operator>**</operator><name>_</name></name>, <name>a</name>)</tuple> <range>in <expr><name>b</name></expr></range></control></for></comprehension> }</set></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>types</name> <operator>=</operator> <set>{ <expr><call><name>type</name><argument_list>(<argument><expr><name>a</name></expr></argument>)</argument_list></call></expr> <comprehension><for>for <control><array>[<name><operator>**</operator><name>_</name></name>, <name>a</name>]</array> <range>in <expr><name>b</name></expr></range></control></for></comprehension> }</set></expr></expr_stmt>
+</unit>
+
 </unit>
