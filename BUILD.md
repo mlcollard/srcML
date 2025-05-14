@@ -5,7 +5,7 @@ macOS, Fedora, Ubuntu, OpenSUSE, and Windows Visual Studio.
 
 Out-of-source builds (builds outside the source directory) are required, and in-source builds are not supported.
 
-For full configuration, a set of presets for each platform, including ci-ubuntu, ci-rpm, macOS, and ci-msvc, should be used.
+For full configuration, use a presets for your platform: ci-ubuntu, ci-rpm, macOS, and ci-msvc.
 
 ## Unix
 
