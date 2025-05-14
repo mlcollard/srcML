@@ -18,9 +18,22 @@ list(REMOVE_DUPLICATES CPACK_GENERATOR)
 # System name based on macOS, then used in package name
 set(CPACK_SYSTEM_NAME "macOS")
 
-# Archive package filenames
-set(BASE_SRCML_FILE_NAME "${CPACK_COMPONENT_SRCML_DISPLAY_NAME}-${PROJECT_VERSION}-${CPACK_SYSTEM_NAME}")
+# Append the architecture to the package name based on the architecture:
+# * No architecture specified, use current system architecture
+# * One architecture specified, use the one architecture
+# * Multiple architectures (universal binary), do not append anything
+set(SRCML_ARCHITECTURE "")
+list(LENGTH CMAKE_OSX_ARCHITECTURES ARCH_COUNT)
+if(ARCH_COUNT EQUAL 0)
+    set(SRCML_ARCHITECTURE "-${CMAKE_SYSTEM_PROCESSOR}")
+elseif(ARCH_COUNT EQUAL 1)
+    set(SRCML_ARCHITECTURE "-${CMAKE_OSX_ARCHITECTURES}")
+endif()
+
+# Package filenames
+set(BASE_SRCML_FILE_NAME "${CPACK_COMPONENT_SRCML_DISPLAY_NAME}-${PROJECT_VERSION}-${CPACK_SYSTEM_NAME}${SRCML_ARCHITECTURE}")
 set(CPACK_ARCHIVE_SRCML_FILE_NAME "${BASE_SRCML_FILE_NAME}")
+set(CPACK_PACKAGE_FILE_NAME "${BASE_SRCML_FILE_NAME}")
 
 # Targets for installing generated packages
 add_custom_target(install_package
