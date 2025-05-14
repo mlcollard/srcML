@@ -1414,8 +1414,8 @@ start_python[] {
             comprehension_py();
         }
 
-        // special markup for an "if" that appears in a "case" statement
-        if (LA(1) == IF && inTransparentMode(MODE_CASE_PY)) {
+        // special markup for an "if" that appears at the 'top-level' in a "case" statement
+        if (LA(1) == IF && !inMode(MODE_STATEMENT) && inTransparentMode(MODE_CASE_PY)) {
             endDownToMode(MODE_CASE_PY);
             consume();  // IF
             startNewMode(MODE_CONDITION | MODE_EXPECT);
