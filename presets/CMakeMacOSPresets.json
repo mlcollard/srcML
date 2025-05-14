@@ -18,6 +18,9 @@
       "inherits": ["ci-macos-only", "ci-clang", "ci-sibling-build"],
       "generator": "Ninja",
       "cacheVariables": {
+        // srcml client searches for libsrcml in current directory, sibling lib/ directory, or /usr/local/lib
+        "CMAKE_INSTALL_RPATH": "@loader_path;@loader_path/../lib;/usr/local/lib",
+        "CMAKE_INSTALL_RPATH_USE_LINK_PATH": "TRUE",
         // Making the exported_symbols_list an empty file reduces size of executable, as strip does not work
         "SRCML_CLIENT_LINK_FLAGS": "-exported_symbols_list /dev/null",
         "SRCML_ANTLR_COMPILE_FLAGS": "-Wno-system-headers;-Wno-deprecated-declarations;-Wno-format",
