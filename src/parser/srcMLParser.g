@@ -17191,7 +17191,7 @@ complete_python_parameter[] {
 
   Handles a Python parameter annotation.
 */
-parameter_annotation_py[] { bool found_init = false; ENTRY_DEBUG } :
+parameter_annotation_py[] { int lparen_types_size = 0; bool found_init = false; ENTRY_DEBUG } :
         {
             // This is possible if called after handling an arbitrary positional parameter
             // or arbitrary keyword parameter in complete_python_parameter.  In a Python
@@ -17202,13 +17202,11 @@ parameter_annotation_py[] { bool found_init = false; ENTRY_DEBUG } :
             startNewMode(MODE_ANNOTATION_PY);
 
             startElement(SANNOTATION);
+
+            lparen_types_size = lparen_types_py.size();
         }
 
         PY_COLON
-
-        {
-            startNewMode(MODE_EXPRESSION | MODE_EXPECT);
-        }
 
         (options { greedy = true; } :
             // do not consume the ending RPAREN for a parameter list or EQUAL for an init
@@ -17230,7 +17228,15 @@ parameter_annotation_py[] { bool found_init = false; ENTRY_DEBUG } :
             { inMode(MODE_EXPRESSION) }?
             parameter_init_py |
 
-            expression
+            {
+                if (!inMode(MODE_EXPRESSION))
+                    startNewMode(MODE_EXPRESSION | MODE_EXPECT);
+            }
+            expression |
+
+            // do not consume parameter list commas
+            { lparen_types_size < lparen_types_py.size() }?
+            comma
         )*
 
         {
