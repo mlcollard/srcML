@@ -3201,16 +3201,18 @@ call_check_paren_pair[int& argumenttoken, int depth = 0] { int call_token = LA(1
             (identifier | generic_selection)
             throw_exception[true] |
 
-            // forbid parentheses (handled recursively) but allow "if"/"else" for Python ternaries,
-            // "lambda" for Python lambdas, and "async"/"for"/"in"/"if" for Python comprehensions
+            // forbid parentheses (handled recursively) but allow the following in Python:
+            // - "if"/"else" for ternaries
+            // - "lambda" for lambdas
+            // - "async"/"for"/"in"/"if" for comprehensions
+            // - "yield"/"from" for yield expressions
             {
                 call_token == LPAREN
                 && inLanguage(LANGUAGE_PYTHON)
                 && (
                     !keyword_token_set.member(LA(1))
-                    || LA(1) == IF || LA(1) == ELSE
-                    || LA(1) == FOR || LA(1) == PY_IN
-                    || LA(1) == PY_ASYNC || LA(1) == PY_LAMBDA
+                    || LA(1) == IF || LA(1) == ELSE || LA(1) == FOR || LA(1) == PY_IN || LA(1) == PY_ASYNC
+                    || LA(1) == PY_LAMBDA || LA(1) == PY_YIELD || LA(1) == PY_FROM
                 )
             }?
             ~(LPAREN | RPAREN | TERMINATE)

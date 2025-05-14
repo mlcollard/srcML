@@ -59,4 +59,18 @@
 </block_content></block></function>
 </unit>
 
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><call><name>call_one</name><argument_list>(
+    <argument><expr><call><name>call_two</name><argument_list>(<argument><expr><operator>(</operator><lambda>lambda: <expr><operator>(</operator><yield>yield <expr><name>a</name></expr></yield><operator>)</operator></expr></lambda><operator>)</operator></expr></argument>)</argument_list></call></expr></argument>,
+    <argument><expr><name>a</name></expr></argument>,
+)</argument_list></call></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><call><name>call_one</name><argument_list>(
+    <argument><expr><call><name>call_two</name><argument_list>(<argument><expr><operator>(</operator><lambda>lambda: <expr><operator>(</operator><yield type="from">yield from <expr><name>a</name></expr></yield><operator>)</operator></expr></lambda><operator>)</operator></expr></argument>)</argument_list></call></expr></argument>,
+    <argument><expr><name>a</name></expr></argument>,
+)</argument_list></call></expr></expr_stmt>
+</unit>
+
 </unit>
