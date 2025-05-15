@@ -407,4 +407,20 @@ def <name>call_function</name><parameter_list>(<parameter><name>a</name></parame
 <expr_stmt><expr><name>call_op_paren</name> <operator>=</operator> <operator>(</operator><operator>(</operator><operator>(</operator><call><call><name>call_one</name><argument_list>(<argument><expr><literal type="number">1</literal></expr></argument>)</argument_list></call><argument_list>(<argument><expr><literal type="number">2</literal></expr></argument>)</argument_list></call><operator>)</operator><operator>)</operator><operator>)</operator></expr></expr_stmt>
 </unit>
 
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>result</name> <operator>=</operator> <call><name>call_one</name><argument_list>(<argument><expr><name>a</name></expr></argument>, <argument><expr><name>b</name></expr></argument>)</argument_list></call><index>[<expr><literal type="number">0</literal></expr>]</index></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>result</name> <operator>=</operator> <call><name>call_one</name><argument_list>(<argument><expr><name>a</name></expr></argument>, <argument><expr><name>b</name></expr></argument>)</argument_list></call><index>[<expr><literal type="number">0</literal></expr>]</index><index>[<expr><literal type="number">1</literal></expr>]</index></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>result</name> <operator>=</operator> <call><name>call_one</name><argument_list>(<argument><expr><name>a</name></expr></argument>, <argument><expr><name>b</name></expr></argument>)</argument_list></call><index>[<expr><literal type="number">0</literal></expr>]</index><operator>.</operator><call><name>call_two</name><argument_list>(<argument><expr><name>c</name></expr></argument>, <argument><expr><name>d</name></expr></argument>)</argument_list></call><index>[<expr><literal type="number">1</literal></expr>]</index></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>result</name> <operator>=</operator> <call><name>call_one</name><argument_list>(<argument><expr><call><name>call_two</name><argument_list>(<argument><expr><name>a</name></expr></argument>, <argument><expr><name>b</name></expr></argument>)</argument_list></call><index>[<expr><literal type="number">0</literal></expr>]</index></expr></argument>, <argument><expr><name>c</name></expr></argument>)</argument_list></call><index>[<expr><literal type="number">0</literal></expr>]</index></expr></expr_stmt>
+</unit>
+
 </unit>

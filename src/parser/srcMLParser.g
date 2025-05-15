@@ -12226,6 +12226,14 @@ expression_part[CALL_TYPE type = NOCALL, int call_count = 1] {
 
         ENTRY_DEBUG
 } :
+        // looking for a Python indexable function call (e.g., a()[], b()[][], etc.)
+        {
+            inLanguage(LANGUAGE_PYTHON)
+            && (last_consumed == RPAREN || last_consumed == RBRACKET)
+            && LA(1) == LBRACKET
+        }?
+        variable_identifier_array_grammar_sub[flag] |
+
         // looking for name to start a Python subscriptable function call (e.g., a[]())
         {
             inLanguage(LANGUAGE_PYTHON)
