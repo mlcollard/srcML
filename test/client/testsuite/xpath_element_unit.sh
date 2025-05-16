@@ -47,3 +47,22 @@ check result.xml "$result"
 
 echo "a;" | srcml -l C++  --xmlns:pre=foo.com --xpath="//src:name" --element="pre:element" --xmlns:pre=foo.com -o result.xml
 check result.xml "$resultstdin"
+
+# Test for both element and attribute
+define prefix <<- 'STDOUT'
+	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:extra="mlcollard.net/extr" revision="1.0.0" language="Java" filename="a.java">
+	<expr_stmt><expr><extra:state extra:type="test"><name>a</name></extra:state> <operator>=</operator> <extra:state extra:type="test"><name>b</name></extra:state></expr>;</expr_stmt>
+	</unit>
+STDOUT
+srcml -l Java --filename="a.java" --text="\na = b;\n" --xpath="//src:name" --xmlns:extra="mlcollard.net/extr" --element=extra:state --attribute extra:type=test
+check "$prefix"
+
+define prefixdiff <<- 'STDOUT'
+	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:attr="mlcollard.net/attr" xmlns:extra="mlcollard.net/extr" revision="1.0.0" language="Java" filename="a.java">
+	<expr_stmt><expr><extra:state extra:type="test"><name>a</name></extra:state> <operator>=</operator> <extra:state extra:type="test"><name>b</name></extra:state></expr>;</expr_stmt>
+	</unit>
+STDOUT
+srcml -l Java --filename="a.java" --text="\na = b;\n" --xpath="//src:name" --xmlns:extra="mlcollard.net/extr" --xmlns:attr="mlcollard.net/attr" --element=extra:state --attribute attr:type=test
+check "$prefixdiff"
