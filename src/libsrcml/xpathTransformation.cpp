@@ -61,6 +61,8 @@ xpathTransformation::xpathTransformation(srcml_archive* /* oarchive */, const ch
     // create a namespace for the new attribute (if needed)
     if (attr_uri) {
         attr_ns = xmlNewNs(NULL, (const xmlChar *) attr_uri, (const xmlChar *) attr_prefix);
+    } else {
+        attr_ns = xmlNewNs(NULL, (const xmlChar *) element_uri, (const xmlChar *) element_prefix);
     }
 
     // create a namespace for the new element (if needed)

@@ -9,8 +9,8 @@ project(srcML-Examples)
 
 # Produces the target srcML::LibsrcML
 # Can also specify components. The default component is shared
-#   find_package(srcml COMPONENT shared REQUIRED)
-#   find_package(srcml COMPONENT static REQUIRED)
+#   find_package(srcML COMPONENT shared REQUIRED)
+#   find_package(srcML COMPONENT static REQUIRED)
 find_package(srcML REQUIRED)
 
 set(CMAKE_CXX_STANDARD          11)

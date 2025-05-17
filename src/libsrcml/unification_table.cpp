@@ -92,7 +92,7 @@ bool UnificationTable::does_element_match_variable(std::string_view variable_ide
     return true;
 }
 
-bool UnificationTable::is_element_in_bucket(std::string_view variable_identifier, int order, std::string_view t, uintptr_t address) const {
+bool UnificationTable::is_element_in_bucket(std::string_view variable_identifier, std::string_view t, uintptr_t address) const {
     std::string token(t);
     const auto bucketVar = bucket.find(variable_identifier);
     for (int i = size_of_variable_bucket(variable_identifier); i > 0; --i) {
@@ -150,11 +150,11 @@ bool UnificationTable::check_regex(std::string_view variable_identifier, std::st
 }
 
 std::ostream& operator<<(std::ostream& out, const UnificationTable& storage) {
-    for(auto const& variable : storage.bucket) {
+    for (auto const& variable : storage.bucket) {
         out << variable.first << std::endl;
-        for(auto const& order : variable.second) {
+        for (auto const& order : variable.second) {
             out << "\t" << order.first << std::endl;
-            for(auto element : order.second) {
+            for (auto element : order.second) {
                 out << "\t\t" << element.token << " | " << element.address << std::endl;
             }
         }
