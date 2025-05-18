@@ -10,7 +10,7 @@ source $(dirname "$0")/framework_test.sh
 
 # test
 #	<unit revision="REVISION" language="C++" filename="a.cpp" item="1" location="/src:expr_stmt[1]/src:expr[1]/src:name[1]"><name>a</name></unit>
-define output1 <<- 'STDOUT'
+defineXML output1 <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -20,7 +20,7 @@ define output1 <<- 'STDOUT'
 STDOUT
 
 #	<unit revision="REVISION" language="C++" filename="a.cpp" item="1" location="/src:expr_stmt[1]/src:expr[1]/src:name[1]"><name>a</name></unit>
-define output2 <<- 'STDOUT'
+defineXML output2 <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -29,12 +29,12 @@ define output2 <<- 'STDOUT'
 	</unit>
 STDOUT
 
-define output_empty <<- 'STDOUT'
+defineXML output_empty <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION"/>
 STDOUT
 
-define srcml <<- 'STDOUT'
+defineXML srcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++" filename="a.cpp"><expr_stmt><expr><name>a</name></expr>;</expr_stmt>
 	</unit>
@@ -123,7 +123,7 @@ srcml --xpath="count(//src:name)" < sub/a.cpp.xml
 check "1
 "
 
-define oneresult <<- 'STDOUT'
+defineXML oneresult <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -140,14 +140,14 @@ check "true
 "
 
 # test for omp
-define ompsrcml <<- 'STDOUT'
+defineXML ompsrcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:cpp="http://www.srcML.org/srcML/cpp" xmlns:omp="http://www.srcML.org/srcML/openmp" revision="REVISION" language="C">
 	<cpp:pragma>#<cpp:directive>pragma</cpp:directive> <omp:directive>omp <omp:name>parallel</omp:name></omp:directive></cpp:pragma>
 	</unit>
 STDOUT
 
-define xpathout <<- 'STDOUT'
+defineXML xpathout <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -158,7 +158,7 @@ define xpathout <<- 'STDOUT'
 	</unit>
 STDOUT
 
-define xpathoutcpp <<- 'STDOUT'
+defineXML xpathoutcpp <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 

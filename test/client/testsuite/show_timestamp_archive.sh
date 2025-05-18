@@ -9,7 +9,7 @@
 source $(dirname "$0")/framework_test.sh
 
 # test get directory
-define archive <<- 'STDOUT'
+defineXML archive <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -30,7 +30,7 @@ srcml --show-timestamp < sub/archive.cpp.xml
 check
 
 # empty
-define empty <<- 'STDOUT'
+defineXML empty <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -51,7 +51,7 @@ srcml --show-timestamp < sub/archive.cpp.xml
 check
 
 # none
-define none <<- 'STDIN'
+defineXML none <<- 'STDIN'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 

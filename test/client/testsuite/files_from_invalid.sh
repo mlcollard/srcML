@@ -9,7 +9,7 @@
 source $(dirname "$0")/framework_test.sh
 
 # files from
-define empty_srcml <<- 'STDOUT'
+defineXML empty_srcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION"/>
 STDOUT
@@ -59,7 +59,7 @@ check_exit 1 "$open_error"
 #loop.xml "$empty_srcml"
 
 # file list references empty file
-define empty_archive <<- 'STDOUT'
+defineXML empty_archive <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -84,7 +84,7 @@ srcml --files-from filelist.txt --archive -o files-from-empty-cpp.xml
 check files-from-empty-cpp.xml "$empty_archive"
 
 # empty archived file list
-define empty_srcml_with_url <<- 'STDOUT'
+defineXML empty_srcml_with_url <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" url="test"/>
 STDOUT

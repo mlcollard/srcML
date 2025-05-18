@@ -9,7 +9,7 @@
 source $(dirname "$0")/framework_test.sh
 
 # get metadata combinations
-define input <<- 'STDOUT'
+defineXML input <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++" url="sub" filename="a.cpp" version="1.2"/>
 STDOUT

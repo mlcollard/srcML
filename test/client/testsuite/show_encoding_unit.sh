@@ -9,13 +9,13 @@
 source $(dirname "$0")/framework_test.sh
 
 # test on single unit
-define input <<- 'STDOUT'
+defineXML input <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++" directory="bar" filename="foo" version="1.2"/>
 STDOUT
 
 # test on archive of one unit
-define archive <<- 'STDOUT'
+defineXML archive <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -44,7 +44,7 @@ srcml --show-encoding < sub/archive.cpp.xml
 check "UTF-8\n"
 
 # test on empty archive
-define empty <<- 'STDOUT'
+defineXML empty <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION"/>
 STDOUT

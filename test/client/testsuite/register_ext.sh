@@ -9,7 +9,7 @@
 source $(dirname "$0")/framework_test.sh
 
 # test register language
-define fxmlfile <<- 'STDOUT'
+defineXML fxmlfile <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="Java" filename="sub/a.cpp"/>
 STDOUT
@@ -30,7 +30,7 @@ check sub/a.cpp.xml "$fxmlfile"
 srcml --register-ext cpp=Java sub/a.cpp --register-ext xml=Java -o sub/a.cpp.xml
 check sub/a.cpp.xml "$fxmlfile"
 
-define fsxmlfile <<- 'STDOUT'
+defineXML fsxmlfile <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++" filename="a.cpp"/>
 STDOUT

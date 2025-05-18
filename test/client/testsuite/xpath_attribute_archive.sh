@@ -9,7 +9,7 @@
 source $(dirname "$0")/framework_test.sh
 
 # test setting the attribute on xpath query results
-define result <<- 'STDOUT'
+defineXML result <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:pre="foo.com" revision="REVISION">
 
@@ -30,7 +30,7 @@ createfile b.cpp "b;
 "
 
 # test setting the attribute on xpath query results
-define original <<- 'STDOUT'
+defineXML original <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:pre="foo.com" revision="REVISION">
 

@@ -10,7 +10,7 @@ source $(dirname "$0")/framework_test.sh
 
 # archive of one unit
 # test on standard in
-define output <<- 'STDOUT'
+defineXML output <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" url="bar">
 
@@ -20,7 +20,7 @@ define output <<- 'STDOUT'
 STDOUT
 
 # test on file
-define fsrcml <<- 'STDOUT'
+defineXML fsrcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" url="bar">
 
@@ -59,7 +59,7 @@ check sub/a.cpp.xml "$fsrcml"
 
 # archive of multiple units
 # test on file
-define fsrcml <<- 'STDOUT'
+defineXML fsrcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" url="bar">
 

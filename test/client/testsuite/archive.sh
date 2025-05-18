@@ -9,7 +9,7 @@
 source $(dirname "$0")/framework_test.sh
 
 # test archive
-define fileasrcml <<- 'STDOUT'
+defineXML fileasrcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -19,7 +19,7 @@ define fileasrcml <<- 'STDOUT'
 STDOUT
 xmlcheck "$fileasrcml"
 
-define asrcml <<- 'STDOUT'
+defineXML asrcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -29,7 +29,7 @@ define asrcml <<- 'STDOUT'
 STDOUT
 xmlcheck "$asrcml"
 
-define nestedfile <<- 'STDOUT'
+defineXML nestedfile <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 

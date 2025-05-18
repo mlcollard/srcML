@@ -10,7 +10,7 @@ source $(dirname "$0")/framework_test.sh
 
 # test other_prefixes
 
-define srcml <<- 'STDOUT'
+defineXML srcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:foo="http://www.cs.uakron.edu/~collard/foo" xmlns:bar="http://www.cs.uakron.edu/~collard/bar" >
 
@@ -25,12 +25,12 @@ define srcml <<- 'STDOUT'
 	</unit>
 STDOUT
 
-define xpathempty <<- 'STDOUT'
+defineXML xpathempty <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:foo="http://www.cs.uakron.edu/~collard/foo" xmlns:bar="http://www.cs.uakron.edu/~collard/bar" revision="REVISION"/>
 STDOUT
 
-define output <<- 'STDOUT'
+defineXML output <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:foo="http://www.cs.uakron.edu/~collard/foo" xmlns:bar="http://www.cs.uakron.edu/~collard/bar" revision="REVISION">
 

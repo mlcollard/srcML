@@ -9,7 +9,7 @@
 source $(dirname "$0")/framework_test.sh
 
 # test executing an xpath search on an archive with more than one unit in it
-define srcml <<- 'STDOUT'
+defineXML srcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -41,7 +41,7 @@ xmlcheck "$srcml"
 createfile sub/archive.cpp.xml "$srcml"
 
 # select elements matching *<argument><expr><name>*
-define output <<- 'STDOUT'
+defineXML output <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 

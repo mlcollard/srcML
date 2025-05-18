@@ -9,7 +9,7 @@
 source $(dirname "$0")/framework_test.sh
 
 # test src-version attribute on archive of one
-define srcml <<- 'STDOUT'
+defineXML srcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" version="1.0">
 
@@ -18,7 +18,7 @@ define srcml <<- 'STDOUT'
 	</unit>
 STDOUT
 
-define fsrcml <<- 'STDOUT'
+defineXML fsrcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" version="1.0">
 
@@ -91,7 +91,7 @@ srcml --archive -s 1.0 sub/a.cpp
 check "$fsrcml"
 
 # test src-version attribute an archive of more than one
-define fsrcml <<- 'STDOUT'
+defineXML fsrcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" version="1.0">
 

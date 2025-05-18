@@ -11,7 +11,7 @@ source $(dirname "$0")/framework_test.sh
 # test verbose on an archive
 define sfile <<< "a;"
 
-define fsrcml <<- 'STDOUT'
+defineXML fsrcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 

@@ -18,7 +18,7 @@ define input <<- 'INPUT'
 	#endif
 INPUT
 
-define markup_else <<- 'STDOUT'
+defineXML markup_else <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -33,7 +33,7 @@ define markup_else <<- 'STDOUT'
 	</unit>
 STDOUT
 
-define fmarkup_else <<- 'STDOUT'
+defineXML fmarkup_else <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -48,7 +48,7 @@ define fmarkup_else <<- 'STDOUT'
 	</unit>
 STDOUT
 
-define nomarkup_else <<- 'STDOUT'
+defineXML nomarkup_else <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" options="CPP_TEXT_ELSE">
 
@@ -63,7 +63,7 @@ define nomarkup_else <<- 'STDOUT'
 	</unit>
 STDOUT
 
-define fnomarkup_else <<- 'STDOUT'
+defineXML fnomarkup_else <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" options="CPP_TEXT_ELSE">
 

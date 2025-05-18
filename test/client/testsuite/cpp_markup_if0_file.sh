@@ -18,7 +18,7 @@ define input <<- 'INPUT'
 	#endif
 INPUT
 
-define nomarkupif0 <<- 'STDOUT'
+defineXML nomarkupif0 <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:cpp="http://www.srcML.org/srcML/cpp" revision="REVISION" language="C++">
 	<cpp:if>#<cpp:directive>if</cpp:directive> <expr><literal type="number">0</literal></expr></cpp:if>
@@ -27,7 +27,7 @@ define nomarkupif0 <<- 'STDOUT'
 	</unit>
 STDOUT
 
-define fnomarkupif0 <<- 'STDOUT'
+defineXML fnomarkupif0 <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:cpp="http://www.srcML.org/srcML/cpp" revision="REVISION" language="C++" filename="sub/a.cpp">
 	<cpp:if>#<cpp:directive>if</cpp:directive> <expr><literal type="number">0</literal></expr></cpp:if>
@@ -36,7 +36,7 @@ define fnomarkupif0 <<- 'STDOUT'
 	</unit>
 STDOUT
 
-define markupif0 <<- 'STDOUT'
+defineXML markupif0 <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:cpp="http://www.srcML.org/srcML/cpp" revision="REVISION" language="C++" options="CPP_MARKUP_IF0">
 	<cpp:if>#<cpp:directive>if</cpp:directive> <expr><literal type="number">0</literal></expr></cpp:if>
@@ -45,7 +45,7 @@ define markupif0 <<- 'STDOUT'
 	</unit>
 STDOUT
 
-define fmarkupif0 <<- 'STDOUT'
+defineXML fmarkupif0 <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:cpp="http://www.srcML.org/srcML/cpp" revision="REVISION" language="C++" filename="sub/a.cpp" options="CPP_MARKUP_IF0">
 	<cpp:if>#<cpp:directive>if</cpp:directive> <expr><literal type="number">0</literal></expr></cpp:if>

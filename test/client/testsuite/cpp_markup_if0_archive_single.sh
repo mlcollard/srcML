@@ -16,7 +16,7 @@ define input <<- 'INPUT'
 	#endif
 INPUT
 
-define nomarkupif0 <<- 'STDOUT'
+defineXML nomarkupif0 <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -29,7 +29,7 @@ define nomarkupif0 <<- 'STDOUT'
 	</unit>
 STDOUT
 
-define fnomarkupif0 <<- 'STDOUT'
+defineXML fnomarkupif0 <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -42,7 +42,7 @@ define fnomarkupif0 <<- 'STDOUT'
 	</unit>
 STDOUT
 
-define markupif0 <<- 'STDOUT'
+defineXML markupif0 <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" options="CPP_MARKUP_IF0">
 
@@ -55,7 +55,7 @@ define markupif0 <<- 'STDOUT'
 	</unit>
 STDOUT
 
-define fmarkupif0 <<- 'STDOUT'
+defineXML fmarkupif0 <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" options="CPP_MARKUP_IF0">
 

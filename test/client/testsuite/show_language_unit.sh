@@ -14,7 +14,7 @@ STDOUT
 # test get language
 
 # C++
-define srcmlcpp <<- 'STDOUT'
+defineXML srcmlcpp <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++" directory="bar" filename="foo" version="1.2"/>
 STDOUT
@@ -29,7 +29,7 @@ srcml --show-language < sub/a.cpp.xml
 check "C++\n"
 
 # Java
-define srcmljava <<- 'STDOUT'
+defineXML srcmljava <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="Java">
 	</unit>
@@ -45,7 +45,7 @@ srcml --show-language < sub/a.java.xml
 check "Java\n"
 
 # C
-define srcmlc <<- 'STDOUT'
+defineXML srcmlc <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C">
 	</unit>
@@ -61,7 +61,7 @@ srcml --show-language < sub/a.c.xml
 check "C\n"
 
 # Objective-C
-define srcmlobjc <<- 'STDOUT'
+defineXML srcmlobjc <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="Objective-C">
 	</unit>
@@ -77,7 +77,7 @@ srcml --show-language < sub/a.m.xml
 check "Objective-C\n"
 
 # Aspect J
-define srcmlaj <<- 'STDOUT'
+defineXML srcmlaj <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="Java">
 	</unit>
@@ -93,7 +93,7 @@ srcml --show-language < sub/a.aj.xml
 check "Java\n"
 
 # Empty
-define empty <<- 'STDIN'
+defineXML empty <<- 'STDIN'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="" directory="" filename="" version=""/>
 STDIN

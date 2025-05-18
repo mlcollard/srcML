@@ -11,7 +11,7 @@ source $(dirname "$0")/framework_test.sh
 # test metadata options with xml and unit
 rm -f sub/a.cpp sub/b.cpp
 
-define nestedfileextra <<- 'STDIN'
+defineXML nestedfileextra <<- 'STDIN'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -24,7 +24,7 @@ define nestedfileextra <<- 'STDIN'
 	</unit>
 STDIN
 
-define file1 <<- 'STDOUT'
+defineXML file1 <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C" filename="a.cpp" hash="1a2c5d67e6f651ae10b7673c53e8c502c97316d6"><expr_stmt><expr><name>a</name></expr>;</expr_stmt>
 	</unit>
@@ -51,7 +51,7 @@ check "C\n"
 srcml -X --unit "2" --show-language <<< "$nestedfileextra"
 check "Java\n"
 
-define input <<- 'INPUT'
+defineXML input <<- 'INPUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:lc="http://www.srcML.org/srcML/linecol" revision="REVISION" language="C++" url="sub">
 
@@ -67,19 +67,19 @@ define input <<- 'INPUT'
 	</unit>
 INPUT
 
-define file1 <<- 'STDOUT'
+defineXML file1 <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:lc="http://www.srcML.org/srcML/linecol" revision="REVISION" language="C" filename="a.cpp" mytag="foo"><expr_stmt lc:line="1"><expr><name>a</name></expr>;</expr_stmt>
 	</unit>
 STDOUT
 
-define file2 <<- 'STDOUT'
+defineXML file2 <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:lc="http://www.srcML.org/srcML/linecol" revision="REVISION" language="Java" filename="b.cpp" mytag="foo"><expr_stmt lc:line="1"><expr><name>b</name></expr>;</expr_stmt>
 	</unit>
 STDOUT
 
-define file3 <<- 'STDOUT'
+defineXML file3 <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:lc="http://www.srcML.org/srcML/linecol" revision="REVISION" language="C++" filename="c.cpp" mytag="foo"><expr_stmt lc:line="1"><expr><name>c</name></expr>;</expr_stmt>
 	</unit>
@@ -122,7 +122,7 @@ check "C\n"
 srcml -X --unit "2" --show-language <<< "$input"
 check "Java\n"
 
-define nestedfileextra <<- 'STDOUT'
+defineXML nestedfileextra <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" url="sub">
 

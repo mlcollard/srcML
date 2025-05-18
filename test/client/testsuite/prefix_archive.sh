@@ -9,7 +9,7 @@
 source $(dirname "$0")/framework_test.sh
 
 # archive of one unit
-define input <<- 'INPUT'
+defineXML input <<- 'INPUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:foo="foo.com" revision="REVISION">
 
@@ -78,7 +78,7 @@ check "
 "
 
 # archive of multiple units
-define archive_multi <<- 'INPUT'
+defineXML archive_multi <<- 'INPUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:foo="foo.com" revision="REVISION">
 

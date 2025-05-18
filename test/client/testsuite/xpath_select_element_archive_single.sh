@@ -9,7 +9,7 @@
 source $(dirname "$0")/framework_test.sh
 
 # test executing an xpath search on an archive with more than one unit in it
-define srcml <<- 'STDOUT'
+defineXML srcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -41,7 +41,7 @@ xmlcheck "$srcml"
 createfile sub/archive.cpp.xml "$srcml"
 
 # select elements matching *<argument><expr><name>*
-define output <<- 'STDOUT'
+defineXML output <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -83,7 +83,7 @@ srcml -o sub/a.xml sub/archive.cpp.xml --xpath "//src:argument/src:expr/src:name
 check sub/a.xml "$output"
 
 # select the first elements (from each archive unit) that match *<name>*
-define output <<- 'STDOUT'
+defineXML output <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -116,7 +116,7 @@ srcml --xpath "(//src:name)[1]" -o sub/a.xml sub/archive.cpp.xml
 check sub/a.xml "$output"
 
 # select the text from *<type><name>
-define output <<- 'STDOUT'
+defineXML output <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -154,7 +154,7 @@ srcml --xpath "//src:type/src:name/text()" sub/archive.cpp.xml -o sub/a.xml
 check sub/a.xml "$output"
 
 # select all comment elements that contain block comments
-define output <<- 'STDOUT'
+defineXML output <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 

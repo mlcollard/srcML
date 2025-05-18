@@ -9,7 +9,7 @@
 source $(dirname "$0")/framework_test.sh
 
 # default xmlns
-define foosrcml <<- 'STDOUT'
+defineXML foosrcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<bar:unit xmlns:bar="http://www.srcML.org/srcML/src" xmlns="http://www.foo.com" revision="REVISION">
 
@@ -85,7 +85,7 @@ srcml -o sub/a.xml --archive sub/a.cpp --xmlns="http://www.foo.com" --xmlns:bar=
 check sub/a.xml "$foosrcml"
 
 # with prefix
-define fooprefixsrcml <<- 'STDOUT'
+defineXML fooprefixsrcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:foo="http://www.foo.com" revision="REVISION">
 

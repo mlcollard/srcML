@@ -9,7 +9,7 @@
 source $(dirname "$0")/framework_test.sh
 
 # text flag with empty input
-define srcml <<- 'STDOUT'
+defineXML srcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++"/>
 STDOUT
@@ -65,13 +65,13 @@ srcml -l C++ --text -o sub/a.cpp.xml
 check_exit 1
 
 # simple input
-define asrcml <<- 'STDOUT'
+defineXML asrcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++"><expr_stmt><expr><name>a</name></expr>;</expr_stmt></unit>
 STDOUT
 
 # input with ?
-define srcml_question <<- 'STDOUT'
+defineXML srcml_question <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++"><expr_stmt><expr><ternary><condition><expr><name>a</name></expr> ?</condition><then> <expr><name>b</name></expr> </then><else>: <expr><name>c</name></expr></else></ternary></expr>;</expr_stmt></unit>
 STDOUT
@@ -121,7 +121,7 @@ srcml -l C++ --text="a;" -o sub/a.cpp.xml
 check sub/a.cpp.xml "$asrcml"
 
 # multiple applications
-define multiplesrcml <<- 'STDOUT'
+defineXML multiplesrcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="1.0.0">
 
@@ -139,7 +139,7 @@ srcml --text="a;\0b;" -l C++
 check "$multiplesrcml"
 
 # escaped newline
-define ansrcml <<- 'STDOUT'
+defineXML ansrcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++"><expr_stmt><expr><name>a</name></expr>;</expr_stmt>
 	</unit>

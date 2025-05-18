@@ -9,7 +9,7 @@
 source $(dirname "$0")/framework_test.sh
 
 # xslt identity transformation (archive of single file)
-define identity_xslt <<- 'STDOUT'
+defineXML identity_xslt <<- 'STDOUT'
 	<xsl:stylesheet
 	xmlns="http://www.srcML.org/srcML/src"
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -24,7 +24,7 @@ define identity_xslt <<- 'STDOUT'
 	</xsl:stylesheet>
 STDOUT
 
-define srcml <<- 'STDOUT'
+defineXML srcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 

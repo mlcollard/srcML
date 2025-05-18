@@ -9,12 +9,12 @@
 source $(dirname "$0")/framework_test.sh
 
 # test output options
-define sxmlfile <<- 'STDOUT'
+defineXML sxmlfile <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++" filename="sub/a.cpp"><expr_stmt><expr><name>a</name></expr>;</expr_stmt></unit>
 STDOUT
 
-define xmlfile <<- 'STDOUT'
+defineXML xmlfile <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++"><expr_stmt><expr><name>a</name></expr>;</expr_stmt></unit>
 STDOUT
@@ -44,7 +44,7 @@ srcml -l C++ - -o sub/a.cpp.xml < sub/a.cpp
 check sub/a.cpp.xml "$xmlfile"
 
 # output to source code
-define foutput <<- STDOUT
+defineXML foutput <<- STDOUT
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++"><expr_stmt><expr><name>a</name></expr>;</expr_stmt>
 	</unit>

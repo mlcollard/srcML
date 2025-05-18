@@ -9,7 +9,7 @@
 source $(dirname "$0")/framework_test.sh
 
 # test on archive of one unit
-define archive_single <<- 'STDOUT'
+defineXML archive_single <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -20,7 +20,7 @@ define archive_single <<- 'STDOUT'
 STDOUT
 
 # test on archive of > 1 unit
-define archive_multi <<- 'STDOUT'
+defineXML archive_multi <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -70,7 +70,7 @@ srcml sub/a.cpp sub/b.cpp --show-unit-count
 check "$archive_multi_output"
 
 # test count on empty archive
-define empty <<- 'STDOUT'
+defineXML empty <<- 'STDOUT'
 	<unit xmlns="http://www.srcML.org/srcML/src"/>
 STDOUT
 

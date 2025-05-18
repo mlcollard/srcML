@@ -8,7 +8,7 @@
 # test framework
 source $(dirname "$0")/framework_test.sh
 
-define schema <<- 'STDOUT'
+defineXML schema <<- 'STDOUT'
 	<grammar xmlns="http://relaxng.org/ns/structure/1.0">
 
 	  <start>
@@ -34,7 +34,7 @@ define schema <<- 'STDOUT'
 STDOUT
 
 # test on archive of many
-define srcml <<- 'STDOUT'
+defineXML srcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -104,7 +104,7 @@ srcml --relaxng=schema.rng -o sub/b.cpp.xml < sub/archive_multi.xml
 check sub/b.cpp.xml "$srcml"
 
 # test on archive of one
-define srcml <<- 'STDOUT'
+defineXML srcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 

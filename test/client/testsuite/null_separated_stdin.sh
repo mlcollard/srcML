@@ -9,7 +9,7 @@
 source $(dirname "$0")/framework_test.sh
 
 # text flag with empty input
-define srcml <<- 'STDOUT'
+defineXML srcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++"/>
 STDOUT
@@ -20,13 +20,13 @@ printf "" | srcml -l C++
 check "$srcml"
 
 # simple input
-define asrcml <<- 'STDOUT'
+defineXML asrcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++"><expr_stmt><expr><name>a</name></expr>;</expr_stmt></unit>
 STDOUT
 
 # input with ?
-define srcml_question <<- 'STDOUT'
+defineXML srcml_question <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++"><expr_stmt><expr><ternary><condition><expr><name>a</name></expr> ?</condition><then> <expr><name>b</name></expr> </then><else>: <expr><name>c</name></expr></else></ternary></expr>;</expr_stmt></unit>
 STDOUT
@@ -40,7 +40,7 @@ printf "a ? b : c;" | srcml -l "C++"
 check "$srcml_question"
 
 # escaped newline
-define ansrcml <<- 'STDOUT'
+defineXML ansrcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++"><expr_stmt><expr><name>a</name></expr>;</expr_stmt>
 	</unit>
@@ -54,7 +54,7 @@ check "$ansrcml"
 ##
 # Test archive creation using null-separated stdin
 
-define absrcml <<- 'STDOUT'
+defineXML absrcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++"><expr_stmt><expr><name>a</name></expr>;</expr_stmt>
 	</unit>
@@ -62,7 +62,7 @@ STDOUT
 
 xmlcheck "$absrcml"
 
-define absrcml <<- 'STDOUT'
+defineXML absrcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="1.0.0">
 
@@ -76,7 +76,7 @@ STDOUT
 printf "a;\0b;" | srcml -l "C++"
 check "$absrcml"
 
-define abesrcml <<- 'STDOUT'
+defineXML abesrcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="1.0.0">
 
@@ -92,7 +92,7 @@ STDOUT
 printf "a;\0b;\0" | srcml -l C++
 check "$abesrcml"
 
-define abeesrcml <<- 'STDOUT'
+defineXML abeesrcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="1.0.0">
 
@@ -110,7 +110,7 @@ STDOUT
 printf "a;\0b;\0\0" | srcml -l C++
 check "$abeesrcml"
 
-define eabsrcml <<- 'STDOUT'
+defineXML eabsrcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="1.0.0">
 

@@ -9,7 +9,7 @@
 source $(dirname "$0")/framework_test.sh
 
 # test xpath query for attribute info
-define srcml <<- 'STDOUT'
+defineXML srcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -44,7 +44,7 @@ xmlcheck "$srcml"
 createfile sub/archive_multi.xml "$srcml"
 
 # select filename
-define output <<- 'STDOUT'
+defineXML output <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -82,7 +82,7 @@ srcml --xpath "//src:unit/@filename" sub/archive_multi.xml
 check sub/a.xml "$output"
 
 # select comment format (doxygen)
-define output <<- 'STDOUT'
+defineXML output <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 

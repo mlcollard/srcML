@@ -22,7 +22,7 @@ define srcab <<- 'STDOUT'
 STDOUT
 
 # multi archive
-define srcml <<- 'STDOUT'
+defineXML srcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -138,7 +138,7 @@ srcml -U 2 -S -o sub/b.cpp < sub/a.cpp.xml
 check sub/b.cpp "$srcb"
 
 # single archive
-define srcml <<- 'STDOUT'
+defineXML srcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 

@@ -9,7 +9,7 @@
 source $(dirname "$0")/framework_test.sh
 
 # test encoding flag on an archive of one
-define srcml <<- 'STDOUT'
+defineXML srcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -18,7 +18,7 @@ define srcml <<- 'STDOUT'
 	</unit>
 STDOUT
 
-define fsrcml <<- 'STDOUT'
+defineXML fsrcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -53,7 +53,7 @@ srcml --xml-encoding "ISO-8859-1" sub/a.cpp -o sub/a.cpp.xml --archive
 check sub/a.cpp.xml "$fsrcml"
 
 # test encoding flag on an archive of more than one
-define srcmlb <<- 'STDOUT'
+defineXML srcmlb <<- 'STDOUT'
 	<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -64,7 +64,7 @@ define srcmlb <<- 'STDOUT'
 	</unit>
 STDOUT
 
-define fsrcmlb <<- 'STDOUT'
+defineXML fsrcmlb <<- 'STDOUT'
 	<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 

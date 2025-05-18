@@ -9,7 +9,7 @@
 source $(dirname "$0")/framework_test.sh
 
 # testing for verbose
-define fsrcml <<- 'STDOUT'
+defineXML fsrcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++" filename="sub/a.cpp"><expr_stmt><expr><name>a</name></expr>;</expr_stmt></unit>
 STDOUT
@@ -39,7 +39,7 @@ srcml --verbose sub/a.cpp -o sub/c.cpp.xml
 check sub/c.cpp.xml "$fsrcml" "$output"
 
 # from standard in
-define srcml <<- 'STDOUT'
+defineXML srcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++"><expr_stmt><expr><name>a</name></expr>;</expr_stmt></unit>
 STDOUT

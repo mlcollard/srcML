@@ -9,11 +9,11 @@
 source $(dirname "$0")/framework_test.sh
 
 # test
-define xpath_error <<- 'STDOUT'
+defineXML xpath_error <<- 'STDOUT'
 	Error Parsing: Start tag expected, '<' not found
 STDOUT
 
-define xpath_empty <<- 'STDOUT'
+defineXML xpath_empty <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 

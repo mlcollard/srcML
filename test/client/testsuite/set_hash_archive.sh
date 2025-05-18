@@ -9,7 +9,7 @@
 source $(dirname "$0")/framework_test.sh
 
 # test enabling hash
-define fsrcml <<- 'STDOUT'
+defineXML fsrcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -18,7 +18,7 @@ define fsrcml <<- 'STDOUT'
 	</unit>
 STDOUT
 
-define srcml <<- 'STDOUT'
+defineXML srcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -85,7 +85,7 @@ srcml -o sub/a.xml --hash -l C++ --archive < sub/a.cpp
 check sub/a.xml "$srcml"
 
 # with more than one unit in the archive
-define fsrcml <<- 'STDOUT'
+defineXML fsrcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 

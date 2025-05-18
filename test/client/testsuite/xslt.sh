@@ -9,12 +9,12 @@
 source $(dirname "$0")/framework_test.sh
 
 # test xslt empty input
-define srcml <<- 'STDOUT'
+defineXML srcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++"/>
 STDOUT
 
-define copyxslt <<- 'STDOUT'
+defineXML copyxslt <<- 'STDOUT'
 	<xsl:stylesheet
 	xmlns="http://www.srcML.org/srcML/src"
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -34,7 +34,7 @@ define copyxslt <<- 'STDOUT'
 	</xsl:stylesheet>
 STDOUT
 
-define setlanguage <<- 'STDOUT'
+defineXML setlanguage <<- 'STDOUT'
 	<xsl:stylesheet
 	xmlns="http://www.srcML.org/srcML/src"
 	xmlns:src="http://www.srcML.org/srcML/src"
@@ -59,12 +59,12 @@ define setlanguage <<- 'STDOUT'
 	</xsl:stylesheet>
 STDOUT
 
-define srcml <<- 'STDOUT'
+defineXML srcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++"/>
 STDOUT
 
-define srcmljava <<- 'STDOUT'
+defineXML srcmljava <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="Java"/>
 STDOUT

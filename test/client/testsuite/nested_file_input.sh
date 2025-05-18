@@ -8,7 +8,7 @@
 # test framework
 source $(dirname "$0")/framework_test.sh
 
-define output <<- 'STDOUT'
+defineXML output <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -18,7 +18,7 @@ define output <<- 'STDOUT'
 	</unit>
 STDOUT
 
-define nestedfile <<- 'STDOUT'
+defineXML nestedfile <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -31,7 +31,7 @@ define nestedfile <<- 'STDOUT'
 	</unit>
 STDOUT
 
-define nestedfilesrc <<- 'STDOUT'
+defineXML nestedfilesrc <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<src:unit xmlns:src="http://www.srcML.org/srcML/src" revision="REVISION">
 
