@@ -96,11 +96,7 @@ define() {
 # variable $1 is set to the contents of stdin
 defineXML() {
 
-    # read stdin into variable $1
-    IFS= read -r -d '' $1 || true
-
-    # replace any mention of REVISION with the revision number,
-    eval $1=\${$1//REVISION/${REVISION}}
+    define $1
 
     echo "${!1}" | xmllint --noout /dev/stdin
 }
