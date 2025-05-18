@@ -8,7 +8,7 @@
 # test framework
 source $(dirname "$0")/framework_test.sh
 
-define srcml <<- 'STDOUT'
+defineXML srcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -19,8 +19,7 @@ define srcml <<- 'STDOUT'
 	</unit>
 
 	</unit>
-	STDOUT
-xmlcheck "$srcml"
+STDOUT
 
 define output <<- 'STDOUT'
 	XML encoding: UTF-8
@@ -28,7 +27,7 @@ define output <<- 'STDOUT'
 	    2  C++     1 520b48acbdb61e411641fd94359a82686d5591eb b.cpp
 	units: 2
 	LOC: 2
-	STDOUT
+STDOUT
 
 createfile sub/a.cpp.xml "$srcml"
 

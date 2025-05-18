@@ -93,6 +93,14 @@ define() {
     eval $1=\${$1//REVISION/${REVISION}}
 }
 
+# variable $1 is set to the contents of stdin
+defineXML() {
+
+    define $1
+
+    echo "${!1}" | xmllint --noout /dev/stdin
+}
+
 # file with name $1 is created from the contents of string variable $2
 # created files are recorded so that cleanup can occur
 createfile() {

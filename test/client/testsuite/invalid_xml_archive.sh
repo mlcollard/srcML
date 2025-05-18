@@ -27,7 +27,7 @@ define illformed_archive_mulit <<- 'INPUT'
 	</unit>
 
 	</unit>
-	INPUT
+INPUT
 
 define illformed_archive_single <<- 'INPUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -39,30 +39,30 @@ define illformed_archive_single <<- 'INPUT'
 	</unit>
 
 	</unit>
-	INPUT
+INPUT
 
 # expected output
 define info_archive <<- 'STDOUT'
 	xmlns="http://www.srcML.org/srcML/src"
 	encoding="UTF-8"
-	STDOUT
+STDOUT
 
 define output <<- 'STDOUT'
 
 	a;
-	STDOUT
+STDOUT
 
 define units3 <<- 'STDOUT'
 	3
-	STDOUT
+STDOUT
 
 define units1 <<- 'STDOUT'
 	1
-	STDOUT
+STDOUT
 
 define xml_archive_error <<- 'STDERR'
 	srcml: 17:1 Extra content at the end of the document
-	STDERR
+STDERR
 
 createfile xml_error/illformedarchive_multi.xml "$illformed_archive_mulit"
 createfile xml_error/illformedarchive_single.xml "$illformed_archive_single"

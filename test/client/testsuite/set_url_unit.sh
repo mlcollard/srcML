@@ -9,19 +9,17 @@
 source $(dirname "$0")/framework_test.sh
 
 # test on standard in
-define output <<- 'STDOUT'
+defineXML output <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++" url="bar"/>
-	STDOUT
+STDOUT
 
 # test on file
-define fsrcml <<- 'STDOUT'
+defineXML fsrcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++" url="bar" filename="sub/a.cpp"/>
-	STDOUT
+STDOUT
 
-xmlcheck "$output"
-xmlcheck "$fsrcml"
 createfile sub/a.cpp ""
 
 echo -n "" | srcml -l C++ --url bar

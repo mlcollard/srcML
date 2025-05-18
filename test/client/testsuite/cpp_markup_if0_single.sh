@@ -16,9 +16,9 @@ define input <<- 'INPUT'
 	#if 0
 	break;
 	#endif
-	INPUT
+INPUT
 
-define output <<- 'STDOUT'
+defineXML output <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:cpp="http://www.srcML.org/srcML/cpp" revision="REVISION" language="C++">
 	<cpp:if>#<cpp:directive>if</cpp:directive> <expr><literal type="number">0</literal></expr></cpp:if>
@@ -26,9 +26,7 @@ define output <<- 'STDOUT'
 	<cpp:endif>#<cpp:directive>endif</cpp:directive></cpp:endif>
 
 	</unit>
-	STDOUT
-
-xmlcheck "$output"
+STDOUT
 
 srcml -l C++ <<< "$input"
 check "$output"
@@ -36,7 +34,7 @@ check "$output"
 #srcml -l C++ --cpp-text-if0 <<< "$input"
 #check "$output"
 
-define output2 <<- 'STDOUT'
+defineXML output2 <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:cpp="http://www.srcML.org/srcML/cpp" revision="REVISION" language="C++" options="CPP_MARKUP_IF0">
 	<cpp:if>#<cpp:directive>if</cpp:directive> <expr><literal type="number">0</literal></expr></cpp:if>
@@ -44,9 +42,7 @@ define output2 <<- 'STDOUT'
 	<cpp:endif>#<cpp:directive>endif</cpp:directive></cpp:endif>
 
 	</unit>
-	STDOUT
-
-xmlcheck "$output"
+STDOUT
 
 srcml -l C++ --cpp-markup-if0 <<< "$input"
 check "$output2"

@@ -10,19 +10,19 @@ source $(dirname "$0")/framework_test.sh
 
 define srca <<- 'STDOUT'
 	a;
-	STDOUT
+STDOUT
 
 define srcb <<- 'STDOUT'
 	b;
-	STDOUT
+STDOUT
 
 define srcab <<- 'STDOUT'
 	a;
 	b;
-	STDOUT
+STDOUT
 
 # multi archive
-define srcml <<- 'STDOUT'
+defineXML srcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -33,10 +33,9 @@ define srcml <<- 'STDOUT'
 	</unit>
 
 	</unit>
-	STDOUT
+STDOUT
 
 # src --> srcml : input srcml single file
-xmlcheck "$srcml"
 createfile sub/a.cpp.xml "$srcml"
 
 # have to get null byte into test case result
@@ -138,7 +137,7 @@ srcml -U 2 -S -o sub/b.cpp < sub/a.cpp.xml
 check sub/b.cpp "$srcb"
 
 # single archive
-define srcml <<- 'STDOUT'
+defineXML srcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -146,10 +145,9 @@ define srcml <<- 'STDOUT'
 	</unit>
 
 	</unit>
-	STDOUT
+STDOUT
 
 # srcml --> src : input srcml single file
-xmlcheck "$srcml"
 createfile sub/a.cpp.xml "$srcml"
 
 srcml --output-src sub/a.cpp.xml

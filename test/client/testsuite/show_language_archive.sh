@@ -10,7 +10,7 @@ source $(dirname "$0")/framework_test.sh
 
 # language shouldn't be on the archive unit, just on individual units
 # none
-define none <<- 'STDIN'
+defineXML none <<- 'STDIN'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -19,22 +19,21 @@ define none <<- 'STDIN'
 	</unit>
 
 	</unit>
-  STDIN
+STDIN
 
-xmlcheck "$none"
 createfile sub/archive.cpp.xml "$none"
 
 srcml --show-language sub/archive.cpp.xml
-check "C++"
+check "C++\n"
 
 srcml --show-language < sub/archive.cpp.xml
-check "C++"
+check "C++\n"
 
 # empty
-define empty <<- 'STDOUT'
+defineXML empty <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION"/>
-  STDOUT
+STDOUT
 
 createfile sub/archive.cpp.xml "$empty"
 

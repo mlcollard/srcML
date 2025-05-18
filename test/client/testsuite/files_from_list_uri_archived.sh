@@ -8,14 +8,14 @@
 # test framework
 source $(dirname "$0")/framework_test.sh
 
-define empty_srcml_archive <<- 'STDOUT'
+defineXML empty_srcml_archive <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" url="test">
 
 	<unit revision="REVISION" language="C++" filename="empty.cpp" hash="da39a3ee5e6b4b0d3255bfef95601890afd80709"/>
 
 	</unit>
-	STDOUT
+STDOUT
 
 createfile "list-empty-cpio-bz2.txt" "https://raw.githubusercontent.com/srcML/test-data/1.0.0/empty/empty.cpp.cpio.bz2"
 srcml --files-from list-empty-cpio-bz2.txt --url="test"
