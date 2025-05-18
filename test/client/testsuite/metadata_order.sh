@@ -17,7 +17,6 @@ defineXML srcml <<- 'STDOUT'
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++" url="sub" filename="a.cpp" version="1.0"/>
 STDOUT
 
-xmlcheck "$srcml"
 createfile sub/a.cpp.xml "$srcml"
 
 options=( --show-language --show-url --show-filename --show-src-version --show-encoding )

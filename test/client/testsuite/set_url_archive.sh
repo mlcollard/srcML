@@ -29,8 +29,6 @@ defineXML fsrcml <<- 'STDOUT'
 	</unit>
 STDOUT
 
-xmlcheck "$output"
-xmlcheck "$fsrcml"
 createfile sub/a.cpp "a;"
 
 echo -n "a;" | srcml -l C++ --url bar --archive

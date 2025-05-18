@@ -40,7 +40,6 @@ defineXML srcml <<- 'STDOUT'
 	</unit>
 STDOUT
 
-xmlcheck "$srcml"
 createfile sub/archive.cpp.xml "$srcml"
 
 # select elements matching *<argument><expr><name>*
@@ -64,8 +63,6 @@ defineXML output <<- 'STDOUT'
 
 	</unit>
 STDOUT
-
-xmlcheck "$output"
 
 srcml sub/archive.cpp.xml --xpath "//src:argument/src:expr/src:name"
 check "$output"
@@ -96,8 +93,6 @@ defineXML output <<- 'STDOUT'
 
 	</unit>
 STDOUT
-
-xmlcheck "$output"
 
 srcml sub/archive.cpp.xml --xpath "(//src:name)[1]"
 check "$output"
@@ -136,8 +131,6 @@ defineXML output <<- 'STDOUT'
 	</unit>
 STDOUT
 
-xmlcheck "$output"
-
 srcml sub/archive.cpp.xml --xpath "//src:type/src:name/text()"
 check "$output"
 
@@ -173,8 +166,6 @@ defineXML output <<- 'STDOUT'
 
 	</unit>
 STDOUT
-
-xmlcheck "$output"
 
 srcml sub/archive.cpp.xml --xpath='//src:comment[@type="block"]'
 check "$output"

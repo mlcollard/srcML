@@ -23,9 +23,6 @@ defineXML foutput <<- 'STDOUT'
 	</unit>
 STDOUT
 
-xmlcheck "$output"
-xmlcheck "$foutput"
-
 srcml --language 'C' <<< "a;"
 
 check "$output"

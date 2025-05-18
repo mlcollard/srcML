@@ -24,8 +24,6 @@ defineXML archive_output <<- 'STDOUT'
 	</unit>
 STDOUT
 
-xmlcheck "$output"
-
 # input from a valid remote source file
 srcml https://raw.githubusercontent.com/srcML/test-data/1.0.0/source/a.cpp
 check "$output"

@@ -20,7 +20,6 @@ defineXML srcml <<- 'STDOUT'
 
 	</unit>
 STDOUT
-xmlcheck "$srcml"
 
 define output <<- 'STDOUT'
 	XML encoding: UTF-8

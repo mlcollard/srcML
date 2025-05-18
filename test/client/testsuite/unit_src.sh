@@ -38,9 +38,6 @@ defineXML nestedfilesrc <<- 'STDOUT'
 	</src:unit>
 STDOUT
 
-xmlcheck "$nestedfile"
-xmlcheck "$nestedfilesrc"
-
 # test
 srcml --show-unit-count <<< "$nestedfile"
 check "2\n"

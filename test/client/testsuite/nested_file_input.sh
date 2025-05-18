@@ -44,10 +44,6 @@ defineXML nestedfilesrc <<- 'STDOUT'
 	</src:unit>
 STDOUT
 
-xmlcheck "$output"
-xmlcheck "$nestedfile"
-xmlcheck "$nestedfilesrc"
-
 createfile sub/a.cpp "
 a;"
 createfile sub/b.cpp "

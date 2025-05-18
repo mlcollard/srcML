@@ -29,7 +29,6 @@ defineXML output <<- 'STDOUT'
 	<cpp:endif>#<cpp:directive>endif</cpp:directive></cpp:endif>
 	</unit>
 STDOUT
-xmlcheck "$output"
 
 defineXML foutput <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -40,7 +39,6 @@ defineXML foutput <<- 'STDOUT'
 	<cpp:endif>#<cpp:directive>endif</cpp:directive></cpp:endif>
 	</unit>
 STDOUT
-xmlcheck "$foutput"
 
 createfile sub/a.java "$input"
 

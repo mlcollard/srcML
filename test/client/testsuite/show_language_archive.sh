@@ -21,7 +21,6 @@ defineXML none <<- 'STDIN'
 	</unit>
 STDIN
 
-xmlcheck "$none"
 createfile sub/archive.cpp.xml "$none"
 
 srcml --show-language sub/archive.cpp.xml

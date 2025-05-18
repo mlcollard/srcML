@@ -19,7 +19,6 @@ defineXML srcml <<- 'STDOUT'
 STDOUT
 
 # src --> srcml : input single source file
-xmlcheck "$srcml"
 createfile sub/a.cpp "$src"
 
 srcml --output-src sub/a.cpp

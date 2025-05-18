@@ -19,8 +19,6 @@ defineXML srcml <<- 'STDOUT'
 	</unit>
 STDOUT
 
-xmlcheck "$srcml"
-
 createfile sub/a.cpp "a;"
 createfile sub/b.cpp "b;"
 

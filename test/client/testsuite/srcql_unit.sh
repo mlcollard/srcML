@@ -40,10 +40,6 @@ defineXML srcml <<- 'STDOUT'
 	</unit>
 STDOUT
 
-xmlcheck "$output1"
-xmlcheck "$output2"
-xmlcheck "$output_empty"
-xmlcheck "$srcml"
 createfile sub/a.cpp.xml "$srcml"
 
 define oneline_a <<- 'STDOUT'

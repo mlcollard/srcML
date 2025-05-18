@@ -41,9 +41,6 @@ defineXML xmlfile <<- 'STDOUT'
 	</unit>
 STDOUT
 
-xmlcheck "$sxmlfile"
-xmlcheck "$xmlfile"
-
 # src --> srcml
 createfile sub/a.cpp "$sfile"
 

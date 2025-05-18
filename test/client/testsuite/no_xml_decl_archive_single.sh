@@ -25,9 +25,6 @@ defineXML fsrcml <<- 'STDOUT'
 	</unit>
 STDOUT
 
-xmlcheck "$srcml"
-xmlcheck "$fsrcml"
-
 createfile sub/a.cpp "a;"
 
 # from standard in

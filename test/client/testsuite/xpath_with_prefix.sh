@@ -45,10 +45,6 @@ defineXML output <<- 'STDOUT'
 	</unit>
 STDOUT
 
-xmlcheck "$srcml"
-xmlcheck "$xpathempty"
-xmlcheck "$output"
-
 createfile sub/a.cpp.xml "$srcml"
 
 # /src:unit

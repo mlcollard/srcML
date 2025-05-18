@@ -29,11 +29,6 @@ defineXML expr_stmt_fsxmlfile <<- 'STDOUT'
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++" filename="sub/b.cpp"><expr_stmt><expr><name>b</name></expr>;</expr_stmt></unit>
 STDOUT
 
-xmlcheck "$sxmlfile"
-xmlcheck "$fsxmlfile"
-xmlcheck "$expr_stmt_sxmlfile"
-xmlcheck "$expr_stmt_fsxmlfile"
-
 createfile sub/a.cpp "a"
 createfile sub/b.cpp "b;"
 

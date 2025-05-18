@@ -47,10 +47,6 @@ defineXML archive_output <<- 'STDOUT'
 	</unit>
 STDOUT
 
-xmlcheck "$archive_output"
-xmlcheck "$foutput"
-xmlcheck "$output"
-
 createfile archive/a.cpp "$src"
 tar -cjf archive/a.cpp.tbz2 archive/a.cpp
 

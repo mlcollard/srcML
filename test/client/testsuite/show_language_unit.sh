@@ -19,7 +19,6 @@ defineXML srcmlcpp <<- 'STDOUT'
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++" directory="bar" filename="foo" version="1.2"/>
 STDOUT
 
-xmlcheck "$srcmlcpp"
 createfile sub/a.cpp.xml "$srcmlcpp"
 
 srcml --show-language sub/a.cpp.xml
@@ -35,7 +34,6 @@ defineXML srcmljava <<- 'STDOUT'
 	</unit>
 STDOUT
 
-xmlcheck "$srcmljava"
 createfile sub/a.java.xml "$srcmljava"
 
 srcml --show-language sub/a.java.xml
@@ -51,7 +49,6 @@ defineXML srcmlc <<- 'STDOUT'
 	</unit>
 STDOUT
 
-xmlcheck "$srcmlc"
 createfile sub/a.c.xml "$srcmlc"
 
 srcml --show-language sub/a.c.xml
@@ -67,7 +64,6 @@ defineXML srcmlobjc <<- 'STDOUT'
 	</unit>
 STDOUT
 
-xmlcheck "$srcmlobjc"
 createfile sub/a.m.xml "$srcmlobjc"
 
 srcml --show-language sub/a.m.xml
@@ -83,7 +79,6 @@ defineXML srcmlaj <<- 'STDOUT'
 	</unit>
 STDOUT
 
-xmlcheck "$srcmlaj"
 createfile sub/a.aj.xml "$srcmlaj"
 
 srcml --show-language sub/a.aj.xml
@@ -98,7 +93,6 @@ defineXML empty <<- 'STDIN'
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="" directory="" filename="" version=""/>
 STDIN
 
-xmlcheck "$empty"
 createfile sub/a.cpp.xml "$empty"
 
 srcml --show-language sub/a.cpp.xml

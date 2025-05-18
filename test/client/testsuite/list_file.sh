@@ -21,7 +21,6 @@ define output <<- 'STDOUT'
 	LOC: 1
 STDOUT
 
-xmlcheck "$srcml"
 createfile sub/a.cpp.xml "$srcml"
 
 # test --list on input archives

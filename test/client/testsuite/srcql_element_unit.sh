@@ -22,7 +22,6 @@ defineXML result <<- 'STDOUT'
 	</unit>
 STDOUT
 
-xmlcheck "$result"
 createfile sub/a.cpp "a;
 "
 srcml sub/a.cpp --xmlns:pre=foo.com -o sub/a.xml

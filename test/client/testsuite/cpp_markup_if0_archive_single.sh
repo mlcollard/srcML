@@ -68,11 +68,6 @@ defineXML fmarkupif0 <<- 'STDOUT'
 	</unit>
 STDOUT
 
-xmlcheck "$nomarkupif0"
-xmlcheck "$fnomarkupif0"
-xmlcheck "$markupif0"
-xmlcheck "$fmarkupif0"
-
 createfile sub/a.cpp "$input"
 
 # use default, where if 0 sections are not marked up

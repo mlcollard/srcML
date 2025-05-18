@@ -44,10 +44,6 @@ define oneline_a <<- 'STDOUT'
 	a
 STDOUT
 
-xmlcheck "$output1"
-xmlcheck "$output2"
-xmlcheck "$output_empty"
-xmlcheck "$srcml"
 createfile sub/a.cpp.xml "$srcml"
 
 # /src:unit/src:expr_stmt/src:expr/src:name

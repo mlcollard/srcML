@@ -26,9 +26,6 @@ defineXML archive <<- 'STDOUT'
 	</unit>
 STDOUT
 
-xmlcheck "$input"
-xmlcheck "$archive"
-
 createfile sub/a.cpp.xml "$input"
 createfile sub/archive.cpp.xml "$archive"
 
@@ -62,9 +59,6 @@ defineXML emptyarchive <<- 'STDOUT'
 	</unit>
 STDOUT
 
-xmlcheck "$empty"
-xmlcheck "$emptyarchive"
-
 createfile sub/a.cpp.xml "$empty"
 createfile sub/archive.cpp.xml "$emptyarchive"
 
@@ -97,9 +91,6 @@ defineXML none <<- 'STDIN'
 
 	</unit>
 STDIN
-
-xmlcheck "$noneempty"
-xmlcheck "$none"
 
 createfile sub/a.cpp.xml "$noneempty"
 createfile sub/archive.cpp.xml "$none"

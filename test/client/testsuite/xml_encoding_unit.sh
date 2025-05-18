@@ -19,8 +19,6 @@ defineXML fsrcml <<- 'STDOUT'
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++" filename="sub/a.cpp"/>
 STDOUT
 
-xmlcheck "$srcml"
-xmlcheck "$fsrcml"
 createfile sub/a.cpp ""
 
 echo -n "" | srcml -l C++ --xml-encoding "ISO-8859-1"

@@ -37,7 +37,6 @@ defineXML srcml <<- 'STDOUT'
 	</unit>
 STDOUT
 
-xmlcheck "$srcml"
 createfile sub/archive_single.cpp.xml "$srcml"
 
 # select filename
@@ -49,8 +48,6 @@ defineXML output <<- 'STDOUT'
 
 	</unit>
 STDOUT
-
-xmlcheck "$output"
 
 srcml sub/archive_single.cpp.xml --xpath "//src:unit/@filename"
 check "$output"
@@ -85,8 +82,6 @@ defineXML output <<- 'STDOUT'
 
 	</unit>
 STDOUT
-
-xmlcheck "$output"
 
 srcml sub/archive_single.cpp.xml --xpath "//src:comment/@format"
 check "$output"

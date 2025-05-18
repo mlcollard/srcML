@@ -47,10 +47,6 @@ defineXML archive_output <<- 'STDOUT'
 	</unit>
 STDOUT
 
-xmlcheck "$archive_output"
-xmlcheck "$foutput"
-xmlcheck "$output"
-
 createfile archive/a.cpp "$src"
 echo archive/a.cpp | tr " " "\n" | cpio -o > archive/a.cpp.cpio
 bzip2 -c archive/a.cpp.cpio > archive/a.cpp.cpio.bz2

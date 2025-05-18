@@ -17,7 +17,6 @@ defineXML fileasrcml <<- 'STDOUT'
 
 	</unit>
 STDOUT
-xmlcheck "$fileasrcml"
 
 defineXML asrcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -27,7 +26,6 @@ defineXML asrcml <<- 'STDOUT'
 
 	</unit>
 STDOUT
-xmlcheck "$asrcml"
 
 defineXML nestedfile <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -39,7 +37,6 @@ defineXML nestedfile <<- 'STDOUT'
 
 	</unit>
 STDOUT
-xmlcheck "$nestedfile"
 
 createfile sub/a.cpp "a;"
 createfile sub/b.cpp "b;"

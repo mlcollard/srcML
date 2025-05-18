@@ -20,8 +20,6 @@ defineXML srcml <<- 'STDOUT'
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:pos="http://www.srcML.org/srcML/position" revision="REVISION" language="C++" pos:tabs="4"/>
 STDOUT
 
-xmlcheck "$fsrcml"
-xmlcheck "$srcml"
 createfile sub/a.cpp ""
 
 srcml -l C++ --position --tabs 4 < sub/a.cpp

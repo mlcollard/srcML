@@ -22,7 +22,6 @@ defineXML xpath_empty <<- 'STDOUT'
 	</unit>
 STDOUT
 
-xmlcheck "$xpath_empty"
 createfile sub/a.cpp.xml ""
 
 srcml --xpath=src:unit sub/a.cpp.xml

@@ -17,7 +17,6 @@ defineXML foutput <<- 'STDOUT'
 	</unit>
 STDOUT
 
-xmlcheck "$foutput"
 createfile sub/a.cpp "$sfile1"
 createfile sub/a.cpp.xml "$foutput"
 

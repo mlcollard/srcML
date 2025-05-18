@@ -21,9 +21,6 @@ defineXML empty <<- 'STDOUT'
 	<unit xmlns="http://www.srcML.org/srcML/src" language="C++" revision="REVISION"/>
 STDOUT
 
-xmlcheck "$srcml"
-xmlcheck "$empty"
-
 # test on src that creates single unit
 define src <<- 'STDOUT'
 	a;

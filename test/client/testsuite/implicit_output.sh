@@ -34,9 +34,6 @@ defineXML bxml <<- 'STDOUT'
 	</unit>
 STDOUT
 
-xmlcheck "$xmlfile"
-xmlcheck "$axml"
-xmlcheck "$bxml"
 createfile sub/a.xml "$axml"
 createfile sub/b.xml "$bxml"
 

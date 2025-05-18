@@ -28,8 +28,6 @@ defineXML output <<- 'STDOUT'
 	</unit>
 STDOUT
 
-xmlcheck "$output"
-
 srcml -l C++ <<< "$input"
 check "$output"
 
@@ -45,8 +43,6 @@ defineXML output2 <<- 'STDOUT'
 
 	</unit>
 STDOUT
-
-xmlcheck "$output"
 
 srcml -l C++ --cpp-markup-if0 <<< "$input"
 check "$output2"

@@ -69,7 +69,6 @@ defineXML srcmljava <<- 'STDOUT'
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="Java"/>
 STDOUT
 
-xmlcheck "$srcml"
 createfile sub/a.cpp.xml "$srcml"
 createfile copy.xsl "$copyxslt"
 createfile setlanguage.xsl "$setlanguage"

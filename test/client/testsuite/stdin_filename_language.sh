@@ -19,9 +19,6 @@ defineXML output_language_precedence <<- 'OUTPUT'
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C" filename="foo.cpp"/>
 	OUTPUT
 
-xmlcheck "$output"
-xmlcheck "$output_language_precedence"
-
 echo -n "" | srcml -f "foo.cpp"
 check "$output"
 

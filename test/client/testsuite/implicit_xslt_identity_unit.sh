@@ -30,7 +30,6 @@ defineXML identity <<- 'STDOUT'
 	</xsl:stylesheet>
 STDOUT
 
-xmlcheck "$srcml"
 createfile sub/unit.cpp.xml "$srcml"
 createfile identity.xsl "$identity"
 

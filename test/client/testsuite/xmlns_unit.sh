@@ -29,8 +29,6 @@ defineXML foutputnocpp <<- 'STDOUT'
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:cpp="http://www.srcML.org/srcML/cpp" revision="REVISION" language="C++" filename="sub/a.cpp"><cpp:define>#<cpp:directive>define</cpp:directive></cpp:define></unit>
 STDOUT
 
-xmlcheck "$output"
-xmlcheck "$foutput"
 createfile sub/a.cpp "#define"
 
 # separate

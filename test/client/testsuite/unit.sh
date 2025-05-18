@@ -43,9 +43,6 @@ defineXML nestedfile <<- 'STDOUT'
 	</unit>
 STDOUT
 
-xmlcheck "$sxmlfile1"
-xmlcheck "$sxmlfile2"
-xmlcheck "$nestedfile"
 createfile sub/a.cpp.xml "$nestedfile"
 
 srcml sub/a.cpp.xml -U "1"

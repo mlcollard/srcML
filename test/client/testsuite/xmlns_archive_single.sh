@@ -18,7 +18,6 @@ defineXML foosrcml <<- 'STDOUT'
 	</bar:unit>
 STDOUT
 
-xmlcheck "$foosrcml"
 createfile sub/a.cpp "a;"
 
 srcml --xmlns="http://www.foo.com" --xmlns:bar=http://www.srcML.org/srcML/src sub/a.cpp --archive
@@ -93,8 +92,6 @@ defineXML fooprefixsrcml <<- 'STDOUT'
 
 	</unit>
 STDOUT
-
-xmlcheck "$fooprefixsrcml"
 
 srcml --xmlns:foo="http://www.foo.com" sub/a.cpp --archive
 check "$fooprefixsrcml"

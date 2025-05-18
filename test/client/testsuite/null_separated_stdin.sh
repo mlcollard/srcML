@@ -14,8 +14,6 @@ defineXML srcml <<- 'STDOUT'
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++"/>
 STDOUT
 
-xmlcheck "$srcml"
-
 printf "" | srcml -l C++
 check "$srcml"
 
@@ -31,8 +29,6 @@ defineXML srcml_question <<- 'STDOUT'
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++"><expr_stmt><expr><ternary><condition><expr><name>a</name></expr> ?</condition><then> <expr><name>b</name></expr> </then><else>: <expr><name>c</name></expr></else></ternary></expr>;</expr_stmt></unit>
 STDOUT
 
-xmlcheck "$asrcml"
-
 printf "a;" | srcml -l "C++"
 check "$asrcml"
 
@@ -46,8 +42,6 @@ defineXML ansrcml <<- 'STDOUT'
 	</unit>
 STDOUT
 
-xmlcheck "$ansrcml"
-
 printf "a;\n" | srcml -l "C++"
 check "$ansrcml"
 
@@ -59,8 +53,6 @@ defineXML absrcml <<- 'STDOUT'
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++"><expr_stmt><expr><name>a</name></expr>;</expr_stmt>
 	</unit>
 STDOUT
-
-xmlcheck "$absrcml"
 
 defineXML absrcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>

@@ -14,8 +14,6 @@ defineXML output <<- 'STDOUT'
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C#"/>
 STDOUT
 
-xmlcheck "$output"
-
 echo -n "" | srcml -l C#
 check "$output"
 

@@ -17,7 +17,6 @@ defineXML output <<- 'STDOUT'
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++" filename="foo.cpp"/>
 STDOUT
 
-xmlcheck "$output"
 createfile sub/a.cpp ""
 
 srcml sub/a.cpp -f "foo.cpp"

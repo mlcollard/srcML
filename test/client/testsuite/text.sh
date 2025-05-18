@@ -21,8 +21,6 @@ else
 	export ECHO=/bin/echo
 fi
 
-xmlcheck "$srcml"
-
 srcml -t "" -l "C++"
 check "$srcml"
 
@@ -75,8 +73,6 @@ defineXML srcml_question <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++"><expr_stmt><expr><ternary><condition><expr><name>a</name></expr> ?</condition><then> <expr><name>b</name></expr> </then><else>: <expr><name>c</name></expr></else></ternary></expr>;</expr_stmt></unit>
 STDOUT
-
-xmlcheck "$asrcml"
 
 srcml -t "a;" -l "C++"
 check "$asrcml"
@@ -144,8 +140,6 @@ defineXML ansrcml <<- 'STDOUT'
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++"><expr_stmt><expr><name>a</name></expr>;</expr_stmt>
 	</unit>
 STDOUT
-
-xmlcheck "$ansrcml"
 
 srcml -t "a;\n" -l "C++"
 check "$ansrcml"

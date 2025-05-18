@@ -58,8 +58,6 @@ defineXML schema <<- 'STDOUT'
 	</grammar>
 STDOUT
 
-xmlcheck "$srcml"
-xmlcheck "$schema"
 createfile sub/unit.cpp.xml "$srcml"
 
 # apply schema

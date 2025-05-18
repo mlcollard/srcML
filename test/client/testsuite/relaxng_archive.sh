@@ -65,9 +65,6 @@ defineXML srcml <<- 'STDOUT'
 	</unit>
 STDOUT
 
-xmlcheck "$schema"
-xmlcheck "$srcml"
-
 createfile schema.rng "$schema"
 createfile sub/archive_multi.xml "$srcml"
 

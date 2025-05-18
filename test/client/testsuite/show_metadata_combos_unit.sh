@@ -20,7 +20,6 @@ define output <<- 'STDOUT'
 	language="C++"
 STDOUT
 
-xmlcheck "$input"
 createfile sub/a.cpp.xml "$input"
 
 # language, url, filename

@@ -23,7 +23,6 @@ define output <<- 'STDOUT'
 	b.cpp
 STDOUT
 
-xmlcheck "$srcml_nested"
 createfile sub/a.cpp.xml "$srcml_nested"
 
 srcml sub/a.cpp.xml --xpath "string(//src:unit/@filename)"

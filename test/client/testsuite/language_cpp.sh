@@ -22,8 +22,6 @@ defineXML fsrcml <<- 'STDOUT'
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++" filename="sub/a.cpp"/>
 STDOUT
 
-xmlcheck "$fsrcml"
-xmlcheck "$srcml"
 createfile sub/a.cpp ""
 
 srcml -l "C++" sub/a.cpp

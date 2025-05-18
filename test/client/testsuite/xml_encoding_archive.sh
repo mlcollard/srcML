@@ -27,8 +27,6 @@ defineXML fsrcml <<- 'STDOUT'
 	</unit>
 STDOUT
 
-xmlcheck "$srcml"
-xmlcheck "$fsrcml"
 createfile sub/a.cpp "a;"
 
 srcml sub/a.cpp --xml-encoding="ISO-8859-1" --archive
@@ -75,8 +73,6 @@ defineXML fsrcmlb <<- 'STDOUT'
 	</unit>
 STDOUT
 
-xmlcheck "$srcmlb"
-xmlcheck "$fsrcmlb"
 createfile sub/b.cpp "b;"
 
 srcml sub/a.cpp sub/b.cpp --xml-encoding "ISO-8859-1"

@@ -30,9 +30,6 @@ defineXML file1 <<- 'STDOUT'
 	</unit>
 STDOUT
 
-xmlcheck "$nestedfileextra"
-xmlcheck "$file1"
-
 srcml -X --unit "1" - <<< "$nestedfileextra"
 check "$file1"
 

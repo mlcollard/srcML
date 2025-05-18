@@ -27,8 +27,6 @@ define foutput <<- 'STDERR'
 	Source Files: 1	Other Files: 0	Errors: 0	Total Files: 1
 STDERR
 
-xmlcheck "$fsrcml"
-
 createfile sub/a.cpp "a;"
 createfile sub/a.cpp.xml "$fsrcml"
 
@@ -58,8 +56,6 @@ define output <<- 'STDERR'
 
 	Source Files: 1	Other Files: 0	Errors: 0	Total Files: 1
 STDERR
-
-xmlcheck "$srcml"
 
 srcml --verbose -l C++ --archive < sub/a.cpp
 check "$srcml" "$output"

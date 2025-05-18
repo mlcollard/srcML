@@ -78,11 +78,6 @@ defineXML fnomarkup_else <<- 'STDOUT'
 	</unit>
 STDOUT
 
-xmlcheck "$markup_else"
-xmlcheck "$fmarkup_else"
-xmlcheck "$nomarkup_else"
-xmlcheck "$fnomarkup_else"
-
 createfile sub/a.cpp "$input"
 
 # markup else by default

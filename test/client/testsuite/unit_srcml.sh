@@ -30,9 +30,6 @@ defineXML sxmlfile1 <<- 'STDOUT'
 	</unit>
 STDOUT
 
-xmlcheck "$nestedfile"
-xmlcheck "$sxmlfile1"
-
 srcml -X --unit "1" - <<< "$nestedfile"
 check "$sxmlfile1"
 
@@ -65,8 +62,6 @@ STDOUT
 # single newline
 define emptysrc <<- 'STDOUT'
 STDOUT
-
-xmlcheck "$sxmlfile2"
 
 srcml -X --unit "2" - <<< "$nestedfile"
 check "$sxmlfile2"

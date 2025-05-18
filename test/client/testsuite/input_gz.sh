@@ -44,11 +44,6 @@ defineXML archive_output <<- 'STDOUT'
 	</unit>
 STDOUT
 
-xmlcheck "$archive_output"
-xmlcheck "$foutput"
-xmlcheck "$output"
-xmlcheck "$empty_output"
-
 createfile archive/a.cpp "$src"
 gzip -c archive/a.cpp > archive/a.cpp.gz
 

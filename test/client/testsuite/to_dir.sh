@@ -37,8 +37,6 @@ define output <<- 'STDERR'
 	Source Files: 0\tOther Files: 0\tErrors: 0\tTotal Files: 0
 STDERR
 
-xmlcheck "$srcml"
-xmlcheck "$nestedfile"
 createfile a.cpp.xml "$srcml"
 rmfile sub/a.cpp
 

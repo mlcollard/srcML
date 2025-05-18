@@ -14,7 +14,6 @@ defineXML input <<- 'STDOUT'
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++" filename="sub/a.cpp"><expr_stmt><expr><name>a</name></expr>;</expr_stmt></unit>
 STDOUT
 
-xmlcheck "$input"
 createfile sub/a.cpp.xml "$input"
 createfile sub/a.cpp "a;"
 

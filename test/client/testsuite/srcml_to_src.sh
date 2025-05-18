@@ -20,8 +20,6 @@ defineXML input <<- 'STDIN'
 	</unit>
 STDIN
 
-xmlcheck "$input"
-
 srcml <<< "$input"
 check "$src"
 

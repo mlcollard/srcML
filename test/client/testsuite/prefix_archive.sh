@@ -18,7 +18,6 @@ defineXML input <<- 'INPUT'
 	</unit>
 INPUT
 
-xmlcheck "$input"
 createfile sub/a.xml "$input"
 
 # from a file

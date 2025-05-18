@@ -36,7 +36,6 @@ defineXML srcml <<- 'STDOUT'
 STDOUT
 
 # src --> srcml : input srcml single file
-xmlcheck "$srcml"
 createfile sub/a.cpp.xml "$srcml"
 
 # have to get null byte into test case result
@@ -149,7 +148,6 @@ defineXML srcml <<- 'STDOUT'
 STDOUT
 
 # srcml --> src : input srcml single file
-xmlcheck "$srcml"
 createfile sub/a.cpp.xml "$srcml"
 
 srcml --output-src sub/a.cpp.xml

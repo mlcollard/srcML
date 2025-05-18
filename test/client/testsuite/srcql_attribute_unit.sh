@@ -15,8 +15,6 @@ defineXML resultstdin <<- 'STDOUT'
 	</unit>
 STDOUT
 
-xmlcheck "$resultstdin"
-
 # test setting the attribute on xpath query results
 defineXML result <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -31,8 +29,6 @@ defineXML resultnop <<- 'STDOUT'
 	</unit>
 STDOUT
 
-xmlcheck "$resultstdin"
-xmlcheck "$result"
 createfile a.cpp "a;
 "
 

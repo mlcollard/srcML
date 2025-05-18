@@ -20,8 +20,6 @@ defineXML fsrcml <<- 'STDOUT'
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++" url="bar" filename="sub/a.cpp"/>
 STDOUT
 
-xmlcheck "$output"
-xmlcheck "$fsrcml"
 createfile sub/a.cpp ""
 
 echo -n "" | srcml -l C++ --url bar

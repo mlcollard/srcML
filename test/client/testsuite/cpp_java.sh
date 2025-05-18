@@ -23,9 +23,6 @@ defineXML foutput <<- 'STDOUT'
 	</unit>
 STDOUT
 
-xmlcheck "$output"
-xmlcheck "$foutput"
-
 createfile sub/a.java "#define\n"
 
 srcml --cpp sub/a.java

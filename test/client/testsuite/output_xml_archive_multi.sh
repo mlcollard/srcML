@@ -40,10 +40,6 @@ STDOUT
 define output <<- 'STDOUT'
 STDOUT
 
-#xmlcheck "$output"
-xmlcheck "$outputa"
-xmlcheck "$outputb"
-xmlcheck "$srcml"
 createfile sub/a.cpp.xml "$srcml"
 
 # file before options

@@ -28,8 +28,6 @@ defineXML output <<- 'STDOUT'
 	</unit>
 STDOUT
 
-xmlcheck "$output"
-
 defineXML output2 <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" url="dir2">
@@ -55,8 +53,6 @@ defineXML output2 <<- 'STDOUT'
 	</unit>
 STDOUT
 
-xmlcheck "$output2"
-
 defineXML output3 <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" url="symtest">
@@ -72,8 +68,6 @@ defineXML output3 <<- 'STDOUT'
 
 	</unit>
 STDOUT
-
-xmlcheck "$output3"
 
 # directory of just source
 createfile dir/file.aj "\na;"

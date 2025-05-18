@@ -35,9 +35,6 @@ defineXML output <<- 'OUTPUT'
 	</unit>
 OUTPUT
 
-xmlcheck "$input"
-xmlcheck "$output"
-
 createfile sub/archive.xml "$input"
 
 srcml --xpath "//comment()" <<< "$input"
