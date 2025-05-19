@@ -16,4 +16,19 @@ a;</comment>
 <expr_stmt><expr><name>a</name></expr>;</expr_stmt>
 </unit>
 
+<unit revision="1.0.0" language="C++">
+<comment type="line">//a\\</comment>
+<expr_stmt><expr><name>a</name></expr>;</expr_stmt>
+</unit>
+
+<unit revision="1.0.0" language="C++">
+<comment type="line">//a\\\
+a;</comment>
+</unit>
+
+<unit revision="1.0.0" language="C++">
+<comment type="line">//a\\\\</comment>
+<expr_stmt><expr><name>a</name></expr>;</expr_stmt>
+</unit>
+
 </unit>
