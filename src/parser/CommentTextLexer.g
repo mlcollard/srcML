@@ -32,6 +32,7 @@ header {
    #include <iostream>
    #include <antlr/TokenStreamSelector.hpp>
    #include <srcml_options.hpp>
+   #include <Language.hpp>
 }
 
 options {
@@ -43,6 +44,7 @@ options {
 class CommentTextLexer extends Lexer;
 
 options {
+    classHeaderSuffix="public Language";
     k = 1;
     noConstructors = true;
     defaultErrorHandler = false;
@@ -85,8 +87,8 @@ int dquote_count = 0;
 
 OPTION_TYPE options;
 
-CommentTextLexer(const antlr::LexerSharedInputState& state)
-    : antlr::CharScanner(state,true), mode(0), onpreprocline(false), noescape(false), delimiter1("")
+CommentTextLexer(const antlr::LexerSharedInputState& state, int language)
+    : Language(language), antlr::CharScanner(state,true), mode(0), onpreprocline(false), noescape(false), delimiter1("")
 {}
 
 private:
