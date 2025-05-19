@@ -9,7 +9,7 @@
 source $(dirname "$0")/framework_test.sh
 
 # test output options
-define xmlfile <<- 'STDOUT'
+defineXML xmlfile <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -20,23 +20,20 @@ define xmlfile <<- 'STDOUT'
 	</unit>
 
 	</unit>
-	STDOUT
+STDOUT
 
-define axml <<- 'STDOUT'
+defineXML axml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++" filename="sub/a.cpp"><expr_stmt><expr><name>a</name></expr>;</expr_stmt>
 	</unit>
-	STDOUT
+STDOUT
 
-define bxml <<- 'STDOUT'
+defineXML bxml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++" filename="sub/b.cpp"><expr_stmt><expr><name>b</name></expr>;</expr_stmt>
 	</unit>
-	STDOUT
+STDOUT
 
-xmlcheck "$xmlfile"
-xmlcheck "$axml"
-xmlcheck "$bxml"
 createfile sub/a.xml "$axml"
 createfile sub/b.xml "$bxml"
 

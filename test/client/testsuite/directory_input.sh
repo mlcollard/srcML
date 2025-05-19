@@ -9,7 +9,7 @@
 source $(dirname $BASH_SOURCE)/framework_test.sh
 
 # test directory input
-define output <<- 'STDOUT'
+defineXML output <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" url="dir">
 
@@ -26,11 +26,9 @@ define output <<- 'STDOUT'
 	<expr_stmt><expr><name>a</name></expr>;</expr_stmt></unit>
 
 	</unit>
-	STDOUT
+STDOUT
 
-xmlcheck "$output"
-
-define output2 <<- 'STDOUT'
+defineXML output2 <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" url="dir2">
 
@@ -53,11 +51,9 @@ define output2 <<- 'STDOUT'
 	<expr_stmt><expr><name>q</name></expr>;</expr_stmt></unit>
 
 	</unit>
-	STDOUT
+STDOUT
 
-xmlcheck "$output2"
-
-define output3 <<- 'STDOUT'
+defineXML output3 <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" url="symtest">
 
@@ -71,9 +67,7 @@ define output3 <<- 'STDOUT'
 	<expr_stmt><expr><name>c</name></expr>;</expr_stmt></unit>
 
 	</unit>
-	STDOUT
-
-xmlcheck "$output3"
+STDOUT
 
 # directory of just source
 createfile dir/file.aj "\na;"

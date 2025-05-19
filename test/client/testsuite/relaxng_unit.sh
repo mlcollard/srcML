@@ -9,7 +9,7 @@
 source $(dirname "$0")/framework_test.sh
 
 # test
-define srcml <<- 'STDOUT'
+defineXML srcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:cpp="http://www.srcML.org/srcML/cpp" revision="REVISION" language="C++"><comment type="block" format="doxygen">/**
 	 * @returns Return 1 on success and 0 on failure.
@@ -31,9 +31,9 @@ define srcml <<- 'STDOUT'
 	<cpp:endif>#<cpp:directive>endif</cpp:directive></cpp:endif>
 	</block_content>}</block></function>
 	</unit>
-	STDOUT
+STDOUT
 
-define schema <<- 'STDOUT'
+defineXML schema <<- 'STDOUT'
 	<grammar xmlns="http://relaxng.org/ns/structure/1.0">
 
 	  <start>
@@ -56,10 +56,8 @@ define schema <<- 'STDOUT'
 	  </define>
 
 	</grammar>
-	STDOUT
+STDOUT
 
-xmlcheck "$srcml"
-xmlcheck "$schema"
 createfile sub/unit.cpp.xml "$srcml"
 
 # apply schema

@@ -11,7 +11,7 @@ source $(dirname "$0")/framework_test.sh
 # test verbose on an archive
 define sfile <<< "a;"
 
-define fsrcml <<- 'STDOUT'
+defineXML fsrcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -20,7 +20,7 @@ define fsrcml <<- 'STDOUT'
 	<unit revision="REVISION" language="C++" filename="sub/b.cpp" hash="9a1e1d3d0e27715d29bcfbf72b891b3ece985b36"><expr_stmt><expr><name>b</name></expr>;</expr_stmt></unit>
 
 	</unit>
-	STDOUT
+STDOUT
 
 define foutput <<- 'STDERR'
 	XML encoding:  UTF-8
@@ -28,9 +28,7 @@ define foutput <<- 'STDERR'
 	    2 C++      1 9a1e1d3d0e27715d29bcfbf72b891b3ece985b36 sub/b.cpp
 
 	Source Files: 2	Other Files: 0	Errors: 0	Total Files: 2
-	STDERR
-
-xmlcheck "$fsrcml"
+STDERR
 
 createfile sub/a.cpp "a;"
 createfile sub/b.cpp "b;"

@@ -9,7 +9,7 @@
 source $(dirname "$0")/framework_test.sh
 
 # test xpath query for attribute info
-define srcml <<- 'STDOUT'
+defineXML srcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -35,22 +35,19 @@ define srcml <<- 'STDOUT'
 	</unit>
 
 	</unit>
-	STDOUT
+STDOUT
 
-xmlcheck "$srcml"
 createfile sub/archive_single.cpp.xml "$srcml"
 
 # select filename
-define output <<- 'STDOUT'
+defineXML output <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
 	<unit revision="REVISION" language="C++" filename="a.cpp" item="1">filename="a.cpp"</unit>
 
 	</unit>
-	STDOUT
-
-xmlcheck "$output"
+STDOUT
 
 srcml sub/archive_single.cpp.xml --xpath "//src:unit/@filename"
 check "$output"
@@ -77,16 +74,14 @@ srcml --xpath "//src:unit/@filename" sub/archive_single.cpp.xml
 check sub/a.xml "$output"
 
 # select comment format (doxygen)
-define output <<- 'STDOUT'
+defineXML output <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
 	<unit revision="REVISION" language="C++" filename="a.cpp" item="1">format="doxygen"</unit>
 
 	</unit>
-	STDOUT
-
-xmlcheck "$output"
+STDOUT
 
 srcml sub/archive_single.cpp.xml --xpath "//src:comment/@format"
 check "$output"

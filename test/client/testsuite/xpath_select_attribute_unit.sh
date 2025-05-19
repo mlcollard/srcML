@@ -9,7 +9,7 @@
 source $(dirname "$0")/framework_test.sh
 
 # test xpath query for attribute info
-define srcml <<- 'STDOUT'
+defineXML srcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:cpp="http://www.srcML.org/srcML/cpp" revision="REVISION" language="C++" filename="a.cpp"><comment type="block" format="doxygen">/**
 	 * @returns Return 1 on success and 0 on failure.
@@ -31,22 +31,19 @@ define srcml <<- 'STDOUT'
 	<cpp:endif>#<cpp:directive>endif</cpp:directive></cpp:endif>
 	</block_content>}</block></function>
 	</unit>
-	STDOUT
+STDOUT
 
-xmlcheck "$srcml"
 createfile sub/unit.cpp.xml "$srcml"
 
 # select filename
-define output <<- 'STDOUT'
+defineXML output <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
 	<unit xmlns:cpp="http://www.srcML.org/srcML/cpp" revision="REVISION" language="C++" filename="a.cpp" item="1">filename="a.cpp"</unit>
 
 	</unit>
-	STDOUT
-
-xmlcheck "$output"
+STDOUT
 
 srcml sub/unit.cpp.xml --xpath "//src:unit/@filename"
 check "$output"
@@ -73,16 +70,14 @@ srcml --xpath "//src:unit/@filename" sub/unit.cpp.xml
 check sub/a.xml "$output"
 
 # select comment format (doxygen)
-define output <<- 'STDOUT'
+defineXML output <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
 	<unit xmlns:cpp="http://www.srcML.org/srcML/cpp" revision="REVISION" language="C++" filename="a.cpp" item="1">format="doxygen"</unit>
 
 	</unit>
-	STDOUT
-
-xmlcheck "$output"
+STDOUT
 
 srcml sub/unit.cpp.xml --xpath "//src:comment/@format"
 check "$output"
