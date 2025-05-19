@@ -79,3 +79,6 @@ check sub/b.cpp.xml "$srcml"
 
 srcml identity.xsl -o sub/b.cpp.xml < sub/unit.cpp.xml
 check sub/b.cpp.xml "$srcml"
+
+srcml --xslt-param name=value identity.xsl -o sub/b.cpp.xml < sub/unit.cpp.xml
+check sub/b.cpp.xml "$srcml"

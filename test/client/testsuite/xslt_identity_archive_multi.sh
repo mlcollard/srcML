@@ -103,3 +103,6 @@ check sub/b.cpp.xml "$srcml"
 
 srcml --xslt="identity.xsl" -o sub/b.cpp.xml < sub/a.cpp.xml
 check sub/b.cpp.xml "$srcml"
+
+srcml --xslt-param name=value --xslt="identity.xsl" -o sub/b.cpp.xml < sub/a.cpp.xml
+check sub/b.cpp.xml "$srcml"
