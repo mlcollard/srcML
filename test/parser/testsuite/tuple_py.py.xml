@@ -105,7 +105,7 @@
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<expr_stmt><expr><name>result</name> <operator>=</operator> <tuple>(<expr><name>a</name></expr>, <expr><operator>*</operator><array>[<expr><name>b</name></expr> <comprehension><for>for <control><name>_</name> <range>in <expr><call><name>c</name><argument_list>(<argument><expr><call><name>d</name><argument_list>(<argument><expr><name>e</name></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr></range></control></for></comprehension>]</array></expr>)</tuple></expr></expr_stmt>
+<expr_stmt><expr><name>result</name> <operator>=</operator> <tuple>(<expr><name>a</name></expr>, <expr><operator>*</operator><array>[<expr><name>b</name></expr> <comprehension><for>for <control><expr><name>_</name></expr> <range>in <expr><call><name>c</name><argument_list>(<argument><expr><call><name>d</name><argument_list>(<argument><expr><name>e</name></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr></range></control></for></comprehension>]</array></expr>)</tuple></expr></expr_stmt>
 </unit>
 
 <unit revision="1.1.0" language="Python">
@@ -135,13 +135,13 @@
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<with>with <expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call></expr> <alias>as <name>a</name></alias><block>:<block_content>
+<with>with <expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call></expr> <alias>as <expr><name>a</name></expr></alias><block>:<block_content>
     <expr_stmt><expr><tuple><expr><name>indices</name></expr>, <expr><name>values</name></expr></tuple> <operator>=</operator> <call><name><name>a</name><operator>.</operator><name>zip</name></name><argument_list>()</argument_list></call></expr></expr_stmt>
 </block_content></block></with>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<with><specifier>async</specifier> with <expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call></expr> <alias>as <name>a</name></alias><block>:<block_content>
+<with><specifier>async</specifier> with <expr><call><name>open</name><argument_list>(<argument><expr><literal type="string">'test.txt'</literal></expr></argument>,<argument><expr><literal type="string">'w'</literal></expr></argument>)</argument_list></call></expr> <alias>as <expr><name>a</name></expr></alias><block>:<block_content>
     <expr_stmt><expr><tuple><expr><name>indices</name></expr>, <expr><name>values</name></expr></tuple> <operator>=</operator> <call><name><name>a</name><operator>.</operator><name>zip</name></name><argument_list>()</argument_list></call></expr></expr_stmt>
 </block_content></block></with>
 </unit>

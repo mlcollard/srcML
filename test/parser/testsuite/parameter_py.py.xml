@@ -88,7 +88,7 @@
 <unit revision="1.1.0" language="Python">
 <function>def <name>add</name><parameter_list>(<parameter type="args">*<name>b</name><annotation>: <expr><name>int</name></expr></annotation></parameter>)</parameter_list><block>:<block_content>
     <expr_stmt><expr><name>result</name> <operator>=</operator> <literal type="number">0</literal></expr></expr_stmt>
-    <for>for <control><name>i</name> <range>in <expr><name>b</name></expr></range></control><block>:<block_content>
+    <for>for <control><expr><name>i</name></expr> <range>in <expr><name>b</name></expr></range></control><block>:<block_content>
          <expr_stmt><expr><name>result</name> <operator>=</operator> <name>result</name> <operator>+</operator> <name>i</name></expr></expr_stmt>
 </block_content></block></for>    <return>return <expr><name>result</name></expr></return>
 </block_content></block></function>
@@ -102,7 +102,7 @@
 
 <unit revision="1.1.0" language="Python">
 <function>def <name>add</name><parameter_list>(<parameter type="kwargs">**<name>a</name><annotation>: <expr><name>int</name></expr></annotation></parameter>)</parameter_list><block>:<block_content>
-    <for>for <control><name>i</name> <range>in <expr><call><name><name>a</name><operator>.</operator><name>items</name></name><argument_list>()</argument_list></call></expr></range></control><block>:<block_content>
+    <for>for <control><expr><name>i</name></expr> <range>in <expr><call><name><name>a</name><operator>.</operator><name>items</name></name><argument_list>()</argument_list></call></expr></range></control><block>:<block_content>
         <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><name>i</name></expr></argument>)</argument_list></call></expr></expr_stmt>
 </block_content></block></for></block_content></block></function>
 </unit>
@@ -125,7 +125,7 @@
 
 <unit revision="1.1.0" language="Python">
 <function>def <name>numberGenerator</name><parameter_list>(<parameter><name>number_range</name><annotation>: <expr><name>int</name></expr></annotation></parameter>)</parameter_list><block>:<block_content>
-    <for>for <control><name>i</name> <range>in <expr><call><name>range</name><argument_list>(<argument><expr><name>number_range</name><operator>+</operator><literal type="number">1</literal></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
+    <for>for <control><expr><name>i</name></expr> <range>in <expr><call><name>range</name><argument_list>(<argument><expr><name>number_range</name><operator>+</operator><literal type="number">1</literal></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
         <yield>yield <expr><name>i</name></expr></yield>
 </block_content></block></for></block_content></block></function>
 </unit>

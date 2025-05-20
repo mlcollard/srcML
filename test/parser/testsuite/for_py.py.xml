@@ -2,13 +2,13 @@
 <unit xmlns="http://www.srcML.org/srcML/src" language="Python" url="for">
 
 <unit revision="1.1.0" language="Python">
-<for>for <control><name>x</name> <range>in <expr><call><name>range</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
+<for>for <control><expr><name>x</name></expr> <range>in <expr><call><name>range</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
     <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><name>x</name></expr></argument>)</argument_list></call></expr></expr_stmt>
 </block_content></block></for>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<for>for <control><name>x</name> <range>in <expr><call><name>range</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
+<for>for <control><expr><name>x</name></expr> <range>in <expr><call><name>range</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
     <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><name>x</name><operator>**</operator><literal type="number">2</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
 </block_content></block><else>else<block>:<block_content>
     <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">'else'</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
@@ -16,13 +16,13 @@
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<for><specifier>async</specifier> for <control><name>x</name> <range>in <expr><call><name>range</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
+<for><specifier>async</specifier> for <control><expr><name>x</name></expr> <range>in <expr><call><name>range</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
     <expr_stmt><expr><operator>await</operator> <call><name>do_thing</name><argument_list>(<argument><expr><name>x</name></expr></argument>)</argument_list></call></expr></expr_stmt>
 </block_content></block></for>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<for><specifier>async</specifier> for <control><name>x</name> <range>in <expr><call><name>range</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
+<for><specifier>async</specifier> for <control><expr><name>x</name></expr> <range>in <expr><call><name>range</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
     <expr_stmt><expr><operator>await</operator> <call><name>do_thing</name><argument_list>(<argument><expr><name>x</name></expr></argument>)</argument_list></call></expr></expr_stmt>
 </block_content></block><else>else<block>:<block_content>
     <expr_stmt><expr><operator>await</operator> <call><name>exit_conenction</name><argument_list>()</argument_list></call></expr></expr_stmt>
@@ -30,201 +30,207 @@
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<for>for <control><name>x</name> <range>in <expr><call><name>range</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><name>x</name></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></for>
+<for>for <control><expr><name>x</name></expr> <range>in <expr><call><name>range</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><name>x</name></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></for>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<for>for <control><name>x</name> <range>in <expr><call><name>range</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><name>x</name></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block>
+<for>for <control><expr><name>x</name></expr> <range>in <expr><call><name>range</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><name>x</name></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block>
 <else>else<block>:<block_content> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"srcML"</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></else></for>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<for>for <control><name>x</name> <range>in <expr><call><name>range</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><name>x</name></expr></argument>)</argument_list></call></expr>;</expr_stmt> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"\n"</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block>
+<for>for <control><expr><name>x</name></expr> <range>in <expr><call><name>range</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><name>x</name></expr></argument>)</argument_list></call></expr>;</expr_stmt> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"\n"</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block>
 <else>else<block>:<block_content> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"srcML"</literal></expr></argument>)</argument_list></call></expr>;</expr_stmt> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"infrastructure"</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></else></for>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<for><specifier>async</specifier> for <control><name>x</name> <range>in <expr><call><name>range</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><name>x</name></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></for>
+<for><specifier>async</specifier> for <control><expr><name>x</name></expr> <range>in <expr><call><name>range</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><name>x</name></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></for>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<for><specifier>async</specifier> for <control><name>x</name> <range>in <expr><call><name>range</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><name>x</name></expr></argument>)</argument_list></call></expr>;</expr_stmt> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"\n"</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></for>
+<for><specifier>async</specifier> for <control><expr><name>x</name></expr> <range>in <expr><call><name>range</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><name>x</name></expr></argument>)</argument_list></call></expr>;</expr_stmt> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"\n"</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></for>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<for><specifier>async</specifier> for <control><name>x</name> <range>in <expr><call><name>range</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><name>x</name></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block>
+<for><specifier>async</specifier> for <control><expr><name>x</name></expr> <range>in <expr><call><name>range</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><name>x</name></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block>
 <else>else<block>:<block_content> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"srcML"</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></else></for>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<for><specifier>async</specifier> for <control><name>x</name> <range>in <expr><call><name>range</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><name>x</name></expr></argument>)</argument_list></call></expr>;</expr_stmt> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"\n"</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block>
+<for><specifier>async</specifier> for <control><expr><name>x</name></expr> <range>in <expr><call><name>range</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><name>x</name></expr></argument>)</argument_list></call></expr>;</expr_stmt> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"\n"</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block>
 <else>else<block>:<block_content> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"srcML"</literal></expr></argument>)</argument_list></call></expr>;</expr_stmt> <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"infrastructure"</literal></expr></argument>)</argument_list></call></expr></expr_stmt></block_content></block></else></for>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<for>for <control><name>a</name> <range>in <expr><call><name>enumerate</name><argument_list>(<argument><expr><call><name>zip</name><argument_list>(<argument><expr><name>e</name></expr></argument>, <argument><expr><name>f</name></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
+<for>for <control><expr><name>a</name></expr> <range>in <expr><call><name>enumerate</name><argument_list>(<argument><expr><call><name>zip</name><argument_list>(<argument><expr><name>e</name></expr></argument>, <argument><expr><name>f</name></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
     <pass>pass</pass>
 </block_content></block></for>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<for>for <control>(<name>a</name>) <range>in <expr><call><name>enumerate</name><argument_list>(<argument><expr><call><name>zip</name><argument_list>(<argument><expr><name>e</name></expr></argument>, <argument><expr><name>f</name></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
+<for>for <control><expr><operator>(</operator><name>a</name><operator>)</operator></expr> <range>in <expr><call><name>enumerate</name><argument_list>(<argument><expr><call><name>zip</name><argument_list>(<argument><expr><name>e</name></expr></argument>, <argument><expr><name>f</name></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
     <pass>pass</pass>
 </block_content></block></for>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<for>for <control>(((<name>a</name>))) <range>in <expr><call><name>enumerate</name><argument_list>(<argument><expr><call><name>zip</name><argument_list>(<argument><expr><name>e</name></expr></argument>, <argument><expr><name>f</name></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
+<for>for <control><expr><operator>(</operator><operator>(</operator><operator>(</operator><name>a</name><operator>)</operator><operator>)</operator><operator>)</operator></expr> <range>in <expr><call><name>enumerate</name><argument_list>(<argument><expr><call><name>zip</name><argument_list>(<argument><expr><name>e</name></expr></argument>, <argument><expr><name>f</name></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
     <pass>pass</pass>
 </block_content></block></for>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<for>for <control><tuple><name>a</name>, <name>b</name></tuple> <range>in <expr><call><name>enumerate</name><argument_list>(<argument><expr><call><name>zip</name><argument_list>(<argument><expr><name>e</name></expr></argument>, <argument><expr><name>f</name></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
+<for>for <control><expr><tuple><expr><name>a</name></expr>, <expr><name>b</name></expr></tuple></expr> <range>in <expr><call><name>enumerate</name><argument_list>(<argument><expr><call><name>zip</name><argument_list>(<argument><expr><name>e</name></expr></argument>, <argument><expr><name>f</name></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
     <pass>pass</pass>
 </block_content></block></for>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<for>for <control><tuple>(<name>a</name>, <name>b</name>)</tuple> <range>in <expr><call><name>enumerate</name><argument_list>(<argument><expr><call><name>zip</name><argument_list>(<argument><expr><name>e</name></expr></argument>, <argument><expr><name>f</name></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
+<for>for <control><expr><tuple>(<expr><name>a</name></expr>, <expr><name>b</name></expr>)</tuple></expr> <range>in <expr><call><name>enumerate</name><argument_list>(<argument><expr><call><name>zip</name><argument_list>(<argument><expr><name>e</name></expr></argument>, <argument><expr><name>f</name></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
     <pass>pass</pass>
 </block_content></block></for>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<for>for <control><tuple>(((<name>a</name>)), ((<name>b</name>)))</tuple> <range>in <expr><call><name>enumerate</name><argument_list>(<argument><expr><call><name>zip</name><argument_list>(<argument><expr><name>e</name></expr></argument>, <argument><expr><name>f</name></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
+<for>for <control><expr><tuple>(<expr><operator>(</operator><operator>(</operator><name>a</name><operator>)</operator><operator>)</operator></expr>, <expr><operator>(</operator><operator>(</operator><name>b</name><operator>)</operator><operator>)</operator></expr>)</tuple></expr> <range>in <expr><call><name>enumerate</name><argument_list>(<argument><expr><call><name>zip</name><argument_list>(<argument><expr><name>e</name></expr></argument>, <argument><expr><name>f</name></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
     <pass>pass</pass>
 </block_content></block></for>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<for>for <control><tuple>((<tuple>(<name>a</name>, <name>b</name>)</tuple>), <name>c</name>)</tuple> <range>in <expr><call><name>enumerate</name><argument_list>(<argument><expr><call><name>zip</name><argument_list>(<argument><expr><name>d</name></expr></argument>, <argument><expr><name>e</name></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
+<for>for <control><expr><tuple>(<expr><operator>(</operator><tuple>(<expr><name>a</name></expr>, <expr><name>b</name></expr>)</tuple><operator>)</operator></expr>, <expr><name>c</name></expr>)</tuple></expr> <range>in <expr><call><name>enumerate</name><argument_list>(<argument><expr><call><name>zip</name><argument_list>(<argument><expr><name>d</name></expr></argument>, <argument><expr><name>e</name></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
     <pass>pass</pass>
 </block_content></block></for>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<for>for <control><tuple><name>a</name>, <tuple>(<name>b</name>, <tuple>(<name>c</name>, <name>d</name>)</tuple>)</tuple></tuple> <range>in <expr><call><name>enumerate</name><argument_list>(<argument><expr><call><name>zip</name><argument_list>(<argument><expr><name>e</name></expr></argument>, <argument><expr><name>f</name></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
+<for>for <control><expr><tuple><expr><name>a</name></expr>, <expr><tuple>(<expr><name>b</name></expr>, <expr><tuple>(<expr><name>c</name></expr>, <expr><name>d</name></expr>)</tuple></expr>)</tuple></expr></tuple></expr> <range>in <expr><call><name>enumerate</name><argument_list>(<argument><expr><call><name>zip</name><argument_list>(<argument><expr><name>e</name></expr></argument>, <argument><expr><name>f</name></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
     <pass>pass</pass>
 </block_content></block></for>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<for>for <control><tuple>(<name>a</name>), <tuple>((<name>b</name>), <tuple>((<name>c</name>), (<name>d</name>))</tuple>)</tuple></tuple> <range>in <expr><call><name>enumerate</name><argument_list>(<argument><expr><call><name>zip</name><argument_list>(<argument><expr><name>e</name></expr></argument>, <argument><expr><name>f</name></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
+<for>for <control><expr><tuple><expr><operator>(</operator><name>a</name><operator>)</operator></expr>, <expr><tuple>(<expr><operator>(</operator><name>b</name><operator>)</operator></expr>, <expr><tuple>(<expr><operator>(</operator><name>c</name><operator>)</operator></expr>, <expr><operator>(</operator><name>d</name><operator>)</operator></expr>)</tuple></expr>)</tuple></expr></tuple></expr> <range>in <expr><call><name>enumerate</name><argument_list>(<argument><expr><call><name>zip</name><argument_list>(<argument><expr><name>e</name></expr></argument>, <argument><expr><name>f</name></expr></argument>)</argument_list></call></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
     <pass>pass</pass>
 </block_content></block></for>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<for>for <control><array>[<name>b</name>]</array> <range>in <expr><call><name>enumerate</name><argument_list>(<argument><expr><name>c</name></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
+<for>for <control><expr><array>[<expr><name>b</name></expr>]</array></expr> <range>in <expr><call><name>enumerate</name><argument_list>(<argument><expr><name>c</name></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
     <pass>pass</pass>
 </block_content></block></for>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<for>for <control><array>[<name>b</name>, <name>c</name>]</array> <range>in <expr><call><name>enumerate</name><argument_list>(<argument><expr><name>d</name></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
+<for>for <control><expr><array>[<expr><name>b</name></expr>, <expr><name>c</name></expr>]</array></expr> <range>in <expr><call><name>enumerate</name><argument_list>(<argument><expr><name>d</name></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
     <pass>pass</pass>
 </block_content></block></for>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<for>for <control><array>[(<name>b</name>)]</array> <range>in <expr><call><name>enumerate</name><argument_list>(<argument><expr><name>c</name></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
+<for>for <control><expr><array>[<expr><operator>(</operator><name>b</name><operator>)</operator></expr>]</array></expr> <range>in <expr><call><name>enumerate</name><argument_list>(<argument><expr><name>c</name></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
     <pass>pass</pass>
 </block_content></block></for>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<for>for <control><array>[(<name>b</name>), (<name>c</name>)]</array> <range>in <expr><call><name>enumerate</name><argument_list>(<argument><expr><name>d</name></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
+<for>for <control><expr><array>[<expr><operator>(</operator><name>b</name><operator>)</operator></expr>, <expr><operator>(</operator><name>c</name><operator>)</operator></expr>]</array></expr> <range>in <expr><call><name>enumerate</name><argument_list>(<argument><expr><name>d</name></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
     <pass>pass</pass>
 </block_content></block></for>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<for>for <control>(<array>[<name>b</name>, <name>c</name>]</array>) <range>in <expr><call><name>enumerate</name><argument_list>(<argument><expr><name>d</name></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
+<for>for <control><expr><operator>(</operator><array>[<expr><name>b</name></expr>, <expr><name>c</name></expr>]</array><operator>)</operator></expr> <range>in <expr><call><name>enumerate</name><argument_list>(<argument><expr><name>d</name></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
     <pass>pass</pass>
 </block_content></block></for>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<for>for <control><array>[<tuple>(<name>b</name>, <name>c</name>)</tuple>, <tuple>(<name>d</name>, <name>e</name>)</tuple>]</array> <range>in <expr><call><name>enumerate</name><argument_list>(<argument><expr><name>f</name></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
+<for>for <control><expr><array>[<expr><tuple>(<expr><name>b</name></expr>, <expr><name>c</name></expr>)</tuple></expr>, <expr><tuple>(<expr><name>d</name></expr>, <expr><name>e</name></expr>)</tuple></expr>]</array></expr> <range>in <expr><call><name>enumerate</name><argument_list>(<argument><expr><name>f</name></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
     <pass>pass</pass>
 </block_content></block></for>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<for>for <control>(<array>[<tuple>(<name>b</name>, <name>c</name>)</tuple>, <tuple>(<name>d</name>, <name>e</name>)</tuple>]</array>) <range>in <expr><call><name>enumerate</name><argument_list>(<argument><expr><name>f</name></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
+<for>for <control><expr><operator>(</operator><array>[<expr><tuple>(<expr><name>b</name></expr>, <expr><name>c</name></expr>)</tuple></expr>, <expr><tuple>(<expr><name>d</name></expr>, <expr><name>e</name></expr>)</tuple></expr>]</array><operator>)</operator></expr> <range>in <expr><call><name>enumerate</name><argument_list>(<argument><expr><name>f</name></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
     <pass>pass</pass>
 </block_content></block></for>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<for>for <control><array>[<array>[<name>b</name>, <name>c</name>]</array>, <array>[<name>d</name>, <name>e</name>]</array>]</array> <range>in <expr><call><name>enumerate</name><argument_list>(<argument><expr><name>f</name></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
+<for>for <control><expr><array>[<expr><array>[<expr><name>b</name></expr>, <expr><name>c</name></expr>]</array></expr>, <expr><array>[<expr><name>d</name></expr>, <expr><name>e</name></expr>]</array></expr>]</array></expr> <range>in <expr><call><name>enumerate</name><argument_list>(<argument><expr><name>f</name></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
     <pass>pass</pass>
 </block_content></block></for>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<for>for <control><tuple>(<array>[<array>[<name>b</name>, <name>c</name>]</array>, <array>[<name>d</name>, <name>e</name>]</array>]</array>, <array>[<array>[<name>f</name>, <name>g</name>]</array>, <array>[<name>h</name>, <name>i</name>]</array>]</array>)</tuple> <range>in <expr><call><name>enumerate</name><argument_list>(<argument><expr><name>j</name></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
+<for>for <control><expr><tuple>(<expr><array>[<expr><array>[<expr><name>b</name></expr>, <expr><name>c</name></expr>]</array></expr>, <expr><array>[<expr><name>d</name></expr>, <expr><name>e</name></expr>]</array></expr>]</array></expr>, <expr><array>[<expr><array>[<expr><name>f</name></expr>, <expr><name>g</name></expr>]</array></expr>, <expr><array>[<expr><name>h</name></expr>, <expr><name>i</name></expr>]</array></expr>]</array></expr>)</tuple></expr> <range>in <expr><call><name>enumerate</name><argument_list>(<argument><expr><name>j</name></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
     <pass>pass</pass>
 </block_content></block></for>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<for>for <control><name><operator>*</operator><name>_</name></name> <range>in <expr><name>a</name></expr></range></control><block>:<block_content>
+<for>for <control><expr><name><operator>*</operator><name>_</name></name></expr> <range>in <expr><name>a</name></expr></range></control><block>:<block_content>
     <pass>pass</pass>
 </block_content></block></for>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<for>for <control>(<name><operator>*</operator><name>_</name></name>) <range>in <expr><name>a</name></expr></range></control><block>:<block_content>
+<for>for <control><expr><operator>(</operator><name><operator>*</operator><name>_</name></name><operator>)</operator></expr> <range>in <expr><name>a</name></expr></range></control><block>:<block_content>
     <pass>pass</pass>
 </block_content></block></for>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<for>for <control><tuple><name>a</name>, <name><operator>*</operator><name>_</name></name></tuple> <range>in <expr><name>b</name></expr></range></control><block>:<block_content>
+<for>for <control><expr><tuple><expr><name>a</name></expr>, <expr><name><operator>*</operator><name>_</name></name></expr></tuple></expr> <range>in <expr><name>b</name></expr></range></control><block>:<block_content>
     <pass>pass</pass>
 </block_content></block></for>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<for>for <control><tuple>(<name><operator>*</operator><name>_</name></name>, <name>a</name>)</tuple> <range>in <expr><name>b</name></expr></range></control><block>:<block_content>
+<for>for <control><expr><tuple>(<expr><name><operator>*</operator><name>_</name></name></expr>, <expr><name>a</name></expr>)</tuple></expr> <range>in <expr><name>b</name></expr></range></control><block>:<block_content>
     <pass>pass</pass>
 </block_content></block></for>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<for>for <control><array>[<name><operator>*</operator><name>_</name></name>, <name>a</name>]</array> <range>in <expr><name>b</name></expr></range></control><block>:<block_content>
+<for>for <control><expr><array>[<expr><name><operator>*</operator><name>_</name></name></expr>, <expr><name>a</name></expr>]</array></expr> <range>in <expr><name>b</name></expr></range></control><block>:<block_content>
     <pass>pass</pass>
 </block_content></block></for>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<for>for <control><name><operator>**</operator><name>_</name></name> <range>in <expr><name>a</name></expr></range></control><block>:<block_content>
+<for>for <control><expr><name><operator>**</operator><name>_</name></name></expr> <range>in <expr><name>a</name></expr></range></control><block>:<block_content>
     <pass>pass</pass>
 </block_content></block></for>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<for>for <control>(<name><operator>**</operator><name>_</name></name>) <range>in <expr><name>a</name></expr></range></control><block>:<block_content>
+<for>for <control><expr><operator>(</operator><name><operator>**</operator><name>_</name></name><operator>)</operator></expr> <range>in <expr><name>a</name></expr></range></control><block>:<block_content>
     <pass>pass</pass>
 </block_content></block></for>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<for>for <control><tuple><name>a</name>, <name><operator>**</operator><name>_</name></name></tuple> <range>in <expr><name>b</name></expr></range></control><block>:<block_content>
+<for>for <control><expr><tuple><expr><name>a</name></expr>, <expr><name><operator>**</operator><name>_</name></name></expr></tuple></expr> <range>in <expr><name>b</name></expr></range></control><block>:<block_content>
     <pass>pass</pass>
 </block_content></block></for>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<for>for <control><tuple>(<name><operator>**</operator><name>_</name></name>, <name>a</name>)</tuple> <range>in <expr><name>b</name></expr></range></control><block>:<block_content>
+<for>for <control><expr><tuple>(<expr><name><operator>**</operator><name>_</name></name></expr>, <expr><name>a</name></expr>)</tuple></expr> <range>in <expr><name>b</name></expr></range></control><block>:<block_content>
     <pass>pass</pass>
 </block_content></block></for>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<for>for <control><array>[<name><operator>**</operator><name>_</name></name>, <name>a</name>]</array> <range>in <expr><name>b</name></expr></range></control><block>:<block_content>
+<for>for <control><expr><array>[<expr><name><operator>**</operator><name>_</name></name></expr>, <expr><name>a</name></expr>]</array></expr> <range>in <expr><name>b</name></expr></range></control><block>:<block_content>
+    <pass>pass</pass>
+</block_content></block></for>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<for>for <control><expr><operator>(</operator><name>a</name> <ternary>if <condition><expr><name>b</name></expr></condition> <else>else <expr><name>c</name></expr></else></ternary><operator>)</operator><index>[<expr><literal type="number">0</literal></expr>]</index></expr> <range>in <expr><call><name>range</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
     <pass>pass</pass>
 </block_content></block></for>
 </unit>

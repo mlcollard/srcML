@@ -453,7 +453,7 @@
 <expr_stmt><expr><name>list_comp</name> <operator>=</operator> <array>[
     <expr><name>x</name></expr>
     <comprehension><for>for
-    <control><name>x</name>
+    <control><expr><name>x</name></expr>
     <range>in
     <expr><call><name>range</name><argument_list>(
         <argument><expr><literal type="number">10</literal></expr></argument>
@@ -468,7 +468,7 @@
     <comment type="hashbang">#! Comment B</comment>
     <comprehension><for>for
     <comment type="line"># Comment C</comment>
-    <control><name>x</name>
+    <control><expr><name>x</name></expr>
     <comment type="hashbang">#! Comment D</comment>
     <range>in
     <comment type="line"># Comment E</comment>
@@ -485,7 +485,7 @@
 <expr_stmt><expr><name>list_comp</name> <operator>=</operator> <array>[
     <expr><name>x</name></expr>
     <comprehension><for>for
-    <control><name>x</name>
+    <control><expr><name>x</name></expr>
     <range>in
     <expr><call><name>range</name><argument_list>(
         <argument><expr><literal type="number">10</literal></expr></argument>
@@ -506,7 +506,7 @@
     <comment type="hashbang">#! Comment B</comment>
     <comprehension><for>for
     <comment type="line"># Comment C</comment>
-    <control><name>x</name>
+    <control><expr><name>x</name></expr>
     <comment type="hashbang">#! Comment D</comment>
     <range>in
     <comment type="line"># Comment E</comment>
@@ -535,7 +535,7 @@
 <expr_stmt><expr><name>list_comp</name> <operator>=</operator> <array>[
     <expr><name>x</name></expr>
     <comprehension><for>for
-    <control><name>x</name>
+    <control><expr><name>x</name></expr>
     <range>in
     <expr><call><name>range</name><argument_list>(
         <argument><expr><literal type="number">10</literal></expr></argument>
@@ -560,151 +560,7 @@
     <comment type="hashbang">#! Comment B</comment>
     <comprehension><for>for
     <comment type="line"># Comment C</comment>
-    <control><name>x</name>
-    <comment type="hashbang">#! Comment D</comment>
-    <range>in
-    <comment type="line"># Comment E</comment>
-    <expr><call><name>range</name><argument_list>(
-        <comment type="hashbang">#! Comment F</comment>
-        <argument><expr><literal type="number">10</literal></expr></argument>
-        <comment type="line"># Comment G</comment>
-    )</argument_list></call></expr></range></control></for>
-    <comment type="hashbang">#! Comment H</comment>
-    <if>if
-    <comment type="line"># Comment I</comment>
-    <condition><expr><name>x</name>
-    <comment type="hashbang">#! Comment J</comment>
-    <operator>%</operator>
-    <comment type="line"># Comment K</comment>
-    <literal type="number">2</literal>
-    <comment type="hashbang">#! Comment L</comment>
-    <operator>==</operator>
-    <comment type="line"># Comment M</comment>
-    <literal type="number">0</literal></expr></condition></if>
-    <comment type="hashbang">#! Comment N</comment>
-    <if>if
-    <comment type="line"># Comment O</comment>
-    <condition><expr><name>x</name>
-    <comment type="hashbang">#! Comment P</comment>
-    <operator>&gt;</operator>
-    <comment type="line"># Comment Q</comment>
-    <literal type="number">0</literal></expr></condition></if></comprehension>
-    <comment type="hashbang">#! Comment R</comment>
-]</array></expr></expr_stmt>
-</unit>
-
-<unit revision="1.1.0" language="Python">
-<expr_stmt><expr><name>list_comp</name> <operator>=</operator> <set>{
-    <expr><name>x</name></expr>
-    <comprehension><for>for
-    <control><name>x</name>
-    <range>in
-    <expr><call><name>range</name><argument_list>(
-        <argument><expr><literal type="number">10</literal></expr></argument>
-    )</argument_list></call></expr></range></control></for></comprehension>
-}</set></expr></expr_stmt>
-</unit>
-
-<unit revision="1.1.0" language="Python">
-<expr_stmt><expr><name>list_comp</name> <operator>=</operator> <set>{
-    <comment type="line"># Comment A</comment>
-    <expr><name>x</name></expr>
-    <comment type="hashbang">#! Comment B</comment>
-    <comprehension><for>for
-    <comment type="line"># Comment C</comment>
-    <control><name>x</name>
-    <comment type="hashbang">#! Comment D</comment>
-    <range>in
-    <comment type="line"># Comment E</comment>
-    <expr><call><name>range</name><argument_list>(
-        <comment type="hashbang">#! Comment F</comment>
-        <argument><expr><literal type="number">10</literal></expr></argument>
-        <comment type="line"># Comment G</comment>
-    )</argument_list></call></expr></range></control></for></comprehension>
-    <comment type="hashbang">#! Comment H</comment>
-}</set></expr></expr_stmt>
-</unit>
-
-<unit revision="1.1.0" language="Python">
-<expr_stmt><expr><name>list_comp</name> <operator>=</operator> <set>{
-    <expr><name>x</name></expr>
-    <comprehension><for>for
-    <control><name>x</name>
-    <range>in
-    <expr><call><name>range</name><argument_list>(
-        <argument><expr><literal type="number">10</literal></expr></argument>
-    )</argument_list></call></expr></range></control></for>
-    <if>if
-    <condition><expr><name>x</name>
-    <operator>%</operator>
-    <literal type="number">2</literal>
-    <operator>==</operator>
-    <literal type="number">0</literal></expr></condition></if></comprehension>
-}</set></expr></expr_stmt>
-</unit>
-
-<unit revision="1.1.0" language="Python">
-<expr_stmt><expr><name>list_comp</name> <operator>=</operator> <set>{
-    <comment type="line"># Comment A</comment>
-    <expr><name>x</name></expr>
-    <comment type="hashbang">#! Comment B</comment>
-    <comprehension><for>for
-    <comment type="line"># Comment C</comment>
-    <control><name>x</name>
-    <comment type="hashbang">#! Comment D</comment>
-    <range>in
-    <comment type="line"># Comment E</comment>
-    <expr><call><name>range</name><argument_list>(
-        <comment type="hashbang">#! Comment F</comment>
-        <argument><expr><literal type="number">10</literal></expr></argument>
-        <comment type="line"># Comment G</comment>
-    )</argument_list></call></expr></range></control></for>
-    <comment type="hashbang">#! Comment H</comment>
-    <if>if
-    <comment type="line"># Comment I</comment>
-    <condition><expr><name>x</name>
-    <comment type="hashbang">#! Comment J</comment>
-    <operator>%</operator>
-    <comment type="line"># Comment K</comment>
-    <literal type="number">2</literal>
-    <comment type="hashbang">#! Comment L</comment>
-    <operator>==</operator>
-    <comment type="line"># Comment M</comment>
-    <literal type="number">0</literal></expr></condition></if></comprehension>
-    <comment type="hashbang">#! Comment N</comment>
-}</set></expr></expr_stmt>
-</unit>
-
-<unit revision="1.1.0" language="Python">
-<expr_stmt><expr><name>list_comp</name> <operator>=</operator> <set>{
-    <expr><name>x</name></expr>
-    <comprehension><for>for
-    <control><name>x</name>
-    <range>in
-    <expr><call><name>range</name><argument_list>(
-        <argument><expr><literal type="number">10</literal></expr></argument>
-    )</argument_list></call></expr></range></control></for>
-    <if>if
-    <condition><expr><name>x</name>
-    <operator>%</operator>
-    <literal type="number">2</literal>
-    <operator>==</operator>
-    <literal type="number">0</literal></expr></condition></if>
-    <if>if
-    <condition><expr><name>x</name>
-    <operator>&gt;</operator>
-    <literal type="number">0</literal></expr></condition></if></comprehension>
-}</set></expr></expr_stmt>
-</unit>
-
-<unit revision="1.1.0" language="Python">
-<expr_stmt><expr><name>list_comp</name> <operator>=</operator> <set>{
-    <comment type="line"># Comment A</comment>
-    <expr><name>x</name></expr>
-    <comment type="hashbang">#! Comment B</comment>
-    <comprehension><for>for
-    <comment type="line"># Comment C</comment>
-    <control><name>x</name>
+    <control><expr><name>x</name></expr>
     <comment type="hashbang">#! Comment D</comment>
     <range>in
     <comment type="line"># Comment E</comment>
@@ -734,6 +590,150 @@
     <comment type="line"># Comment Q</comment>
     <literal type="number">0</literal></expr></condition></if></comprehension>
     <comment type="hashbang">#! Comment R</comment>
+]</array></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>list_comp</name> <operator>=</operator> <set>{
+    <expr><name>x</name></expr>
+    <comprehension><for>for
+    <control><expr><name>x</name></expr>
+    <range>in
+    <expr><call><name>range</name><argument_list>(
+        <argument><expr><literal type="number">10</literal></expr></argument>
+    )</argument_list></call></expr></range></control></for></comprehension>
+}</set></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>list_comp</name> <operator>=</operator> <set>{
+    <comment type="line"># Comment A</comment>
+    <expr><name>x</name></expr>
+    <comment type="hashbang">#! Comment B</comment>
+    <comprehension><for>for
+    <comment type="line"># Comment C</comment>
+    <control><expr><name>x</name></expr>
+    <comment type="hashbang">#! Comment D</comment>
+    <range>in
+    <comment type="line"># Comment E</comment>
+    <expr><call><name>range</name><argument_list>(
+        <comment type="hashbang">#! Comment F</comment>
+        <argument><expr><literal type="number">10</literal></expr></argument>
+        <comment type="line"># Comment G</comment>
+    )</argument_list></call></expr></range></control></for></comprehension>
+    <comment type="hashbang">#! Comment H</comment>
+}</set></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>list_comp</name> <operator>=</operator> <set>{
+    <expr><name>x</name></expr>
+    <comprehension><for>for
+    <control><expr><name>x</name></expr>
+    <range>in
+    <expr><call><name>range</name><argument_list>(
+        <argument><expr><literal type="number">10</literal></expr></argument>
+    )</argument_list></call></expr></range></control></for>
+    <if>if
+    <condition><expr><name>x</name>
+    <operator>%</operator>
+    <literal type="number">2</literal>
+    <operator>==</operator>
+    <literal type="number">0</literal></expr></condition></if></comprehension>
+}</set></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>list_comp</name> <operator>=</operator> <set>{
+    <comment type="line"># Comment A</comment>
+    <expr><name>x</name></expr>
+    <comment type="hashbang">#! Comment B</comment>
+    <comprehension><for>for
+    <comment type="line"># Comment C</comment>
+    <control><expr><name>x</name></expr>
+    <comment type="hashbang">#! Comment D</comment>
+    <range>in
+    <comment type="line"># Comment E</comment>
+    <expr><call><name>range</name><argument_list>(
+        <comment type="hashbang">#! Comment F</comment>
+        <argument><expr><literal type="number">10</literal></expr></argument>
+        <comment type="line"># Comment G</comment>
+    )</argument_list></call></expr></range></control></for>
+    <comment type="hashbang">#! Comment H</comment>
+    <if>if
+    <comment type="line"># Comment I</comment>
+    <condition><expr><name>x</name>
+    <comment type="hashbang">#! Comment J</comment>
+    <operator>%</operator>
+    <comment type="line"># Comment K</comment>
+    <literal type="number">2</literal>
+    <comment type="hashbang">#! Comment L</comment>
+    <operator>==</operator>
+    <comment type="line"># Comment M</comment>
+    <literal type="number">0</literal></expr></condition></if></comprehension>
+    <comment type="hashbang">#! Comment N</comment>
+}</set></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>list_comp</name> <operator>=</operator> <set>{
+    <expr><name>x</name></expr>
+    <comprehension><for>for
+    <control><expr><name>x</name></expr>
+    <range>in
+    <expr><call><name>range</name><argument_list>(
+        <argument><expr><literal type="number">10</literal></expr></argument>
+    )</argument_list></call></expr></range></control></for>
+    <if>if
+    <condition><expr><name>x</name>
+    <operator>%</operator>
+    <literal type="number">2</literal>
+    <operator>==</operator>
+    <literal type="number">0</literal></expr></condition></if>
+    <if>if
+    <condition><expr><name>x</name>
+    <operator>&gt;</operator>
+    <literal type="number">0</literal></expr></condition></if></comprehension>
+}</set></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>list_comp</name> <operator>=</operator> <set>{
+    <comment type="line"># Comment A</comment>
+    <expr><name>x</name></expr>
+    <comment type="hashbang">#! Comment B</comment>
+    <comprehension><for>for
+    <comment type="line"># Comment C</comment>
+    <control><expr><name>x</name></expr>
+    <comment type="hashbang">#! Comment D</comment>
+    <range>in
+    <comment type="line"># Comment E</comment>
+    <expr><call><name>range</name><argument_list>(
+        <comment type="hashbang">#! Comment F</comment>
+        <argument><expr><literal type="number">10</literal></expr></argument>
+        <comment type="line"># Comment G</comment>
+    )</argument_list></call></expr></range></control></for>
+    <comment type="hashbang">#! Comment H</comment>
+    <if>if
+    <comment type="line"># Comment I</comment>
+    <condition><expr><name>x</name>
+    <comment type="hashbang">#! Comment J</comment>
+    <operator>%</operator>
+    <comment type="line"># Comment K</comment>
+    <literal type="number">2</literal>
+    <comment type="hashbang">#! Comment L</comment>
+    <operator>==</operator>
+    <comment type="line"># Comment M</comment>
+    <literal type="number">0</literal></expr></condition></if>
+    <comment type="hashbang">#! Comment N</comment>
+    <if>if
+    <comment type="line"># Comment O</comment>
+    <condition><expr><name>x</name>
+    <comment type="hashbang">#! Comment P</comment>
+    <operator>&gt;</operator>
+    <comment type="line"># Comment Q</comment>
+    <literal type="number">0</literal></expr></condition></if></comprehension>
+    <comment type="hashbang">#! Comment R</comment>
 }</set></expr></expr_stmt>
 </unit>
 
@@ -743,7 +743,7 @@
     :
     <expr><name>x</name></expr>
     <comprehension><for>for
-    <control><name>x</name>
+    <control><expr><name>x</name></expr>
     <range>in
     <expr><call><name>range</name><argument_list>(
         <argument><expr><literal type="number">10</literal></expr></argument>
@@ -762,7 +762,7 @@
     <comment type="hashbang">#! Comment D</comment>
     <comprehension><for>for
     <comment type="line"># Comment E</comment>
-    <control><name>x</name>
+    <control><expr><name>x</name></expr>
     <comment type="hashbang">#! Comment F</comment>
     <range>in
     <comment type="line"># Comment G</comment>
@@ -781,7 +781,7 @@
     :
     <expr><name>x</name></expr>
     <comprehension><for>for
-    <control><name>x</name>
+    <control><expr><name>x</name></expr>
     <range>in
     <expr><call><name>range</name><argument_list>(
         <argument><expr><literal type="number">10</literal></expr></argument>
@@ -806,7 +806,7 @@
     <comment type="hashbang">#! Comment D</comment>
     <comprehension><for>for
     <comment type="line"># Comment E</comment>
-    <control><name>x</name>
+    <control><expr><name>x</name></expr>
     <comment type="hashbang">#! Comment F</comment>
     <range>in
     <comment type="line"># Comment G</comment>
@@ -837,7 +837,7 @@
     :
     <expr><name>x</name></expr>
     <comprehension><for>for
-    <control><name>x</name>
+    <control><expr><name>x</name></expr>
     <range>in
     <expr><call><name>range</name><argument_list>(
         <argument><expr><literal type="number">10</literal></expr></argument>
@@ -866,7 +866,7 @@
     <comment type="hashbang">#! Comment D</comment>
     <comprehension><for>for
     <comment type="line"># Comment E</comment>
-    <control><name>x</name>
+    <control><expr><name>x</name></expr>
     <comment type="hashbang">#! Comment F</comment>
     <range>in
     <comment type="line"># Comment G</comment>

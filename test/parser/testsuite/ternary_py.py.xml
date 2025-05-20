@@ -54,11 +54,11 @@
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<expr_stmt><expr><name>result</name> <operator>=</operator> <array>[<expr><name>val</name></expr> <comprehension><for>for <control><name>val</name> <range>in <expr><name>a</name></expr></range></control></for> <if>if <condition><expr><name>val</name> <operator>%</operator> <literal type="number">2</literal> <operator>==</operator> <literal type="number">0</literal></expr></condition></if></comprehension>]</array></expr></expr_stmt>
+<expr_stmt><expr><name>result</name> <operator>=</operator> <array>[<expr><name>val</name></expr> <comprehension><for>for <control><expr><name>val</name></expr> <range>in <expr><name>a</name></expr></range></control></for> <if>if <condition><expr><name>val</name> <operator>%</operator> <literal type="number">2</literal> <operator>==</operator> <literal type="number">0</literal></expr></condition></if></comprehension>]</array></expr></expr_stmt>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<expr_stmt><expr><name>result</name> <operator>=</operator> <array>[<expr><name>val</name></expr> <comprehension><for>for <control><name>val</name> <range>in <expr><operator>(</operator><name>array</name> <ternary>if <condition><expr><literal type="boolean">True</literal></expr></condition> <else>else <expr><literal type="boolean">False</literal></expr></else></ternary><operator>)</operator></expr></range></control></for> <if>if <condition><expr><operator>(</operator><literal type="boolean">True</literal> <ternary>if <condition><expr><name>val</name> <operator>%</operator> <literal type="number">2</literal> <operator>==</operator> <literal type="number">0</literal></expr></condition> <else>else <expr><literal type="boolean">False</literal></expr></else></ternary><operator>)</operator></expr></condition></if></comprehension>]</array></expr></expr_stmt>
+<expr_stmt><expr><name>result</name> <operator>=</operator> <array>[<expr><name>val</name></expr> <comprehension><for>for <control><expr><name>val</name></expr> <range>in <expr><operator>(</operator><name>array</name> <ternary>if <condition><expr><literal type="boolean">True</literal></expr></condition> <else>else <expr><literal type="boolean">False</literal></expr></else></ternary><operator>)</operator></expr></range></control></for> <if>if <condition><expr><operator>(</operator><literal type="boolean">True</literal> <ternary>if <condition><expr><name>val</name> <operator>%</operator> <literal type="number">2</literal> <operator>==</operator> <literal type="number">0</literal></expr></condition> <else>else <expr><literal type="boolean">False</literal></expr></else></ternary><operator>)</operator></expr></condition></if></comprehension>]</array></expr></expr_stmt>
 </unit>
 
 <unit revision="1.1.0" language="Python">
@@ -75,21 +75,21 @@
 <expr_stmt><expr><name>example</name> <operator>=</operator> <array>[
     <expr><array>[
         <expr><name>a</name> <ternary>if <condition><expr><name>a</name> <operator>is not</operator> <literal type="null">None</literal></expr></condition> <else>else <expr><call><name><name>sample</name><operator>.</operator><name>b</name></name><argument_list>(<argument><expr><literal type="number">2</literal></expr></argument>, <argument><expr><literal type="number">10</literal></expr></argument>, <argument><name>size</name>=<expr><tuple>(<expr><literal type="number">1</literal></expr>,)</tuple></expr></argument>)</argument_list></call><operator>.</operator><call><name>c</name><argument_list>()</argument_list></call></expr></else></ternary></expr>
-        <comprehension><for>for <control><name>a</name> <range>in <expr><name>array</name></expr></range></control></for></comprehension>
+        <comprehension><for>for <control><expr><name>a</name></expr> <range>in <expr><name>array</name></expr></range></control></for></comprehension>
     ]</array></expr>
-    <comprehension><for>for <control><name>a</name> <range>in <expr><call><name>range</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control></for></comprehension>
+    <comprehension><for>for <control><expr><name>a</name></expr> <range>in <expr><call><name>range</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control></for></comprehension>
 ]</array></expr></expr_stmt>
 </unit>
 
 <unit revision="1.1.0" language="Python">
 <expr_stmt><expr><name>example</name> <operator>=</operator> <call><name>max</name><argument_list>(
     <argument><expr><operator>(</operator><call><name><name>a</name><operator>.</operator><name>b</name></name><argument_list>(<argument><expr><name>c</name></expr></argument>)</argument_list></call> <ternary>if <condition><expr><call><name>sample</name><argument_list>(<argument><expr><name>c</name></expr></argument>, <argument><expr><name>d</name></expr></argument>)</argument_list></call></expr></condition> <else>else <expr><name>c</name></expr></else></ternary><operator>)</operator><operator>.</operator><name><name>array</name><index>[<expr><literal type="number">0</literal></expr>]</index></name></expr>
-    <comprehension><for>for <control><name>c</name> <range>in <expr><name>d</name></expr></range></control></for></comprehension></argument>
+    <comprehension><for>for <control><expr><name>c</name></expr> <range>in <expr><name>d</name></expr></range></control></for></comprehension></argument>
 )</argument_list></call></expr></expr_stmt>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<for>for <control><name>a</name> <range>in <expr><name>array</name></expr></range></control><block>:<block_content>
+<for>for <control><expr><name>a</name></expr> <range>in <expr><name>array</name></expr></range></control><block>:<block_content>
     <expr_stmt><expr><name>b</name> <operator>=</operator> <name>b</name> <ternary>if <condition><expr><call><name>sample</name><argument_list>(<argument><expr><name>c</name></expr></argument>, <argument><expr><name>d</name></expr></argument>)</argument_list></call></expr></condition> <else>else <expr><call><name><name>example</name><operator>.</operator><name>e</name></name><argument_list>(<argument><expr><name>b</name></expr></argument>)</argument_list></call></expr></else></ternary></expr></expr_stmt>
     <expr_stmt><expr><call><name><name>compound</name><operator>.</operator><name>name</name></name><argument_list>(<argument><expr><name><name>b</name><operator>.</operator><name>prop</name></name> <operator>is not</operator> <literal type="null">None</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
 </block_content></block></for>
@@ -99,10 +99,10 @@
 <function>def <name>ternaries</name><parameter_list>(<parameter><name>a</name></parameter>, <parameter><name>b</name></parameter>)</parameter_list><block>:<block_content>
     <expr_stmt><expr><name>example</name> <operator>=</operator> <call><name>max</name><argument_list>(
         <argument><expr><operator>(</operator><call><name><name>a</name><operator>.</operator><name>b</name></name><argument_list>(<argument><expr><name>c</name></expr></argument>)</argument_list></call> <ternary>if <condition><expr><call><name>sample</name><argument_list>(<argument><expr><name>c</name></expr></argument>, <argument><expr><name>d</name></expr></argument>)</argument_list></call></expr></condition> <else>else <expr><name>c</name></expr></else></ternary><operator>)</operator><operator>.</operator><name><name>array</name><index>[<expr><literal type="number">0</literal></expr>]</index></name></expr>
-        <comprehension><for>for <control><name>c</name> <range>in <expr><name>d</name></expr></range></control></for></comprehension></argument>
+        <comprehension><for>for <control><expr><name>c</name></expr> <range>in <expr><name>d</name></expr></range></control></for></comprehension></argument>
     )</argument_list></call></expr></expr_stmt>
 
-    <for>for <control><name>a</name> <range>in <expr><name>array</name></expr></range></control><block>:<block_content>
+    <for>for <control><expr><name>a</name></expr> <range>in <expr><name>array</name></expr></range></control><block>:<block_content>
         <expr_stmt><expr><name>b</name> <operator>=</operator> <name>b</name> <ternary>if <condition><expr><call><name>sample</name><argument_list>(<argument><expr><name>c</name></expr></argument>, <argument><expr><name>d</name></expr></argument>)</argument_list></call></expr></condition> <else>else <expr><call><name><name>example</name><operator>.</operator><name>e</name></name><argument_list>(<argument><expr><name>b</name></expr></argument>)</argument_list></call></expr></else></ternary></expr></expr_stmt>
         <expr_stmt><expr><call><name><name>compound</name><operator>.</operator><name>name</name></name><argument_list>(<argument><expr><name><name>b</name><operator>.</operator><name>prop</name></name> <operator>is not</operator> <literal type="null">None</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
 </block_content></block></for></block_content></block></function>
@@ -128,7 +128,7 @@
 <expr_stmt><expr><name>operator_paren</name> <operator>=</operator> <operator>(</operator>
     <call><name>call_one</name><argument_list>(<argument><expr><name>a</name></expr></argument>)</argument_list></call>
     <ternary>if <condition><expr><call><name>call_two</name><argument_list>(<argument><expr><name>b</name></expr></argument>, <argument><expr><name><name>c</name><operator>.</operator><name>d</name></name></expr></argument>)</argument_list></call></expr></condition>
-    <else>else <expr><call><name>tuple</name><argument_list>(<argument><expr><call><name>call_three</name><argument_list>(<argument><expr><name>e</name></expr></argument>)</argument_list></call></expr> <comprehension><for>for <control><name>f</name> <range>in <expr><name>g</name></expr></range></control></for></comprehension></argument>)</argument_list></call></expr></else></ternary>
+    <else>else <expr><call><name>tuple</name><argument_list>(<argument><expr><call><name>call_three</name><argument_list>(<argument><expr><name>e</name></expr></argument>)</argument_list></call></expr> <comprehension><for>for <control><expr><name>f</name></expr> <range>in <expr><name>g</name></expr></range></control></for></comprehension></argument>)</argument_list></call></expr></else></ternary>
 <operator>)</operator></expr></expr_stmt>
 </unit>
 
@@ -144,10 +144,10 @@
 <try>try<block>:<block_content>
     <expr_stmt><expr><name>values</name> <operator>=</operator> <array>[
         <expr><literal type="null">None</literal> <ternary>if <condition><expr><name>a</name> <operator>is</operator> <literal type="null">None</literal></expr></condition> <else>else <expr><call><name>call_one</name><argument_list>(<argument><expr><name>a</name></expr></argument>)</argument_list></call></expr></else></ternary></expr>
-        <comprehension><for>for <control><tuple><name>a</name>, <name>b</name></tuple>
+        <comprehension><for>for <control><expr><tuple><expr><name>a</name></expr>, <expr><name>b</name></expr></tuple></expr>
         <range>in <expr><call><name>zip</name><argument_list>(<argument><expr><name><name>a</name><operator>.</operator><name>c</name></name></expr></argument>, <argument><expr><name><name>b</name><operator>.</operator><name>d</name></name></expr></argument>)</argument_list></call></expr></range></control></for></comprehension>
     ]</array></expr></expr_stmt>
-</block_content></block><catch>except <expr><name>ValueError</name></expr> <alias>as <name>e</name></alias><block>:<block_content>
+</block_content></block><catch>except <expr><name>ValueError</name></expr> <alias>as <expr><name>e</name></expr></alias><block>:<block_content>
     <throw>raise <expr><call><name>call_two</name><argument_list>(<argument><expr><name>e</name></expr></argument>)</argument_list></call></expr></throw>
 </block_content></block></catch></try>
 </unit>

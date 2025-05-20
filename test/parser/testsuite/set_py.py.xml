@@ -26,7 +26,7 @@
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<expr_stmt><expr><set>{<expr><name>x</name></expr> <comprehension><for>for <control><name>x</name> <range>in <expr><call><name>print</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control></for></comprehension>}</set></expr></expr_stmt>
+<expr_stmt><expr><set>{<expr><name>x</name></expr> <comprehension><for>for <control><expr><name>x</name></expr> <range>in <expr><call><name>print</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control></for></comprehension>}</set></expr></expr_stmt>
 </unit>
 
 </unit>

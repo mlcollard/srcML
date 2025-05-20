@@ -350,6 +350,8 @@ const static srcMLState::MODE_TYPE MODE_EXCEPT_PY;
 
 const static srcMLState::MODE_TYPE MODE_LAMBDA_PY;
 
+const static srcMLState::MODE_TYPE MODE_ALIAS_PY;
+
 const static srcMLState::MODE_TYPE MODE_ARRAY_PY;
 
 const static srcMLState::MODE_TYPE MODE_INDEX_PY;

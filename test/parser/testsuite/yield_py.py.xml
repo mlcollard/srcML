@@ -22,7 +22,7 @@
 
 <unit revision="1.1.0" language="Python">
 <function>def <name>generator</name><parameter_list>(<parameter><name>x</name></parameter>)</parameter_list><block>:<block_content>
-    <for>for <control><name>i</name> <range>in <expr><call><name>range</name><argument_list>(<argument><expr><name>x</name></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
+    <for>for <control><expr><name>i</name></expr> <range>in <expr><call><name>range</name><argument_list>(<argument><expr><name>x</name></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
         <yield>yield <expr><name>i</name></expr></yield>
 </block_content></block></for></block_content></block></function>
 </unit>
@@ -48,7 +48,7 @@
 
 <unit revision="1.1.0" language="Python">
 <function>def <name>generator</name><parameter_list>(<parameter><name>x</name></parameter>)</parameter_list><block>:<block_content>
-    <for>for <control><name>i</name> <range>in <expr><call><name>range</name><argument_list>(<argument><expr><name>x</name></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
+    <for>for <control><expr><name>i</name></expr> <range>in <expr><call><name>range</name><argument_list>(<argument><expr><name>x</name></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
         <expr_stmt><expr><name>val</name> <operator>=</operator> <yield>yield <expr><name>i</name></expr></yield></expr></expr_stmt>
 </block_content></block></for></block_content></block></function>
 </unit>

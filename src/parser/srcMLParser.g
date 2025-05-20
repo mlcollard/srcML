@@ -16678,13 +16678,15 @@ condition_py[] { ENTRY_DEBUG } :
 
   Handles a Python "as" expression on its own.
 */
-alias_py[] { SingleElement element(this); int lparen_types_size = 0; ENTRY_DEBUG } :
+alias_py[] { CompleteElement element(this); int lparen_types_size = 0; ENTRY_DEBUG } :
         {
             // end the current expression before starting the alias
-            if (inTransparentMode(MODE_EXPRESSION)) {
+            if (inMode(MODE_EXPRESSION)) {
                 endDownToMode(MODE_EXPRESSION);
                 endMode(MODE_EXPRESSION);
             }
+
+            startNewMode(MODE_ALIAS_PY);
 
             startElement(SALIAS);
 
@@ -16694,37 +16696,44 @@ alias_py[] { SingleElement element(this); int lparen_types_size = 0; ENTRY_DEBUG
         PY_ALIAS
 
         (options { greedy = true; } :
-            { LA(1) == INDENT }?
+            // end the alias if:
+            // - at the start of a block
+            // - at RPAREN that is not part of the alias
+            // - at IF that is not part of the alias (special case for "case")
+            {
+                LA(1) == INDENT
+                || (LA(1) == RPAREN && lparen_types_size == lparen_types_py.size())
+                || (
+                    LA(1) == IF
+                    && lparen_types_size == lparen_types_py.size()
+                    && inTransparentMode(MODE_CASE_PY)
+                )
+            }?
             {
                 break;
             } |
 
-            // surround the outer non-parenthesized tuple with a tag
-            {
-                (LA(1) != LPAREN && LA(1) != LBRACKET && LA(1) != COMMA)
-                && !inTransparentMode(MODE_TUPLE_OF_NAMES_PY)
-                && !inTransparentMode(MODE_EXCLUDE_NO_PAREN_TUPLES_PY)
-                && perform_tuple_names_check_no_paren_py()
-            }?
-            {
-                startNewMode(MODE_LIST | MODE_TUPLE_OF_NAMES_PY);
-                startElement(STUPLE);
-            } |
+            // ensure compound calls are marked correctly (e.g., "a(b)(c)")
+            { inMode(MODE_FUNCTION_CALL) && last_consumed == RPAREN && LA(1) == LPAREN }?
+            call_argument_list |
 
-            { perform_tuple_names_check_py() }?
-            tuple_names_py |
+            { inMode(MODE_ARGUMENT) }?
+            argument |
 
-            parenthesized_name_py | array_names_py | compound_name |
+            {
+                if (!inMode(MODE_EXPRESSION))
+                    startNewMode(MODE_EXPRESSION | MODE_EXPECT);
+            }
+            expression |
 
             { lparen_types_size < lparen_types_py.size() }?
             comma
         )*
 
         {
-            // close any non-parenthesized tuples before the alias ends
-            while (inTransparentMode(MODE_TUPLE_OF_NAMES_PY)) {
-                endDownToMode(MODE_TUPLE_OF_NAMES_PY);
-                endMode(MODE_TUPLE_OF_NAMES_PY);
+            if (inTransparentMode(MODE_ALIAS_PY)) {
+                endDownToMode(MODE_ALIAS_PY);
+                endMode(MODE_ALIAS_PY);
             }
         }
 ;
@@ -16735,7 +16744,7 @@ alias_py[] { SingleElement element(this); int lparen_types_size = 0; ENTRY_DEBUG
   Handles a Python "from" used with an "import" keyword.
   Use perform_from_import_check to ensure an "import" appears after "from" at some point.
 */
-from_import_py[] { ENTRY_DEBUG } :
+from_import_py[] { CompleteElement element(this); int paren_count = 0; ENTRY_DEBUG } :
         {
             startNewMode(MODE_STATEMENT | MODE_EXCLUDE_NO_PAREN_TUPLES_PY);
             startElement(SIMPORT_STATEMENT);
@@ -16767,11 +16776,20 @@ from_import_py[] { ENTRY_DEBUG } :
 
         PY_IMPORT
 
-        {
-            // special case; "*" will not be marked as a name otherwise
-            if (LA(1) == MULTOPS)
-                multops_as_name();
-        }
+        (options { greedy = true; } :
+            { paren_count > 0 }?
+            {
+                --paren_count;
+            }
+            RPAREN |
+
+            {
+                ++paren_count;
+            }
+            LPAREN |
+
+            alias_py | multops_as_name | compound_name | comma
+        )*
 ;
 
 /*
@@ -18701,7 +18719,7 @@ type_alias_annotation_py[] { int lparen_types_size = 0; ENTRY_DEBUG } :
 /*
   control_initialization_py
 
-  Handles Python name(s) in the control portion of a for-loop or comprehension.
+  Handles Python expressions in the control portion of a for-loop or comprehension.
 */
 control_initialization_py[] { ENTRY_DEBUG } :
         {
@@ -18717,299 +18735,84 @@ control_initialization_py[] { ENTRY_DEBUG } :
         (options { greedy = true; } :
             { LA(1) == PY_IN }?
             {
+                if (inTransparentMode(MODE_EXPRESSION)) {
+                    endDownToMode(MODE_EXPRESSION);
+                    endMode(MODE_EXPRESSION);
+                }
+
                 break;
             } |
 
-            // surround the outer non-parenthesized tuple with a tag
-            { !inTransparentMode(MODE_TUPLE_OF_NAMES_PY) && perform_tuple_names_check_no_paren_py() }?
+            // ensure compound calls are marked correctly (e.g., "a(b)(c)")
+            { inMode(MODE_FUNCTION_CALL) && last_consumed == RPAREN && LA(1) == LPAREN }?
+            call_argument_list |
+
+            { inMode(MODE_ARGUMENT) }?
+            argument |
+
+            // special non-parenthesized tuple logic outside of 'expression'
+            { perform_tuple_check_no_paren_py() }?
+            control_tuple_no_paren_py |
+
             {
-                startNewMode(MODE_LIST | MODE_TUPLE_OF_NAMES_PY);
-                startElement(STUPLE);
-            } |
-
-            { perform_tuple_names_check_py() }?
-            tuple_names_py |
-
-            parenthesized_name_py | array_names_py | star_name_py | compound_name | comma
-        )*
-
-        {
-            // close any non-parenthesized tuples before the control initialization ends
-            while (inTransparentMode(MODE_TUPLE_OF_NAMES_PY)) {
-                endDownToMode(MODE_TUPLE_OF_NAMES_PY);
-                endMode(MODE_TUPLE_OF_NAMES_PY);
+                if (!inMode(MODE_EXPRESSION))
+                    startNewMode(MODE_EXPRESSION | MODE_EXPECT);
             }
-        }
+            expression |
+
+            comma
+        )*
 ;
 
 /*
-  perform_tuple_names_check_py
+  control_tuple_no_paren_py
 
-  Determines if an LPAREN starts a tuple.
+  Handles Python tuples that do not use parentheses that occur in the control portion of a for-loop
+  or comprehension. Not used directly, but can be called by control_initialization_py.
 */
-perform_tuple_names_check_py[] returns [bool is_tuple] {
-        is_tuple = false;
-        int num_parens = 0;
-        int num_square_brackets = 0;
-        int last_consumed_current = last_consumed;
-        int start = mark();
-        inputState->guessing++;
-
-        try {
-            // found an empty tuple, "()"
-            if (LA(1) == LPAREN && next_token() == RPAREN)
-                is_tuple = true;
-            else {
-                while (true) {
-                    if (LA(1) == LPAREN)
-                        ++num_parens;
-
-                    if (LA(1) == RPAREN)
-                        --num_parens;
-
-                    if (LA(1) == LBRACKET)
-                        ++num_square_brackets;
-
-                    if (LA(1) == RBRACKET)
-                        --num_square_brackets;
-
-                    // something went wrong if the number of parentheses or square brackets is less than zero
-                    if (num_parens < 0 || num_square_brackets < 0)
-                        break;
-
-                    // there is a comma in the first set of parentheses
-                    if (LA(1) == COMMA && num_parens == 1 && num_square_brackets == 0) {
-                        is_tuple = true;
-                        break;
-                    }
-
-                    // likely a tuple without parentheses
-                    if (LA(1) == COMMA && num_parens == 0)
-                        break;
-
-                    if (LA(1) == PY_IN || LA(1) == INDENT || LA(1) == TERMINATE || LA(1) == 1 /* EOF */)
-                        break;
-
-                    consume();
-                }
-            }
-        }
-        catch (...) {}
-
-        inputState->guessing--;
-        rewind(start);
-
-        last_consumed = last_consumed_current;
-
-        ENTRY_DEBUG
-} :;
-
-/*
-  tuple_names_py
-
-  Handles Python tuples that can only contain names (in for-loops or comprehensions).
-  Not used directly, but can be called by control_initialization_py.
-*/
-tuple_names_py[] { CompleteElement element(this); ENTRY_DEBUG } :
+control_tuple_no_paren_py[] { int lparen_types_size = 0; ENTRY_DEBUG } :
         {
-            startNewMode(MODE_LOCAL | MODE_TOP | MODE_LIST | MODE_TUPLE_OF_NAMES_PY);
+            if (!inMode(MODE_EXPRESSION)) {
+                startNewMode(MODE_EXPRESSION | MODE_EXPECT);
+                startElement(SEXPRESSION);
+            }
+
+            startNewMode(MODE_EXCLUDE_NO_PAREN_TUPLES_PY | MODE_LOCAL | MODE_TOP | MODE_LIST | MODE_TUPLE_NO_PAREN_PY);
 
             startElement(STUPLE);
 
-            lparen_types_py.emplace_back('t');  // tuple LPAREN
+            lparen_types_size = lparen_types_py.size();
         }
 
-        LPAREN
-
         (options { greedy = true; } :
-            // found closing RPAREN for a tuple if:
-            // - last token consumed was LPAREN (e.g., an empty tuple)
-            // - LPAREN deque has a tuple parenthesis at the back
-            // - next token is the "in" keyword
-            {
-                LA(1) == RPAREN
-                && (
-                    last_consumed == LPAREN  // empty tuple "()"
-                    || lparen_types_py.back() == 't'
-                    || next_token() == PY_IN
-                )
-            }?
+            // the non-parenthesized tuple ends before a top-level 'in' keyword
+            { LA(1) == PY_IN && lparen_types_size == lparen_types_py.size() }?
             {
                 break;
             } |
 
-            { perform_tuple_names_check_py() }?
-            tuple_names_py |
+            alias_py |
 
-            parenthesized_name_py | array_names_py | star_name_py | compound_name | comma
-        )*
+            // ensure compound calls are marked correctly (e.g., "a(b)(c)")
+            { inMode(MODE_FUNCTION_CALL) && last_consumed == RPAREN && LA(1) == LPAREN }?
+            call_argument_list |
 
-        {
-            if (inTransparentMode(MODE_TUPLE_OF_NAMES_PY))
-                endDownToMode(MODE_TUPLE_OF_NAMES_PY);
+            { inMode(MODE_ARGUMENT) }?
+            argument |
 
-            if (lparen_types_py.back() == 't')
-                lparen_types_py.pop_back();
-        }
-
-        RPAREN
-
-        {
-            if (inMode(MODE_TUPLE_OF_NAMES_PY))
-                endMode(MODE_TUPLE_OF_NAMES_PY);
-        }
-;
-
-/*
-  perform_tuple_names_check_no_paren_py
-
-  Determines if a series of names (containing at least one COMMA) is a tuple (e.g., "a, b").
-  'tuple_names_py' handles parenthesized tuples with only names.
-*/
-perform_tuple_names_check_no_paren_py[] returns [bool is_tuple] {
-        is_tuple = false;
-        int num_parens = 0;
-        int num_square_brackets = 0;
-        int last_consumed_current = last_consumed;
-        int start = mark();
-        inputState->guessing++;
-
-        try {
-            while (true) {
-                if (LA(1) == LPAREN)
-                    ++num_parens;
-
-                if (LA(1) == RPAREN)
-                    --num_parens;
-
-                if (LA(1) == LBRACKET)
-                    ++num_square_brackets;
-
-                if (LA(1) == RBRACKET)
-                    --num_square_brackets;
-
-                // something went wrong if the number of parentheses or square brackets is less than zero
-                if (num_parens < 0 || num_square_brackets < 0)
-                    break;
-
-                // there is a comma not in any parentheses or square brackets
-                if (LA(1) == COMMA && num_parens == 0 && num_square_brackets == 0) {
-                    is_tuple = true;
-                    break;
-                }
-
-                if (LA(1) == PY_IN || LA(1) == INDENT || LA(1) == TERMINATE || LA(1) == 1 /* EOF */)
-                    break;
-
-                consume();
-            }
-        }
-        catch (...) {}
-
-        inputState->guessing--;
-        rewind(start);
-
-        last_consumed = last_consumed_current;
-
-        ENTRY_DEBUG
-} :;
-
-/*
-  parenthesized_name_py
-
-  Handles names in a Python for-loop or comprehension that are enclosed in parentheses.
-  These act similar to "operator" parentheses (e.g., "(a)"), but are not marked as operators.
-*/
-parenthesized_name_py[] { CompleteElement element(this); int lparen_count = 1; ENTRY_DEBUG } :
-        LPAREN
-
-        {
-            // consume multiple consecutive LPAREN before the name (if applicable)
-            while (LA(1) == LPAREN && !perform_tuple_names_check_py()) {
-                consume();
-                ++lparen_count;
-            }
-        }
-
-        (options { greedy = true; } :
-            { LA(1) == RPAREN }?
             {
-                break;
-            } |
+                if (!inMode(MODE_EXPRESSION))
+                    startNewMode(MODE_EXPRESSION | MODE_EXPECT);
+            }
+            expression |
 
-            { perform_tuple_names_check_py() }?
-            tuple_names_py |
-
-            array_names_py | star_name_py | compound_name
+            comma
         )*
 
         {
-            // consume an equivalent number of RPAREN (if possible)
-            for (int i = 0; i < lparen_count; ++i) {
-                if (LA(1) == RPAREN)
-                    consume();
+            if (inTransparentMode(MODE_TUPLE_NO_PAREN_PY)) {
+                endDownToMode(MODE_TUPLE_NO_PAREN_PY);
+                endMode(MODE_TUPLE_NO_PAREN_PY);
             }
         }
-;
-
-/*
-  array_names_py
-
-  Handles Python lists that can only contain names (in for-loops or comprehensions).
-  Not used directly, but can be called by control_initialization_py.
-*/
-array_names_py[] { CompleteElement element(this); ENTRY_DEBUG } :
-        {
-            startNewMode(MODE_LOCAL | MODE_TOP | MODE_LIST | MODE_ARRAY_OF_NAMES_PY);
-
-            startElement(SARRAY);
-        }
-
-        LBRACKET
-
-        (options { greedy = true; } :
-            { perform_tuple_names_check_py() }?
-            tuple_names_py |
-
-            parenthesized_name_py | array_names_py | star_name_py | compound_name | comma
-        )*
-
-        {
-            if (inTransparentMode(MODE_ARRAY_OF_NAMES_PY))
-                endDownToMode(MODE_ARRAY_OF_NAMES_PY);
-        }
-
-        RBRACKET
-
-        {
-            if (inMode(MODE_ARRAY_OF_NAMES_PY))
-                endMode(MODE_ARRAY_OF_NAMES_PY);
-        }
-;
-
-/*
-  star_name_py
-
-  Used to mark "*" + NAME (or "**" + NAME) as a compound name (e.g., "*_").
-  Only applicable in Python a tuple of names/array of names.
-*/
-star_name_py[] { CompleteElement element(this); ENTRY_DEBUG } :
-        {
-            // start the outer name tag
-            startNewMode(MODE_LOCAL);
-            startElement(SCNAME);
-
-            // start the inner operator tag
-            startNewMode(MODE_LOCAL);
-            startElement(SOPERATOR);
-        }
-
-        (MULTOPS | EXPONENTIATION)
-
-        {
-            // close the inner operator tag
-            endMode(MODE_LOCAL);
-        }
-
-        compound_name
 ;

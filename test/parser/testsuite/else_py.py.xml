@@ -14,7 +14,7 @@
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<for>for <control><name>x</name> <range>in <expr><call><name>range</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
+<for>for <control><expr><name>x</name></expr> <range>in <expr><call><name>range</name><argument_list>(<argument><expr><literal type="number">10</literal></expr></argument>)</argument_list></call></expr></range></control><block>:<block_content>
     <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><name>x</name></expr></argument>)</argument_list></call></expr></expr_stmt>
 </block_content></block><else>else<block>:<block_content>
     <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">'for_else'</literal></expr></argument>)</argument_list></call></expr></expr_stmt>

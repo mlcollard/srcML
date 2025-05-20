@@ -10,11 +10,11 @@
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<import>import <name>module</name> <alias>as <name>alias</name></alias></import>
+<import>import <name>module</name> <alias>as <expr><name>alias</name></expr></alias></import>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<import>import <name>module_1</name> <alias>as <name>alias_1</name></alias>, <name>module_2</name> <alias>as <name>alias_2</name></alias></import>
+<import>import <name>module_1</name> <alias>as <expr><name>alias_1</name></expr></alias>, <name>module_2</name> <alias>as <expr><name>alias_2</name></expr></alias></import>
 </unit>
 
 <unit revision="1.1.0" language="Python">
@@ -34,27 +34,27 @@
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<import><from>from <name>module</name></from> import <name>name</name> <alias>as <name>alias</name></alias></import>
+<import><from>from <name>module</name></from> import <name>name</name> <alias>as <expr><name>alias</name></expr></alias></import>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<import><from>from <name>module</name></from> import (<name>name</name> <alias>as <name>alias</name></alias>)</import>
+<import><from>from <name>module</name></from> import (<name>name</name> <alias>as <expr><name>alias</name></expr></alias>)</import>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<import><from>from <name>module</name></from> import <name>name_1</name> <alias>as <name>name_1</name></alias>, <name>name_2</name> <alias>as <name>alias_2</name></alias></import>
+<import><from>from <name>module</name></from> import <name>name_1</name> <alias>as <expr><name>name_1</name></expr></alias>, <name>name_2</name> <alias>as <expr><name>alias_2</name></expr></alias></import>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<import><from>from <name>module</name></from> import (<name>name_1</name> <alias>as <name>name_1</name></alias>, <name>name_2</name> <alias>as <name>alias_2</name></alias>)</import>
+<import><from>from <name>module</name></from> import (<name>name_1</name> <alias>as <expr><name>name_1</name></expr></alias>, <name>name_2</name> <alias>as <expr><name>alias_2</name></expr></alias>)</import>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<import><from>from <name>module</name></from> import <name>name_1</name>, <name>name_2</name> <alias>as <name>alias</name></alias>, <name>name_3</name></import>
+<import><from>from <name>module</name></from> import <name>name_1</name>, <name>name_2</name> <alias>as <expr><name>alias</name></expr></alias>, <name>name_3</name></import>
 </unit>
 
 <unit revision="1.1.0" language="Python">
-<import><from>from <name>module</name></from> import (<name>name_1</name>, <name>name_2</name> <alias>as <name>alias</name></alias>, <name>name_3</name>)</import>
+<import><from>from <name>module</name></from> import (<name>name_1</name>, <name>name_2</name> <alias>as <expr><name>alias</name></expr></alias>, <name>name_3</name>)</import>
 </unit>
 
 <unit revision="1.1.0" language="Python">
