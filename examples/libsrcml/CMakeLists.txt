@@ -11,7 +11,7 @@ cmake_minimum_required(VERSION 3.28)
 project(srcML-Examples-libsrcml)
 
 if(SRCML_TEST_INSTALLED OR NOT TARGET srcML::LibsrcML)
-    find_package(srcml REQUIRED)
+    find_package(srcML REQUIRED)
 endif()
 
 # Install directory for libsrcml examples

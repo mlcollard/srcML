@@ -8,7 +8,7 @@
 # test framework
 source $(dirname "$0")/framework_test.sh
 
-define output <<- 'STDOUT'
+defineXML output <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -16,9 +16,9 @@ define output <<- 'STDOUT'
 	<expr_stmt><expr><name>a</name></expr>;</expr_stmt></unit>
 
 	</unit>
-	STDOUT
+STDOUT
 
-define nestedfile <<- 'STDOUT'
+defineXML nestedfile <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -29,9 +29,9 @@ define nestedfile <<- 'STDOUT'
 	<expr_stmt><expr><name>b</name></expr>;</expr_stmt></unit>
 
 	</unit>
-	STDOUT
+STDOUT
 
-define nestedfilesrc <<- 'STDOUT'
+defineXML nestedfilesrc <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<src:unit xmlns:src="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -42,11 +42,7 @@ define nestedfilesrc <<- 'STDOUT'
 	<src:expr_stmt><src:expr><src:name>b</src:name></src:expr>;</src:expr_stmt></src:unit>
 
 	</src:unit>
-	STDOUT
-
-xmlcheck "$output"
-xmlcheck "$nestedfile"
-xmlcheck "$nestedfilesrc"
+STDOUT
 
 createfile sub/a.cpp "
 a;"

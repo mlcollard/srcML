@@ -9,7 +9,7 @@
 source $(dirname "$0")/framework_test.sh
 
 # test
-define input <<- 'INPUT'
+defineXML input <<- 'INPUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -22,9 +22,9 @@ define input <<- 'INPUT'
 	</unit>
 
 	</unit>
-	INPUT
+INPUT
 
-define output <<- 'OUTPUT'
+defineXML output <<- 'OUTPUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -33,10 +33,7 @@ define output <<- 'OUTPUT'
 	<unit revision="REVISION" language="C++" filename="b.cpp" item="1"><!-- Comment Two --></unit>
 
 	</unit>
-	OUTPUT
-
-xmlcheck "$input"
-xmlcheck "$output"
+OUTPUT
 
 createfile sub/archive.xml "$input"
 

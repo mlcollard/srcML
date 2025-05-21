@@ -10,7 +10,7 @@ source $(dirname "$0")/framework_test.sh
 
 # test executing an xpath search on an archive with more than one unit in it
 # test
-define srcml <<- 'STDOUT'
+defineXML srcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:cpp="http://www.srcML.org/srcML/cpp" revision="REVISION" language="C++" filename="a.cpp"><comment type="block" format="doxygen">/**
 	 * @returns Return 1 on success and 0 on failure.
@@ -32,13 +32,12 @@ define srcml <<- 'STDOUT'
 	<cpp:endif>#<cpp:directive>endif</cpp:directive></cpp:endif>
 	</block_content>}</block></function>
 	</unit>
-	STDOUT
+STDOUT
 
-xmlcheck "$srcml"
 createfile sub/a.cpp.xml "$srcml"
 
 # select elements matching *<argument><expr><name>*
-define output <<- 'STDOUT'
+defineXML output <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -57,9 +56,7 @@ define output <<- 'STDOUT'
 	<unit xmlns:cpp="http://www.srcML.org/srcML/cpp" revision="REVISION" language="C++" filename="a.cpp" item="7"><name>handle</name></unit>
 
 	</unit>
-	STDOUT
-
-xmlcheck "$output"
+STDOUT
 
 srcml sub/a.cpp.xml --srcql '$C($N)' --xpath="//src:argument/src:expr/src:name"
 check "$output"
@@ -80,16 +77,14 @@ srcml -o sub/a.xml sub/a.cpp.xml --srcql '$C($N)' --xpath "//src:argument/src:ex
 check sub/a.xml "$output"
 
 # select the first elements (from each archive unit) that match *<name>*
-define output <<- 'STDOUT'
+defineXML output <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
 	<unit xmlns:cpp="http://www.srcML.org/srcML/cpp" revision="REVISION" language="C++" filename="a.cpp" item="1"><name>int</name></unit>
 
 	</unit>
-	STDOUT
-
-xmlcheck "$output"
+STDOUT
 
 # srcml sub/a.cpp.xml --srcql '$N' --xpath "(//src:name)[1]"
 # check "$output"
@@ -122,9 +117,7 @@ xmlcheck "$output"
 # 	<unit xmlns:cpp="http://www.srcML.org/srcML/cpp" revision="REVISION" language="C++" filename="a.cpp" item="2">void</unit>
 
 # 	</unit>
-# 	STDOUT
-
-# xmlcheck "$output"
+# STDOUT
 
 # srcml sub/a.cpp.xml --srcql '$C($N)' --xpath "//src:type/src:name/text()"
 # check "$output"
@@ -160,9 +153,7 @@ xmlcheck "$output"
 # 	 */</comment></unit>
 
 # 	</unit>
-# 	STDOUT
-
-# xmlcheck "$output"
+# STDOUT
 
 # srcml sub/a.cpp.xml --xpath='//src:comment[@type="block"]'
 # check "$output"

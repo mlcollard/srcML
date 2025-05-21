@@ -9,16 +9,15 @@
 source $(dirname "$0")/framework_test.sh
 
 # default xmlns
-define foosrcml <<- 'STDOUT'
+defineXML foosrcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<bar:unit xmlns:bar="http://www.srcML.org/srcML/src" xmlns="http://www.foo.com" revision="REVISION">
 
 	<bar:unit revision="REVISION" language="C++" filename="sub/a.cpp" hash="a301d91aac4aa1ab4e69cbc59cde4b4fff32f2b8"><bar:expr_stmt><bar:expr><bar:name>a</bar:name></bar:expr>;</bar:expr_stmt></bar:unit>
 
 	</bar:unit>
-	STDOUT
+STDOUT
 
-xmlcheck "$foosrcml"
 createfile sub/a.cpp "a;"
 
 srcml --xmlns="http://www.foo.com" --xmlns:bar=http://www.srcML.org/srcML/src sub/a.cpp --archive
@@ -85,16 +84,14 @@ srcml -o sub/a.xml --archive sub/a.cpp --xmlns="http://www.foo.com" --xmlns:bar=
 check sub/a.xml "$foosrcml"
 
 # with prefix
-define fooprefixsrcml <<- 'STDOUT'
+defineXML fooprefixsrcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:foo="http://www.foo.com" revision="REVISION">
 
 	<unit revision="REVISION" language="C++" filename="sub/a.cpp" hash="a301d91aac4aa1ab4e69cbc59cde4b4fff32f2b8"><expr_stmt><expr><name>a</name></expr>;</expr_stmt></unit>
 
 	</unit>
-	STDOUT
-
-xmlcheck "$fooprefixsrcml"
+STDOUT
 
 srcml --xmlns:foo="http://www.foo.com" sub/a.cpp --archive
 check "$fooprefixsrcml"

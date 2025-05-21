@@ -9,22 +9,20 @@
 source $(dirname "$0")/framework_test.sh
 
 # test
-define srcml <<- 'STDOUT'
+defineXML srcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++"/>
-	STDOUT
+STDOUT
 
-define xpath <<- 'STDOUT'
+defineXML xpath <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
 	<unit revision="REVISION" language="C++"/>
 
 	</unit>
-	STDOUT
+STDOUT
 
-xmlcheck "$srcml"
-xmlcheck "$xpath"
 createfile sub/a.cpp.xml "$srcml"
 
 srcml --xpath=/src:unit sub/a.cpp.xml

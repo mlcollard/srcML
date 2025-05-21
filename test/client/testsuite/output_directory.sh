@@ -8,26 +8,26 @@
 # test framework
 source $(dirname "$0")/framework_test.sh
 
-define srcml <<- 'STDOUT'
+defineXML srcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++" filename="a.cpp"><expr_stmt><expr><name>a</name></expr>;</expr_stmt>
 	</unit>
-  STDOUT
+STDOUT
 createfile a.xml "$srcml"
-createfile a.cpp "a;"
+createfile a.cpp "a;\n"
+
+mkdir nonexistent_dir
 
 # output directory does not exist
-rm -rf nonexistent_dir
+rm -rf nonexistent_dir/a.xml
 
 echo "a;" | srcml -l C++ -o nonexistent_dir/a.xml --filename "a.cpp"
 check nonexistent_dir/a.xml "$srcml"
 
-rm -rf nonexistent_dir
+rm -rf nonexistent_dir/a.xml
 
 srcml a.cpp -o nonexistent_dir/a.xml
 check nonexistent_dir/a.xml "$srcml"
 
-rm -rf nonexistent_dir
-
 srcml a.xml -o nonexistent_dir/a.cpp
-check nonexistent_dir/a.cpp "a;"
+check nonexistent_dir/a.cpp "a;\n"

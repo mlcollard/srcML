@@ -16,9 +16,9 @@ define input <<- 'INPUT'
 	#else
 	return;
 	#endif
-	INPUT
+INPUT
 
-define markup_else <<- 'STDOUT'
+defineXML markup_else <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:cpp="http://www.srcML.org/srcML/cpp" revision="REVISION" language="C++">
 	<cpp:if>#<cpp:directive>if</cpp:directive> <expr><name>A</name></expr></cpp:if>
@@ -27,9 +27,9 @@ define markup_else <<- 'STDOUT'
 	<return>return;</return>
 	<cpp:endif>#<cpp:directive>endif</cpp:directive></cpp:endif>
 	</unit>
-	STDOUT
+STDOUT
 
-define fmarkup_else <<- 'STDOUT'
+defineXML fmarkup_else <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:cpp="http://www.srcML.org/srcML/cpp" revision="REVISION" language="C++" filename="sub/a.cpp">
 	<cpp:if>#<cpp:directive>if</cpp:directive> <expr><name>A</name></expr></cpp:if>
@@ -38,9 +38,9 @@ define fmarkup_else <<- 'STDOUT'
 	<return>return;</return>
 	<cpp:endif>#<cpp:directive>endif</cpp:directive></cpp:endif>
 	</unit>
-	STDOUT
+STDOUT
 
-define nomarkup_else <<- 'STDOUT'
+defineXML nomarkup_else <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:cpp="http://www.srcML.org/srcML/cpp" revision="REVISION" language="C++" options="CPP_TEXT_ELSE">
 	<cpp:if>#<cpp:directive>if</cpp:directive> <expr><name>A</name></expr></cpp:if>
@@ -49,9 +49,9 @@ define nomarkup_else <<- 'STDOUT'
 	return;
 	<cpp:endif>#<cpp:directive>endif</cpp:directive></cpp:endif>
 	</unit>
-	STDOUT
+STDOUT
 
-define fnomarkup_else <<- 'STDOUT'
+defineXML fnomarkup_else <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:cpp="http://www.srcML.org/srcML/cpp" revision="REVISION" language="C++" filename="sub/a.cpp" options="CPP_TEXT_ELSE">
 	<cpp:if>#<cpp:directive>if</cpp:directive> <expr><name>A</name></expr></cpp:if>
@@ -60,12 +60,7 @@ define fnomarkup_else <<- 'STDOUT'
 	return;
 	<cpp:endif>#<cpp:directive>endif</cpp:directive></cpp:endif>
 	</unit>
-	STDOUT
-
-xmlcheck "$markup_else"
-xmlcheck "$fmarkup_else"
-xmlcheck "$nomarkup_else"
-xmlcheck "$fnomarkup_else"
+STDOUT
 
 createfile sub/a.cpp "$input"
 

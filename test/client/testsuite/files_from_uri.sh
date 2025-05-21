@@ -9,7 +9,7 @@
 source $(dirname "$0")/framework_test.sh
 
 # files from
-define nestedfile <<- 'STDOUT'
+defineXML nestedfile <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -20,9 +20,7 @@ define nestedfile <<- 'STDOUT'
 	<expr_stmt><expr><name>b</name></expr>;</expr_stmt></unit>
 
 	</unit>
-	STDOUT
-
-xmlcheck "$nestedfile"
+STDOUT
 
 createfile sub/a.cpp "
 a;"
@@ -36,10 +34,10 @@ srcml --files-from "https://raw.githubusercontent.com/srcML/test-data/1.0.0/file
 check sub/both.xml "$nestedfile"
 
 # compressed remote filelist
-define empty_srcml_with_url <<- 'STDOUT'
+defineXML empty_srcml_with_url <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION"/>
-	STDOUT
+STDOUT
 
 srcml --files-from https://raw.githubusercontent.com/srcML/test-data/1.0.0/empty/empty.txt.bz2
 check "$empty_srcml_with_url"

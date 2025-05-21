@@ -9,12 +9,10 @@
 source $(dirname "$0")/framework_test.sh
 
 # test language_attribute_cpp
-define output <<- 'OUTPUT'
+defineXML output <<- 'OUTPUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++"/>
-	OUTPUT
-
-xmlcheck "$output"
+OUTPUT
 
 echo -n "" | srcml -l "C++"
 check "$output"

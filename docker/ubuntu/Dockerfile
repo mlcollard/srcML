@@ -1,8 +1,8 @@
 ARG TAG=22.04
-FROM ubuntu:${TAG} AS ubuntu
+ARG JAVA_TAG=${TAG}
 
 # Generate lightweight jre
-FROM ubuntu AS java
+FROM ubuntu:${JAVA_TAG} AS java
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -q && apt-get install -q -y \
     binutils openjdk-11-jdk-headless \
@@ -13,14 +13,15 @@ RUN jlink --compress=2 --strip-debug --add-modules=java.base --output /opt/java 
     && strip -p --strip-unneeded /opt/java/lib/server/*.so \
     && strip -p --strip-unneeded /opt/java/lib/*.so
 
-FROM ubuntu
+FROM ubuntu:${TAG}
+ARG TAG
 LABEL org.srcml.email="srcmldev@gmail.com"
 LABEL org.srcml.url="srcml.org"
 LABEL org.srcml.distro="ubuntu"
 LABEL org.srcml.osversion="${TAG}"
 
 # Copy lightweight jre install
-COPY --from=java /opt/java /opt/java
+COPY --link --from=java /opt/java /opt/java
 ENV JAVA_HOME=/opt/java
 
 # Avoid prompts for timezone
@@ -53,8 +54,8 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 
 # Install cmake
 # Install direct binary for Ubuntu 20.04
-ARG TAG
 ENV TAG=$TAG
+ARG CMAKE_VERSION=4.0.0
 ARG CMAKE_BINARY
 ARG TARGETPLATFORM
 RUN if [ "$CMAKE_BINARY" = "ON" ]; then case "${TARGETPLATFORM}" in \
@@ -62,7 +63,7 @@ RUN if [ "$CMAKE_BINARY" = "ON" ]; then case "${TARGETPLATFORM}" in \
          "linux/arm64")  ARCHITECTURE="aarch64"  ;; \
          *)  exit 1 ;; \
     esac; \
-    curl --insecure -L "https://github.com/Kitware/CMake/releases/download/v3.29.0/cmake-3.29.0-linux-${ARCHITECTURE}.tar.gz" | tar xz --strip-components=1 -C /usr/local; \
+    curl --insecure -L "https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}-linux-${ARCHITECTURE}.tar.gz" | tar xz --strip-components=1 -C /usr/local; \
     fi
 # Install via apt.kitware.com package repo for all but Ubuntu 20.04
 RUN if [ "$CMAKE_BINARY" != "ON" ]; then apt-get update && \
@@ -82,5 +83,5 @@ RUN if [ "$CMAKE_BINARY" != "ON" ]; then apt-get update && \
 RUN sed -i '/path-exclude=\/usr\/share\/man\/*/c\#path-exclude=\/usr\/share\/man\/*' /etc/dpkg/dpkg.cfg.d/excludes
 
 # Put ccache into the path
-ENV PATH /usr/lib/ccache:$PATH
+ENV PATH=/usr/lib/ccache:$PATH
 RUN export PATH=/usr/lib/ccache/:$PATH

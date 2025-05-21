@@ -9,30 +9,26 @@
 source $(dirname "$0")/framework_test.sh
 
 # test setting the attribute on xpath query results
-define resultstdin <<- 'STDOUT'
+defineXML resultstdin <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:pre="foo.com" revision="REVISION" language="C++"><expr_stmt><expr><name pre:attr="value">a</name></expr>;</expr_stmt>
 	</unit>
-	STDOUT
-
-xmlcheck "$resultstdin"
+STDOUT
 
 # test setting the attribute on xpath query results
-define result <<- 'STDOUT'
+defineXML result <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:pre="foo.com" revision="REVISION" language="C++" filename="a.cpp"><expr_stmt><expr><name pre:attr="value">a</name></expr>;</expr_stmt>
 	</unit>
-	STDOUT
+STDOUT
 
 # test setting the attribute on xpath query results
-define resultnop <<- 'STDOUT'
+defineXML resultnop <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:pre="foo.com" revision="REVISION" language="C++" filename="a.cpp"><expr_stmt><expr><name>a</name></expr>;</expr_stmt>
 	</unit>
-	STDOUT
+STDOUT
 
-xmlcheck "$resultstdin"
-xmlcheck "$result"
 createfile a.cpp "a;
 "
 
