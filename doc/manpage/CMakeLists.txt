@@ -127,6 +127,9 @@ set(PRETTY_FLAG_LONG "pretty")
 set(NULL_SEPARATOR_LONG "print0")
 set(NULL_SEPARATOR_SHORT "Z")
 
+set(HEADER_BLOCK_LONG "header")
+set(HEADER_BLOCK_SHORT "H")
+
 # Custom commands for creating things using pandoc
 configure_file(${CMAKE_SOURCE_DIR}/doc/manpage/srcml.cfg ${CMAKE_BINARY_DIR}/srcml.md)
 add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/srcml.1
