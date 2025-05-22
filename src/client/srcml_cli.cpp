@@ -701,8 +701,11 @@ srcml_request_t parseCLI11(int argc, char* argv[]) {
         ->group("EXTRACTING SOURCE CODE");
 
     // separate output with nulls
-    app.add_flag_callback("--header,-H",    [&]() { srcml_request.command |= SRCML_COMMAND_HEADER; },
-        "Adds YAML header block to source output")
+    app.add_flag_callback("--header,-H",    [&]() {
+            srcml_request.command |= SRCML_COMMAND_HEADER;
+            srcml_request.command |= SRCML_COMMAND_NULL;
+        },
+        "Adds YAML header block to source output. Automatically enables --print0")
         ->group("EXTRACTING SOURCE CODE");
 
     // debug
