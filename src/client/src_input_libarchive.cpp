@@ -295,18 +295,6 @@ int src_input_libarchive(ParseQueue& queue,
             if (const char* l = srcml_archive_check_extension(srcml_arch, input_file.extension.data()))
                 language = l;
 
-        // stdin, single files require a explicit filename
-        if (language.empty() && input_file.filename == "stdin://-"sv) {
-            SRCMLstatus(ERROR_MSG, "Language required for stdin single files");
-            exit(1);
-        }
-
-        // if we don't have a language, and are not verbose, then just end this attemp
-        if (language.empty() && !(option(SRCML_COMMAND_VERBOSE))) {
-            ++count;
-            continue;
-        }
-
         std::optional<std::string_view> svBuffer = inBuffer;
         inBuffer.remove_prefix(inBuffer.size());
 
@@ -485,7 +473,14 @@ schedule:
                 }
             }
 
-            // schedule for parsing
+            // stdin, single files require a explicit filename
+            if (prequest->language.empty() && input_file.filename == "stdin://-"sv) {
+                SRCMLstatus(ERROR_MSG, "Language required for stdin single files");
+                exit(1);
+            }
+
+            prequest->status = !prequest->language.empty() ? 0 : SRCML_STATUS_UNSET_LANGUAGE;
+
             queue.schedule(prequest);
 
             ++count;
