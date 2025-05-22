@@ -421,8 +421,6 @@ schedule:
                     if (isHeader) {
                         buffer.erase(buffer.begin(), buffer.begin() + header.size());
 
-                        parsedData.erase("documentType");
-
                         // filename
                         auto search = parsedData.find("filename");
                         if (search != parsedData.end()) {
