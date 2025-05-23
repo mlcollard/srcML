@@ -82,7 +82,7 @@ int srcml_handler_dispatch(ParseQueue& queue,
         return src_input_filesystem(queue, srcml_arch, srcml_request, input);
     }
 
-    if (input.protocol == "file"sv && input.archives.empty() && input.compressions.empty()) {
+    if (input.protocol == "file"sv && !option(SRCML_COMMAND_HEADER) && input.archives.empty() && input.compressions.empty() && srcml_archive_check_extension(srcml_arch, input.extension.data())) {
 
         return src_input_file(queue, srcml_arch, srcml_request, input);
     }
