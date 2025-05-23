@@ -705,7 +705,7 @@ srcml_request_t parseCLI11(int argc, char* argv[]) {
             srcml_request.command |= SRCML_COMMAND_HEADER;
             srcml_request.command |= SRCML_COMMAND_NULL;
         },
-        "Adds YAML header block to source output. Automatically enables --print0")
+        "On source output, it adds a YAML header block and automatically enables --print0; on input, it indicates a file contains YAML headers")
         ->group("EXTRACTING SOURCE CODE");
 
     // debug
