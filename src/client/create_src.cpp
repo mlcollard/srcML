@@ -36,6 +36,25 @@ using namespace ::std::literals::string_view_literals;
 #define WRITE _write
 #endif
 
+static std::string createYAMLNamespace(const char* prefix, const char* uri) {
+
+    std::string header;
+    bool isDefault = prefix && ""sv.compare(prefix) == 0;
+    if (!isDefault)
+        header += '"';
+    header += "xmlns";
+    if (!isDefault) {
+        header += ':';
+        header += prefix;
+        header += '"';
+    }
+    header += ": \"";
+    header += uri;
+    header += "\"\n";
+
+    return header;
+}
+
 static std::string createYAMLHeader(const srcml_archive* arch, const srcml_unit* unit) {
 
     std::string header = "---\n";
@@ -44,19 +63,7 @@ static std::string createYAMLHeader(const srcml_archive* arch, const srcml_unit*
     for (size_t i = 0; i < srcml_archive_get_namespace_size(arch); ++i) {
         if ("http://www.srcML.org/srcML/src"sv.compare(srcml_archive_get_namespace_uri(arch, i)) != 0)
             continue;
-        auto prefix = srcml_archive_get_namespace_prefix(arch, i);
-        bool isDefault = prefix && ""sv.compare(prefix) == 0;
-        if (!isDefault)
-            header += '"';
-        header += "xmlns";
-        if (!isDefault) {
-            header += ':';
-            header += prefix;
-            header += '"';
-        }
-        header += ": \"";
-        header += srcml_archive_get_namespace_uri(arch, i);
-        header += "\"\n";
+        header += createYAMLNamespace(srcml_archive_get_namespace_prefix(arch, i), srcml_archive_get_namespace_uri(arch, i));
         break;
     }
 
@@ -64,38 +71,14 @@ static std::string createYAMLHeader(const srcml_archive* arch, const srcml_unit*
     for (size_t i = 0; i < srcml_archive_get_namespace_size(arch); ++i) {
         if ("http://www.srcML.org/srcML/src"sv.compare(srcml_archive_get_namespace_uri(arch, i)) == 0)
             continue;
-        auto prefix = srcml_archive_get_namespace_prefix(arch, i);
-        bool isDefault = prefix && ""sv.compare(prefix) == 0;
-        if (!isDefault)
-            header += '"';
-        header += "xmlns";
-        if (!isDefault) {
-            header += ':';
-            header += prefix;
-            header += '"';
-        }
-        header += ": \"";
-        header += srcml_archive_get_namespace_uri(arch, i);
-        header += "\"\n";
+        header += createYAMLNamespace(srcml_archive_get_namespace_prefix(arch, i), srcml_archive_get_namespace_uri(arch, i));
     }
 
     // output custom namespaces
     for (size_t i = 0; i < srcml_unit_get_namespace_size(unit); ++i) {
         if ("http://www.srcML.org/srcML/src"sv.compare(srcml_unit_get_namespace_uri(unit, i)) == 0)
             continue;
-        auto prefix = srcml_unit_get_namespace_prefix(unit, i);
-        bool isDefault = prefix && ""sv.compare(prefix) == 0;
-        if (!isDefault)
-            header += '"';
-        header += "xmlns";
-        if (!isDefault) {
-            header += ':';
-            header += prefix;
-            header += '"';
-        }
-        header += ": \"";
-        header += srcml_unit_get_namespace_uri(unit, i);
-        header += "\"\n";
+        header += createYAMLNamespace(srcml_unit_get_namespace_prefix(unit, i), srcml_unit_get_namespace_uri(unit, i));
     }
 
     const auto language = srcml_unit_get_language(unit);
