@@ -442,31 +442,30 @@ schedule:
                             // parsedData.erase("src-version");
                         }
 
+                        // register namespaces
                         for (const auto &kv : parsedData) {
-                            // std::cout << kv.first << "|" << kv.second << std::endl;
 
                             if (kv.first.substr(0, "xmlns:"sv.size()) == "xmlns:"sv) {
 
                                 const std::string prefix(kv.first.substr("xmlns:"sv.size()));
                                 const std::string url(kv.second);
-
                                 srcml_unit_register_namespace(prequest->unit.get(), prefix.data(), url.data());
+                            }
+                        }
 
-                            } else {
-
+                        // register attributes
+                        for (const auto &kv : parsedData) {
+                            if (kv.first.substr(0, "xmlns:"sv.size()) != "xmlns:"sv) {
                                 const auto separator = kv.first.find(':');
                                 if (separator != kv.first.npos) {
 
                                     const std::string prefix(kv.first.substr(0, separator));
                                     const std::string name(kv.first.substr(separator + 1));
                                     std::string value(kv.second);
-
                                     srcml_unit_add_attribute(prequest->unit.get(), prefix.c_str(), name.c_str(), value.c_str());
-                                    // prequest->namespaceValues.push_back(XMLNamespaceValue{ prefix.data(), name.data(), value.data() });
                                 }
                             }
                         }
-
                     }
                 }
             }
