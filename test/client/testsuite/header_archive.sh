@@ -206,3 +206,53 @@ check projectCustomAttributeAttribute.xml
 
 cat projectCustomAttributeAttribute.txt | srcml | srcml --header
 check projectCustomAttributeAttribute.txt
+
+defineXML headerURLXML <<- 'OUTPUT'
+	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+	<unit xmlns="http://www.srcML.org/srcML/src" revision="1.0.0" url="http://github.com">
+
+	<unit revision="1.0.0" language="C++" filename="n.cpp" hash="2b22284231f33eb19e66388951726a07ccbec135"><decl_stmt><decl><type><name>int</name></type> <name>n</name> <init>= <expr><literal type="number">0</literal></expr></init></decl>;</decl_stmt>
+	</unit>
+
+	<unit revision="1.0.0" language="C++" filename="m.cpp" hash="4e505f4b4ab0455bc5357bfe34ddd8430a71d66a"><decl_stmt><decl><type><name>int</name></type> <name>m</name> <init>= <expr><literal type="number">0</literal></expr></init></decl>;</decl_stmt>
+	</unit>
+
+	</unit>
+OUTPUT
+createfile projectURL.xml "$headerURLXML"
+
+define file1URL <<-'EOF'
+	---
+	xmlns: "http://www.srcML.org/srcML/src"
+	url: "http://github.com"
+	language: "C++"
+	filename: "n.cpp"
+	---
+	int n = 0;
+EOF
+
+define file2URL <<-'EOF'
+	---
+	xmlns: "http://www.srcML.org/srcML/src"
+	language: "C++"
+	filename: "m.cpp"
+	---
+	int m = 0;
+EOF
+
+echo -n "$file1URL" > projectURL.txt
+printf '\0' >> projectURL.txt
+echo -n "$file2URL" >> projectURL.txt
+
+srcml projectURL.xml --header
+check projectURL.txt
+
+srcml --header projectURL.txt
+check projectURL.xml
+
+cat projectURL.txt | srcml
+check projectURL.xml
+
+cat projectURL.txt | srcml | srcml --header
+check projectURL.txt
+

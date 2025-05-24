@@ -425,21 +425,24 @@ schedule:
                         auto search = parsedData.find("filename");
                         if (search != parsedData.end()) {
                             prequest->filename = search->second;
-                            // parsedData.erase("filename");
                         }
 
                         // language
                         search = parsedData.find("language");
                         if (search != parsedData.end()) {
                             prequest->language = search->second;
-                            // parsedData.erase("language");
                         }
 
                         // src-version
                         search = parsedData.find("src-version");
                         if (search != parsedData.end()) {
                             prequest->version = search->second;
-                            // parsedData.erase("src-version");
+                        }
+
+                        // url on the archive
+                        search = parsedData.find("url");
+                        if (search != parsedData.end()) {
+                            srcml_archive_set_url(prequest->srcml_arch, std::string(search->second).data());
                         }
 
                         // register namespaces

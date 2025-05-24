@@ -55,7 +55,7 @@ static std::string createYAMLNamespace(const char* prefix, const char* uri) {
     return header;
 }
 
-static std::string createYAMLHeader(const srcml_archive* arch, const srcml_unit* unit) {
+static std::string createYAMLHeader(const srcml_archive* arch, const srcml_unit* unit, bool first = false) {
 
     std::string header = "---\n";
 
@@ -81,6 +81,12 @@ static std::string createYAMLHeader(const srcml_archive* arch, const srcml_unit*
         header += createYAMLNamespace(srcml_unit_get_namespace_prefix(unit, i), srcml_unit_get_namespace_uri(unit, i));
     }
 
+    const auto url = srcml_archive_get_url(arch);
+    if (first && url) {
+        header += "url: \"";
+        header += url;
+        header += "\"\n";
+    }
     const auto language = srcml_unit_get_language(unit);
     if (language) {
         header += "language: \"";
@@ -255,7 +261,7 @@ void create_src(const srcml_request_t& srcml_request,
             // output the text header if requested
             if (option(SRCML_COMMAND_HEADER)) {
 
-                const auto header = createYAMLHeader(arch.get(), unit.get());
+                const auto header = createYAMLHeader(arch.get(), unit.get(), count == 0);
                 write(destination, header.data(), header.size());
             }
 
