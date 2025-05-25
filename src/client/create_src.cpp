@@ -67,18 +67,29 @@ static std::string createYAMLHeader(const srcml_archive* arch, const srcml_unit*
         break;
     }
 
-    // output custom namespaces
+    // output custom archive namespaces
     for (size_t i = 0; i < srcml_archive_get_namespace_size(arch); ++i) {
         if ("http://www.srcML.org/srcML/src"sv.compare(srcml_archive_get_namespace_uri(arch, i)) == 0)
             continue;
         header += createYAMLNamespace(srcml_archive_get_namespace_prefix(arch, i), srcml_archive_get_namespace_uri(arch, i));
     }
 
-    // output custom namespaces
+    // output custom unit namespaces
     for (size_t i = 0; i < srcml_unit_get_namespace_size(unit); ++i) {
         if ("http://www.srcML.org/srcML/src"sv.compare(srcml_unit_get_namespace_uri(unit, i)) == 0)
             continue;
         header += createYAMLNamespace(srcml_unit_get_namespace_prefix(unit, i), srcml_unit_get_namespace_uri(unit, i));
+    }
+
+    // output custom archive attributes
+    for (size_t i = 0; i < srcml_archive_get_attribute_size(arch); ++i) {
+        header += "\"";
+        header += srcml_archive_get_attribute_prefix(arch, i);
+        header += ":";
+        header += srcml_archive_get_attribute_name(arch, i);
+        header += "\": \"";
+        header += srcml_archive_get_attribute_value(arch, i);
+        header += "\"\n";
     }
 
     const auto url = srcml_archive_get_url(arch);

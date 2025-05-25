@@ -256,3 +256,69 @@ check projectURL.xml
 cat projectURL.txt | srcml | srcml --header
 check projectURL.txt
 
+defineXML headerRootXML <<- 'OUTPUT'
+	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:metrics="http://www.srcML.org/srcML/metrics" revision="1.0.0" url="http://github.com" metrics:complexity="1">
+
+	<unit revision="1.0.0" language="C++" filename="n.cpp" hash="2b22284231f33eb19e66388951726a07ccbec135"><decl_stmt><decl><type><name>int</name></type> <name>n</name> <init>= <expr><literal type="number">0</literal></expr></init></decl>;</decl_stmt>
+	</unit>
+
+	<unit revision="1.0.0" language="C++" filename="m.cpp" hash="4e505f4b4ab0455bc5357bfe34ddd8430a71d66a"><decl_stmt><decl><type><name>int</name></type> <name>m</name> <init>= <expr><literal type="number">0</literal></expr></init></decl>;</decl_stmt>
+	</unit>
+
+	</unit>
+OUTPUT
+createfile projectRoot.xml "$headerRootXML"
+
+defineXML headerRootOutputXML <<- 'OUTPUT'
+	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+	<unit xmlns="http://www.srcML.org/srcML/src" revision="1.0.0" url="http://github.com">
+
+	<unit xmlns:metrics="http://www.srcML.org/srcML/metrics" revision="1.0.0" language="C++" filename="n.cpp" hash="2b22284231f33eb19e66388951726a07ccbec135" metrics:complexity="1"><decl_stmt><decl><type><name>int</name></type> <name>n</name> <init>= <expr><literal type="number">0</literal></expr></init></decl>;</decl_stmt>
+	</unit>
+
+	<unit xmlns:metrics="http://www.srcML.org/srcML/metrics" revision="1.0.0" language="C++" filename="m.cpp" hash="4e505f4b4ab0455bc5357bfe34ddd8430a71d66a" metrics:complexity="1"><decl_stmt><decl><type><name>int</name></type> <name>m</name> <init>= <expr><literal type="number">0</literal></expr></init></decl>;</decl_stmt>
+	</unit>
+
+	</unit>
+OUTPUT
+createfile projectRootOutput.xml "$headerRootOutputXML"
+
+define file1Root <<-'EOF'
+	---
+	xmlns: "http://www.srcML.org/srcML/src"
+	"xmlns:metrics": "http://www.srcML.org/srcML/metrics"
+	"metrics:complexity": "1"
+	url: "http://github.com"
+	language: "C++"
+	filename: "n.cpp"
+	---
+	int n = 0;
+EOF
+
+define file2Root <<-'EOF'
+	---
+	xmlns: "http://www.srcML.org/srcML/src"
+	"xmlns:metrics": "http://www.srcML.org/srcML/metrics"
+	"metrics:complexity": "1"
+	language: "C++"
+	filename: "m.cpp"
+	---
+	int m = 0;
+EOF
+
+echo -n "$file1Root" > projectRoot.txt
+printf '\0' >> projectRoot.txt
+echo -n "$file2Root" >> projectRoot.txt
+
+srcml projectRoot.xml --header
+check projectRoot.txt
+
+srcml --header projectRoot.txt
+check projectRootOutput.xml
+
+cat projectRoot.txt | srcml
+check projectRootOutput.xml
+
+# cat projectRoot.txt | srcml | srcml --header
+# check projectRoot.txt
