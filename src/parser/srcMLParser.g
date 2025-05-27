@@ -12226,7 +12226,7 @@ expression_part[CALL_TYPE type = NOCALL, int call_count = 1] {
 
         ENTRY_DEBUG
 } :
-        // looking for a Python indexable function call (e.g., a()[], b()[][], etc.)
+        // looking for a Python indexable function call (e.g., "a()[]", "b()[][]", etc.)
         {
             inLanguage(LANGUAGE_PYTHON)
             && (last_consumed == RPAREN || last_consumed == RBRACKET)
@@ -12234,11 +12234,11 @@ expression_part[CALL_TYPE type = NOCALL, int call_count = 1] {
         }?
         variable_identifier_array_grammar_sub[flag] |
 
-        // looking for name to start a Python subscriptable function call (e.g., a[]())
+        // looking for name to start a Python subscriptable function call (e.g., "a[]()" or "a.b[]()")
         {
             inLanguage(LANGUAGE_PYTHON)
             && LA(1) == NAME
-            && next_token() == LBRACKET
+            && (next_token() == LBRACKET || (next_token() == PERIOD && perform_member_access_function_call_check_py()))
             && perform_subscriptable_function_call_check_py()
         }?
         call[call_count]
@@ -18603,6 +18603,53 @@ perform_python_2_except_check returns [bool is_python_2] {
                     break;
 
                 consume();
+            }
+        }
+        catch (...) {}
+
+        inputState->guessing--;
+        rewind(start);
+
+        last_consumed = last_consumed_current;
+
+        ENTRY_DEBUG
+} :;
+
+/*
+  perform_member_access_function_call_check_py
+
+  Determines if a NAME + PERIOD begins a Python function call (e.g., "a.b()").
+*/
+perform_member_access_function_call_check_py returns [bool is_call] {
+        is_call = false;
+        int last_consumed_current = last_consumed;
+        int start = mark();
+        inputState->guessing++;
+
+        try {
+            while (true) {
+                // consume all content inside the index
+                if (LA(1) == LBRACKET) {
+                    while (LA(1) != RBRACKET && LA(1) != INDENT && LA(1) != TERMINATE && LA(1) != 1 /* EOF */)
+                        consume();
+
+                    if (LA(1) == RBRACKET)
+                        consume();
+                }
+
+                // found the start of the call
+                else if (LA(1) == LPAREN) {
+                    is_call = true;
+                    break;
+                }
+
+                // consume names and periods (for compound names)
+                else if (identifier_list_tokens_set.member(LA(1)) || LA(1) == PERIOD)
+                    consume();
+
+                // encountering any other token indicates no call
+                else
+                    break;
             }
         }
         catch (...) {}
