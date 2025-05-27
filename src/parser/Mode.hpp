@@ -310,8 +310,6 @@ const static srcMLState::MODE_TYPE MODE_TERNARY_CONTENT_PY;
 
 const static srcMLState::MODE_TYPE MODE_WITH_EXPRESSION_PY;
 
-const static srcMLState::MODE_TYPE MODE_ARRAY_OF_NAMES_PY;
-
 const static srcMLState::MODE_TYPE MODE_LAMBDA_CONTENT_PY;
 
 const static srcMLState::MODE_TYPE MODE_OPERATOR_PAREN_PY;
@@ -319,8 +317,6 @@ const static srcMLState::MODE_TYPE MODE_OPERATOR_PAREN_PY;
 const static srcMLState::MODE_TYPE MODE_PARAMETER_LIST_PY;
 
 const static srcMLState::MODE_TYPE MODE_TUPLE_NO_PAREN_PY;
-
-const static srcMLState::MODE_TYPE MODE_TUPLE_OF_NAMES_PY;
 
 const static srcMLState::MODE_TYPE MODE_COMPREHENSION_PY;
 
@@ -367,8 +363,6 @@ const static srcMLState::MODE_TYPE MODE_YIELD_PY;
 const static srcMLState::MODE_TYPE MODE_CASE_PY;
 
 const static srcMLState::MODE_TYPE MODE_FROM_PY;
-
-const static srcMLState::MODE_TYPE MODE_WITH_PY;
 
 const static srcMLState::MODE_TYPE MODE_SET_PY;
 
