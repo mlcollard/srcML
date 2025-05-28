@@ -8,7 +8,7 @@
 # test framework
 source $(dirname "$0")/framework_test.sh
 
-define nestedfile <<- 'STDIN'
+defineXML nestedfile <<- 'STDIN'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -21,7 +21,7 @@ define nestedfile <<- 'STDIN'
 	</unit>
 
 	</unit>
-	STDIN
+STDIN
 
 # test invalid_input
 echo "a;" | srcml -l C++ --strip

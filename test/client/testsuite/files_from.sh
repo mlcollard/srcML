@@ -9,7 +9,7 @@
 source $(dirname "$0")/framework_test.sh
 
 # files from
-define nestedfile <<- 'STDOUT'
+defineXML nestedfile <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -20,9 +20,7 @@ define nestedfile <<- 'STDOUT'
 	<expr_stmt><expr><name>b</name></expr>;</expr_stmt></unit>
 
 	</unit>
-	STDOUT
-
-xmlcheck "$nestedfile"
+STDOUT
 
 createfile sub/a.cpp "
 a;"

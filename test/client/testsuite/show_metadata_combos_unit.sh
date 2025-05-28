@@ -9,18 +9,17 @@
 source $(dirname "$0")/framework_test.sh
 
 # get metadata combinations
-define input <<- 'STDOUT'
+defineXML input <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++" url="sub" filename="a.cpp" version="1.2"/>
-	STDOUT
+STDOUT
 
 define output <<- 'STDOUT'
 	url="sub"
 	filename="a.cpp"
 	language="C++"
-	STDOUT
+STDOUT
 
-xmlcheck "$input"
 createfile sub/a.cpp.xml "$input"
 
 # language, url, filename
@@ -49,7 +48,7 @@ define output <<- 'STDOUT'
 	url="sub"
 	filename="a.cpp"
 	language="C++"
-	STDOUT
+STDOUT
 
 # language, url, filename, encoding
 srcml --show-language --show-url --show-filename --show-encoding sub/a.cpp.xml
@@ -71,7 +70,7 @@ define output <<- 'STDOUT'
 	filename="a.cpp"
 	language="C++"
 	version="1.2"
-	STDOUT
+STDOUT
 
 # filename, url, language, encoding, src version
 srcml --show-filename --show-url --show-language --show-encoding --show-src-version sub/a.cpp.xml

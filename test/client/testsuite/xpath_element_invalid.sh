@@ -9,7 +9,7 @@
 source $(dirname "$0")/framework_test.sh
 
 # test specify element after xpath (archive)
-define result <<- 'STDOUT'
+defineXML result <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:pre="foo.com" revision="REVISION">
 
@@ -20,9 +20,8 @@ define result <<- 'STDOUT'
 	</unit>
 
 	</unit>
-	STDOUT
+STDOUT
 
-xmlcheck "$result"
 createfile a.cpp "a;
 "
 createfile b.cpp "b;
@@ -44,7 +43,7 @@ srcml --element="pre:element" --xpath="//src:name" archive.xml -o result.xml
 check_exit 1
 
 # test specify element after xpath (unit)
-define result <<- 'STDOUT'
+defineXML result <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:pre="foo.com" revision="REVISION">
 
@@ -52,9 +51,8 @@ define result <<- 'STDOUT'
 	</unit>
 
 	</unit>
-	STDOUT
+STDOUT
 
-xmlcheck "$result"
 createfile sub/a.cpp "a;
 "
 srcml sub/a.cpp --xmlns:pre=foo.com -o sub/a.xml

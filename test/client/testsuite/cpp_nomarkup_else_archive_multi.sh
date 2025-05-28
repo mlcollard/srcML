@@ -16,9 +16,9 @@ define input <<- 'INPUT'
 	#else
 	return;
 	#endif
-	INPUT
+INPUT
 
-define fmarkup_else <<- 'STDOUT'
+defineXML fmarkup_else <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -33,9 +33,9 @@ define fmarkup_else <<- 'STDOUT'
 	<unit revision="REVISION" language="C++" filename="sub/b.cpp" hash="9a1e1d3d0e27715d29bcfbf72b891b3ece985b36"><expr_stmt><expr><name>b</name></expr>;</expr_stmt></unit>
 
 	</unit>
-	STDOUT
+STDOUT
 
-define fnomarkup_else <<- 'STDOUT'
+defineXML fnomarkup_else <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" options="CPP_TEXT_ELSE">
 
@@ -50,10 +50,7 @@ define fnomarkup_else <<- 'STDOUT'
 	<unit revision="REVISION" language="C++" filename="sub/b.cpp" hash="9a1e1d3d0e27715d29bcfbf72b891b3ece985b36"><expr_stmt><expr><name>b</name></expr>;</expr_stmt></unit>
 
 	</unit>
-	STDOUT
-
-xmlcheck "$fmarkup_else"
-xmlcheck "$fnomarkup_else"
+STDOUT
 
 createfile sub/a.cpp "$input"
 createfile sub/b.cpp "b;"

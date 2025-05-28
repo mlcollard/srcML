@@ -37,7 +37,7 @@ int src_input_filesystem(ParseQueue& queue,
                           std::string_view raw_input) {
 
     // with immediate directory "." lookup the current working directory
-    std::string_view input = raw_input;
+    std::string input = std::string(raw_input);
     if (input == "."sv) {
         char* cwd(getcwd(nullptr, 0));
         input = cwd;

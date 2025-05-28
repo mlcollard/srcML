@@ -9,13 +9,13 @@
 source $(dirname "$0")/framework_test.sh
 
 # test on single unit
-define input <<- 'STDOUT'
+defineXML input <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++" directory="bar" filename="foo" version="1.0"/>
-  STDOUT
+STDOUT
 
 # test on archive of one unit
-define archive <<- 'STDOUT'
+defineXML archive <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" version="1.0">
 
@@ -24,34 +24,31 @@ define archive <<- 'STDOUT'
 	</unit>
 
 	</unit>
-  STDOUT
-
-xmlcheck "$input"
-xmlcheck "$archive"
+STDOUT
 
 createfile sub/a.cpp.xml "$input"
 createfile sub/archive.cpp.xml "$archive"
 
 srcml --show-src-version sub/a.cpp.xml
-check "1.0"
+check "1.0\n"
 
 srcml --show-src-version < sub/a.cpp.xml
-check "1.0"
+check "1.0\n"
 
 srcml --show-src-version sub/archive.cpp.xml
-check "1.0"
+check "1.0\n"
 
 srcml --show-src-version < sub/archive.cpp.xml
-check "1.0"
+check "1.0\n"
 
 # test src version on single unit with empty version
-define empty <<- 'STDIN'
+defineXML empty <<- 'STDIN'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="" directory="" filename="" version=""/>
-  STDIN
+STDIN
 
 # test on archive of one unit with an empty version
-define emptyarchive <<- 'STDOUT'
+defineXML emptyarchive <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" version="">
 
@@ -60,34 +57,31 @@ define emptyarchive <<- 'STDOUT'
 	</unit>
 
 	</unit>
-  STDOUT
-
-xmlcheck "$empty"
-xmlcheck "$emptyarchive"
+STDOUT
 
 createfile sub/a.cpp.xml "$empty"
 createfile sub/archive.cpp.xml "$emptyarchive"
 
 srcml --show-src-version sub/a.cpp.xml
-check ""
+check "\n"
 
 srcml --show-src-version < sub/a.cpp.xml
-check ""
+check "\n"
 
 srcml --show-src-version sub/archive.cpp.xml
-check ""
+check "\n"
 
 srcml --show-src-version < sub/archive.cpp.xml
-check ""
+check "\n"
 
 # test on empty archive with no version
-define noneempty <<- 'STDIN'
+defineXML noneempty <<- 'STDIN'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:cpp="http://www.srcML.org/srcML/cpp"/>
-  STDIN
+STDIN
 
 # test on archive of one unit with no version
-define none <<- 'STDIN'
+defineXML none <<- 'STDIN'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -96,10 +90,7 @@ define none <<- 'STDIN'
 	</unit>
 
 	</unit>
-  STDIN
-
-xmlcheck "$noneempty"
-xmlcheck "$none"
+STDIN
 
 createfile sub/a.cpp.xml "$noneempty"
 createfile sub/archive.cpp.xml "$none"

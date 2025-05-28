@@ -12,25 +12,25 @@ source $(dirname "$0")/framework_test.sh
 
 define sfile1 <<- 'STDOUT'
 	a;
-	STDOUT
+STDOUT
 
 define sfile2 <<- 'STDOUT'
 	b;
-	STDOUT
+STDOUT
 
-define sxmlfile1 <<- 'STDOUT'
+defineXML sxmlfile1 <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++" filename="a.cpp"><expr_stmt><expr><name>a</name></expr>;</expr_stmt>
 	</unit>
-	STDOUT
+STDOUT
 
-define sxmlfile2 <<- 'STDOUT'
+defineXML sxmlfile2 <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++" filename="b.cpp"><expr_stmt><expr><name>b</name></expr>;</expr_stmt>
 	</unit>
-	STDOUT
+STDOUT
 
-define nestedfile <<- 'STDOUT'
+defineXML nestedfile <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -41,11 +41,8 @@ define nestedfile <<- 'STDOUT'
 	</unit>
 
 	</unit>
-	STDOUT
+STDOUT
 
-xmlcheck "$sxmlfile1"
-xmlcheck "$sxmlfile2"
-xmlcheck "$nestedfile"
 createfile sub/a.cpp.xml "$nestedfile"
 
 srcml sub/a.cpp.xml -U "1"

@@ -9,12 +9,12 @@
 source $(dirname "$0")/framework_test.sh
 
 # test xslt empty input
-define srcml <<- 'STDOUT'
+defineXML srcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++"/>
-	STDOUT
+STDOUT
 
-define copyxslt <<- 'STDOUT'
+defineXML copyxslt <<- 'STDOUT'
 	<xsl:stylesheet
 	xmlns="http://www.srcML.org/srcML/src"
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -32,9 +32,9 @@ define copyxslt <<- 'STDOUT'
 	<xsl:template match="@*|node()"><xsl:copy><xsl:apply-templates select="@*|node()"/></xsl:copy></xsl:template>
 
 	</xsl:stylesheet>
-	STDOUT
+STDOUT
 
-define setlanguage <<- 'STDOUT'
+defineXML setlanguage <<- 'STDOUT'
 	<xsl:stylesheet
 	xmlns="http://www.srcML.org/srcML/src"
 	xmlns:src="http://www.srcML.org/srcML/src"
@@ -57,19 +57,18 @@ define setlanguage <<- 'STDOUT'
 	<xsl:template match="@*|node()"><xsl:copy><xsl:apply-templates select="@*|node()"/></xsl:copy></xsl:template>
 
 	</xsl:stylesheet>
-	STDOUT
+STDOUT
 
-define srcml <<- 'STDOUT'
+defineXML srcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++"/>
-	STDOUT
+STDOUT
 
-define srcmljava <<- 'STDOUT'
+defineXML srcmljava <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="Java"/>
-	STDOUT
+STDOUT
 
-xmlcheck "$srcml"
 createfile sub/a.cpp.xml "$srcml"
 createfile copy.xsl "$copyxslt"
 createfile setlanguage.xsl "$setlanguage"

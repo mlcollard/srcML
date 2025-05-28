@@ -21,9 +21,9 @@ source $(dirname "$0")/framework_test.sh
 define sfile <<- 'STDOUT'
 
 	a;
-	STDOUT
+STDOUT
 
-define sxmlfile <<- 'STDOUT'
+defineXML sxmlfile <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -32,17 +32,14 @@ define sxmlfile <<- 'STDOUT'
 	</unit>
 
 	</unit>
-	STDOUT
+STDOUT
 
-define xmlfile <<- 'STDOUT'
+defineXML xmlfile <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++" filename="sub/a.cpp">
 	<expr_stmt><expr><name>a</name></expr>;</expr_stmt>
 	</unit>
-	STDOUT
-
-xmlcheck "$sxmlfile"
-xmlcheck "$xmlfile"
+STDOUT
 
 # src --> srcml
 createfile sub/a.cpp "$sfile"

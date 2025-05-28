@@ -185,7 +185,11 @@ srcml_request_t parseCLI11(int argc, char* argv[]) {
         * Options/flags are added, and can be searched, by name on command line, e.g., --language
     */
 
+    // might get the xslt parameter before the xslt filename
+    std::optional<std::string> xsltParamCache;
+
     // positional arguments, i.e., input files
+    auto xsltEntry = srcml_request.transformations.begin();
     app.add_option_function<std::vector<std::string>>("InputFiles", [&](const std::vector<std::string>&) {}, "")
         ->group("")
         ->each([&](std::string filename) {
@@ -198,7 +202,12 @@ srcml_request_t parseCLI11(int argc, char* argv[]) {
 
             // xslt transformation file
             if (input.extension == ".xsl"sv) {
-                srcml_request.transformations.insert(srcml_request.transformations.begin(), src_prefix_add_uri("xslt", input.filename));
+
+                xsltEntry = srcml_request.transformations.insert(srcml_request.transformations.begin(), src_prefix_add_uri("xslt", src_prefix_resource(input.filename)));
+                if (xsltParamCache) {
+                    srcml_request.transformations.insert(std::next(xsltEntry), src_prefix_add_uri("xslt-param", *xsltParamCache));
+                    xsltParamCache = std::nullopt;
+                }
                 return;
             }
 
@@ -208,7 +217,7 @@ srcml_request_t parseCLI11(int argc, char* argv[]) {
                 return;
             }
 
-            srcml_request.input_sources.push_back(std::move(input));
+            srcml_request.input_sources.push_back(input);
         });
 
     // general
@@ -654,7 +663,6 @@ srcml_request_t parseCLI11(int argc, char* argv[]) {
             srcml_request.xpath_query_support.back().first = element{ value.substr(0, elemn_index), value.substr(elemn_index + 1) };
         });
 
-    auto xsltEntry = srcml_request.transformations.begin();
     auto xslt =
     app.add_option("--xslt",
         "Apply the XSLT program FILE to each unit, where FILE can be a url")
@@ -668,10 +676,15 @@ srcml_request_t parseCLI11(int argc, char* argv[]) {
         "Passes the string parameter NAME with UTF-8 encoded string VALUE to the XSLT program")
         ->type_name("NAME=\"VALUE\"")
         ->group("QUERY & TRANSFORMATION")
-        ->needs(xslt)
+        // ->needs(xslt)
         ->each([&](std::string value) {
             // insert after the xslt entry
-            srcml_request.transformations.insert(std::next(xsltEntry), src_prefix_add_uri("xslt-param", value));
+            auto entry = src_prefix_add_uri("xslt-param", value);
+            if (srcml_request.transformations.empty()) {
+                xsltParamCache = entry;
+            } else {
+                srcml_request.transformations.insert(std::next(xsltEntry), entry);
+            }
         });
 
     app.add_option("--relaxng",

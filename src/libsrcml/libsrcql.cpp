@@ -20,7 +20,7 @@ const char* srcql_convert_query_to_xpath(const char* src_query, const char* lang
 
     std::string xpath;
 
-    if(auto search = queries.find(std::string(language)+":"+src_query); search != queries.end()) {
+    if (auto search = queries.find(std::string(language)+":"+src_query); search != queries.end()) {
         xpath = search->second;
     }
     else {

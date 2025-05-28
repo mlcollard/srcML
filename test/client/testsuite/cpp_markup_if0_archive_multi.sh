@@ -14,9 +14,9 @@ define input <<- 'INPUT'
 	#if 0
 	break;
 	#endif
-	INPUT
+INPUT
 
-define fnomarkupif0 <<- 'STDOUT'
+defineXML fnomarkupif0 <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -33,9 +33,9 @@ define fnomarkupif0 <<- 'STDOUT'
 	</unit>
 
 	</unit>
-	STDOUT
+STDOUT
 
-define fmarkupif0 <<- 'STDOUT'
+defineXML fmarkupif0 <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" options="CPP_MARKUP_IF0">
 
@@ -52,10 +52,7 @@ define fmarkupif0 <<- 'STDOUT'
 	</unit>
 
 	</unit>
-	STDOUT
-
-xmlcheck "$fnomarkupif0"
-xmlcheck "$fmarkupif0"
+STDOUT
 
 createfile sub/a.cpp "$input"
 createfile sub/b.cpp "$input"

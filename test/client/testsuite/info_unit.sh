@@ -19,7 +19,7 @@ define info <<- 'STDOUT'
 	language="C++"
 	url="test"
 	filename="sub/unit.cpp"
-	STDOUT
+STDOUT
 
 define longinfo <<- 'STDOUT'
 	xmlns="http://www.srcML.org/srcML/src"
@@ -28,14 +28,13 @@ define longinfo <<- 'STDOUT'
 	url="test"
 	filename="sub/unit.cpp"
 	units="1"
-	STDOUT
+STDOUT
 
-define srcml <<- 'STDOUT'
+defineXML srcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++" url="test" filename="sub/unit.cpp"><expr_stmt><expr><name>a</name></expr>;</expr_stmt></unit>
-	STDOUT
+STDOUT
 
-xmlcheck "$srcml"
 createfile sub/unit.cpp.xml "$srcml"
 
 srcml sub/unit.cpp.xml -i

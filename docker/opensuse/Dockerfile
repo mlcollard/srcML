@@ -1,9 +1,11 @@
 ARG OPENSUSE=leap
 ARG TAG=15
+ARG JAVA_TAG=${TAG}
 FROM opensuse/$OPENSUSE:${TAG} AS opensuse
 
 # Generate lightweight jre
-FROM opensuse AS java
+FROM opensuse/${OPENSUSE}:${JAVA_TAG} AS java
+
 RUN zypper --non-interactive install --no-recommends \
     binutils \
     java-11-openjdk-devel \
@@ -13,14 +15,15 @@ RUN jlink --compress=2 --strip-debug --add-modules=java.base --output /opt/java 
     && strip -p --strip-unneeded /opt/java/lib/server/*.so \
     && strip -p --strip-unneeded /opt/java/lib/*.so
 
-FROM opensuse
+FROM opensuse/${OPENSUSE}:${TAG}
+ARG TAG
 LABEL org.srcml.email="srcmldev@gmail.com"
 LABEL org.srcml.url="srcml.org"
 LABEL org.srcml.distro="opensuse"
 LABEL org.srcml.osversion="${TAG}"
 
 # Copy lightweight jre install
-COPY --from=java /opt/java /opt/java
+COPY --link --from=java /opt/java /opt/java
 ENV JAVA_HOME=/opt/java
 
 # Avoid prompts for timezone
@@ -53,13 +56,14 @@ RUN zypper --non-interactive install --no-recommends \
 
 # CMake
 ARG TARGETPLATFORM
+ARG CMAKE_VERSION=4.0.0
 RUN case "${TARGETPLATFORM}" in \
          "linux/amd64")  ARCHITECTURE="x86_64"   ;; \
          "linux/arm64")  ARCHITECTURE="aarch64"  ;; \
          *)  exit 1 ;; \
     esac; \
-    curl --insecure -L "https://github.com/Kitware/CMake/releases/download/v3.30.4/cmake-3.30.4-linux-${ARCHITECTURE}.tar.gz" | tar xz --strip-components=1 -C /usr/local
+    curl --insecure -L "https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}-linux-${ARCHITECTURE}.tar.gz" | tar xz --strip-components=1 -C /usr/local
 
 # Put ccache into the path
-ENV PATH /usr/lib/ccache:$PATH
+ENV PATH=/usr/lib/ccache:$PATH
 RUN export PATH=/usr/lib/ccache/:$PATH
