@@ -179,8 +179,16 @@ int src_input_libarchive(ParseQueue& queue,
     // which then hangs
     // Note: may need to fix in libsrcml
     if ((!contains<int>(input_file) && !option(SRCML_COMMAND_HEADER) && !contains<FILE*>(input_file) && input_file.compressions.empty() && input_file.archives.empty() && !srcml_check_extension(input_file.plainfile.data())) | input_file.skip) {
+
+
         // if we are not verbose, then just end this attemp
         if (!(option(SRCML_COMMAND_VERBOSE))) {
+
+            if (!input_file.exists) {
+                std::string s("srcml: Unable to open file ");
+                s += src_prefix_resource(input_file.filename);
+                SRCMLstatus(WARNING_MSG, s);
+            }
             return 0;
         }
 
@@ -199,6 +207,7 @@ int src_input_libarchive(ParseQueue& queue,
         prequest->srcml_arch = srcml_arch;
         prequest->language = "";
         prequest->status = SRCML_STATUS_UNSET_LANGUAGE;
+        prequest->exists = input_file.exists;
 
         // schedule for parsing
         queue.schedule(prequest);
