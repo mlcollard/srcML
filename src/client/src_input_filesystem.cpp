@@ -95,6 +95,12 @@ int src_input_filesystem(ParseQueue& queue,
 
         srcml_input_src input_file(filename);
 
+        // Skip any files that have a non-source-code extension that we support
+        // Prevents large non-source-code files from being processed, which takes a long
+        // time because srcml is reading the entire file
+        if (!srcml_check_extension(input_file.extension.data()))
+            input_file.skip = true;
+
         // If a directory contains archives skip them
         if (!(srcml_request.command & SRCML_COMMAND_PARSER_TEST) && !(input_file.archives.empty())) {
             input_file.skip = true;
