@@ -172,10 +172,6 @@ private:
 
             // more partial parsing to do
             switch (getLanguage()) {
-            case LANGUAGE_JAVASCRIPT:
-                srcMLParser::start_javascript();
-                break;
-
             case LANGUAGE_PYTHON:
                 srcMLParser::start_python();
                 break;

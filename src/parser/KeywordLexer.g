@@ -315,44 +315,6 @@ tokens {
 
     ASSIGNMENT; // +=, -=, etc.
 
-    GUARD;
-
-    // JavaScript
-    JS_ALIAS;
-    JS_ARROW;
-    JS_ASYNC;
-    JS_AWAIT;
-    JS_BREAK;
-    JS_CATCH;
-    JS_CONST;
-    JS_CONSTRUCTOR;
-    JS_CONTINUE;
-    JS_DEBUGGER;
-    JS_DEFAULT;
-    JS_DELETE;
-    JS_DO;
-    JS_EACH;
-    JS_ELSE;
-    JS_EXPORT;
-    JS_FINALLY;
-    JS_FROM;
-    JS_FUNCTION;
-    JS_GET;
-    JS_IMPORT;
-    JS_INSTANCE_OF;
-    JS_LET;
-    JS_RANGE_IN;
-    JS_RANGE_OF;
-    JS_SET;
-    JS_STATIC;
-    JS_SWITCH;
-    JS_TRY;
-    JS_TYPEOF;
-    JS_VAR;
-    JS_VOID;
-    JS_WITH;
-    JS_YIELD;
-
     // Python
     EXPONENTIATION;
     LITERAL_ELLIPSIS;
@@ -765,44 +727,6 @@ KeywordLexer(UTF8CharBuffer* pinput, int language, OPTION_TYPE & options,
 
         // OpenMp
         { "omp"          , OMP_OMP           , LANGUAGE_C_FAMILY },
-
-        // JavaScript
-        { "=>"           , JS_ARROW          , LANGUAGE_JAVASCRIPT },
-        { "as"           , JS_ALIAS          , LANGUAGE_JAVASCRIPT },
-        { "async"        , JS_ASYNC          , LANGUAGE_JAVASCRIPT },
-        { "await"        , JS_AWAIT          , LANGUAGE_JAVASCRIPT },
-        { "break"        , JS_BREAK          , LANGUAGE_JAVASCRIPT },
-        { "catch"        , JS_CATCH          , LANGUAGE_JAVASCRIPT },
-        { "const"        , JS_CONST          , LANGUAGE_JAVASCRIPT },
-        { "constructor"  , JS_CONSTRUCTOR    , LANGUAGE_JAVASCRIPT },
-        { "continue"     , JS_CONTINUE       , LANGUAGE_JAVASCRIPT },
-        { "debugger"     , JS_DEBUGGER       , LANGUAGE_JAVASCRIPT },
-        { "default"      , JS_DEFAULT        , LANGUAGE_JAVASCRIPT },
-        { "delete"       , JS_DELETE         , LANGUAGE_JAVASCRIPT },
-        { "do"           , JS_DO             , LANGUAGE_JAVASCRIPT },
-        { "each"         , JS_EACH           , LANGUAGE_JAVASCRIPT },
-        { "else"         , JS_ELSE           , LANGUAGE_JAVASCRIPT },
-        { "export"       , JS_EXPORT         , LANGUAGE_JAVASCRIPT },
-        { "extends"      , EXTENDS           , LANGUAGE_JAVASCRIPT },
-        { "finally"      , JS_FINALLY        , LANGUAGE_JAVASCRIPT },
-        { "from"         , JS_FROM           , LANGUAGE_JAVASCRIPT },
-        { "function"     , JS_FUNCTION       , LANGUAGE_JAVASCRIPT },
-        { "get"          , JS_GET            , LANGUAGE_JAVASCRIPT },
-        { "import"       , JS_IMPORT         , LANGUAGE_JAVASCRIPT },
-        { "in"           , JS_RANGE_IN       , LANGUAGE_JAVASCRIPT },
-        { "instanceof"   , JS_INSTANCE_OF    , LANGUAGE_JAVASCRIPT },
-        { "let"          , JS_LET            , LANGUAGE_JAVASCRIPT },
-        { "null"         , NULLLITERAL       , LANGUAGE_JAVASCRIPT },
-        { "of"           , JS_RANGE_OF       , LANGUAGE_JAVASCRIPT },
-        { "set"          , JS_SET            , LANGUAGE_JAVASCRIPT },
-        { "static"       , JS_STATIC         , LANGUAGE_JAVASCRIPT },
-        { "switch"       , JS_SWITCH         , LANGUAGE_JAVASCRIPT },
-        { "try"          , JS_TRY            , LANGUAGE_JAVASCRIPT },
-        { "typeof"       , JS_TYPEOF         , LANGUAGE_JAVASCRIPT },
-        { "var"          , JS_VAR            , LANGUAGE_JAVASCRIPT },
-        { "void"         , JS_VOID           , LANGUAGE_JAVASCRIPT },
-        { "with"         , JS_WITH           , LANGUAGE_JAVASCRIPT },
-        { "yield"        , JS_YIELD          , LANGUAGE_JAVASCRIPT },
 
         // Python special characters or operators
         { "}"            , PY_RCURLY         , LANGUAGE_PYTHON },

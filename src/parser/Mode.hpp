@@ -256,51 +256,6 @@ const static srcMLState::MODE_TYPE MODE_IF_STATEMENT;
 
 const static srcMLState::MODE_TYPE MODE_NO_BLOCK_CONTENT;
 
-const static srcMLState::MODE_TYPE MODE_PSEUDOBLOCK;
-
-const static srcMLState::MODE_TYPE MODE_DECLARATION_STATEMENT;
-
-// JavaScript modes
-const static srcMLState::MODE_TYPE MODE_ARGUMENT_JS;
-
-const static srcMLState::MODE_TYPE MODE_PARAMETER_LIST_JS;
-
-const static srcMLState::MODE_TYPE MODE_NAME_LIST_JS;
-
-const static srcMLState::MODE_TYPE MODE_ALIAS_COMPOUND_NAME_JS;
-
-const static srcMLState::MODE_TYPE MODE_DECLARATION_JS;
-
-const static srcMLState::MODE_TYPE MODE_FOR_LOOP_JS;
-
-const static srcMLState::MODE_TYPE MODE_CATCH_JS;
-
-const static srcMLState::MODE_TYPE MODE_WITH_JS;
-
-const static srcMLState::MODE_TYPE MODE_IMPORT_JS;
-
-const static srcMLState::MODE_TYPE MODE_LAMBDA_JS;
-
-const static srcMLState::MODE_TYPE MODE_CONSTRUCTOR_JS;
-
-const static srcMLState::MODE_TYPE MODE_CLASS_EXPR_JS;
-
-const static srcMLState::MODE_TYPE MODE_LAMBDA_ARROW_JS;
-
-const static srcMLState::MODE_TYPE MODE_ARROW_OP_JS;
-
-const static srcMLState::MODE_TYPE MODE_ARROW_BLOCK_JS;
-
-const static srcMLState::MODE_TYPE MODE_OBJECT_JS;
-
-const static srcMLState::MODE_TYPE MODE_PROPERTY_JS;
-
-const static srcMLState::MODE_TYPE MODE_GETTER_JS;
-
-const static srcMLState::MODE_TYPE MODE_SETTER_JS;
-
-const static srcMLState::MODE_TYPE MODE_ARRAY_JS;
-
 // Python modes
 const static srcMLState::MODE_TYPE MODE_EXCLUDE_NO_PAREN_TUPLES_PY;
 

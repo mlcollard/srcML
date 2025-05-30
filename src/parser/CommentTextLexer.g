@@ -65,7 +65,6 @@ tokens {
     CHAR_END;
     SQUOTE_DOCSTRING_END;
     SQUOTE_DOXYGEN_END;
-    BACKTICK_END;
     CONTROL_CHAR;
     LINE_DOXYGEN_COMMENT_END;
     JAVADOC_COMMENT_END;
@@ -420,16 +419,7 @@ COMMENT_TEXT {
         }
     } |
 
-    ']'..'_' |
-
-    '`' {
-        if (prevLA != '\\' && mode == BACKTICK_END) {
-            $setType(mode);
-            selector->pop();
-        }
-    } |
-
-    'a'..'\377') {
+    ']'..'\377') {
 
         // not the first character anymore
         first = false;

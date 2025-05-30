@@ -24,7 +24,7 @@ endforeach()
 set(TESTFILES)
 
 # convert from input language to input extension
-set(LANGLIST "C++" "cpp" "C" "c" "Java" "java" "C#" "cs" "Objective-C" "m" "Python" "py" "JavaScript" "js")
+set(LANGLIST "C++" "cpp" "C" "c" "Java" "java" "C#" "cs" "Objective-C" "m" "Python" "py")
 function(lang2ext LANG EXT)
     list(FIND LANGLIST "${LANG}" LANG_POS)
     math(EXPR EXT_POS "${LANG_POS} + 1")
@@ -112,15 +112,9 @@ foreach(GEN IN ITEMS ${SUITE})
 
         # base is C++, so these just get added
         list(APPEND TESTFILES "${URL}.cpp.xml")
-        setlanguage("C++" "${URL}" "Java" "C#" "Objective-C" "C" "Python" "JavaScript")
+        setlanguage("C++" "${URL}" "Java" "C#" "Objective-C" "C" "Python")
 
     elseif(CATEGORY STREQUAL "LANGUAGE_ALL_GEN")
-
-        # explicitly generated
-        list(APPEND TESTFILES "${URL}.cpp.xml")
-        setlanguage("C++" "${URL}" "Java" "C#" "Objective-C" "C" "JavaScript")
-
-    elseif(CATEGORY STREQUAL "LANGUAGE_ALL_NO_JAVASCRIPT_NO_PYTHON")
 
         # explicitly generated
         list(APPEND TESTFILES "${URL}.cpp.xml")
@@ -130,8 +124,7 @@ foreach(GEN IN ITEMS ${SUITE})
 
         # explicitly generated
         list(APPEND TESTFILES "${URL}.cpp.xml")
-        setlanguage("C++" "${URL}" "Java" "JavaScript" "C#" "Objective-C" "C")
-
+        setlanguage("C++" "${URL}" "Java" "C#" "Objective-C" "C")
 
     elseif(CATEGORY STREQUAL "LANGUAGE_CSHARP")
 
@@ -223,12 +216,10 @@ foreach(GENURL IN ITEMS ${TESTFILES})
 
     # Generate "formfeed" "comment" "block" "struct" "ifthenelse"
     foreach(VARIATION IN ITEMS "formfeed" "comment" "block" "struct" "preproc" "ifthenelse")
-        # preproc and struct do not work with Java or JavaScript
+        # preproc and struct do not work with Java
         # skip generating any of these tests for Python
         if((LANGEXT STREQUAL "java" AND (VARIATION STREQUAL "struct" OR VARIATION STREQUAL "preproc")) OR
-           (LANGEXT STREQUAL "cs" AND VARIATION STREQUAL "struct") OR
-           (LANGEXT STREQUAL "js" AND (VARIATION STREQUAL "struct" OR VARIATION STREQUAL "preproc")) OR
-           (LANGEXT STREQUAL "py"))
+           (LANGEXT STREQUAL "cs" AND VARIATION STREQUAL "struct") OR (LANGEXT STREQUAL "py"))
             continue()
         endif()
 
@@ -252,25 +243,6 @@ foreach(GENURL IN ITEMS ${TESTFILES})
         OUTPUT ${URL}.all.${LANGEXT}.xml
     )
     list(APPEND CONTEXT_FILES ${URL}.all.${LANGEXT}.xml)
-
-endforeach()
-
-# Create a copy of CONTEXT_FILES to avoid modifying the original list
-set(JS_XML_FILES ${CONTEXT_FILES})
-
-# Filter the JS_XML_FILES list to include only files matching *.js.xml
-list(APPEND JS_XML_FILES "${TESTFILES}")
-list(FILTER JS_XML_FILES INCLUDE REGEX ".*\\.js\\.xml$")
-
-# Generate variations: formfeed, comment, block, etc.
-foreach(GENURL IN ITEMS ${JS_XML_FILES})
-
-    # ${URL}.${LANGEXT}.xml
-    get_filename_component(SRCFILENAME "${GENURL}" NAME_WLE)
-    get_filename_component(URL "${SRCFILENAME}" NAME_WLE)
-    get_filename_component(EXTENSION "${SRCFILENAME}" LAST_EXT)
-    # remove '.'
-    string(SUBSTRING "${EXTENSION}" 1 -1 LANGEXT)
 
 endforeach()
 

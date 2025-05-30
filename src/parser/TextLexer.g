@@ -46,7 +46,6 @@ tokens {
     DQUOTE_DOCSTRING_START;
     CHAR_START;
     SQUOTE_DOCSTRING_START;
-    BACKTICK_START;
     MACRO_NAME;
     COMPLEX_NUMBER;
     HASHBANG_COMMENT_START;
@@ -120,20 +119,6 @@ CHAR_START :
             changetotextlexer(PY_SIMPLE_SQUOTE_STRING_END);
         else {
             $setType(CHAR_START); changetotextlexer(CHAR_END);
-        }
-    }
-;
-
-BACKTICK_START :
-    { startline = false; }
-
-    // backtick is a string literal in JavaScript and an operator otherwise
-    '`' {
-        if (inLanguage(LANGUAGE_JAVASCRIPT)) {
-            $setType(BACKTICK_START); changetotextlexer(BACKTICK_END);
-        }
-        else {
-            $setType(OPERATORS);
         }
     }
 ;

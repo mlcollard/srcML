@@ -47,9 +47,6 @@ namespace LanguageName {
     /** String constant for Objective-C language */
     const char* const LANGUAGE_OBJECTIVE_C = "Objective-C";
 
-    /** String constant for JavaScript language */
-    const char* const LANGUAGE_JAVASCRIPT = "JavaScript";
-
     /** String constant for Python language */
     const char* const LANGUAGE_PYTHON = "Python";
 }
@@ -90,14 +87,11 @@ public:
         /** Objective-C language */
         LANGUAGE_OBJECTIVE_C = 16,
 
-        /** JavaScript language */
-        LANGUAGE_JAVASCRIPT = 32,
-
         /** Python language */
-        LANGUAGE_PYTHON = 64,
+        LANGUAGE_PYTHON = 32,
 
         /** C++ family i.e. C++/C#  */
-        LANGUAGE_CXX_FAMILY = LANGUAGE_CXX | LANGUAGE_CSHARP | LANGUAGE_JAVASCRIPT | LANGUAGE_PYTHON,
+        LANGUAGE_CXX_FAMILY = LANGUAGE_CXX | LANGUAGE_CSHARP | LANGUAGE_PYTHON,
 
         /** C family i.e. C/C++/C# */
         LANGUAGE_C_FAMILY = LANGUAGE_C | LANGUAGE_CXX_FAMILY | LANGUAGE_OBJECTIVE_C,

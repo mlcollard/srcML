@@ -37,12 +37,11 @@ token_set(srcMLParser, keyword_token_set,
     srcMLParser::ELSE, srcMLParser::TRY, srcMLParser::FINALLY, srcMLParser::FOREACH, srcMLParser::FIXED, srcMLParser::IF,
     srcMLParser::UNCHECKED, srcMLParser::BREAK, srcMLParser::CONTINUE, srcMLParser::TEMPLATE, srcMLParser::USING,
     srcMLParser::THROW, srcMLParser::ASSERT, srcMLParser::MACRO_CASE, srcMLParser::FOREVER, srcMLParser::STATIC_ASSERT,
-    srcMLParser::CXX_CATCH, srcMLParser::CXX_TRY, srcMLParser::JS_CONSTRUCTOR, srcMLParser::JS_DEBUGGER, srcMLParser::JS_EXPORT,
-    srcMLParser::JS_FROM, srcMLParser::JS_FUNCTION, srcMLParser::JS_GET, srcMLParser::JS_IMPORT, srcMLParser::JS_SET, srcMLParser::JS_WITH,
-    srcMLParser::JS_YIELD, srcMLParser::PY_2_EXEC, srcMLParser::PY_2_PRINT, srcMLParser::PY_ALIAS, srcMLParser::PY_ASYNC, srcMLParser::PY_CASE,
-    srcMLParser::PY_FUNCTION, srcMLParser::PY_DELETE, srcMLParser::PY_ELIF, srcMLParser::PY_EXCEPT, srcMLParser::PY_FROM, srcMLParser::PY_GLOBAL,
-    srcMLParser::PY_IMPORT, srcMLParser::PY_IN, srcMLParser::PY_LAMBDA, srcMLParser::PY_MATCH, srcMLParser::PY_NONLOCAL, srcMLParser::PY_PASS,
-    srcMLParser::PY_RAISE, srcMLParser::PY_TYPE, srcMLParser::PY_WITH, srcMLParser::PY_YIELD
+    srcMLParser::CXX_CATCH, srcMLParser::CXX_TRY, srcMLParser::PY_2_EXEC, srcMLParser::PY_2_PRINT, srcMLParser::PY_ALIAS,
+    srcMLParser::PY_ASYNC, srcMLParser::PY_CASE, srcMLParser::PY_FUNCTION, srcMLParser::PY_DELETE, srcMLParser::PY_ELIF,
+    srcMLParser::PY_EXCEPT, srcMLParser::PY_FROM, srcMLParser::PY_GLOBAL, srcMLParser::PY_IMPORT, srcMLParser::PY_IN,
+    srcMLParser::PY_LAMBDA, srcMLParser::PY_MATCH, srcMLParser::PY_NONLOCAL, srcMLParser::PY_PASS, srcMLParser::PY_RAISE,
+    srcMLParser::PY_TYPE, srcMLParser::PY_WITH, srcMLParser::PY_YIELD
 )
 
 token_set(srcMLParser, macro_call_token_set,
@@ -142,10 +141,6 @@ token_set(srcMLParser, identifier_list_tokens_set,
     // Qt
     srcMLParser::EMIT, srcMLParser::FOREACH, srcMLParser::SIGNAL, srcMLParser::FOREVER,
 
-    // JavaScript
-    srcMLParser::JS_BREAK, srcMLParser::JS_CATCH, srcMLParser::JS_CONTINUE, srcMLParser::JS_DO, srcMLParser::JS_ELSE, srcMLParser::JS_FINALLY, srcMLParser::JS_ASYNC, srcMLParser::JS_DEBUGGER, srcMLParser::JS_DEFAULT,
-    srcMLParser::JS_EACH, srcMLParser::JS_EXPORT, srcMLParser::JS_FUNCTION, srcMLParser::JS_IMPORT, srcMLParser::JS_RANGE_IN, srcMLParser::JS_WITH, srcMLParser::JS_YIELD, srcMLParser::JS_SWITCH, srcMLParser::JS_TRY,
-
     // Python
     srcMLParser::PY_2_EXEC, srcMLParser::PY_2_PRINT, srcMLParser::PY_CASE, srcMLParser::PY_MATCH, srcMLParser::PY_TYPE
 )
@@ -174,17 +169,6 @@ token_set(srcMLParser, whitespace_token_set,
 )
 
 token_set(srcMLParser, duplex_keyword_set,
-    // JavaScript
-    srcMLParser::JS_CATCH,
-    srcMLParser::JS_DEFAULT,
-    srcMLParser::JS_ELSE,
-    srcMLParser::JS_EXPORT,
-    srcMLParser::JS_FUNCTION,
-    srcMLParser::JS_IMPORT,
-    srcMLParser::JS_STATIC,
-    srcMLParser::JS_WITH,
-    srcMLParser::JS_YIELD,
-
     // Python
     srcMLParser::PY_EXCEPT,
     srcMLParser::PY_YIELD
