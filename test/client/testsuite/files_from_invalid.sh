@@ -45,7 +45,7 @@ check_exit 1 "$open_error"
 
 # file list references itself
 define open_error <<- 'STDOUT'
-	srcml: Extension not supported loop.txt
+	srcml: WARNING Filelist entry duplicate of filelist: loop.txt
 STDOUT
 
 createfile loop.txt "loop.txt"
