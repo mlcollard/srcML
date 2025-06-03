@@ -71,7 +71,7 @@ const unsigned long long SRCML_COMMAND_CAT_XML                   = 1ull << 30ull
 
 const unsigned long long SRCML_COMMAND_NULL                      = 1ull << 31ull;
 
-const unsigned long long SRCML_COMMAND_SRCQL_NO_VARIABLE_WARNING = 1ull << 32ull;
+const unsigned long long SRCML_COMMAND_SRCQL_WARNING_OFF         = 1ull << 32ull;
 
 // commands that are simple queries on srcml
 const unsigned long long SRCML_COMMAND_INSRCML =
@@ -111,7 +111,7 @@ struct srcml_request_t {
 
     std::optional<std::size_t> stdindex;
 
-    int command = 0;
+    unsigned long long command = 0ull;
     std::optional<int> markup_options;
 
     // unit attributes
