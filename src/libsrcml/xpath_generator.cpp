@@ -167,6 +167,9 @@ XPathNode* XPathGenerator::get_xpath_from_argument(std::string src_query) {
     srcml_unit_free(converter);
 
     bool change_from_macro = pat_to_srcml.find("macro") != std::string::npos;
+    bool extract_expr_from_expr_stmt = language == "Python" &&
+                                       pat_to_srcml.find("<",1) == pat_to_srcml.find("<expr_stmt>") &&
+                                       pat_to_srcml.find("<expr_stmt>") == pat_to_srcml.rfind("<expr_stmt>");
 
     if (change_from_macro) {
         srcml_unit* macro_change = srcml_unit_create(holder);
@@ -177,6 +180,12 @@ XPathNode* XPathGenerator::get_xpath_from_argument(std::string src_query) {
 
         srcml_unit_free(macro_change);
     }
+
+    if (extract_expr_from_expr_stmt) {
+        pat_to_srcml.replace(pat_to_srcml.find("<expr_stmt>"),11,"");
+        pat_to_srcml.replace(pat_to_srcml.find("</expr_stmt>"),12,"");
+    }
+
 
     srcml_archive_close(holder);
     srcml_archive_free(holder);
