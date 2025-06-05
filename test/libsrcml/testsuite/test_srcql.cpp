@@ -2233,6 +2233,158 @@ int foo(int y) {}
     }
 
 
+    const std::string python_swap_assignments_src = R"(
+x, y = y, x # y
+parent[a], parent[b] = c, c
+d, e, f = {}, {}, {}
+a, b, c = a, c, b # y
+a, b, c = b, a, c # y
+a, b, c = b, c, a # y
+a, b, c = c, a, b # y
+a, b, c = c, b, a # y
+indices[n], indices[m] = indices[m], indices[n] # y
+indices[i], indices[i + 1] = indices[i + 1], indices[i] # y
+a[1], a[2] = a[3], a[4]
+q, q = q, q # y
+(a),(b) = (b),(a) # y
+[a, b], [c, d] = [c, d], [a, b] # y
+[a, b], [c, d] = [a, d], [c, b]
+)";
+
+
+    const std::vector<std::string> python_swap_assignments_expr_srcml = {
+        R"(<expr><tuple><expr><name>x</name></expr>, <expr><name>y</name></expr></tuple> <operator>=</operator> <tuple><expr><name>y</name></expr>, <expr><name>x</name></expr></tuple></expr>)",
+        R"(<expr><tuple><expr><name><name>parent</name><index>[<expr><name>a</name></expr>]</index></name></expr>, <expr><name><name>parent</name><index>[<expr><name>b</name></expr>]</index></name></expr></tuple> <operator>=</operator> <tuple><expr><name>c</name></expr>, <expr><name>c</name></expr></tuple></expr>)",
+        R"(<expr><tuple><expr><name>d</name></expr>, <expr><name>e</name></expr>, <expr><name>f</name></expr></tuple> <operator>=</operator> <tuple><expr><dictionary>{}</dictionary></expr>, <expr><dictionary>{}</dictionary></expr>, <expr><dictionary>{}</dictionary></expr></tuple></expr>)",
+        R"(<expr><tuple><expr><name>a</name></expr>, <expr><name>b</name></expr>, <expr><name>c</name></expr></tuple> <operator>=</operator> <tuple><expr><name>a</name></expr>, <expr><name>c</name></expr>, <expr><name>b</name></expr></tuple></expr>)",
+        R"(<expr><tuple><expr><name>a</name></expr>, <expr><name>b</name></expr>, <expr><name>c</name></expr></tuple> <operator>=</operator> <tuple><expr><name>b</name></expr>, <expr><name>a</name></expr>, <expr><name>c</name></expr></tuple></expr>)",
+        R"(<expr><tuple><expr><name>a</name></expr>, <expr><name>b</name></expr>, <expr><name>c</name></expr></tuple> <operator>=</operator> <tuple><expr><name>b</name></expr>, <expr><name>c</name></expr>, <expr><name>a</name></expr></tuple></expr>)",
+        R"(<expr><tuple><expr><name>a</name></expr>, <expr><name>b</name></expr>, <expr><name>c</name></expr></tuple> <operator>=</operator> <tuple><expr><name>c</name></expr>, <expr><name>a</name></expr>, <expr><name>b</name></expr></tuple></expr>)",
+        R"(<expr><tuple><expr><name>a</name></expr>, <expr><name>b</name></expr>, <expr><name>c</name></expr></tuple> <operator>=</operator> <tuple><expr><name>c</name></expr>, <expr><name>b</name></expr>, <expr><name>a</name></expr></tuple></expr>)",
+        R"(<expr><tuple><expr><name><name>indices</name><index>[<expr><name>n</name></expr>]</index></name></expr>, <expr><name><name>indices</name><index>[<expr><name>m</name></expr>]</index></name></expr></tuple> <operator>=</operator> <tuple><expr><name><name>indices</name><index>[<expr><name>m</name></expr>]</index></name></expr>, <expr><name><name>indices</name><index>[<expr><name>n</name></expr>]</index></name></expr></tuple></expr>)",
+        R"(<expr><tuple><expr><name><name>indices</name><index>[<expr><name>i</name></expr>]</index></name></expr>, <expr><name><name>indices</name><index>[<expr><name>i</name> <operator>+</operator> <literal type="number">1</literal></expr>]</index></name></expr></tuple> <operator>=</operator> <tuple><expr><name><name>indices</name><index>[<expr><name>i</name> <operator>+</operator> <literal type="number">1</literal></expr>]</index></name></expr>, <expr><name><name>indices</name><index>[<expr><name>i</name></expr>]</index></name></expr></tuple></expr>)",
+        R"(<expr><tuple><expr><name><name>a</name><index>[<expr><literal type="number">1</literal></expr>]</index></name></expr>, <expr><name><name>a</name><index>[<expr><literal type="number">2</literal></expr>]</index></name></expr></tuple> <operator>=</operator> <tuple><expr><name><name>a</name><index>[<expr><literal type="number">3</literal></expr>]</index></name></expr>, <expr><name><name>a</name><index>[<expr><literal type="number">4</literal></expr>]</index></name></expr></tuple></expr>)",
+        R"(<expr><tuple><expr><name>q</name></expr>, <expr><name>q</name></expr></tuple> <operator>=</operator> <tuple><expr><name>q</name></expr>, <expr><name>q</name></expr></tuple></expr>)",
+        R"(<expr><tuple><expr><operator>(</operator><name>a</name><operator>)</operator></expr>,<expr><operator>(</operator><name>b</name><operator>)</operator></expr></tuple> <operator>=</operator> <tuple><expr><operator>(</operator><name>b</name><operator>)</operator></expr>,<expr><operator>(</operator><name>a</name><operator>)</operator></expr></tuple></expr>)",
+        R"(<expr><tuple><expr><array>[<expr><name>a</name></expr>, <expr><name>b</name></expr>]</array></expr>, <expr><array>[<expr><name>c</name></expr>, <expr><name>d</name></expr>]</array></expr></tuple> <operator>=</operator> <tuple><expr><array>[<expr><name>c</name></expr>, <expr><name>d</name></expr>]</array></expr>, <expr><array>[<expr><name>a</name></expr>, <expr><name>b</name></expr>]</array></expr></tuple></expr>)",
+        R"(<expr><tuple><expr><array>[<expr><name>a</name></expr>, <expr><name>b</name></expr>]</array></expr>, <expr><array>[<expr><name>c</name></expr>, <expr><name>d</name></expr>]</array></expr></tuple> <operator>=</operator> <tuple><expr><array>[<expr><name>a</name></expr>, <expr><name>d</name></expr>]</array></expr>, <expr><array>[<expr><name>c</name></expr>, <expr><name>b</name></expr>]</array></expr></tuple></expr>)",
+    };
+
+    const std::vector<std::string> python_swap_assignments_expr_stmt_srcml = {
+        R"(<expr_stmt><expr><tuple><expr><name>x</name></expr>, <expr><name>y</name></expr></tuple> <operator>=</operator> <tuple><expr><name>y</name></expr>, <expr><name>x</name></expr></tuple></expr></expr_stmt>)",
+        R"(<expr_stmt><expr><tuple><expr><name><name>parent</name><index>[<expr><name>a</name></expr>]</index></name></expr>, <expr><name><name>parent</name><index>[<expr><name>b</name></expr>]</index></name></expr></tuple> <operator>=</operator> <tuple><expr><name>c</name></expr>, <expr><name>c</name></expr></tuple></expr></expr_stmt>)",
+        R"(<expr_stmt><expr><tuple><expr><name>d</name></expr>, <expr><name>e</name></expr>, <expr><name>f</name></expr></tuple> <operator>=</operator> <tuple><expr><dictionary>{}</dictionary></expr>, <expr><dictionary>{}</dictionary></expr>, <expr><dictionary>{}</dictionary></expr></tuple></expr></expr_stmt>)",
+        R"(<expr_stmt><expr><tuple><expr><name>a</name></expr>, <expr><name>b</name></expr>, <expr><name>c</name></expr></tuple> <operator>=</operator> <tuple><expr><name>a</name></expr>, <expr><name>c</name></expr>, <expr><name>b</name></expr></tuple></expr></expr_stmt>)",
+        R"(<expr_stmt><expr><tuple><expr><name>a</name></expr>, <expr><name>b</name></expr>, <expr><name>c</name></expr></tuple> <operator>=</operator> <tuple><expr><name>b</name></expr>, <expr><name>a</name></expr>, <expr><name>c</name></expr></tuple></expr></expr_stmt>)",
+        R"(<expr_stmt><expr><tuple><expr><name>a</name></expr>, <expr><name>b</name></expr>, <expr><name>c</name></expr></tuple> <operator>=</operator> <tuple><expr><name>b</name></expr>, <expr><name>c</name></expr>, <expr><name>a</name></expr></tuple></expr></expr_stmt>)",
+        R"(<expr_stmt><expr><tuple><expr><name>a</name></expr>, <expr><name>b</name></expr>, <expr><name>c</name></expr></tuple> <operator>=</operator> <tuple><expr><name>c</name></expr>, <expr><name>a</name></expr>, <expr><name>b</name></expr></tuple></expr></expr_stmt>)",
+        R"(<expr_stmt><expr><tuple><expr><name>a</name></expr>, <expr><name>b</name></expr>, <expr><name>c</name></expr></tuple> <operator>=</operator> <tuple><expr><name>c</name></expr>, <expr><name>b</name></expr>, <expr><name>a</name></expr></tuple></expr></expr_stmt>)",
+        R"(<expr_stmt><expr><tuple><expr><name><name>indices</name><index>[<expr><name>n</name></expr>]</index></name></expr>, <expr><name><name>indices</name><index>[<expr><name>m</name></expr>]</index></name></expr></tuple> <operator>=</operator> <tuple><expr><name><name>indices</name><index>[<expr><name>m</name></expr>]</index></name></expr>, <expr><name><name>indices</name><index>[<expr><name>n</name></expr>]</index></name></expr></tuple></expr></expr_stmt>)",
+        R"(<expr_stmt><expr><tuple><expr><name><name>indices</name><index>[<expr><name>i</name></expr>]</index></name></expr>, <expr><name><name>indices</name><index>[<expr><name>i</name> <operator>+</operator> <literal type="number">1</literal></expr>]</index></name></expr></tuple> <operator>=</operator> <tuple><expr><name><name>indices</name><index>[<expr><name>i</name> <operator>+</operator> <literal type="number">1</literal></expr>]</index></name></expr>, <expr><name><name>indices</name><index>[<expr><name>i</name></expr>]</index></name></expr></tuple></expr></expr_stmt>)",
+        R"(<expr_stmt><expr><tuple><expr><name><name>a</name><index>[<expr><literal type="number">1</literal></expr>]</index></name></expr>, <expr><name><name>a</name><index>[<expr><literal type="number">2</literal></expr>]</index></name></expr></tuple> <operator>=</operator> <tuple><expr><name><name>a</name><index>[<expr><literal type="number">3</literal></expr>]</index></name></expr>, <expr><name><name>a</name><index>[<expr><literal type="number">4</literal></expr>]</index></name></expr></tuple></expr></expr_stmt>)",
+        R"(<expr_stmt><expr><tuple><expr><name>q</name></expr>, <expr><name>q</name></expr></tuple> <operator>=</operator> <tuple><expr><name>q</name></expr>, <expr><name>q</name></expr></tuple></expr></expr_stmt>)",
+        R"(<expr_stmt><expr><tuple><expr><operator>(</operator><name>a</name><operator>)</operator></expr>,<expr><operator>(</operator><name>b</name><operator>)</operator></expr></tuple> <operator>=</operator> <tuple><expr><operator>(</operator><name>b</name><operator>)</operator></expr>,<expr><operator>(</operator><name>a</name><operator>)</operator></expr></tuple></expr></expr_stmt>)",
+        R"(<expr_stmt><expr><tuple><expr><array>[<expr><name>a</name></expr>, <expr><name>b</name></expr>]</array></expr>, <expr><array>[<expr><name>c</name></expr>, <expr><name>d</name></expr>]</array></expr></tuple> <operator>=</operator> <tuple><expr><array>[<expr><name>c</name></expr>, <expr><name>d</name></expr>]</array></expr>, <expr><array>[<expr><name>a</name></expr>, <expr><name>b</name></expr>]</array></expr></tuple></expr></expr_stmt>)",
+        R"(<expr_stmt><expr><tuple><expr><array>[<expr><name>a</name></expr>, <expr><name>b</name></expr>]</array></expr>, <expr><array>[<expr><name>c</name></expr>, <expr><name>d</name></expr>]</array></expr></tuple> <operator>=</operator> <tuple><expr><array>[<expr><name>a</name></expr>, <expr><name>d</name></expr>]</array></expr>, <expr><array>[<expr><name>c</name></expr>, <expr><name>b</name></expr>]</array></expr></tuple></expr></expr_stmt>)",
+    };
+
+    // $LEFT, $RIGHT = $RIGHT, $LEFT
+    {
+        char* s;
+        size_t size;
+
+        srcml_archive* oarchive = srcml_archive_create();
+        srcml_archive_write_open_memory(oarchive,&s, &size);
+
+        srcml_unit* unit = srcml_unit_create(oarchive);
+        srcml_unit_set_language(unit,"Python");
+        srcml_unit_parse_memory(unit,python_swap_assignments_src.c_str(),python_swap_assignments_src.size());
+        dassert(srcml_archive_write_unit(oarchive,unit), SRCML_STATUS_OK);
+
+        srcml_unit_free(unit);
+        srcml_archive_close(oarchive);
+        srcml_archive_free(oarchive);
+
+        std::string srcml_text = std::string(s, size);
+        free(s);
+
+        srcml_archive* iarchive = srcml_archive_create();
+        srcml_archive_read_open_memory(iarchive,srcml_text.c_str(),srcml_text.size());
+        dassert(srcml_append_transform_srcql(iarchive,"$LEFT, $RIGHT = $RIGHT, $LEFT"), SRCML_STATUS_OK);
+
+        unit = srcml_archive_read_unit(iarchive);
+        srcml_transform_result* result = nullptr;
+        srcml_unit_apply_transforms(iarchive, unit, &result);
+
+        dassert(srcml_transform_get_type(result), SRCML_RESULT_UNITS);
+        dassert(srcml_transform_get_unit_size(result), 11);
+        dassert(srcml_unit_get_srcml_inner(srcml_transform_get_unit(result,0)), python_swap_assignments_expr_srcml[0]);
+        dassert(srcml_unit_get_srcml_inner(srcml_transform_get_unit(result,1)), python_swap_assignments_expr_srcml[3]);
+        dassert(srcml_unit_get_srcml_inner(srcml_transform_get_unit(result,2)), python_swap_assignments_expr_srcml[4]);
+        dassert(srcml_unit_get_srcml_inner(srcml_transform_get_unit(result,3)), python_swap_assignments_expr_srcml[5]);
+        dassert(srcml_unit_get_srcml_inner(srcml_transform_get_unit(result,4)), python_swap_assignments_expr_srcml[6]);
+        dassert(srcml_unit_get_srcml_inner(srcml_transform_get_unit(result,5)), python_swap_assignments_expr_srcml[7]);
+        dassert(srcml_unit_get_srcml_inner(srcml_transform_get_unit(result,6)), python_swap_assignments_expr_srcml[8]);
+        dassert(srcml_unit_get_srcml_inner(srcml_transform_get_unit(result,7)), python_swap_assignments_expr_srcml[9]);
+        dassert(srcml_unit_get_srcml_inner(srcml_transform_get_unit(result,8)), python_swap_assignments_expr_srcml[11]);
+        dassert(srcml_unit_get_srcml_inner(srcml_transform_get_unit(result,9)), python_swap_assignments_expr_srcml[12]);
+        dassert(srcml_unit_get_srcml_inner(srcml_transform_get_unit(result,10)), python_swap_assignments_expr_srcml[13]);
+
+        srcml_unit_free(unit);
+        srcml_transform_free(result);
+        srcml_archive_close(iarchive);
+        srcml_archive_free(iarchive);
+    }
+
+    // FIND src:expr_stmt CONTAINS $LEFT, $RIGHT = $RIGHT, $LEFT
+    {
+        char* s;
+        size_t size;
+
+        srcml_archive* oarchive = srcml_archive_create();
+        srcml_archive_write_open_memory(oarchive,&s, &size);
+
+        srcml_unit* unit = srcml_unit_create(oarchive);
+        srcml_unit_set_language(unit,"Python");
+        srcml_unit_parse_memory(unit,python_swap_assignments_src.c_str(),python_swap_assignments_src.size());
+        dassert(srcml_archive_write_unit(oarchive,unit), SRCML_STATUS_OK);
+
+        srcml_unit_free(unit);
+        srcml_archive_close(oarchive);
+        srcml_archive_free(oarchive);
+
+        std::string srcml_text = std::string(s, size);
+        free(s);
+
+        srcml_archive* iarchive = srcml_archive_create();
+        srcml_archive_read_open_memory(iarchive,srcml_text.c_str(),srcml_text.size());
+        dassert(srcml_append_transform_srcql(iarchive,"FIND src:expr_stmt CONTAINS $LEFT, $RIGHT = $RIGHT, $LEFT"), SRCML_STATUS_OK);
+
+        unit = srcml_archive_read_unit(iarchive);
+        srcml_transform_result* result = nullptr;
+        srcml_unit_apply_transforms(iarchive, unit, &result);
+
+        dassert(srcml_transform_get_type(result), SRCML_RESULT_UNITS);
+        dassert(srcml_transform_get_unit_size(result), 11);
+        dassert(srcml_unit_get_srcml_inner(srcml_transform_get_unit(result,0)), python_swap_assignments_expr_stmt_srcml[0]);
+        dassert(srcml_unit_get_srcml_inner(srcml_transform_get_unit(result,1)), python_swap_assignments_expr_stmt_srcml[3]);
+        dassert(srcml_unit_get_srcml_inner(srcml_transform_get_unit(result,2)), python_swap_assignments_expr_stmt_srcml[4]);
+        dassert(srcml_unit_get_srcml_inner(srcml_transform_get_unit(result,3)), python_swap_assignments_expr_stmt_srcml[5]);
+        dassert(srcml_unit_get_srcml_inner(srcml_transform_get_unit(result,4)), python_swap_assignments_expr_stmt_srcml[6]);
+        dassert(srcml_unit_get_srcml_inner(srcml_transform_get_unit(result,5)), python_swap_assignments_expr_stmt_srcml[7]);
+        dassert(srcml_unit_get_srcml_inner(srcml_transform_get_unit(result,6)), python_swap_assignments_expr_stmt_srcml[8]);
+        dassert(srcml_unit_get_srcml_inner(srcml_transform_get_unit(result,7)), python_swap_assignments_expr_stmt_srcml[9]);
+        dassert(srcml_unit_get_srcml_inner(srcml_transform_get_unit(result,8)), python_swap_assignments_expr_stmt_srcml[11]);
+        dassert(srcml_unit_get_srcml_inner(srcml_transform_get_unit(result,9)), python_swap_assignments_expr_stmt_srcml[12]);
+        dassert(srcml_unit_get_srcml_inner(srcml_transform_get_unit(result,10)), python_swap_assignments_expr_stmt_srcml[13]);
+
+        srcml_unit_free(unit);
+        srcml_transform_free(result);
+        srcml_archive_close(iarchive);
+        srcml_archive_free(iarchive);
+    }
+
+
     const std::string call_expressions = R"(
 foo();
 bar();

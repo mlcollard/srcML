@@ -129,18 +129,6 @@ void add_element(xmlXPathParserContext* ctxt, int nargs) {
 
         const xmlNode* node = node_set.get()->nodeTab[i];
 
-        // check for invalid elements
-        const std::string_view nodeURI((char *) node->ns->href);
-        const std::string_view nodeName((char*) node->name);
-        const bool invalidElement = ("operator"sv == nodeName ||
-                                    "comment"sv == nodeName ||
-                                    "modifier"sv == nodeName ||
-                                    "specifier"sv == nodeName) && "http://www.srcML.org/srcML/src"sv == nodeURI;
-        if (invalidElement) {
-            xmlXPathReturnBoolean(ctxt, false);
-            return;
-        }
-
         const std::string token(get_node_text(node));
         const auto node_ptr = reinterpret_cast<std::uintptr_t>(node);
 
@@ -283,10 +271,8 @@ void clear_elements(xmlXPathParserContext* ctxt, int nargs) {
     UnificationTable* table = (UnificationTable*)(ctxt->context->userData);
 
     if (nargs == 0) {
-
         // clear all buckets
         table->empty_buckets();
-
     } else if (nargs == 1) {
 
         // clear this bucket
