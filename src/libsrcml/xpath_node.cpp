@@ -1,12 +1,16 @@
 #include "xpath_node.hpp"
 
-XPathNode::XPathNode(const XPathNode& orig) {
+XPathNode::XPathNode(const XPathNode& orig, bool special_copy) {
     text = orig.text;
     type = orig.type;
     for (auto child : orig.children) {
-        add_child(new XPathNode(*child));
+        // Special copy is for the following-sibling count predicates, where we don't want a true deep copy
+        if (!special_copy || (child->type == PREDICATE && (child->text.find("text()=") == 0 || child->text == "qli:is-valid-element(.)"))) {
+            add_child(new XPathNode(*child));
+        }
     }
 }
+
 
 XPathNode::~XPathNode() {
     if (!children.empty()) {
@@ -26,7 +30,7 @@ std::ostream& operator<<(std::ostream& out, const XPathNode& node) {
     if (node.type != UNION) { out << node.text; };
     if (node.type == PARENTHESES) { out << ')'; }
     if (node.type != CALL) {
-        for (auto child : node.children) { out << child->to_string(); }
+        for (auto child : node.children) { out << *child; }
     }
     else {
         out << "(";
@@ -38,12 +42,12 @@ std::ostream& operator<<(std::ostream& out, const XPathNode& node) {
                 break;
             }
             if (i != 0) { out << ","; }
-            out << child->to_string();
+            out << *child;
             ++i;
         }
         out << ")";
         if (union_child) {
-            out << node.children[i]->to_string();
+            out << *node.children[i];
         }
     }
 
@@ -87,6 +91,40 @@ std::string XPathNode::to_string(std::string_view rtn_view) {
     if (type == PREDICATE)        { rtn += ']' ; }
 
     return rtn;
+}
+
+void XPathNode::pretty_print(int tabs) {
+    if (type == PREDICATE)        { std::cout << '\n'; tabs++; for(int i = 0; i < tabs; ++i) { std::cout << "\t"; } std::cout << '['  ; }
+    else if (type == PARENTHESES) { std::cout << '('  ; }
+    else if (type == NEXT)        { std::cout << '/'  ; }
+    else if (type == ANY)         { std::cout << "//" ; }
+    else if (type == UNION)       { std::cout << "|"  ; }
+
+    if (type != UNION) { std::cout << text; };
+    if (type == PARENTHESES) { std::cout << ')'; }
+    if (type != CALL) {
+        for (auto child : children) { child->pretty_print(tabs); }
+    }
+    else {
+        std::cout << "(";
+        int i = 0;
+        bool union_child = false;
+        for (auto child : children) {
+            if (child->get_type() == UNION) {
+                union_child = true;
+                break;
+            }
+            if (i != 0) { std::cout << ","; }
+            child->pretty_print(tabs);
+            ++i;
+        }
+        std::cout << ")";
+        if (union_child) {
+            children[i]->pretty_print(tabs);
+        }
+    }
+
+    if (type == PREDICATE)        { std::cout << "]" ; }
 }
 
 XPathNode* XPathNode::pop_child_beginning() {
