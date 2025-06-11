@@ -81,14 +81,14 @@ jobs:
 
       - name: Build
         shell: bash
-        # working-directory: build
+        working-directory: build
         continue-on-error: true
         run: |
           export UseMultiToolTask=true
           cmake --build . --config Release
 
       - name: Package
-        working-directory: build
+        # working-directory: build
         continue-on-error: true
         run: |
           cpack -V --preset ci-msvc
