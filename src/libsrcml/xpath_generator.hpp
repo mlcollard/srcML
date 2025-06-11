@@ -22,6 +22,7 @@ private:
     void convert_traverse(xmlNode*, XPathNode*);
     void organize_add_calls(XPathNode*);
     void add_bucket_clears(XPathNode*,int);
+    void add_sibling_count_predicates(XPathNode*);
 
     // XML Node Funcs
     std::string get_full_name(xmlNode*);
@@ -36,6 +37,7 @@ private:
     std::string add_quotes(std::string_view);
     std::string extract_variable(std::string_view);
     void get_variable_info(std::string_view, std::string&, size_t&);
+    bool is_no_decl_language();
 
     // xmlNode* srcml_root;
     // XPathNode* xpath_root;
