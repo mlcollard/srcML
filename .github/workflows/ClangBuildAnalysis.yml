@@ -10,10 +10,10 @@ jobs:
     steps:
 
       - name: Checkout Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Checkout ClangBuildAnalyzer
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: aras-p/ClangBuildAnalyzer
           path: analyzer
