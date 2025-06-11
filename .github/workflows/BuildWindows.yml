@@ -63,7 +63,7 @@ jobs:
         working-directory: build
         run: |
           export UseMultiToolTask=true
-          cmake .. --preset msvc
+          cmake .. --preset ci-msvc
 
       # - name: CMake Setup on Windows
       #   uses: lukka/run-cmake@v10
@@ -83,7 +83,7 @@ jobs:
         working-directory: build
         continue-on-error: true
         run: |
-          cpack -V --preset msvc
+          cpack -V --preset ci-msvc
           dir dist/*
       # - uses: actions/upload-artifact@v4
       #   with:
