@@ -17,7 +17,8 @@ std::vector<std::string> split(std::string str, std::string delim) {
         if (sub != "") { res.push_back(sub); }
         pos = end + delim.size();
     }
-    res.push_back(str.substr(pos,str.size()-pos));
+    std::string sub = str.substr(pos,str.size()-pos);
+    if (sub != "") { res.push_back(sub); }
     return res;
 }
 
@@ -440,7 +441,17 @@ std::string XPathGenerator::convert() {
         }
     }
 
-    assert(operations.size() == source_exprs.size()-1);
+    // Check if provided query was invalid
+    if (operations.size() != source_exprs.size()-1) {
+        // Invalid query, return ""
+        return "";
+    }
+    for (auto expr : source_exprs) {
+        if (expr->to_string() == "") {
+            // Invalid query, return ""
+            return "";
+        }
+    }
 
     // WHERE NOT and WHERE COUNT and WITH
     for (size_t i = 0; i < operations.size(); ++i) {
