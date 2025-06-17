@@ -106,7 +106,7 @@
 </unit>
 
 <unit xmlns:cpp="http://www.srcML.org/srcML/cpp" language="C++">
-<typedef>typedef <type><name>float</name> <name>SFtype</name></type> <name>__attribute__</name> ((<name>mode</name> (<name>SF</name>)));</typedef>
+<typedef>typedef <type><name>float</name></type> <name>SFtype</name> <attribute>__attribute__ ((<expr><name>mode</name> <argument_list>(<argument><expr><name>SF</name></expr></argument>)</argument_list></expr>))</attribute>;</typedef>
 </unit>
 
 

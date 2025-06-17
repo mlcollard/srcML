@@ -6360,7 +6360,7 @@ pattern_check_core[
                     throw_exception[fla != TERMINATE && fla != LCURLY]
                 )
             )
-        
+
             // default to variable in function body; however, if it is an anonymous function (does not end in ":"), then it is not a variable
             throw_exception[
                 (
@@ -6465,9 +6465,9 @@ trace_int[int s] {
         std::cerr << "HERE " << s << std::endl;
 } :;
 
+traceLA { std::cerr << "LA(1) is " << LA(1) << " " << LT(1)->getText() << std::endl; } :;
 // Commented-out code
 /*
-traceLA { std::cerr << "LA(1) is " << LA(1) << " " << LT(1)->getText() << std::endl; } :;
 marker[] { CompleteElement element(this); startNewMode(MODE_LOCAL); startElement(SMARKER); } :;
 */
 
@@ -7205,6 +7205,95 @@ attribute_cpp[] { CompleteElement element(this); ENTRY_DEBUG } :
         RBRACKET
 ;
 
+attribute_c[] { CompleteElement element(this); ENTRY_DEBUG } :
+        {
+            // start a mode to end at right bracket with expressions inside
+            startNewMode(MODE_TOP | /* MODE_LIST | */ MODE_EXPRESSION | MODE_EXPECT | MODE_END_AT_COMMA);
+
+            startElement(SATTRIBUTE);
+        }
+        C_ATTRIBUTE
+        /*
+            (())
+            ((a,b))
+            ((a,))
+        */
+        LPAREN
+        LPAREN
+        ({ LA(1) != RPAREN }? complete_attribute_expression
+        (COMMA ({ LA(1) != RPAREN }? complete_attribute_expression | { LA(1) != RPAREN }? empty_attribute_expression | )) * | )
+        RPAREN
+        RPAREN
+;
+
+/*
+  complete_attribute_expression
+
+  Matches a complete expression (no stream).
+*/
+complete_attribute_expression[] { CompleteElement element(this); ENTRY_DEBUG
+
+fprintf(stderr, "DEBUG:  %s %s %d \n", __FILE__,  __FUNCTION__, __LINE__);
+fprintf(stderr, "DEBUG:  %s %s %d LA(1): %d\n", __FILE__,  __FUNCTION__, __LINE__,  (int) LA(1));
+fprintf(stderr, "DEBUG:  %s %s %d next_token()->getType(): %d\n", __FILE__,  __FUNCTION__, __LINE__,  (int) next_token());
+
+ } :
+        {
+            // start a mode to end at right bracket with expressions inside
+            startNewMode(MODE_TOP | MODE_EXPECT | MODE_EXPRESSION);
+
+            startElement(SEXPRESSION);
+        }
+        (
+            (NAME LPAREN)=>
+{ fprintf(stderr, "DEBUG:  %s %s %d \n", __FILE__,  __FUNCTION__, __LINE__);
+}
+            function_identifier complete_argument_list |
+{ fprintf(stderr, "DEBUG:  %s %s %d \n", __FILE__,  __FUNCTION__, __LINE__);
+}
+            identifier |
+            attribute_c_const
+        )
+;
+
+/*
+  attribute_c_const
+
+  const as a name
+*/
+attribute_c_const[] { SingleElement element(this); ENTRY_DEBUG } :
+        {
+            startElement(SNAME);
+        }
+
+        CONST
+;
+
+/*
+  complete_attribute_expression
+
+  Matches a complete expression (no stream).
+*/
+empty_attribute_expression[] { CompleteElement element(this); ENTRY_DEBUG }:
+        {
+            // start a mode to end at right bracket with expressions inside
+            startNewMode(MODE_TOP | MODE_EXPECT | MODE_EXPRESSION);
+
+            startElement(SEXPRESSION);
+        }
+;
+
+/*
+  attribute_name
+*/
+attribute_name[] { SingleElement element(this); ENTRY_DEBUG } :
+        {
+            startElement(SNAME);
+        }
+
+        NAME
+;
+
 /*
   complete_argument_list
 
@@ -7742,9 +7831,15 @@ identifier_optional_specifier_destop[bool push, bool& is_nop] { SingleElement el
 identifier[] { SingleElement element(this); ENTRY_DEBUG } :
         {
             startElement(SNAME);
+
+            fprintf(stderr, "DEBUG:  %s %s %d \n", __FILE__,  __FUNCTION__, __LINE__);
+
         }
 
         identifier_list
+
+        { fprintf(stderr, "DEBUG:  %s %s %d \n", __FILE__,  __FUNCTION__, __LINE__);
+    }
 ;
 
 /*
@@ -7752,7 +7847,11 @@ identifier[] { SingleElement element(this); ENTRY_DEBUG } :
 
   Handles the list of identifiers that are also marked up as tokens for other things.
 */
-identifier_list[] { ENTRY_DEBUG } :
+identifier_list[] { ENTRY_DEBUG
+
+fprintf(stderr, "DEBUG:  %s %s %d LA(1): %d\n", __FILE__,  __FUNCTION__, __LINE__,  (int) LA(1));
+
+    } :
         NAME | INCLUDE | DEFINE | ELIF | ENDIF | ERRORPREC | IFDEF | IFNDEF | LINE | PRAGMA | UNDEF |
         WARNING | SUPER | REGION | ENDREGION | GET | SET | ADD | REMOVE | ASYNC | YIELD | FINAL |
         OVERRIDE | VOID | ASM |
@@ -7954,7 +8053,6 @@ compound_name_inner[bool index] { CompleteElement element(this); TokenPosition t
 
             macro_type_name_call
         )
-
         (options { greedy = true; } :
             { inLanguage(LANGUAGE_CXX) && next_token() == LBRACKET }?
             attribute_cpp
@@ -10394,7 +10492,7 @@ variable_declaration[int type_count] { ENTRY_DEBUG } :
             startNewMode(MODE_LIST | MODE_VARIABLE_NAME | MODE_INIT | MODE_EXPECT);
 
             // declaration
-            startNewMode(MODE_LOCAL| MODE_VARIABLE_NAME | MODE_INIT | MODE_EXPECT);
+            startNewMode(MODE_LOCAL| MODE_VARIABLE_NAME | MODE_INIT | MODE_EXPECT /* | MODE_INCLUDE_ATTRIBUTE */);
 
             if (inTransparentMode(MODE_CONTROL_CONDITION | MODE_END_AT_COMMA))
                 setMode(MODE_LIST);
