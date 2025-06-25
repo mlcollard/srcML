@@ -34,8 +34,6 @@ jobs:
       #     sudo apt install antlr libantlr-dev libantlr-java libarchive-dev \
       #                      libcurl4-openssl-dev libxml2-utils libxslt1-dev \
       #                      ninja-build
-      #     curl -L http://www.sdml.cs.kent.edu/build/srcML-1.0.0-Boost.tar.gz | \
-      #         sudo tar xz -C /usr/local/include
 
       # - name: Create build directory
       #   shell: bash
