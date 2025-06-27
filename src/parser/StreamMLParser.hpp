@@ -734,7 +734,7 @@ private:
      */
     inline void pushCorrectToken(const antlr::RefToken& /* rtoken */) {
 
-        if (isSkipToken(srcMLParser::LA(1)) || inAttribute)
+        if (isSkipToken(srcMLParser::LA(1)))
 
             // push the token
             pushSkipToken();
