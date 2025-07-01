@@ -6465,7 +6465,7 @@ trace_int[int s] {
         std::cerr << "HERE " << s << std::endl;
 } :;
 
-traceLA { std::cerr << "LA(1) is " << LA(1) << " " << LT(1)->getText() << std::endl; } :;
+traceLA[const char* s = ""] { std::cerr << s << " LA(1) is " << LA(1) << " " << LT(1)->getText() << std::endl; } :;
 // Commented-out code
 /*
 marker[] { CompleteElement element(this); startNewMode(MODE_LOCAL); startElement(SMARKER); } :;
@@ -7220,10 +7220,50 @@ attribute_c[] { CompleteElement element(this); ENTRY_DEBUG } :
         */
         LPAREN
         LPAREN
-        ({ LA(1) != RPAREN }? complete_attribute_expression
-        (COMMA ({ LA(1) != RPAREN }? complete_attribute_expression | { LA(1) != RPAREN }? empty_attribute_expression | )) * | )
+
+        inner_attribute_c
+
         RPAREN
         RPAREN
+;
+
+inner_attribute_c[] { CompleteElement element(this); ENTRY_DEBUG } :
+        {
+            // start a mode to end at right bracket with expressions inside
+            startNewMode(MODE_TOP | MODE_LIST | MODE_EXPRESSION | MODE_EXPECT | MODE_END_AT_COMMA);
+        }
+        cpp_complete_expression_attribute
+//        ({ LA(1) != RPAREN }? cpp_complete_expression_attribute |
+//        (COMMA ({ LA(1) != RPAREN }? cpp_complete_expression_attribute | { LA(1) != RPAREN }? empty_attribute_expression | )) * | )
+;
+
+cpp_complete_expression_attribute[] { CompleteElement element(this); ENTRY_DEBUG } :
+        {
+            // start a mode to end at the right bracket with expressions inside
+            startNewMode(MODE_TOP | MODE_EXPECT | MODE_EXPRESSION | MODE_END_AT_COMMA);
+        }
+        (options { greedy = true; } :
+            { !cpp_check_end() && LA(1) != COMMA && (LA(1) != RPAREN || inTransparentMode(MODE_INTERNAL_END_PAREN)) }?
+            (
+                // commas in a list
+//                { inTransparentMode(MODE_END_ONLY_AT_RPAREN) || !inTransparentMode(MODE_END_AT_COMMA) }?
+//                comma |
+
+                // right parenthesis, unless we are in a pair of parentheses in an expression
+//                { !inTransparentMode(MODE_INTERNAL_END_PAREN) }?
+//                rparen[false] |
+
+                // argument mode (as part of call)
+                { inMode(MODE_ARGUMENT) }?
+                argument |
+
+                // expression with right parentheses if a previous match is in one
+                { LA(1) != RPAREN || inTransparentMode(MODE_INTERNAL_END_PAREN) }?
+                cpp_expression |
+
+                COLON
+            )
+        )*
 ;
 
 /*
@@ -7231,13 +7271,7 @@ attribute_c[] { CompleteElement element(this); ENTRY_DEBUG } :
 
   Matches a complete expression (no stream).
 */
-complete_attribute_expression[] { CompleteElement element(this); ENTRY_DEBUG
-
-fprintf(stderr, "DEBUG:  %s %s %d \n", __FILE__,  __FUNCTION__, __LINE__);
-fprintf(stderr, "DEBUG:  %s %s %d LA(1): %d\n", __FILE__,  __FUNCTION__, __LINE__,  (int) LA(1));
-fprintf(stderr, "DEBUG:  %s %s %d next_token()->getType(): %d\n", __FILE__,  __FUNCTION__, __LINE__,  (int) next_token());
-
- } :
+complete_attribute_expression[] { CompleteElement element(this); ENTRY_DEBUG } :
         {
             // start a mode to end at right bracket with expressions inside
             startNewMode(MODE_TOP | MODE_EXPECT | MODE_EXPRESSION);
@@ -7246,11 +7280,7 @@ fprintf(stderr, "DEBUG:  %s %s %d next_token()->getType(): %d\n", __FILE__,  __F
         }
         (
             (NAME LPAREN)=>
-{ fprintf(stderr, "DEBUG:  %s %s %d \n", __FILE__,  __FUNCTION__, __LINE__);
-}
             function_identifier complete_argument_list |
-{ fprintf(stderr, "DEBUG:  %s %s %d \n", __FILE__,  __FUNCTION__, __LINE__);
-}
             identifier |
             attribute_c_const
         )
@@ -7831,15 +7861,8 @@ identifier_optional_specifier_destop[bool push, bool& is_nop] { SingleElement el
 identifier[] { SingleElement element(this); ENTRY_DEBUG } :
         {
             startElement(SNAME);
-
-            fprintf(stderr, "DEBUG:  %s %s %d \n", __FILE__,  __FUNCTION__, __LINE__);
-
         }
-
         identifier_list
-
-        { fprintf(stderr, "DEBUG:  %s %s %d \n", __FILE__,  __FUNCTION__, __LINE__);
-    }
 ;
 
 /*
@@ -7847,11 +7870,8 @@ identifier[] { SingleElement element(this); ENTRY_DEBUG } :
 
   Handles the list of identifiers that are also marked up as tokens for other things.
 */
-identifier_list[] { ENTRY_DEBUG
+identifier_list[] { ENTRY_DEBUG } :
 
-fprintf(stderr, "DEBUG:  %s %s %d LA(1): %d\n", __FILE__,  __FUNCTION__, __LINE__,  (int) LA(1));
-
-    } :
         NAME | INCLUDE | DEFINE | ELIF | ENDIF | ERRORPREC | IFDEF | IFNDEF | LINE | PRAGMA | UNDEF |
         WARNING | SUPER | REGION | ENDREGION | GET | SET | ADD | REMOVE | ASYNC | YIELD | FINAL |
         OVERRIDE | VOID | ASM |
