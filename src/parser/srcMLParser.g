@@ -133,11 +133,9 @@ header "post_include_hpp" {
 
 using namespace ::std::literals::string_view_literals;
 
-// Commented-out code
-//#define DEBUG_PARSER
-
 // Macros to introduce trace statements
-#ifdef DEBUG_PARSER
+// Define SRCML_DEBUG_PARSER to use
+#ifdef SRCML_DEBUG_PARSER
 class RuleTrace {
 public:
     RuleTrace(int guessing, int token, int rd, std::string text, const char* fun, int line) :
