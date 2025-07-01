@@ -7232,9 +7232,8 @@ inner_attribute_c[] { CompleteElement element(this); ENTRY_DEBUG } :
             // start a mode to end at right bracket with expressions inside
             startNewMode(MODE_TOP | MODE_LIST | MODE_EXPRESSION | MODE_EXPECT | MODE_END_AT_COMMA);
         }
-        cpp_complete_expression_attribute
-//        ({ LA(1) != RPAREN }? cpp_complete_expression_attribute |
-//        (COMMA ({ LA(1) != RPAREN }? cpp_complete_expression_attribute | { LA(1) != RPAREN }? empty_attribute_expression | )) * | )
+        { LA(1) != RPAREN }? cpp_complete_expression_attribute
+        (COMMA ({ LA(1) != RPAREN }? cpp_complete_expression_attribute | { LA(1) != RPAREN }? empty_attribute_expression | ))*
 ;
 
 cpp_complete_expression_attribute[] { CompleteElement element(this); ENTRY_DEBUG } :
