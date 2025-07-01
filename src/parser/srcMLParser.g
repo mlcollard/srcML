@@ -7221,7 +7221,7 @@ attribute_c[] { CompleteElement element(this); ENTRY_DEBUG } :
         LPAREN
         LPAREN
 
-        inner_attribute_c
+        ({ LA(1) != RPAREN}? inner_attribute_c | )
 
         RPAREN
         RPAREN
