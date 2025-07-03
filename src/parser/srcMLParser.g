@@ -5746,6 +5746,7 @@ pattern_check_core[
                 set_int[parameter_pack_pos, LA(1) == DOTDOTDOT ? parameter_pack_pos = type_count : parameter_pack_pos]
                 set_bool[isoperator, isoperator || LA(1) == OPERATOR]
 
+
                 // indicates whether a bracket was at the end; necessary for Java
                 set_bool[endbracket, inLanguage(LANGUAGE_JAVA_FAMILY) && LA(1) == LBRACKET]
 
@@ -5781,6 +5782,7 @@ pattern_check_core[
                             || next_token() != LPAREN
                         )
                     }?
+
 
 
                     set_int[token, LA(1)]
@@ -5888,14 +5890,14 @@ pattern_check_core[
                     set_int[attribute_count, attribute_count + 1] |
 
                     attribute_c_sole
-                    set_int[c_attribute_after_name_count, c_attribute_after_name_count + 1]
+                    set_int[c_attribute_after_name_count, c_attribute_after_name_count + 1] |
 
-                    { type_count == (attribute_count + specifier_count) }?
+                    { type_count == (attribute_count + specifier_count + c_attribute_after_name_count) }?
                     property_method_name
                     set_type[type, PROPERTY_ACCESSOR, true] |
 
                     {
-                        type_count == attribute_count + specifier_count + template_count
+                        type_count == attribute_count + specifier_count + template_count + c_attribute_after_name_count
                         && (
                             !inLanguage(LANGUAGE_JAVA)
                             || (
@@ -6020,7 +6022,7 @@ pattern_check_core[
                     set_bool[foundpure]
                     set_int[type_count, type_count + 1] |
 
-                    { type_count == attribute_count + specifier_count + template_count }?
+                    { type_count == attribute_count + specifier_count + template_count + c_attribute_after_name_count }?
                     (ENUM set_type[type, ENUM_DECL])
 
                     set_bool[lcurly, LA(1) == LCURLY]
@@ -6150,18 +6152,18 @@ pattern_check_core[
                 set_int[token, LA(1), type_count == 1]
             )*
 
-
             // special case for property attributes as names, e.g., get, set, etc.
             throw_exception[
                 type == PROPERTY_ACCESSOR
-                && (type_count == attribute_count + specifier_count + 1)
+                && (type_count == attribute_count + specifier_count + 1 + c_attribute_after_name_count)
                 && LA(1) == LCURLY
             ]
             set_type[type, PROPERTY_ACCESSOR_DECL, type == PROPERTY_ACCESSOR]
 
+
             throw_exception[
                 type == PROPERTY_ACCESSOR_DECL
-                && (type_count == attribute_count + specifier_count + 1)
+                && (type_count == attribute_count + specifier_count + c_attribute_after_name_count + 1)
                 && LA(1) == TERMINATE
             ]
             set_type[type, NONE, type == PROPERTY_ACCESSOR_DECL]
@@ -6220,7 +6222,6 @@ pattern_check_core[
             throw_exception[type == PROPERTY_STMT]
 
             attribute_c
-
             /*
               We have a declaration (at this point a variable) if we have:
               - At least one non-specifier in the type
@@ -6299,7 +6300,7 @@ pattern_check_core[
                 && !inLanguage(LANGUAGE_OBJECTIVE_C)
 
                 // entire type is specifiers
-                && (type_count == (specifier_count + attribute_count + template_count))
+                && (type_count == (specifier_count + attribute_count + template_count + c_attribute_after_name_count))
 
                 && (
                     // inside of a C++ class definition; must match class name
