@@ -5683,6 +5683,7 @@ pattern_check_core[
         specifier_count = 0;
         attribute_count = 0;
         template_count = 0;
+        int c_attribute_after_name_count = 0;
 
         type = NONE;
         sawtemplate = false;
@@ -5887,7 +5888,7 @@ pattern_check_core[
                     set_int[attribute_count, attribute_count + 1] |
 
                     attribute_c_sole
-                    set_int[attribute_count, attribute_count + 1] |
+                    set_int[c_attribute_after_name_count, c_attribute_after_name_count + 1]
 
                     { type_count == (attribute_count + specifier_count) }?
                     property_method_name
@@ -6093,7 +6094,8 @@ pattern_check_core[
                     set_bool[operatorname, false]
                     compound_name set_bool[foundpure]
                     set_bool[isoperator, isoperator || (inLanguage(LANGUAGE_CXX_FAMILY) && operatorname)]
-                    set_bool[operatorname, false] |
+                    set_bool[operatorname, false]
+                    set_int[c_attribute_after_name_count, 0] |
 
                     // always count as a name for now since is always used as a type or type modifier
                     auto_keyword[false] |
@@ -6132,10 +6134,12 @@ pattern_check_core[
 
                         pure_lead_type_identifier_no_specifiers
                     )
+                    set_int[c_attribute_after_name_count, 0]
                     set_bool[foundpure] |
 
                     // type parts that must only occur after other type parts (excluding specifiers)
                     non_lead_type_identifier
+                    set_int[c_attribute_after_name_count, 0]
                     throw_exception[!foundpure]
                 )
 
@@ -6173,10 +6177,12 @@ pattern_check_core[
             // adjust type tokens to eliminate for last left bracket (Java only)
             set_int[type_count, endbracket ? type_count - 1 : type_count]
 
+            // adjust type tokens for c-attributes after all the names
+            set_int[type_count, type_count - c_attribute_after_name_count]
+
             // have a sequence of type tokens, last one is function/variable name (except for function pointer, which is handled later)
             // using also has no name so counter operation
             set_int[type_count, inMode(MODE_USING) ? type_count + 1 : type_count]
-
 
             set_int[
                 type_count,
@@ -6214,6 +6220,7 @@ pattern_check_core[
             throw_exception[type == PROPERTY_STMT]
 
             attribute_c
+
             /*
               We have a declaration (at this point a variable) if we have:
               - At least one non-specifier in the type
