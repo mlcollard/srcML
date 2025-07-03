@@ -5723,6 +5723,7 @@ pattern_check_core[
 
         (
             (
+                set_int[c_attribute_after_name_count, LA(1) == TERMINATE || LA(1) == C_ATTRIBUTE ? c_attribute_after_name_count : 0]
                 {
                     (
                         (
@@ -6096,8 +6097,7 @@ pattern_check_core[
                     set_bool[operatorname, false]
                     compound_name set_bool[foundpure]
                     set_bool[isoperator, isoperator || (inLanguage(LANGUAGE_CXX_FAMILY) && operatorname)]
-                    set_bool[operatorname, false]
-                    set_int[c_attribute_after_name_count, 0] |
+                    set_bool[operatorname, false] |
 
                     // always count as a name for now since is always used as a type or type modifier
                     auto_keyword[false] |
@@ -6136,12 +6136,10 @@ pattern_check_core[
 
                         pure_lead_type_identifier_no_specifiers
                     )
-                    set_int[c_attribute_after_name_count, 0]
                     set_bool[foundpure] |
 
                     // type parts that must only occur after other type parts (excluding specifiers)
                     non_lead_type_identifier
-                    set_int[c_attribute_after_name_count, 0]
                     throw_exception[!foundpure]
                 )
 
