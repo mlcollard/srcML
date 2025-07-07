@@ -1044,6 +1044,24 @@ ligula a lectus maximus mollis."</literal></expr></expr_stmt>
 </unit>
 
 <unit revision="1.1.0" language="Python">
+<function>def <name>example</name><parameter_list>(<parameter><name>self</name></parameter>)</parameter_list><block>:<block_content>
+    <if_stmt><if>if <condition><expr><name>a</name></expr></condition><block>:<block_content>
+        <return>return <expr><tuple><expr><name>b</name></expr>, <expr><literal type="string">'(c: %s, d: %s)'</literal> <operator>%</operator> \
+    <tuple>(<expr><name>c</name></expr>, <expr><name>d</name></expr>)</tuple></expr></tuple></expr></return>
+</block_content></block></if></if_stmt></block_content></block></function>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<function>def <name>example</name><parameter_list>(<parameter><name>self</name></parameter>)</parameter_list><block>:<block_content>
+    <if_stmt><if>if <condition><expr><name>a</name></expr></condition><block>:<block_content>
+        <return>return \
+    <expr><tuple><expr><name>b</name></expr>, \
+    <expr><literal type="string">'(c: %s, d: %s)'</literal> <operator>%</operator> \
+    <tuple>(<expr><name>c</name></expr>, <expr><name>d</name></expr>)</tuple></expr></tuple></expr></return>
+</block_content></block></if></if_stmt></block_content></block></function>
+</unit>
+
+<unit revision="1.1.0" language="Python">
 <expr_stmt><expr><name>line_continuation</name> <operator>=</operator> <name>a</name> \
                     <ternary>if <condition><expr><name>b</name></expr></condition> \
                     <else>else <expr><name>c</name></expr></else></ternary></expr></expr_stmt>

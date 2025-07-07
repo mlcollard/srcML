@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 /**
- * @file OffSideRule.hpp
+ * @file OffSideRule.cpp
  *
  * @copyright Copyright (C) 2024 srcML, LLC. (www.srcML.org)
  *
@@ -129,6 +129,11 @@ void OffSideRule::handleBlocks(antlr::RefToken token) {
             recordToken = true;
         }
 
+        // The current statement in a block ends with a line continuation character;
+        // the code on the next line should NOT end the current block (if applicable)
+        if (numIndents > 0 && nextToken->getType() == srcMLParser::EOL_BACKSLASH)
+            statementContinues = true;
+
         // Record the indentation level at the start of a line (if in a block)
         // Do not record indentation level if the first statements are one-line statements
         if (numIndents > 0 && nextToken->getColumn() == 1 && nextToken->getType() == srcMLParser::WS && !isOneLineStatement) {
@@ -153,7 +158,8 @@ void OffSideRule::handleBlocks(antlr::RefToken token) {
                 break;
             }
 
-            if (srcMLParser::comment_py_token_set.member(postWSToken->getType())) {
+            // Special case: found WS + a comment, or a line continuation character on the previous line
+            if (srcMLParser::comment_py_token_set.member(postWSToken->getType()) || statementContinues) {
                 indentBuffer.emplace_back(nextToken);
 
                 // Detect if currently in/out of `()`, `{}`, or `[]`
@@ -163,6 +169,7 @@ void OffSideRule::handleBlocks(antlr::RefToken token) {
                 expectBlockCheck(postWSToken);
 
                 indentBuffer.emplace_back(postWSToken);
+                statementContinues = false;
                 continue;
             }
             else

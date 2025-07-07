@@ -59,6 +59,7 @@ private:
     bool expectBlock = false;
     bool delayExpectBlockCheck = false;
     bool checkOneLineStatement = false;
+    bool statementContinues = false;
     bool recordToken = false;
 };
 
