@@ -17174,6 +17174,7 @@ perform_python_2_except_check returns [bool is_python_2] {
         int start = mark();
         inputState->guessing++;
 
+        // is there a comma at the top-level?
         try {
             while (true) {
                 if (LA(1) == LPAREN || LA(1) == PY_LCURLY || LA(1) == LBRACKET)
@@ -17189,6 +17190,7 @@ perform_python_2_except_check returns [bool is_python_2] {
                 // the except clause contains a comma not in any brackets
                 if (LA(1) == COMMA && num_brackets == 0) {
                     is_python_2 = true;
+                    consume();
                     break;
                 }
 
@@ -17199,6 +17201,25 @@ perform_python_2_except_check returns [bool is_python_2] {
             }
         }
         catch (...) {}
+
+        // are there any additional commas, besides the one at the top-level?
+        if (is_python_2) {
+            try {
+                while (true) {
+                    // should not be a Python 2 "except" clause
+                    if (LA(1) == COMMA) {
+                        is_python_2 = false;
+                        break;
+                    }
+
+                    if (LA(1) == INDENT || LA(1) == TERMINATE || LA(1) == 1 /* EOF */)
+                        break;
+
+                    consume();
+                }
+            }
+            catch (...) {}
+        }
 
         inputState->guessing--;
         rewind(start);
