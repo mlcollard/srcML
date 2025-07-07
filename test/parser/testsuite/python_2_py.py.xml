@@ -10,11 +10,28 @@
 </unit>
 
 <unit revision="1.1.0" language="Python">
+<expr_stmt><expr><call><name>exec</name> <argument_list>(<argument><expr><literal type="string">"x = 4"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
 <print>print <expr><literal type="string">"Hello World"</literal></expr></print>
 </unit>
 
 <unit revision="1.1.0" language="Python">
 <expr_stmt><expr><call><name>print</name><argument_list>(<argument><expr><literal type="string">"Hello World"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<expr_stmt><expr><call><name>print</name> <argument_list>(<argument><expr><literal type="string">"Hello World"</literal></expr></argument>)</argument_list></call></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<class>class <name>Sample</name><super_list>()</super_list><block>:<block_content>
+    <function>def <name>example</name><parameter_list>(<parameter><name>self</name></parameter>)</parameter_list><block>:<block_content>
+        <print>print <expr><tuple><expr><literal type="string">"A"</literal></expr>, <expr><name>a</name></expr>, <expr><literal type="string">"B"</literal></expr>, <expr><name>b</name></expr>, <expr><literal type="string">"."</literal></expr>,</tuple></expr></print> \
+</block_content></block></function></block_content></block></class>
+
+<expr_stmt><expr><name>c</name> <operator>=</operator> <literal type="number">0</literal></expr></expr_stmt>
 </unit>
 
 <unit revision="1.1.0" language="Python">

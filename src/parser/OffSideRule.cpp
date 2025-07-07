@@ -134,6 +134,21 @@ void OffSideRule::handleBlocks(antlr::RefToken token) {
         if (numIndents > 0 && nextToken->getType() == srcMLParser::EOL_BACKSLASH)
             statementContinues = true;
 
+        // [DEDENT] Found an invalid line continuation character in (at least) one block
+        if (statementContinues && (nextToken->getType() == srcMLParser::EOL || nextToken->getType() == srcMLParser::WS_EOL)) {
+            indentBuffer.emplace_back(nextToken);
+
+            for (int i = 0; i < numIndents; ++i) {
+                auto dedentToken = srcMLToken::factory();
+                dedentToken->setType(srcMLParser::DEDENT);
+                indentBuffer.emplace_back(dedentToken);
+            }
+
+            numIndents = 0;
+            statementContinues = false;
+            break;
+        }
+
         // Record the indentation level at the start of a line (if in a block)
         // Do not record indentation level if the first statements are one-line statements
         if (numIndents > 0 && nextToken->getColumn() == 1 && nextToken->getType() == srcMLParser::WS && !isOneLineStatement) {
