@@ -5700,7 +5700,7 @@ pattern_check_core[
         bool modifieroperator = false;
         bool is_c_class_identifier = false;
         bool is_record = false;
-
+        bool attribute_c_found = false;
         is_qmark = false;
         int real_type_count = 0;
         bool lcurly = false;
@@ -5723,6 +5723,7 @@ pattern_check_core[
 
         (
             (
+                set_bool[attribute_c_found, false]
                 set_int[c_attribute_after_name_count, LA(1) == TERMINATE || LA(1) == C_ATTRIBUTE ? c_attribute_after_name_count : 0]
                 {
                     (
@@ -5891,14 +5892,15 @@ pattern_check_core[
                     set_int[attribute_count, attribute_count + 1] |
 
                     attribute_c_sole
+                    set_bool[attribute_c_found, true]
                     set_int[c_attribute_after_name_count, c_attribute_after_name_count + 1] |
 
-                    { type_count == (attribute_count + specifier_count + c_attribute_after_name_count) }?
+                    { type_count == (attribute_count + specifier_count) }?
                     property_method_name
                     set_type[type, PROPERTY_ACCESSOR, true] |
 
                     {
-                        type_count == attribute_count + specifier_count + template_count + c_attribute_after_name_count
+                        type_count == attribute_count + specifier_count + template_count
                         && (
                             !inLanguage(LANGUAGE_JAVA)
                             || (
@@ -6144,7 +6146,8 @@ pattern_check_core[
                 )
 
                 // another type part
-                set_int[type_count, type_count + 1]
+                set_int[type_count, !attribute_c_found ? type_count + 1 : type_count]
+                set_bool[attribute_c_found, false]
 
                 // record second (before we parse it) for label detection
                 set_int[token, LA(1), type_count == 1]
@@ -6176,9 +6179,6 @@ pattern_check_core[
 
             // adjust type tokens to eliminate for last left bracket (Java only)
             set_int[type_count, endbracket ? type_count - 1 : type_count]
-
-            // adjust type tokens for c-attributes after all the names
-            set_int[type_count, type_count - c_attribute_after_name_count]
 
             // have a sequence of type tokens, last one is function/variable name (except for function pointer, which is handled later)
             // using also has no name so counter operation
