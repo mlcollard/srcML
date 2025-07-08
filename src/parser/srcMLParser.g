@@ -2914,6 +2914,7 @@ call_check_paren_pair[int& argumenttoken, int depth = 0] { int call_token = LA(1
             { !inLanguage(LANGUAGE_PYTHON) }?
             (LBRACKET (~RBRACKET)* RBRACKET (LPAREN | LCURLY)) => lambda_expression_full_cpp |
 
+            { !inLanguage(LANGUAGE_PYTHON) }?
             (block_lambda_expression_full) => block_lambda_expression_full |
 
             { inLanguage(LANGUAGE_OBJECTIVE_C) }?
@@ -11894,7 +11895,7 @@ expression_part[CALL_TYPE type = NOCALL, int call_count = 1] {
             LCURLY
         ) => lambda_expression_cpp |
 
-        { inLanguage(LANGUAGE_C_FAMILY) && !inLanguage(LANGUAGE_CSHARP) }?
+        { inLanguage(LANGUAGE_C_FAMILY) && !inLanguage(LANGUAGE_CSHARP) && !inLanguage(LANGUAGE_PYTHON) }?
         (block_lambda_expression_full) => block_lambda_expression |
 
         { inLanguage(LANGUAGE_JAVA) }?

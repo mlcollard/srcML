@@ -54,6 +54,10 @@
 </unit>
 
 <unit revision="1.1.0" language="Python">
+<expr_stmt><expr><call><name>example_one</name><argument_list>(<argument><expr><name>x</name> <operator>^</operator> <name><name>y</name><index>[<expr><name>z</name></expr>]</index></name></expr></argument>)</argument_list></call></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
 <expr_stmt><expr><operator>~</operator><name>value</name></expr></expr_stmt>
 </unit>
 
