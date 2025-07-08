@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 /**
- * @file srcml_xpath.cpp
+ * @file srcml_srcql.cpp
  *
  * @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
  *
@@ -21,7 +21,7 @@ int main(int argc, char * argv[]) {
     srcml_archive* inputArchive = srcml_archive_create();
     srcml_archive_read_open_filename(inputArchive, "project.xml");
 
-    // add the xpath transformation
+    // add the srcQL transformation
     srcml_append_transform_srcql(inputArchive, "FIND $X");
 
     // open the output archive
@@ -33,7 +33,7 @@ int main(int argc, char * argv[]) {
     while ((unit = srcml_archive_read_unit(inputArchive))) {
 
         // apply the transforms
-        // since an XPath transformation can produce multiple units
+        // since a srcQL transformation can produce multiple units
         // from a single input unit, this requires using the srcml_transform_result
         srcml_transform_result* result = nullptr;
         srcml_unit_apply_transforms(inputArchive, unit, &result);
