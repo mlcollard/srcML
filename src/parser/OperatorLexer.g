@@ -144,8 +144,8 @@ OPERATORS options { testLiterals = true; } {
     // >, >>=, >=, not >>
     '>' (('>' '=') => '>' '=')? ('=')? |
 
-    // <, << (C/C++), <=, <<< (CUDA)
-    '<' ('=' | '<' ({ inLanguage(LANGUAGE_CXX) || inLanguage(LANGUAGE_C) }? '<' | '=')? )? |
+    // <, << (C/C++), <=, <<< (CUDA), <> (Python)
+    '<' ('=' | '<' ({ inLanguage(LANGUAGE_CXX) || inLanguage(LANGUAGE_C) }? '<' | '=')? | { inLanguage(LANGUAGE_PYTHON) }? '>' )? |
 
     // match these as individual operators only
     ',' | ';' | '('..')' | '[' | ']' | '{' | '}' | 

@@ -94,6 +94,10 @@
 </unit>
 
 <unit revision="1.1.0" language="Python">
+<expr_stmt><expr><name>x</name> <operator>&lt;&gt;</operator> <name>y</name></expr></expr_stmt>
+</unit>
+
+<unit revision="1.1.0" language="Python">
 <expr_stmt><expr><name>x</name> <operator>=</operator> <name>y</name></expr></expr_stmt>
 </unit>
 
