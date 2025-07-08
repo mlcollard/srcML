@@ -237,6 +237,10 @@ COMMENT_TEXT {
             {
                 ++dquote_count;
 
+                // 2 double quotes (+ 1 initial double quote) starts a Python docstring
+                if (!in_squotes && mode == PY_DQUOTE_STRING_START && dquote_count == 2)
+                    break;
+
                 // 5 double quotes (+ 1 initial double quote) is an empty triple-quoted Python string
                 if (!in_squotes && mode == PY_DQUOTE_STRING_START && dquote_count == 5)
                     break;
@@ -324,6 +328,10 @@ COMMENT_TEXT {
             '\047'
             {
                 ++squote_count;
+
+                // 2 single quotes (+ 1 initial single quote) starts a Python docstring
+                if (!in_dquotes && mode == PY_SQUOTE_STRING_START && squote_count == 2)
+                    break;
 
                 // 5 single quotes (+ 1 initial single quote) is an empty triple-quoted Python string
                 if (!in_dquotes && mode == PY_SQUOTE_STRING_START && squote_count == 5)

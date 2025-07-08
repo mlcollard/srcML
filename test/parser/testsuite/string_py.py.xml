@@ -483,6 +483,38 @@ Func {a}
 </unit>
 
 <unit revision="1.1.0" language="Python">
+<function>def <name>example_one</name><parameter_list>()</parameter_list><block>:<block_content>
+    <expr_stmt><expr><literal type="string" format="docstring">""""a
+    """</literal></expr></expr_stmt>
+    <return>return <expr><literal type="boolean">True</literal></expr></return>
+</block_content></block></function>
+
+<function>def <name>example_two</name><parameter_list>()</parameter_list><block>:<block_content>
+    <expr_stmt><expr><literal type="string" format="docstring">""""for
+
+    b: from c, d
+    """</literal></expr></expr_stmt>
+    <return>return <expr><literal type="boolean">False</literal></expr></return>
+</block_content></block></function>
+</unit>
+
+<unit revision="1.1.0" language="Python">
+<function>def <name>example_one</name><parameter_list>()</parameter_list><block>:<block_content>
+    <expr_stmt><expr><literal type="string" format="docstring">''''a
+    '''</literal></expr></expr_stmt>
+    <return>return <expr><literal type="boolean">True</literal></expr></return>
+</block_content></block></function>
+
+<function>def <name>example_two</name><parameter_list>()</parameter_list><block>:<block_content>
+    <expr_stmt><expr><literal type="string" format="docstring">''''for
+
+    b: from c, d
+    '''</literal></expr></expr_stmt>
+    <return>return <expr><literal type="boolean">False</literal></expr></return>
+</block_content></block></function>
+</unit>
+
+<unit revision="1.1.0" language="Python">
 <expr_stmt><expr><literal type="string">b""</literal></expr></expr_stmt>
 </unit>
 
