@@ -10503,7 +10503,7 @@ variable_declaration[int type_count] { ENTRY_DEBUG } :
             startNewMode(MODE_LIST | MODE_VARIABLE_NAME | MODE_INIT | MODE_EXPECT);
 
             // declaration
-            startNewMode(MODE_LOCAL| MODE_VARIABLE_NAME | MODE_INIT | MODE_EXPECT /* | MODE_INCLUDE_ATTRIBUTE */);
+            startNewMode(MODE_LOCAL| MODE_VARIABLE_NAME | MODE_INIT | MODE_EXPECT | MODE_INCLUDE_ATTRIBUTE);
 
             if (inTransparentMode(MODE_CONTROL_CONDITION | MODE_END_AT_COMMA))
                 setMode(MODE_LIST);
