@@ -787,10 +787,6 @@ public:
   Order of evaluation is important.
 */
 start[] { ++start_count; ENTRY_DEBUG_START ENTRY_DEBUG } :
-
-        // c attribute
-        attribute_c_sole |
-
         // end of file
         eof |
 
@@ -1460,8 +1456,6 @@ function_tail[] { ENTRY_DEBUG } :
 
             { inLanguage(LANGUAGE_CXX) && next_token() == LBRACKET }?
             attribute_cpp |
-
-            attribute_c_sole |
 
             { inLanguage(LANGUAGE_CXX) }?
             trailing_return |
@@ -2449,7 +2443,6 @@ perform_call_check[CALL_TYPE& type, bool& isempty, int& call_count, int secondto
                     || postcalltoken == ATOPTIONAL
                     || postcalltoken == STATIC
                     || postcalltoken == CONST
-                    || postcalltoken == C_ATTRIBUTE
                 )
                 && (save_first != DECLTYPE)
             )
@@ -3954,10 +3947,6 @@ class_definition[] { ENTRY_DEBUG } :
   Handles anything that occurs after the "CLASS" token.
 */
 class_post[] { ENTRY_DEBUG } :
-        (options { greedy = true; } :
-            attribute_c
-        )
-
         (options { greedy = true; } :
             { inLanguage(LANGUAGE_CXX) && next_token() == LBRACKET }?
             attribute_cpp
@@ -5683,7 +5672,6 @@ pattern_check_core[
         specifier_count = 0;
         attribute_count = 0;
         template_count = 0;
-        int c_attribute_after_name_count = 0;
 
         type = NONE;
         sawtemplate = false;
@@ -5700,7 +5688,7 @@ pattern_check_core[
         bool modifieroperator = false;
         bool is_c_class_identifier = false;
         bool is_record = false;
-        bool attribute_c_found = false;
+
         is_qmark = false;
         int real_type_count = 0;
         bool lcurly = false;
@@ -5723,8 +5711,6 @@ pattern_check_core[
 
         (
             (
-                set_bool[attribute_c_found, false]
-                set_int[c_attribute_after_name_count, LA(1) == TERMINATE || LA(1) == C_ATTRIBUTE ? c_attribute_after_name_count : 0]
                 {
                     (
                         (
@@ -5746,8 +5732,8 @@ pattern_check_core[
 
                 set_int[posin, LA(1) == IN ? posin = type_count : posin]
                 set_int[parameter_pack_pos, LA(1) == DOTDOTDOT ? parameter_pack_pos = type_count : parameter_pack_pos]
-                set_bool[isoperator, isoperator || LA(1) == OPERATOR]
 
+                set_bool[isoperator, isoperator || LA(1) == OPERATOR]
 
                 // indicates whether a bracket was at the end; necessary for Java
                 set_bool[endbracket, inLanguage(LANGUAGE_JAVA_FAMILY) && LA(1) == LBRACKET]
@@ -5756,8 +5742,8 @@ pattern_check_core[
                 // this is for disambiguation of destructor declarations from expressions involving the ~ operator
                 set_bool[modifieroperator, modifieroperator || LA(1) == REFOPS || LA(1) == MULTOPS || LA(1) == QMARK]
 
-
                 set_bool[sawcontextual, sawcontextual || LA(1) == CRESTRICT || LA(1) == MUTABLE]
+
                 (
                     {
                         argument_token_set.member(LA(1))
@@ -5784,8 +5770,6 @@ pattern_check_core[
                             || next_token() != LPAREN
                         )
                     }?
-
-
 
                     set_int[token, LA(1)]
                     set_bool[foundpure, foundpure || (LA(1) == CONST || LA(1) == TYPENAME)]
@@ -5821,7 +5805,6 @@ pattern_check_core[
                         { inLanguage(LANGUAGE_JAVA) }?
                         default_specifier
                     )
-
 
                     set_int[specifier_count, specifier_count + 1]
 
@@ -5891,10 +5874,6 @@ pattern_check_core[
                     set_type[type, GLOBAL_ATTRIBUTE]
                     set_int[attribute_count, attribute_count + 1] |
 
-                    attribute_c_sole
-                    set_bool[attribute_c_found, true]
-                    set_int[c_attribute_after_name_count, c_attribute_after_name_count + 1] |
-
                     { type_count == (attribute_count + specifier_count) }?
                     property_method_name
                     set_type[type, PROPERTY_ACCESSOR, true] |
@@ -5951,7 +5930,6 @@ pattern_check_core[
 
                     set_bool[lcurly, LA(1) == LCURLY]
 
-
                     (options { greedy = true; } :
                         { inLanguage(LANGUAGE_CXX) && next_token() == LBRACKET }?
                         attribute_cpp
@@ -5965,8 +5943,6 @@ pattern_check_core[
 
                     class_post
                     (class_header | LCURLY)
-
-                    attribute_c
 
                     set_type[
                         type,
@@ -6025,7 +6001,7 @@ pattern_check_core[
                     set_bool[foundpure]
                     set_int[type_count, type_count + 1] |
 
-                    { type_count == attribute_count + specifier_count + template_count + c_attribute_after_name_count }?
+                    { type_count == attribute_count + specifier_count + template_count }?
                     (ENUM set_type[type, ENUM_DECL])
 
                     set_bool[lcurly, LA(1) == LCURLY]
@@ -6146,8 +6122,7 @@ pattern_check_core[
                 )
 
                 // another type part
-                set_int[type_count, !attribute_c_found ? type_count + 1 : type_count]
-                set_bool[attribute_c_found, false]
+                set_int[type_count, type_count + 1]
 
                 // record second (before we parse it) for label detection
                 set_int[token, LA(1), type_count == 1]
@@ -6156,15 +6131,14 @@ pattern_check_core[
             // special case for property attributes as names, e.g., get, set, etc.
             throw_exception[
                 type == PROPERTY_ACCESSOR
-                && (type_count == attribute_count + specifier_count + 1 + c_attribute_after_name_count)
+                && (type_count == attribute_count + specifier_count + 1)
                 && LA(1) == LCURLY
             ]
             set_type[type, PROPERTY_ACCESSOR_DECL, type == PROPERTY_ACCESSOR]
 
-
             throw_exception[
                 type == PROPERTY_ACCESSOR_DECL
-                && (type_count == attribute_count + specifier_count + c_attribute_after_name_count + 1)
+                && (type_count == attribute_count + specifier_count + 1)
                 && LA(1) == TERMINATE
             ]
             set_type[type, NONE, type == PROPERTY_ACCESSOR_DECL]
@@ -6219,7 +6193,6 @@ pattern_check_core[
             ]
             throw_exception[type == PROPERTY_STMT]
 
-            attribute_c
             /*
               We have a declaration (at this point a variable) if we have:
               - At least one non-specifier in the type
@@ -6239,7 +6212,7 @@ pattern_check_core[
                             && LA(1) != MSPEC
                             && (
                                 (
-                                    (inLanguage(LANGUAGE_CXX) || inLanguage(LANGUAGE_C))
+                                    inLanguage(LANGUAGE_CXX)
                                     && !inMode(MODE_ACCESS_REGION)
                                 )
                                 || LA(1) == 1
@@ -6298,7 +6271,7 @@ pattern_check_core[
                 && !inLanguage(LANGUAGE_OBJECTIVE_C)
 
                 // entire type is specifiers
-                && (type_count == (specifier_count + attribute_count + template_count + c_attribute_after_name_count))
+                && (type_count == (specifier_count + attribute_count + template_count))
 
                 && (
                     // inside of a C++ class definition; must match class name
@@ -6487,7 +6460,7 @@ trace[const char*s] {
   trace_int
 */
 trace_int[const char* s, int n] {
-        std::cerr << s << ": " << n << '\n';
+        std::cerr << s << ": " << n << std::endl;
 } :;
 
 traceLA[const char* s = ""] { std::cerr << s << " LA(1) is " << LA(1) << " " << LT(1)->getText() << std::endl; } :;
@@ -7230,11 +7203,7 @@ attribute_cpp[] { CompleteElement element(this); ENTRY_DEBUG } :
         RBRACKET
 ;
 
-attribute_c[] { ENTRY_DEBUG } :
-    ({ inLanguage(LANGUAGE_C) || inLanguage(LANGUAGE_CXX) }? attribute_c_sole)*
-;
-
-attribute_c_sole[] { CompleteElement element(this); ENTRY_DEBUG } :
+attribute_c[] { CompleteElement element(this); ENTRY_DEBUG } :
         {
             // start a mode to end at right bracket with expressions inside
             startNewMode(MODE_TOP | /* MODE_LIST | */ MODE_EXPRESSION | MODE_EXPECT | MODE_END_AT_COMMA);
@@ -7261,69 +7230,19 @@ inner_attribute_c[] { CompleteElement element(this); ENTRY_DEBUG } :
             // start a mode to end at right bracket with expressions inside
             startNewMode(MODE_TOP | MODE_LIST | MODE_EXPRESSION | MODE_EXPECT | MODE_END_AT_COMMA);
         }
-        { LA(1) != RPAREN }? cpp_complete_expression_attribute
-        (COMMA ({ LA(1) != RPAREN }? cpp_complete_expression_attribute | { LA(1) != RPAREN }? empty_attribute_expression | ))*
+        { LA(1) != RPAREN }? ({ LA(1) != CONST }? complete_default_parameter | attribute_c_const_expression)
+        (COMMA ({ LA(1) != RPAREN }? ({ LA(1) != CONST }? complete_default_parameter | attribute_c_const_expression) | { LA(1) != RPAREN }? empty_attribute_expression | ))*
 ;
 
-cpp_complete_expression_attribute[] { CompleteElement element(this); ENTRY_DEBUG } :
-        {
-            // start a mode to end at the right bracket with expressions inside
-            startNewMode(MODE_TOP | MODE_EXPECT | MODE_EXPRESSION | MODE_END_AT_COMMA);
-        }
-        (options { greedy = true; } :
-            { !cpp_check_end() && LA(1) != COMMA && (LA(1) != RPAREN || inTransparentMode(MODE_INTERNAL_END_PAREN)) }?
-            (
-                // commas in a list
-//                { inTransparentMode(MODE_END_ONLY_AT_RPAREN) || !inTransparentMode(MODE_END_AT_COMMA) }?
-//                comma |
-
-                // right parenthesis, unless we are in a pair of parentheses in an expression
-//                { !inTransparentMode(MODE_INTERNAL_END_PAREN) }?
-//                rparen[false] |
-
-                // argument mode (as part of call)
-                { inMode(MODE_ARGUMENT) }?
-                argument |
-
-                // expression with right parentheses if a previous match is in one
-                { LA(1) != RPAREN || inTransparentMode(MODE_INTERNAL_END_PAREN) }?
-                cpp_expression |
-
-                COLON
-            )
-        )*
-;
-
-/*
-  complete_attribute_expression
-
-  Matches a complete expression (no stream).
-*/
-complete_attribute_expression[] { CompleteElement element(this); ENTRY_DEBUG } :
+attribute_c_const_expression[] { CompleteElement element(this); ENTRY_DEBUG } :
         {
             // start a mode to end at right bracket with expressions inside
             startNewMode(MODE_TOP | MODE_EXPECT | MODE_EXPRESSION);
 
             startElement(SEXPRESSION);
-        }
-        (
-            (NAME LPAREN)=>
-            function_identifier complete_argument_list |
-            identifier |
-            attribute_c_const
-        )
-;
 
-/*
-  attribute_c_const
-
-  const as a name
-*/
-attribute_c_const[] { SingleElement element(this); ENTRY_DEBUG } :
-        {
             startElement(SNAME);
         }
-
         CONST
 ;
 
@@ -10682,8 +10601,6 @@ specifiers_or_macro[] { bool first = true; ENTRY_DEBUG } :
         )*
 
         (options { greedy = true; } : specifier)*
-
-        attribute_c
 ;
 
 /*
@@ -13148,7 +13065,6 @@ label_statement[] { CompleteElement element(this); ENTRY_DEBUG } :
 
         (identifier | keyword_identifier)
         COLON
-        attribute_c
 ;
 
 /*

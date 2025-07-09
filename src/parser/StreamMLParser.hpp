@@ -498,7 +498,7 @@ private:
         }
 
         // c attribute
-        if (false && srcMLParser::LA(1) == srcMLParser::C_ATTRIBUTE) {
+        if (!inAttribute && srcMLParser::LA(1) == srcMLParser::C_ATTRIBUTE) {
 
             inAttribute = true;
 
