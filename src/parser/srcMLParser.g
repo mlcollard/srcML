@@ -13101,7 +13101,7 @@ tempope[] { ENTRY_DEBUG } :
 label_statement[] { CompleteElement element(this); ENTRY_DEBUG } :
         {
             // statement
-            startNewMode(MODE_STATEMENT);
+            startNewMode(MODE_STATEMENT  | MODE_INCLUDE_ATTRIBUTE);
 
             // start the label statement
             startElement(SLABEL_STATEMENT);
