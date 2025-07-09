@@ -6460,7 +6460,7 @@ trace[const char*s] {
   trace_int
 */
 trace_int[const char* s, int n] {
-        std::cerr << s << ": " << n << std::endl;
+    std::cerr << s << ": " << n << std::endl;
 } :;
 
 traceLA[const char* s = ""] { std::cerr << s << " LA(1) is " << LA(1) << " " << LT(1)->getText() << std::endl; } :;
@@ -7223,6 +7223,9 @@ attribute_c[] { CompleteElement element(this); ENTRY_DEBUG } :
 
         RPAREN
         RPAREN
+
+        // some nested calls are not closing, e.g., ((f(a))), so grab the next paren if it is adjoining
+        ( { SkipBufferSize() == 0 }? RPAREN)
 ;
 
 inner_attribute_c[] { CompleteElement element(this); ENTRY_DEBUG } :
@@ -7230,8 +7233,49 @@ inner_attribute_c[] { CompleteElement element(this); ENTRY_DEBUG } :
             // start a mode to end at right bracket with expressions inside
             startNewMode(MODE_TOP | MODE_LIST | MODE_EXPRESSION | MODE_EXPECT | MODE_END_AT_COMMA);
         }
-        { LA(1) != RPAREN }? ({ LA(1) != CONST }? complete_default_parameter | attribute_c_const_expression)
-        (COMMA ({ LA(1) != RPAREN }? ({ LA(1) != CONST }? complete_default_parameter | attribute_c_const_expression) | { LA(1) != RPAREN }? empty_attribute_expression | ))*
+        { LA(1) != RPAREN }? ({ LA(1) != CONST }? complete_attribute_expression | attribute_c_const_expression)
+        (COMMA ({ LA(1) != RPAREN }? ({ LA(1) != CONST }? complete_attribute_expression | attribute_c_const_expression) | { LA(1) != RPAREN }? empty_attribute_expression | ))*
+;
+
+/*
+  complete_expression
+
+  Matches a complete expression (no stream).
+*/
+complete_attribute_expression[] { CompleteElement element(this); ENTRY_DEBUG } :
+        {
+            // start a mode to end at right bracket with expressions inside
+            startNewMode(MODE_TOP | MODE_EXPECT | MODE_EXPRESSION);
+        }
+
+        (options { greedy = true; } :
+            // commas as in a list
+            {
+                (
+                    inTransparentMode(MODE_END_ONLY_AT_RPAREN)
+                    && (getFirstMode(MODE_END_ONLY_AT_RPAREN | MODE_END_AT_COMMA) & MODE_END_AT_COMMA) == 0
+                )
+                || !inTransparentMode(MODE_END_AT_COMMA)
+            }?
+            comma |
+
+            // right parenthesis, unless we are in a pair of parentheses in an expression
+//            { !inTransparentMode(MODE_INTERNAL_END_PAREN) && inMode(MODE_CALL)}?
+//            rparen[false] |
+
+            { inLanguage(LANGUAGE_OBJECTIVE_C) && LA(1) == LBRACKET }?
+            complete_objective_c_call |
+
+            // argument mode (as part of call)
+            { inMode(MODE_ARGUMENT) }?
+            argument |
+
+            // expression with right parentheses if a previous match is in one
+            { LA(1) != RPAREN || inTransparentMode(MODE_INTERNAL_END_PAREN) }?
+            expression |
+
+            colon_marked
+        )*
 ;
 
 attribute_c_const_expression[] { CompleteElement element(this); ENTRY_DEBUG } :
