@@ -10,7 +10,7 @@ jobs:
     steps:
 
       - name: Checkout Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Run docker image
         shell: bash
@@ -24,7 +24,7 @@ jobs:
           echo "PWD: " "$(pwd)"
           docker run -v "$(pwd)"/..:/Source -v "$(pwd)":/Dist srcml/fedora_x86_64_base:latest bash -c "mkdir /Build; cd /Build; cmake /Source -G Ninja;ninja install;ctest;cpack -G RPM; cp dist/*.rpm /Dist/."     # - name: Setup Ubuntu
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         with:
           name: FedoraDist
           path: dist/*
@@ -74,7 +74,7 @@ jobs:
       #   continue-on-error: true
       #   run: |
       #     ctest -VV
-      # - uses: actions/upload-artifact@v2
+      # - uses: actions/upload-artifact@v4
       #   with:
       #     name: ClientTest.${{ runner.os }}.log
       #     path: build/Testing/Temporary/LastTest.log
@@ -94,7 +94,7 @@ jobs:
       #   continue-on-error: true
       #   run: |
       #     ctest -C Release -R ^test_
-      # - uses: actions/upload-artifact@v2
+      # - uses: actions/upload-artifact@v4
       #   with:
       #     name: libsrcmlTest.${{ runner.os }}.log
       #     path: build/Testing/Temporary/LastTest.log
@@ -113,7 +113,7 @@ jobs:
       #   run: |
       #     srcml --parser-test test/parser/testsuite | tee ParserTest.log
 
-      # - uses: actions/upload-artifact@v2
+      # - uses: actions/upload-artifact@v4
       #   with:
       #     name: ParserTest.${{ runner.os }}.log
       #     path: build/ParserTest.log

@@ -220,6 +220,7 @@ tokens {
     MUTABLE;
     VOLATILE;
     TRANSIENT;
+    C_ATTRIBUTE;
 
     // Java tokens
     IMPORT;
@@ -475,6 +476,7 @@ KeywordLexer(UTF8CharBuffer* pinput, int language, OPTION_TYPE & options,
         { "volatile"     , VOLATILE       , LANGUAGE_ALL },
         { "__volatile__" , VOLATILE       , LANGUAGE_C_FAMILY  },
         { "auto"         , AUTO           , LANGUAGE_CXX | LANGUAGE_C },
+        { "__attribute__", C_ATTRIBUTE    , LANGUAGE_CXX | LANGUAGE_C },
 
         // C keywords
         { "restrict"       , RESTRICT          , LANGUAGE_C },

@@ -10,10 +10,10 @@ jobs:
     steps:
 
       - name: Checkout Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Checkout ClangBuildAnalyzer
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: aras-p/ClangBuildAnalyzer
           path: analyzer
@@ -93,7 +93,7 @@ jobs:
           ClangBuildAnalyzer --all . capture_nopch
           ClangBuildAnalyzer --analyze capture_nopch > capture_nopch.txt
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         with:
           name: Capture
           path: build/capture*

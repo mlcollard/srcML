@@ -6459,13 +6459,14 @@ trace[const char*s] {
 /*
   trace_int
 */
-trace_int[int s] {
-        std::cerr << "HERE " << s << std::endl;
+/*trace_int[const char* s, int n] {
+    std::cerr << s << ": " << n << std::endl;
 } :;
 
+traceLA[const char* s = ""] { std::cerr << s << " LA(1) is " << LA(1) << " " << LT(1)->getText() << std::endl; } :;
+*/
 // Commented-out code
 /*
-traceLA { std::cerr << "LA(1) is " << LA(1) << " " << LT(1)->getText() << std::endl; } :;
 marker[] { CompleteElement element(this); startNewMode(MODE_LOCAL); startElement(SMARKER); } :;
 */
 
@@ -7203,6 +7204,121 @@ attribute_cpp[] { CompleteElement element(this); ENTRY_DEBUG } :
         RBRACKET
 ;
 
+attribute_c[] { CompleteElement element(this); ENTRY_DEBUG } :
+        {
+            // start a mode to end at right bracket with expressions inside
+            startNewMode(MODE_TOP | /* MODE_LIST | */ MODE_EXPRESSION | MODE_EXPECT | MODE_END_AT_COMMA);
+
+            startElement(SATTRIBUTE);
+        }
+        C_ATTRIBUTE
+        /*
+            (())
+            ((a,b))
+            ((a,))
+        */
+        LPAREN
+        LPAREN
+
+        ({ LA(1) != RPAREN}? inner_attribute_c | )
+
+        RPAREN
+        RPAREN
+;
+
+inner_attribute_c[] { CompleteElement element(this); ENTRY_DEBUG
+
+    // in guessing mode, just eat the contents until we get to the
+    // RPAREN that is not part of the expression
+    if (inputState->guessing) {
+        int parencount = 0;
+
+        while (LA(1) != antlr::Token::EOF_TYPE) {
+            if (LA(1) == RPAREN)
+                --parencount;
+            else if (LA(1) == LPAREN)
+                ++parencount;
+
+            if (parencount < 0)
+                break;
+
+            consume();
+        }
+        return;
+    }
+
+    } :
+        {
+            // start a mode to end at right bracket with expressions inside
+            startNewMode(MODE_TOP | MODE_LIST | MODE_EXPRESSION | MODE_EXPECT | MODE_END_AT_COMMA);
+        }
+        { LA(1) != RPAREN }? ({ LA(1) != CONST }? complete_attribute_expression | attribute_c_const_expression)
+        (COMMA ({ LA(1) != RPAREN }? ({ LA(1) != CONST }? complete_attribute_expression | attribute_c_const_expression) | { LA(1) != RPAREN }? empty_attribute_expression | ))*
+;
+
+/*
+  complete_expression
+
+  Matches a complete expression (no stream).
+*/
+complete_attribute_expression[] { CompleteElement element(this); ENTRY_DEBUG } :
+        {
+            // start a mode to end at right bracket with expressions inside
+            startNewMode(MODE_TOP | MODE_EXPECT | MODE_EXPRESSION);
+        }
+
+        (options { greedy = true; } :
+            // commas as in a list
+            {
+                (
+                    inTransparentMode(MODE_END_ONLY_AT_RPAREN)
+                    && (getFirstMode(MODE_END_ONLY_AT_RPAREN | MODE_END_AT_COMMA) & MODE_END_AT_COMMA) == 0
+                )
+                || !inTransparentMode(MODE_END_AT_COMMA)
+            }?
+            comma |
+
+            { inLanguage(LANGUAGE_OBJECTIVE_C) && LA(1) == LBRACKET }?
+            complete_objective_c_call |
+
+            // argument mode (as part of call)
+            { inMode(MODE_ARGUMENT) }?
+            argument |
+
+            // expression with right parentheses if a previous match is in one
+            { LA(1) != RPAREN || inTransparentMode(MODE_INTERNAL_END_PAREN) }?
+            expression |
+
+            colon_marked
+        )*
+;
+
+attribute_c_const_expression[] { CompleteElement element(this); ENTRY_DEBUG } :
+        {
+            // start a mode to end at right bracket with expressions inside
+            startNewMode(MODE_TOP | MODE_EXPECT | MODE_EXPRESSION);
+
+            startElement(SEXPRESSION);
+
+            startElement(SNAME);
+        }
+        CONST
+;
+
+/*
+  complete_attribute_expression
+
+  Matches a complete expression (no stream).
+*/
+empty_attribute_expression[] { CompleteElement element(this); ENTRY_DEBUG }:
+        {
+            // start a mode to end at right bracket with expressions inside
+            startNewMode(MODE_TOP | MODE_EXPECT | MODE_EXPRESSION);
+
+            startElement(SEXPRESSION);
+        }
+;
+
 /*
   complete_argument_list
 
@@ -7741,7 +7857,6 @@ identifier[] { SingleElement element(this); ENTRY_DEBUG } :
         {
             startElement(SNAME);
         }
-
         identifier_list
 ;
 
@@ -7751,6 +7866,7 @@ identifier[] { SingleElement element(this); ENTRY_DEBUG } :
   Handles the list of identifiers that are also marked up as tokens for other things.
 */
 identifier_list[] { ENTRY_DEBUG } :
+
         NAME | INCLUDE | DEFINE | ELIF | ENDIF | ERRORPREC | IFDEF | IFNDEF | LINE | PRAGMA | UNDEF |
         WARNING | SUPER | REGION | ENDREGION | GET | SET | ADD | REMOVE | ASYNC | YIELD | FINAL |
         OVERRIDE | VOID | ASM |
@@ -7952,7 +8068,6 @@ compound_name_inner[bool index] { CompleteElement element(this); TokenPosition t
 
             macro_type_name_call
         )
-
         (options { greedy = true; } :
             { inLanguage(LANGUAGE_CXX) && next_token() == LBRACKET }?
             attribute_cpp
@@ -10392,7 +10507,7 @@ variable_declaration[int type_count] { ENTRY_DEBUG } :
             startNewMode(MODE_LIST | MODE_VARIABLE_NAME | MODE_INIT | MODE_EXPECT);
 
             // declaration
-            startNewMode(MODE_LOCAL| MODE_VARIABLE_NAME | MODE_INIT | MODE_EXPECT);
+            startNewMode(MODE_LOCAL| MODE_VARIABLE_NAME | MODE_INIT | MODE_EXPECT | MODE_INCLUDE_ATTRIBUTE);
 
             if (inTransparentMode(MODE_CONTROL_CONDITION | MODE_END_AT_COMMA))
                 setMode(MODE_LIST);
@@ -12034,7 +12149,7 @@ parameter[] {
 } :
         {
             // end parameter correctly
-            startNewMode(MODE_PARAMETER);
+            startNewMode(MODE_PARAMETER | MODE_INCLUDE_ATTRIBUTE);
 
             // start the parameter statement
             startElement(SPARAMETER);
@@ -12990,7 +13105,7 @@ tempope[] { ENTRY_DEBUG } :
 label_statement[] { CompleteElement element(this); ENTRY_DEBUG } :
         {
             // statement
-            startNewMode(MODE_STATEMENT);
+            startNewMode(MODE_STATEMENT  | MODE_INCLUDE_ATTRIBUTE);
 
             // start the label statement
             startElement(SLABEL_STATEMENT);
