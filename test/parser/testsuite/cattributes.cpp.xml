@@ -76,4 +76,16 @@
 </public>}</block>;</struct>
 </unit>
 
+<unit revision="1.0.0" language="C++">
+<function_decl><type><name>int</name></type> <name>f</name><parameter_list>(<parameter><decl><type><name>int</name></type> <name>n</name> <attribute>__attribute__((<expr><name>unused</name></expr>))</attribute></decl></parameter>)</parameter_list>;</function_decl>
+</unit>
+
+<unit revision="1.0.0" language="C++">
+<function_decl><type><name>int</name></type> <name>f</name><parameter_list>(<parameter><decl><type><name>int</name></type> <attribute>__attribute__((<expr><name>unused</name></expr>))</attribute> <name>n</name></decl></parameter>)</parameter_list>;</function_decl>
+</unit>
+
+<unit revision="1.0.0" language="C++">
+<function_decl><type><name>int</name></type> <name>f</name><parameter_list>(<parameter><decl><type><name>int</name></type> <attribute>__attribute__((<expr><name>unused</name></expr>))</attribute></decl></parameter>)</parameter_list>;</function_decl>
+</unit>
+
 </unit>

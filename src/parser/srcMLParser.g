@@ -12149,7 +12149,7 @@ parameter[] {
 } :
         {
             // end parameter correctly
-            startNewMode(MODE_PARAMETER);
+            startNewMode(MODE_PARAMETER | MODE_INCLUDE_ATTRIBUTE);
 
             // start the parameter statement
             startElement(SPARAMETER);
