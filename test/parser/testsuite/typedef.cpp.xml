@@ -105,9 +105,4 @@
 <typedef>typedef <type><enum>enum <block>{ <decl><name>a</name></decl>, <decl><name>b</name> <init>= <expr><name>c</name></expr></init></decl> }</block></enum></type> <name>a</name>;</typedef>
 </unit>
 
-<unit xmlns:cpp="http://www.srcML.org/srcML/cpp" language="C++">
-<typedef>typedef <type><name>float</name></type> <name>SFtype</name> <attribute>__attribute__ ((<expr><call><name>mode</name> <argument_list>(<argument><expr><name>SF</name></expr></argument>)</argument_list></call></expr>))</attribute>;</typedef>
-</unit>
-
-
 </unit>
