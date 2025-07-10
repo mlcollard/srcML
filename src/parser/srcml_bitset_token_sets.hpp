@@ -142,7 +142,7 @@ token_set(srcMLParser, identifier_list_tokens_set,
     srcMLParser::EMIT, srcMLParser::FOREACH, srcMLParser::SIGNAL, srcMLParser::FOREVER,
 
     // Python
-    srcMLParser::PY_2_EXEC, srcMLParser::PY_2_PRINT, srcMLParser::PY_CASE, srcMLParser::PY_MATCH, srcMLParser::PY_TYPE
+    srcMLParser::PY_2_EXEC, srcMLParser::PY_2_PRINT, srcMLParser::PY_ASYNC, srcMLParser::PY_CASE, srcMLParser::PY_MATCH, srcMLParser::PY_TYPE
 )
 
 token_set(srcMLParser, whitespace_token_set,

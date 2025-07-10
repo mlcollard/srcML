@@ -92,4 +92,11 @@ def <name>func</name><parameter_list>()</parameter_list><block>:<block_content>
 </block_content></block></function></block_content></block></function>
 </unit>
 
+<unit revision="1.1.0" language="Python">
+<function><attribute>@<expr><call><name>async</name><argument_list>(<argument><expr><name>async</name><operator>=</operator><literal type="boolean">True</literal></expr></argument>)</argument_list></call></expr></attribute>
+def <name>example_one</name><parameter_list>()</parameter_list><block>:<block_content>
+    <return>return <expr><literal type="boolean">True</literal></expr></return>
+</block_content></block></function>
+</unit>
+
 </unit>

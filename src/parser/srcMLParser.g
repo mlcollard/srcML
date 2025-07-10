@@ -2893,6 +2893,11 @@ call_check_paren_pair[int& argumenttoken, int depth = 0] { int call_token = LA(1
             call_check_paren_pair[argumenttoken, depth + 1]
             set_bool[name, false] |
 
+            // process Python "async" here since it is also in 'identifier'
+            { inLanguage(LANGUAGE_PYTHON) }?
+            PY_ASYNC
+            ({ next_token() == EQUAL }? set_bool[name, true] | set_bool[name, false]) |
+
             // special case for something that looks like a declaration
             { !name || (depth > 0) }?
             (identifier | generic_selection)
@@ -2906,7 +2911,7 @@ call_check_paren_pair[int& argumenttoken, int depth = 0] { int call_token = LA(1
             )* |
 
             // special case for something that looks like a declaration
-            { LA(1) == DELEGATE /* eliminates ANTRL warning, will be nop */ }?
+            { LA(1) == DELEGATE /* eliminates ANTLR warning, will be nop */ }?
             delegate_anonymous |
 
             { next_token_check(LCURLY, LPAREN) }?
@@ -2929,14 +2934,14 @@ call_check_paren_pair[int& argumenttoken, int depth = 0] { int call_token = LA(1
             // forbid parentheses (handled recursively) but allow the following in Python:
             // - "if"/"else" for ternaries
             // - "lambda" for lambdas
-            // - "async"/"for"/"in"/"if" for comprehensions
+            // - "for"/"in"/"if" for comprehensions
             // - "yield"/"from" for yield expressions
             {
                 call_token == LPAREN
                 && inLanguage(LANGUAGE_PYTHON)
                 && (
                     !keyword_token_set.member(LA(1))
-                    || LA(1) == IF || LA(1) == ELSE || LA(1) == FOR || LA(1) == PY_IN || LA(1) == PY_ASYNC
+                    || LA(1) == IF || LA(1) == ELSE || LA(1) == FOR || LA(1) == PY_IN
                     || LA(1) == PY_LAMBDA || LA(1) == PY_YIELD || LA(1) == PY_FROM
                 )
             }?
@@ -8184,7 +8189,7 @@ identifier_list[] { ENTRY_DEBUG } :
         EMIT | FOREACH | SIGNAL | FOREVER |
 
         // Python
-        PY_2_EXEC | PY_2_PRINT | PY_CASE | PY_MATCH | PY_TYPE
+        PY_2_EXEC | PY_2_PRINT | PY_ASYNC | PY_CASE | PY_MATCH | PY_TYPE
 ;
 
 /*
@@ -11832,7 +11837,7 @@ expression_part[CALL_TYPE type = NOCALL, int call_count = 1] {
         set_py |
 
         // looking for "async" + "for" (in an expression) to start a Python comprehension
-        { inLanguage(LANGUAGE_PYTHON) }?
+        { inLanguage(LANGUAGE_PYTHON) && next_token() == FOR }?
         start_comprehension_py
         specifier_py
         comprehension_py |
