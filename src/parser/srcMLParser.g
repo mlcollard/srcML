@@ -6459,11 +6459,12 @@ trace[const char*s] {
 /*
   trace_int
 */
-trace_int[const char* s, int n] {
+/*trace_int[const char* s, int n] {
     std::cerr << s << ": " << n << std::endl;
 } :;
 
 traceLA[const char* s = ""] { std::cerr << s << " LA(1) is " << LA(1) << " " << LT(1)->getText() << std::endl; } :;
+*/
 // Commented-out code
 /*
 marker[] { CompleteElement element(this); startNewMode(MODE_LOCAL); startElement(SMARKER); } :;
@@ -7223,12 +7224,30 @@ attribute_c[] { CompleteElement element(this); ENTRY_DEBUG } :
 
         RPAREN
         RPAREN
-
-        // some nested calls are not closing, e.g., ((f(a))), so grab the next paren if it is adjoining
-        ( { SkipBufferSize() == 0 }? RPAREN)
 ;
 
-inner_attribute_c[] { CompleteElement element(this); ENTRY_DEBUG } :
+inner_attribute_c[] { CompleteElement element(this); ENTRY_DEBUG
+
+    // in guessing mode, just eat the contents until we get to the
+    // RPAREN that is not part of the expression
+    if (inputState->guessing) {
+        int parencount = 0;
+
+        while (LA(1) != antlr::Token::EOF_TYPE) {
+            if (LA(1) == RPAREN)
+                --parencount;
+            else if (LA(1) == LPAREN)
+                ++parencount;
+
+            if (parencount < 0)
+                break;
+
+            consume();
+        }
+        return;
+    }
+
+    } :
         {
             // start a mode to end at right bracket with expressions inside
             startNewMode(MODE_TOP | MODE_LIST | MODE_EXPRESSION | MODE_EXPECT | MODE_END_AT_COMMA);
