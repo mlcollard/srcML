@@ -7278,10 +7278,6 @@ complete_attribute_expression[] { CompleteElement element(this); ENTRY_DEBUG } :
             }?
             comma |
 
-            // right parenthesis, unless we are in a pair of parentheses in an expression
-//            { !inTransparentMode(MODE_INTERNAL_END_PAREN) && inMode(MODE_CALL)}?
-//            rparen[false] |
-
             { inLanguage(LANGUAGE_OBJECTIVE_C) && LA(1) == LBRACKET }?
             complete_objective_c_call |
 
