@@ -7324,17 +7324,6 @@ empty_attribute_expression[] { CompleteElement element(this); ENTRY_DEBUG }:
 ;
 
 /*
-  attribute_name
-*/
-attribute_name[] { SingleElement element(this); ENTRY_DEBUG } :
-        {
-            startElement(SNAME);
-        }
-
-        NAME
-;
-
-/*
   complete_argument_list
 
   Used to match an argument list completely.
