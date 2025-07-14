@@ -10749,7 +10749,7 @@ variable_declaration_nameinit[] { bool isthis = LA(1) == THIS; bool instypeprev 
             if (
                 !inMode(MODE_LOCAL | MODE_VARIABLE_NAME | MODE_INIT | MODE_EXPECT)
                 && inMode(MODE_LIST | MODE_VARIABLE_NAME | MODE_INIT | MODE_EXPECT)
-                && !inTransparentMode(MODE_TYPEDEF)
+                && (!inTransparentMode(MODE_TYPEDEF) || inTransparentMode(MODE_CLASS | MODE_INNER_DECL))
                 && !inTransparentMode(MODE_USING)
             ) {
                 startNewMode(MODE_LOCAL | MODE_VARIABLE_NAME | MODE_INIT | MODE_EXPECT);
