@@ -39,7 +39,7 @@ check "$result"
 srcml --srcql='$N' a.cpp --xmlns:pre=foo.com --attribute="pre:attr=value"
 check "$result"
 
-srcml --srcql="n" a.cpp --xmlns:pre=foo.com --attribute="pre:attr=value"
+srcml --srcql="n" a.cpp --xmlns:pre=foo.com --attribute="pre:attr=value" --srcql-warning-off
 check "$resultnop"
 
 # from standard input

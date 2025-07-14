@@ -66,6 +66,9 @@ int src_input_filelist(ParseQueue& queue,
            vbuffer.insert(vbuffer.end(), buffer, buffer + size);
     }
 
+    struct stat listFile;
+    stat(input_file.data(), &listFile);
+
     char* line = &vbuffer[0];
     while (line < &vbuffer[vbuffer.size() - 1]) {
 
@@ -92,8 +95,19 @@ int src_input_filelist(ParseQueue& queue,
         if (sline[0] == '#')
             continue;
 
-        // process this file
         srcml_input_src input(sline);
+
+        // verify that the filee ntry is not the same as the file list
+        struct stat fileEntry;
+        stat(input.resource.data(), &fileEntry);
+        if ((listFile.st_ino == fileEntry.st_ino) && (listFile.st_dev == fileEntry.st_dev)) {
+            std::string s = "srcml: WARNING Filelist entry duplicate of filelist: ";
+            s += input_file;
+            SRCMLstatus(WARNING_MSG, s);
+            continue;
+        }
+
+        // process this file
         auto fileStatus = srcml_handler_dispatch(queue, srcml_arch, srcml_request, input, destination);
         if (fileStatus == -1)
             return -1;

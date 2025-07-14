@@ -42,7 +42,6 @@ namespace std {
 namespace {
     // remove leading and trailing whitespace
     std::string_view trim_whitespace(std::string_view str) {
-
         const auto first = str.find_first_not_of(" \t\n\r");
         if (first == std::string::npos)
             return "";
@@ -54,7 +53,6 @@ namespace {
 
     // node text with normalized whitespace
     void get_node_text(const xmlNode* top_node, std::string& text, bool top) {
-
         // process list of nodes
         for (const xmlNode* node = top_node; node != NULL && (!top || node == top_node); node = node->next) {
             if (node->type == XML_TEXT_NODE) {
@@ -78,7 +76,6 @@ namespace {
 
     // node text with normalized whitespace
     std::string get_node_text(const xmlNode* top_node) {
-
         // use single string to avoid copying
         std::string s;
         get_node_text(top_node, s, true);
@@ -87,7 +84,6 @@ namespace {
 }
 
 void add_element(xmlXPathParserContext* ctxt, int nargs) {
-
     if (nargs < 3 || nargs > 5) {
         std::cerr << "Arg arity error" << std::endl;
         return;
@@ -262,7 +258,6 @@ void match_element(xmlXPathParserContext* ctxt, int nargs) {
 }
 
 void clear_elements(xmlXPathParserContext* ctxt, int nargs) {
-
     if (nargs > 1) {
         std::cerr << "Arg arity error" << std::endl;
         return;
@@ -286,7 +281,6 @@ void clear_elements(xmlXPathParserContext* ctxt, int nargs) {
 }
 
 void is_valid_element(xmlXPathParserContext* ctxt, int nargs) {
-
     if (nargs != 1) {
         std::cerr << "Arg arity error" << std::endl;
         return;

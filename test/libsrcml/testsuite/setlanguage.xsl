@@ -9,13 +9,6 @@
     setlanguage.xsl
 
     Converts srcML if statement test cases to while statement test cases
-
-    Michael L. Collard
-    collard@cs.kent.edu
-
-    Modified for testing by:
-    Michael John Decker
-    mdecker6@kent.edu
 -->
 
 <xsl:output method="xml" omit-xml-declaration="no" version="1.0" encoding="UTF-8" standalone="yes"/>

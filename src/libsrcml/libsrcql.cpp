@@ -13,20 +13,38 @@
 #include <string>
 #include <cstring>
 #include <unordered_map>
+#include <mutex>
+#include <shared_mutex>
+
+
 
 static std::unordered_map<std::string, std::string> queries;
+static std::shared_mutex queries_mutex;
 
 const char* srcql_convert_query_to_xpath(const char* src_query, const char* language) {
-
+    std::string key = std::string(language)+":"+src_query;
     std::string xpath;
 
-    if (auto search = queries.find(std::string(language)+":"+src_query); search != queries.end()) {
-        xpath = search->second;
+    // Shared lock for read
+    {
+        std::shared_lock lock(queries_mutex);
+        if (auto search = queries.find(key); search != queries.end()) {
+            xpath = search->second;
+        }
     }
-    else {
-        XPathGenerator generator(src_query,language);
-        xpath = generator.convert();
-        queries.insert(std::make_pair(std::string(language)+":"+src_query,xpath));
+
+    if(xpath.empty()) {
+        // Unqiue lock for write
+        std::unique_lock lock(queries_mutex);
+
+        if (auto search = queries.find(key); search != queries.end()) {
+            xpath = search->second;
+        }
+        else {
+            XPathGenerator generator(src_query,language);
+            xpath = generator.convert();
+            queries.insert(std::make_pair(key,xpath));
+        }
     }
 
     char* returned_xpath = new char[xpath.length()+1];

@@ -12,9 +12,9 @@
 
 class SRCMLOptions {
 public:
-    friend void enable(int option);
+    friend void enable(unsigned long long option);
 
-    static void set(int options) {
+    static void set(unsigned long long options) {
 
         opt = options;
     }
@@ -28,12 +28,12 @@ public:
     static int opt;
 };
 
-inline bool option(int option) {
+inline bool option(unsigned long long option) {
 
     return SRCMLOptions::get() & option;
 }
 
-inline void enable(int option) {
+inline void enable(unsigned long long option) {
 
     SRCMLOptions::opt |= option;
 }

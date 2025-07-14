@@ -254,7 +254,11 @@ const static srcMLState::MODE_TYPE MODE_FUNCTION_CALL;
 /** mode for in function call */
 const static srcMLState::MODE_TYPE MODE_IF_STATEMENT;
 
+/** mode to exclude the block content tag */
 const static srcMLState::MODE_TYPE MODE_NO_BLOCK_CONTENT;
+
+/** mode for c-attribute processing */
+const static srcMLState::MODE_TYPE MODE_INCLUDE_ATTRIBUTE;
 
 // Python modes
 const static srcMLState::MODE_TYPE MODE_EXCLUDE_NO_PAREN_TUPLES_PY;
