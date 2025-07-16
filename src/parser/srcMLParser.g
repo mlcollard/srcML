@@ -1197,18 +1197,21 @@ start_python[] {
         }
 
         // invoke the table to handle keywords and duplex keywords
-        // do not mark "type()" as a "type" statement, but as a function call
-        if (inMode(MODE_STATEMENT) && (LA(1) != PY_TYPE || next_token() != LPAREN)) {
+        if (inMode(MODE_STATEMENT)) {
             auto token = LA(1);
+            bool is_type_stmt = (token == PY_TYPE && (next_token() == NAME || identifier_list_tokens_set.member(next_token())));
+
             if (duplex_keyword_set.member((unsigned int) LA(1))) {
                 const auto lookup = duplexKeywords[token + (next_token() << 8)];
                 if (lookup)
                     token = lookup;
             }
 
-            const auto& rule = python_rules[token];
-            if (rule.elementToken && processRule(rule)) {
-                return;
+            if (LA(1) != PY_TYPE || is_type_stmt) {
+                const auto& rule = python_rules[token];
+                if (rule.elementToken && processRule(rule)) {
+                    return;
+                }
             }
         }
 

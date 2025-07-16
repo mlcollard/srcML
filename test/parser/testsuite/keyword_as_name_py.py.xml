@@ -102,7 +102,7 @@
 </unit>
 
 <unit revision="1.0.0" language="Python">
-<expr_stmt><expr><name>typedef</name> <operator>=</operator> <literal type="string">"typedef"</literal></expr></expr_stmt>
+<expr_stmt><expr><name>type</name> <operator>=</operator> <literal type="string">"type"</literal></expr></expr_stmt>
 </unit>
 
 <unit revision="1.0.0" language="Python">
@@ -187,6 +187,10 @@
 
 <unit revision="1.0.0" language="Python">
 <expr_stmt><expr><call><name>type</name><argument_list>()</argument_list></call></expr></expr_stmt>
+</unit>
+
+<unit revision="1.0.0" language="Python">
+<expr_stmt><expr><tuple><expr><name>type</name></expr>, <expr><name>params</name></expr></tuple> <operator>=</operator> <tuple><expr><literal type="number">0</literal></expr>, <expr><literal type="number">1</literal></expr></tuple></expr></expr_stmt>
 </unit>
 
 <unit revision="1.0.0" language="Python">
