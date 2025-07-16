@@ -127,18 +127,21 @@ set(PRETTY_FLAG_LONG "pretty")
 set(NULL_SEPARATOR_LONG "print0")
 set(NULL_SEPARATOR_SHORT "Z")
 
+set(SRCQL_WARNING_OFF_FLAG_LONG "srcql-warning-off")
+set(SRCQL_WARNING_OFF_FLAG_SHORT "F")
+
 # Custom commands for creating things using pandoc
 configure_file(${CMAKE_SOURCE_DIR}/doc/manpage/srcml.cfg ${CMAKE_BINARY_DIR}/srcml.md)
 add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/srcml.1
     COMMAND ${PANDOC_EXE} -s -t man ${CMAKE_BINARY_DIR}/srcml.1.md --output ${CMAKE_BINARY_DIR}/srcml.1
-    COMMENT Generating ${CMAKE_BINARY_DIR}/srcml.1
+    COMMENT "Generating ${CMAKE_BINARY_DIR}/srcml.1"
     DEPENDS ${CMAKE_BINARY_DIR}/srcml.1.md
 )
 
 configure_file(${CMAKE_SOURCE_DIR}/doc/manpage/srcml.cfg ${CMAKE_BINARY_DIR}/srcml.1.md)
 add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/srcml.html 
     COMMAND ${PANDOC_EXE} -s -t html ${CMAKE_BINARY_DIR}/srcml.1.md --output ${CMAKE_BINARY_DIR}/srcml.html
-    COMMENT Generating ${CMAKE_BINARY_DIR}/srcml.html
+    COMMENT "Generating ${CMAKE_BINARY_DIR}/srcml.html"
     DEPENDS ${CMAKE_BINARY_DIR}/srcml.1.md
 )
 

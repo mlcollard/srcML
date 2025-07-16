@@ -37,7 +37,7 @@ int src_input_filesystem(ParseQueue& queue,
                           std::string_view raw_input) {
 
     // with immediate directory "." lookup the current working directory
-    std::string_view input = raw_input;
+    std::string input = std::string(raw_input);
     if (input == "."sv) {
         char* cwd(getcwd(nullptr, 0));
         input = cwd;
@@ -94,6 +94,12 @@ int src_input_filesystem(ParseQueue& queue,
     for (auto& filename : files) {
 
         srcml_input_src input_file(filename);
+
+        // Skip any files that have a non-source-code extension that we support
+        // Prevents large non-source-code files from being processed, which takes a long
+        // time because srcml is reading the entire file
+        if (!srcml_check_extension(input_file.extension.data()))
+            input_file.skip = true;
 
         // If a directory contains archives skip them
         if (!(srcml_request.command & SRCML_COMMAND_PARSER_TEST) && !(input_file.archives.empty())) {

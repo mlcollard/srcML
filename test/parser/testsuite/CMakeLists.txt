@@ -24,7 +24,7 @@ endforeach()
 set(TESTFILES)
 
 # convert from input language to input extension
-set(LANGLIST "C++" "cpp" "C" "c" "Java" "java" "C#" "cs" "Objective-C" "m")
+set(LANGLIST "C++" "cpp" "C" "c" "Java" "java" "C#" "cs" "Objective-C" "m" "Python" "py")
 function(lang2ext LANG EXT)
     list(FIND LANGLIST "${LANG}" LANG_POS)
     math(EXPR EXT_POS "${LANG_POS} + 1")
@@ -112,9 +112,15 @@ foreach(GEN IN ITEMS ${SUITE})
 
         # base is C++, so these just get added
         list(APPEND TESTFILES "${URL}.cpp.xml")
-        setlanguage("C++" "${URL}" "Java" "C#" "Objective-C" "C")
+        setlanguage("C++" "${URL}" "Java" "C#" "Objective-C" "C" "Python")
 
     elseif(CATEGORY STREQUAL "LANGUAGE_ALL_GEN")
+
+        # explicitly generated
+        list(APPEND TESTFILES "${URL}.cpp.xml")
+        setlanguage("C++" "${URL}" "Java" "C#" "Objective-C" "C")
+
+    elseif(CATEGORY STREQUAL "LANGUAGE_ALL_NO_PYTHON")
 
         # explicitly generated
         list(APPEND TESTFILES "${URL}.cpp.xml")
@@ -151,7 +157,7 @@ foreach(GEN IN ITEMS ${SUITE})
 
         list(APPEND TESTFILES "${URL}.cpp.xml")
         setlanguage("C++" "${URL}" "C" "Objective-C")
- 
+
     elseif(CATEGORY STREQUAL "LANGUAGE_C_ONLY")
 
         list(APPEND TESTFILES "${URL}.c.xml")
@@ -160,6 +166,10 @@ foreach(GEN IN ITEMS ${SUITE})
     elseif(CATEGORY STREQUAL "LANGUAGE_JAVA")
 
         list(APPEND TESTFILES "${URL}.java.xml")
+
+    elseif(CATEGORY STREQUAL "LANGUAGE_PYTHON")
+
+        list(APPEND TESTFILES "${URL}.py.xml")
 
     elseif(CATEGORY STREQUAL "LANGUAGE_JAVA_GEN")
 
@@ -207,8 +217,9 @@ foreach(GENURL IN ITEMS ${TESTFILES})
     # Generate "formfeed" "comment" "block" "struct" "ifthenelse"
     foreach(VARIATION IN ITEMS "formfeed" "comment" "block" "struct" "preproc" "ifthenelse")
         # preproc and struct do not work with Java
+        # skip generating any of these tests for Python
         if((LANGEXT STREQUAL "java" AND (VARIATION STREQUAL "struct" OR VARIATION STREQUAL "preproc")) OR
-           (LANGEXT STREQUAL "cs" AND VARIATION STREQUAL "struct"))
+           (LANGEXT STREQUAL "cs" AND VARIATION STREQUAL "struct") OR (LANGEXT STREQUAL "py"))
             continue()
         endif()
 

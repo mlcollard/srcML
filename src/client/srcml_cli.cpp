@@ -567,7 +567,7 @@ srcml_request_t parseCLI11(int argc, char* argv[]) {
     }
 
     app.add_option("--srcql",
-        "Apply SRCQL query to each individual srcML unit")
+        "Apply SRCQL query to each individual srcML unit. Query must be in single quotes, e.g., 'FIND int $V;', to prevent shell variable expansion")
         ->type_name("SRCQL")
         ->group("QUERY & TRANSFORMATION");
 
@@ -582,6 +582,10 @@ srcml_request_t parseCLI11(int argc, char* argv[]) {
                 srcml_request.xpath_query_support.insert(srcml_request.xpath_query_support.begin(), std::make_pair(std::nullopt,std::nullopt));
             });
     }
+
+    app.add_flag_callback("--srcql-warning-off,-F", [&]() { srcml_request.command |= SRCML_COMMAND_SRCQL_WARNING_OFF; },
+        "Turn off warning for srcql queries that have no logical variables")
+        ->group("QUERY & TRANSFORMATION");
 
     app.add_option("--attribute",
         "Insert attribute PRE:NAME=\"VALUE\" into element results of XPath query in original unit")
@@ -765,6 +769,25 @@ srcml_request_t parseCLI11(int argc, char* argv[]) {
     } catch (const CLI::ParseError &e) {
         app.exit(e);
         exit(CLI_STATUS_ERROR);
+    }
+
+    // A srcql query should have at least one logical variable
+    for (const auto& trans : srcml_request.transformations) {
+
+        auto [protocol, resource] = src_prefix_split_uri(trans);
+
+        if (protocol != "srcql"sv)
+            continue;
+
+        if (!(srcml_request.command & SRCML_COMMAND_SRCQL_WARNING_OFF) && resource.find('$') == std::string::npos) {
+            std::cerr << "\033[31msrcml: WARNING The srcql query '" << resource << "'\n" <<
+                "does not contain a srcql logical variable that starts with a \033[1m$\033[0m.\n"
+                "\033[31mIf your srcql query was meant to contain a logical variable, then enclose the\n"
+                "entire query in single quotes, not double quotes, to prevent shell variable\n"
+                "expansion. If not, you can safely ignore this message or disable it with the\n"
+                "option \033[1;31m--srcql-warning-off\033[0m \033[31mor \033[1;31m-F\033[0m\033[31m.\033[0m\n\n";
+            break;
+        }
     }
 
     // make sure --text has an indication of language

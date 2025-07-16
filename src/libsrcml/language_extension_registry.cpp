@@ -40,6 +40,10 @@ language_extension_registry::language_extension_registry() : registered_language
     { "java", Language::LANGUAGE_JAVA },
     { "aj",   Language::LANGUAGE_JAVA },
     { "cs",   Language::LANGUAGE_CSHARP },
+    { "py",   Language::LANGUAGE_PYTHON },
+    { "pyi",  Language::LANGUAGE_PYTHON },
+    { "pyw",  Language::LANGUAGE_PYTHON },
+    { "pyz",  Language::LANGUAGE_PYTHON },
     /* { "m",    Language::LANGUAGE_OBJECTIVE_C | Language::LANGUAGE_C } */ }), use_cpp_for_c(false)
     {}
 
@@ -180,6 +184,11 @@ void language_extension_registry::register_standard_file_extensions() {
     register_user_ext("aj",   Language::LANGUAGE_JAVA);
 
     register_user_ext("cs",   Language::LANGUAGE_CSHARP);
+
+    register_user_ext("py",   Language::LANGUAGE_PYTHON);
+    register_user_ext("pyi",  Language::LANGUAGE_PYTHON);
+    register_user_ext("pyw",  Language::LANGUAGE_PYTHON);
+    register_user_ext("pyz",  Language::LANGUAGE_PYTHON);
 }
 
 /**

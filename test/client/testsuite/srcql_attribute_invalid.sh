@@ -8,7 +8,7 @@
 # test framework
 source $(dirname "$0")/framework_test.sh
 
-# must specify attribute after xpath query
+# must specify attribute after srcql query
 defineXML result <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:pre="foo.com" revision="REVISION">
@@ -43,7 +43,7 @@ check_exit 1
 srcml --attribute="pre:attr=value" --srcql='$N' archive.xml -o result.xml
 check_exit 1
 
-# test setting the attribute on xpath query results
+# test setting the attribute on srcql query results
 defineXML result <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">

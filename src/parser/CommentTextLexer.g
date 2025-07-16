@@ -60,32 +60,59 @@ tokens {
     LINE_COMMENT_END;
     RAW_STRING_END;
     STRING_END;
+    DQUOTE_DOCSTRING_END;
+    DQUOTE_DOXYGEN_END;
     CHAR_END;
+    SQUOTE_DOCSTRING_END;
+    SQUOTE_DOXYGEN_END;
     CONTROL_CHAR;
     LINE_DOXYGEN_COMMENT_END;
     JAVADOC_COMMENT_END;
     DOXYGEN_COMMENT_END;
+    HASHBANG_COMMENT_END;
+    HASHTAG_COMMENT_END;
+    PY_DQUOTE_STRING_START;
+    PY_SIMPLE_DQUOTE_STRING_END;
+    PY_SQUOTE_STRING_START;
+    PY_SIMPLE_SQUOTE_STRING_END;
 }
 
 {
 public:
 
-// particular mode that this lexer should end in
-int mode;
+    // particular mode that this lexer should end in
+    int mode;
 
-// preprocessor lines required unterminated strings to end early
-bool onpreprocline;
+    // preprocessor lines required unterminated strings to end early
+    bool onpreprocline;
 
-// ignore character escapes
-bool noescape;
+    // ignore character escapes
+    bool noescape;
 
-std::string delimiter1;
+    std::string delimiter1;
 
-std::string delimiter;
+    std::string delimiter;
 
-int dquote_count = 0;
+    int dquote_count = 0;                 // number of double-quotes for all languages (including Python)
+    int dquote_count_py = 0;              // differentiates double-quote Python strings from docstrings
+    bool skip_dquote_processing = false;  // ends simple Python strings/docstrings (e.g., "a", """b""", etc.)
+    bool is_multiple_dquotes = false;     // two or more consecutive double-quotes
+    bool in_dquotes = false;              // current token appears in a double-quote string
 
-OPTION_TYPE options;
+    int squote_count = 0;                 // number of single-quotes for all languages (including Python)
+    int squote_count_py = 0;              // differentiates single-quote Python strings from docstrings
+    bool skip_squote_processing = false;  // ends simple Python strings/docstrings (e.g., 'a', '''b''', etc.)
+    bool is_multiple_squotes = false;     // two or more consecutive single-quotes
+    bool in_squotes = false;              // current token appears in a single-quote string
+
+    // reset all quotation mark logic variables to their initial state
+    void resetQuoteState() {
+        dquote_count = 0, dquote_count_py = 0, squote_count = 0, squote_count_py = 0;
+        skip_dquote_processing = false, is_multiple_dquotes = false, in_dquotes = false;
+        skip_squote_processing = false, is_multiple_squotes = false, in_squotes = false;
+    }
+
+    OPTION_TYPE options;
 
 CommentTextLexer(const antlr::LexerSharedInputState& state, int language)
     : Language(language), antlr::CharScanner(state,true), mode(0), onpreprocline(false), noescape(false), delimiter1("")
@@ -175,7 +202,7 @@ COMMENT_TEXT {
 
             ;
 
-        } else if (mode == LINE_COMMENT_END || mode == LINE_DOXYGEN_COMMENT_END || (((mode == STRING_END || mode == RAW_STRING_END) || mode == CHAR_END) && (onpreprocline /* || rawstring */))) {
+        } else if (mode == LINE_COMMENT_END || mode == LINE_DOXYGEN_COMMENT_END || mode == HASHBANG_COMMENT_END || mode == HASHTAG_COMMENT_END || (((mode == STRING_END || mode == RAW_STRING_END) || mode == CHAR_END) && (onpreprocline /* || rawstring */))) {
           $setType(mode);
           selector->pop();
         }
@@ -190,13 +217,90 @@ COMMENT_TEXT {
     '\040'..'\041' |
 
     '\042' /* '\"' */
-        { dquote_count = 1; }
-        (options { greedy = true; } : { prevLA != '\\' || noescape }? '\042' { ++dquote_count; })*
+        {
+            dquote_count = 1;
+
+            if (mode == PY_SIMPLE_DQUOTE_STRING_END && (prevLA != '\\' || noescape)) {
+                mode = STRING_END;
+                resetQuoteState();
+                skip_dquote_processing = true;
+                $setType(mode);
+                selector->pop();
+            }
+
+            if (mode == SQUOTE_DOCSTRING_END || mode == SQUOTE_DOXYGEN_END || mode == CHAR_END)
+                in_squotes = true;
+        }
+        (options { greedy = true; } :
+            { !skip_dquote_processing && (prevLA != '\\' || noescape) }?
+            '\042'
+            {
+                ++dquote_count;
+
+                // 2 double quotes (+ 1 initial double quote) starts a Python docstring
+                if (!in_squotes && mode == PY_DQUOTE_STRING_START && dquote_count == 2)
+                    break;
+
+                // 5 double quotes (+ 1 initial double quote) is an empty triple-quoted Python string
+                if (!in_squotes && mode == PY_DQUOTE_STRING_START && dquote_count == 5)
+                    break;
+
+                // 3 ending double quotes should end the Python docstring
+                if (!in_squotes && (mode == DQUOTE_DOCSTRING_END || mode == DQUOTE_DOXYGEN_END) && dquote_count == 3) {
+                    resetQuoteState();
+                    skip_dquote_processing = true;
+                    $setType(mode);
+                    selector->pop();
+                    break;
+                }
+            }
+        )*
     {
-        if ((noescape && (dquote_count % 2 == 1)) ||
-            (!noescape && (prevLA != '\\') && (mode == STRING_END))) {
-            $setType(mode);
-            selector->pop();
+        // ignore Python double-quotes in single-quotes (e.g., '''"""a"""''')
+        if (in_squotes)
+            in_squotes = (LA(1) != '\047');  // keep ignoring if LA(1) is not a single quote
+        else if (skip_dquote_processing)
+            skip_dquote_processing = false;
+        else {
+            switch (mode) {
+                case PY_DQUOTE_STRING_START: {
+                    dquote_count_py = dquote_count + 1;
+                    mode = ((dquote_count_py == 3) ? DQUOTE_DOCSTRING_END : STRING_END);
+                    is_multiple_dquotes = true;
+
+                    if (mode == DQUOTE_DOCSTRING_END && LA(1) == '\041')
+                        mode = DQUOTE_DOXYGEN_END;
+
+                    // special case for empty strings (e.g., "" and """""", """""""""""", etc.)
+                    if (dquote_count_py == 2 || dquote_count_py % 6 == 0) {
+                        resetQuoteState();
+                        $setType(mode);
+                        selector->pop();
+                    }
+                    break;
+                }
+
+                default: {
+                    if (
+                        !is_multiple_dquotes
+                        && (
+                            (noescape && dquote_count % 2 == 1)
+                            || (!noescape && prevLA != '\\' && mode == STRING_END)
+                        )
+                    ) {
+                        resetQuoteState();
+                        $setType(mode);
+                        selector->pop();
+                    }
+
+                    if (is_multiple_dquotes && (dquote_count_py == dquote_count)) {
+                        resetQuoteState();
+                        $setType(mode);
+                        selector->pop();
+                    }
+                    break;
+                }
+            }
         }
     } |
 
@@ -204,10 +308,86 @@ COMMENT_TEXT {
 
     '&' |
 
-    '\047' /* '\'' */ {
-        if (prevLA != '\\' && mode == CHAR_END) {
-            $setType(mode);
-            selector->pop();
+    '\047' /* '\'' */
+        {
+            squote_count = 1;
+
+            if (mode == PY_SIMPLE_SQUOTE_STRING_END && (prevLA != '\\' || noescape)) {
+                mode = CHAR_END;
+                resetQuoteState();
+                skip_squote_processing = true;
+                $setType(mode);
+                selector->pop();
+            }
+
+            if (mode == DQUOTE_DOCSTRING_END || mode == DQUOTE_DOXYGEN_END || mode == STRING_END)
+                in_dquotes = true;
+        }
+        (options { greedy = true; } :
+            { !skip_squote_processing && (mode == PY_SQUOTE_STRING_START || is_multiple_squotes) && (prevLA != '\\' || noescape) }?
+            '\047'
+            {
+                ++squote_count;
+
+                // 2 single quotes (+ 1 initial single quote) starts a Python docstring
+                if (!in_dquotes && mode == PY_SQUOTE_STRING_START && squote_count == 2)
+                    break;
+
+                // 5 single quotes (+ 1 initial single quote) is an empty triple-quoted Python string
+                if (!in_dquotes && mode == PY_SQUOTE_STRING_START && squote_count == 5)
+                    break;
+
+                // 3 ending single quotes should end the Python docstring
+                if (!in_dquotes && (mode == SQUOTE_DOCSTRING_END || mode == SQUOTE_DOXYGEN_END) && squote_count == 3) {
+                    resetQuoteState();
+                    skip_squote_processing = true;
+                    $setType(mode);
+                    selector->pop();
+                    break;
+                }
+            }
+        )*
+    {
+        // ignore Python single-quotes in double-quotes (e.g., """'''a'''""")
+        if (in_dquotes)
+            in_dquotes = (LA(1) != '\042');  // keep ignoring if LA(1) is not a double quote
+        else if (skip_squote_processing)
+            skip_squote_processing = false;
+        else {
+            switch (mode) {
+                case PY_SQUOTE_STRING_START: {
+                    squote_count_py = squote_count + 1;
+                    mode = ((squote_count_py == 3) ? SQUOTE_DOCSTRING_END : CHAR_END);
+                    is_multiple_squotes = true;
+
+                    // found three double-quotes and an exclamation mark
+                    if (mode == SQUOTE_DOCSTRING_END && LA(1) == '\041')
+                        mode = SQUOTE_DOXYGEN_END;
+
+                    // special case for empty strings (e.g., '' and '''''', '''''''''''', etc.)
+                    if (squote_count_py == 2 || squote_count_py % 6 == 0) {
+                        resetQuoteState();
+                        $setType(mode);
+                        selector->pop();
+                    }
+                    break;
+                }
+
+                default: {
+                    if (!is_multiple_squotes && (prevLA != '\\' && mode == CHAR_END)) {
+                        resetQuoteState();
+                        $setType(mode);
+                        selector->pop();
+                    }
+
+                    if (is_multiple_squotes && (squote_count_py == squote_count)) {
+                        resetQuoteState();
+                        $setType(mode);
+                        selector->pop();
+                    }
+                    break;
+                }
+            }
         }
     } |
 
@@ -267,7 +447,7 @@ COMMENT_TEXT {
         } else if (_ttype == COMMENT_TEXT &&
             ((LA(1) == '\n' && mode != RAW_STRING_END) || LA(1) == EOF_CHAR) &&
             ((((mode == STRING_END || mode == RAW_STRING_END) || mode == CHAR_END) && (onpreprocline || mode == RAW_STRING_END))
-             || mode == LINE_COMMENT_END || mode == LINE_DOXYGEN_COMMENT_END)) {
+             || mode == LINE_COMMENT_END || mode == LINE_DOXYGEN_COMMENT_END || mode == HASHBANG_COMMENT_END || mode == HASHTAG_COMMENT_END)) {
 
             $setType(mode);
             selector->pop();
