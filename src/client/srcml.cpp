@@ -53,9 +53,14 @@ int main(int argc, char* argv[]) {
 
     // version
     if (option(SRCML_COMMAND_VERSION)) {
-        std::cout << "srcml markup " << srcml_markup_version_string("C++") << '\n'
-                  << "srcml client " << SRCML_CLIENT_VERSION_STRING << '\n'
-                  << "libsrcml " << srcml_libsrcml_version_string() << '\n';
+
+        // output the supported srcML source-code languages
+        for (int i = 0; i < srcml_get_language_list_size(); ++i) {
+            std::cout << "srcml " << srcml_get_language_list(i) << ": " << srcml_markup_version_string(srcml_get_language_list(i)) << '\n';
+        }
+
+        std::cout << "srcml client: " << SRCML_CLIENT_VERSION_STRING << '\n'
+                  << "libsrcml: " << srcml_libsrcml_version_string() << '\n';
         return 0;
     }
 
