@@ -115,7 +115,7 @@ public:
     OPTION_TYPE options;
 
 CommentTextLexer(const antlr::LexerSharedInputState& state, int language)
-    : Language(language), antlr::CharScanner(state,true), mode(0), onpreprocline(false), noescape(false), delimiter1("")
+    : antlr::CharScanner(state, true), Language(language), mode(0), onpreprocline(false), noescape(false), delimiter1("")
 {}
 
 private:
