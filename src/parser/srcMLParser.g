@@ -2594,7 +2594,7 @@ objective_c_parameter[] { CompleteElement element(this); ENTRY_DEBUG } :
 
   Handles an Objective-C property declaration.
 */
-property_declaration[] { int type_count = 0; int secondtoken = 0; int after_token = 0; STMT_TYPE stmt_type = NONE; ENTRY_DEBUG } :
+property_declaration[] { ENTRY_DEBUG } :
         {
             startNewMode(MODE_STATEMENT);
 
@@ -9477,7 +9477,6 @@ expression_part_plus_linq_no_ternary[CALL_TYPE type = NOCALL, int call_count = 1
 expression_part_no_ternary[CALL_TYPE type = NOCALL, int call_count = 1] {
         bool flag;
         bool isempty = false;
-        bool end_control_incr = false;
 
         ENTRY_DEBUG
 } :
@@ -12221,7 +12220,7 @@ literals[] { ENTRY_DEBUG } :
   Handles double-quoted strings, docstrings, and doxygen strings in Python.
   Only the start and the end of strings are put directly through the parser.  The contents of the string are handled as whitespace.
 */
-dquote_literal_py[bool markup = true] {
+dquote_literal_py[] {
         LightweightElement element(this);
         bool is_docstring = (LA(1) == DQUOTE_DOCSTRING_START);
         bool is_doxygen = (next_token() == DQUOTE_DOXYGEN_END);
@@ -15394,7 +15393,7 @@ condition_py[] { ENTRY_DEBUG } :
 
   Handles a Python "as" expression on its own.
 */
-alias_py[] { CompleteElement element(this); int lparen_types_size = 0; ENTRY_DEBUG } :
+alias_py[] { CompleteElement element(this); size_t lparen_types_size = 0; ENTRY_DEBUG } :
         {
             // end the current expression before starting the alias
             if (inMode(MODE_EXPRESSION)) {
@@ -15630,7 +15629,7 @@ range_in_py[] { SingleElement element(this); ENTRY_DEBUG } :
   Handles a Python "in" expression in a comprehension using the range tag.
   An "if" expression can appear after the "in" expression (only for comprehensions).
 */
-comprehension_range_py[] { int lparen_types_size = 0; ENTRY_DEBUG } :
+comprehension_range_py[] { size_t lparen_types_size = 0; ENTRY_DEBUG } :
         {
             startNewMode(MODE_RANGE_IN_PY);
 
@@ -15705,7 +15704,7 @@ comprehension_range_py[] { int lparen_types_size = 0; ENTRY_DEBUG } :
 
   Handles an "if" in a Python comprehension differently from other "if" expressions.
 */
-comprehension_if_py[] { bool multiple_ifs = false; int lparen_types_size = 0; ENTRY_DEBUG } :
+comprehension_if_py[] { bool multiple_ifs = false; size_t lparen_types_size = 0; ENTRY_DEBUG } :
         {
             lparen_types_size = lparen_types_py.size();  // do not end call RPAREN early
         }
@@ -15853,14 +15852,7 @@ python_generic_parameter_list[] { CompleteElement element(this); ENTRY_DEBUG } :
 
   Handles a Python parameter.  Python parameters have many forms (e.g., modifier, args, kwargs).
 */
-complete_python_parameter[] {
-        int type_count = 0;
-        int secondtoken = 0;
-        int after_token = 0;
-        STMT_TYPE stmt_type = NONE;
-
-        ENTRY_DEBUG
-} :
+complete_python_parameter[] { ENTRY_DEBUG } :
         {
             startNewMode(MODE_PARAMETER);
 
@@ -15933,7 +15925,7 @@ complete_python_parameter[] {
 
   Handles a Python parameter annotation.
 */
-parameter_annotation_py[] { int lparen_types_size = 0; bool found_init = false; ENTRY_DEBUG } :
+parameter_annotation_py[] { size_t lparen_types_size = 0; bool found_init = false; ENTRY_DEBUG } :
         {
             // This is possible if called after handling an arbitrary positional parameter
             // or arbitrary keyword parameter in complete_python_parameter.  In a Python
@@ -16083,7 +16075,7 @@ function_annotation_py[] { ENTRY_DEBUG } :
   Handles a Python super list, used primarily with classes.
   Operates under the assumption MODE_SUPER_LIST_PY is one of the current modes.
 */
-python_super_list[] { CompleteElement element(this); int lparen_types_size = 0; ENTRY_DEBUG } :
+python_super_list[] { CompleteElement element(this); size_t lparen_types_size = 0; ENTRY_DEBUG } :
         {
             assertMode(MODE_SUPER_LIST_PY);
 
@@ -16419,7 +16411,7 @@ start_comprehension_py[] { ENTRY_DEBUG } :
 
   Handles a Python lambda.  Not used directly, but can be called by expression_part.
 */
-lambda_py[] { CompleteElement element(this); int lparen_types_size = 0; ENTRY_DEBUG } :
+lambda_py[] { CompleteElement element(this); size_t lparen_types_size = 0; ENTRY_DEBUG } :
         {
             startNewMode(MODE_EXCLUDE_NO_PAREN_TUPLES_PY | MODE_LAMBDA_PY);
 
@@ -16719,13 +16711,7 @@ perform_dictionary_check_py[] returns [int is_dictionary] {
 
   Handles Python tuples.  Not used directly, but can be called by expression_part.
 */
-tuple_py[] {
-        CompleteElement element(this);
-        int num_starting_operator_lparen = 0;
-        bool use_operator_lparen = false;
-
-        ENTRY_DEBUG
-} :
+tuple_py[] { CompleteElement element(this); ENTRY_DEBUG } :
         {
             startNewMode(MODE_EXCLUDE_NO_PAREN_TUPLES_PY | MODE_LOCAL | MODE_TOP | MODE_LIST | MODE_TUPLE_PY);
 
@@ -16872,7 +16858,7 @@ perform_tuple_check_py[] returns [bool is_tuple] {
   Handles Python tuples that do not use parentheses.
   Not used directly, but can be called by expression_part.
 */
-tuple_no_paren_py[] { CompleteElement element(this); int lparen_types_size = 0; ENTRY_DEBUG } :
+tuple_no_paren_py[] { CompleteElement element(this); size_t lparen_types_size = 0; ENTRY_DEBUG } :
         {
             startNewMode(MODE_EXCLUDE_NO_PAREN_TUPLES_PY | MODE_LOCAL | MODE_TOP | MODE_LIST | MODE_TUPLE_NO_PAREN_PY);
 
@@ -16980,7 +16966,7 @@ perform_tuple_check_no_paren_py[] returns [bool is_tuple] {
 
   Handles Python ternaries.  Used in multiple places.
 */
-ternary_py[bool is_nested = false] { CompleteElement element(this); int lparen_types_size = 0; ENTRY_DEBUG } :
+ternary_py[bool is_nested = false] { CompleteElement element(this); size_t lparen_types_size = 0; ENTRY_DEBUG } :
         {
             startNewMode(MODE_TERNARY);
             startElement(STERNARY);
@@ -17156,7 +17142,7 @@ yield_expression_py[] { bool is_yield_from = (next_token() == PY_FROM); ENTRY_DE
 operator_parenthesis_complete_py[] {
         CompleteElement element(this);
         TokenPosition tp;
-        int lparen_types_size = 0;
+        size_t lparen_types_size = 0;
 
         ENTRY_DEBUG
 } :
@@ -17458,7 +17444,7 @@ perform_subscriptable_function_call_check_py returns [bool is_call] {
 
   Handles a Python type alias annotation.
 */
-type_alias_annotation_py[] { int lparen_types_size = 0; ENTRY_DEBUG } :
+type_alias_annotation_py[] { size_t lparen_types_size = 0; ENTRY_DEBUG } :
         {
             startNewMode(MODE_ANNOTATION_PY);
 
@@ -17554,7 +17540,7 @@ control_initialization_py[] { ENTRY_DEBUG } :
   Handles Python tuples that do not use parentheses that occur in the control portion of a for-loop
   or comprehension. Not used directly, but can be called by control_initialization_py.
 */
-control_tuple_no_paren_py[] { int lparen_types_size = 0; ENTRY_DEBUG } :
+control_tuple_no_paren_py[] { size_t lparen_types_size = 0; ENTRY_DEBUG } :
         {
             if (!inMode(MODE_EXPRESSION)) {
                 startNewMode(MODE_EXPRESSION | MODE_EXPECT);
