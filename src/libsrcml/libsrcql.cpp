@@ -16,10 +16,18 @@
 #include <mutex>
 #include <shared_mutex>
 
-
-
 static std::unordered_map<std::string, std::string> queries;
 static std::shared_mutex queries_mutex;
+
+// The current version of srcQL as a number
+int srcql_version_number() {
+    return SRCQL_VERSION_NUMBER;
+}
+
+// The current version of srcQL as a string
+const char* srcql_version_string() {
+    return SRCQL_VERSION_STRING;
+}
 
 const char* srcql_convert_query_to_xpath(const char* src_query, const char* language) {
     std::string key = std::string(language)+":"+src_query;
