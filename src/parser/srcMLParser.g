@@ -917,7 +917,11 @@ start[] { ++start_count; ENTRY_DEBUG_START ENTRY_DEBUG } :
         offside_dedent |
 
         // characters with special actions that usually end currently open elements
-        { !inTransparentMode(MODE_INTERNAL_END_CURLY) }?
+        // special case for blocks (e.g., lambda capture) in lcurly argument lists
+        {
+            !inTransparentMode(MODE_INTERNAL_END_CURLY)
+            || (inMode(MODE_BLOCK_CONTENT) && inTransparentMode(MODE_ARGUMENT | MODE_LIST))
+        }?
         block_end |
 
         terminate |
