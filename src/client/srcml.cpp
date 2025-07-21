@@ -55,7 +55,7 @@ int main(int argc, char* argv[]) {
     if (option(SRCML_COMMAND_VERSION)) {
 
         // output the supported srcML source-code languages
-        for (int i = 0; i < srcml_get_language_list_size(); ++i) {
+        for (size_t i = 0; i < srcml_get_language_list_size(); ++i) {
             std::cout << "srcml " << srcml_get_language_list(i) << ": " << srcml_markup_version_string(srcml_get_language_list(i)) << '\n';
         }
 
