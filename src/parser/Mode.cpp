@@ -10,7 +10,7 @@
 #include <ModeStack.hpp>
 
 // Constant MODE_TYPE with bit set
-static constexpr srcMLState::MODE_TYPE bit(size_t pos) {
+static srcMLState::MODE_TYPE bit(size_t pos) {
     return srcMLState::MODE_TYPE{}.set(pos);
 }
 
