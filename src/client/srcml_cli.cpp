@@ -667,7 +667,6 @@ srcml_request_t parseCLI11(int argc, char* argv[]) {
             srcml_request.xpath_query_support.back().first = element{ value.substr(0, elemn_index), value.substr(elemn_index + 1) };
         });
 
-    auto xslt =
     app.add_option("--xslt",
         "Apply the XSLT program FILE to each unit, where FILE can be a url")
         ->type_name("FILE")
