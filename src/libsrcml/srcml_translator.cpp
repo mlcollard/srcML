@@ -30,6 +30,10 @@
 #include <srcml_types.hpp>
 #include <unit_utilities.hpp>
 #include <srcMLOutput.hpp>
+#include <DocstringPython.hpp>
+#include <OffSideRule.hpp>
+#include <NewlineTerminatePython.hpp>
+#include <NameDifferentiatorPython.hpp>
 
 using namespace ::std::literals::string_view_literals;
 
@@ -140,14 +144,41 @@ void srcml_translator::translate(UTF8CharBuffer* parser_input) {
         selector.addInputStream(&textlexer, "text");
         selector.select(&lexer);
 
-        // base stream parser srcML connected to lexical analyzer
-        StreamMLParser parser(selector, getLanguage(), options);
+        if (getLanguage() == LANGUAGE_PYTHON) {
+            // intermediate token stage
+            DocstringPython docstring(selector);
+            docstring.setBlockStartToken(srcMLParser::PY_COLON);
 
-        // connect local parser to attribute for output
-        out.setTokenStream(parser);
+            // intermediate token stage
+            NameDifferentiatorPython differentiator(docstring);
+            differentiator.setBlockStartToken(srcMLParser::PY_COLON);
 
-        // parse and form srcML output with unit attributes
-        out.consume(getLanguageString(), revision, url, filename, version, timestamp, hash, encoding);
+            // intermediate token stage
+            OffSideRule offside(differentiator);
+            offside.setBlockStartToken(srcMLParser::PY_COLON);
+
+            // intermediate token stage
+            NewlineTerminatePython terminate(offside);
+
+            // base stream parser srcML connected to lexical analyzer
+            StreamMLParser parser(terminate, getLanguage(), options);
+
+            // connect local parser to attribute for output
+            out.setTokenStream(parser);
+
+            // parse and form srcML output with unit attributes
+            out.consume(getLanguageString(), revision, url, filename, version, timestamp, hash, encoding);
+        }
+        else {
+            // base stream parser srcML connected to lexical analyzer
+            StreamMLParser parser(selector, getLanguage(), options);
+
+            // connect local parser to attribute for output
+            out.setTokenStream(parser);
+
+            // parse and form srcML output with unit attributes
+            out.consume(getLanguageString(), revision, url, filename, version, timestamp, hash, encoding);
+        }
 
     } catch (const std::exception& e) {
         fprintf(stderr, "SRCML Exception: %s\n", e.what());

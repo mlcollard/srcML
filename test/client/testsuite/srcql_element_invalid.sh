@@ -8,7 +8,7 @@
 # test framework
 source $(dirname "$0")/framework_test.sh
 
-# test specify element after xpath (archive)
+# test specify element after srcql (archive)
 defineXML result <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:pre="foo.com" revision="REVISION">
@@ -29,20 +29,20 @@ createfile b.cpp "b;
 
 srcml a.cpp b.cpp --xmlns:pre=foo.com -o archive.xml
 
-srcml archive.xml --element="pre:element" --xpath="//src:name"
+srcml archive.xml --element="pre:element" --srcql='FIND $N'
 check_exit 1
 
-srcml --element="pre:element" --xpath="//src:name" archive.xml
+srcml --element="pre:element" --srcql='FIND $N' archive.xml
 check_exit 1
 
 # output to a file
-srcml archive.xml --element="pre:element" --xpath="//src:name" -o result.xml
+srcml archive.xml --element="pre:element" --srcql='FIND $N' -o result.xml
 check_exit 1
 
-srcml --element="pre:element" --xpath="//src:name" archive.xml -o result.xml
+srcml --element="pre:element" --srcql='FIND $N' archive.xml -o result.xml
 check_exit 1
 
-# test specify element after xpath (unit)
+# test specify element after srcql (unit)
 defineXML result <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:pre="foo.com" revision="REVISION">
@@ -58,22 +58,22 @@ createfile sub/a.cpp "a;
 srcml sub/a.cpp --xmlns:pre=foo.com -o sub/a.xml
 
 # from a file
-srcml sub/a.xml --element="pre:element" --xpath="//src:name"
+srcml sub/a.xml --element="pre:element" --srcql='FIND $N'
 check_exit 1
 
-srcml --element="pre:element" --xpath="//src:name" sub/a.xml
+srcml --element="pre:element" --srcql='FIND $N' sub/a.xml
 check_exit 1
 
 # from standard input
-echo "a;" | srcml -l C++ --element="pre:element" --xpath="//src:name"
+echo "a;" | srcml -l C++ --element="pre:element" --srcql='FIND $N'
 check_exit 1
 
 # output to a file
-srcml sub/a.xml --element="pre:element" --xpath="//src:name" -o result.xml
+srcml sub/a.xml --element="pre:element" --srcql='FIND $N' -o result.xml
 check_exit 1
 
-srcml --element="pre:element" --xpath="//src:name" sub/a.xml -o result.xml
+srcml --element="pre:element" --srcql='FIND $N' sub/a.xml -o result.xml
 check_exit 1
 
-echo "a;" | srcml -l C++ --element="pre:element" --xpath="//src:name" -o result.xml
+echo "a;" | srcml -l C++ --element="pre:element" --srcql='FIND $N' -o result.xml
 check_exit 1

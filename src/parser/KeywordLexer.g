@@ -315,6 +315,42 @@ tokens {
     OMP_OMP;
 
     ASSIGNMENT; // +=, -=, etc.
+
+    // Python
+    EXPONENTIATION;
+    LITERAL_ELLIPSIS;
+    LITERAL_NONE;
+    PY_2_EXEC;
+    PY_2_PRINT;
+    PY_ALIAS;
+    PY_AND;
+    PY_ARROW;
+    PY_ASYNC;
+    PY_ATSIGN;
+    PY_AWAIT;
+    PY_CASE;
+    PY_COLON;
+    PY_DELETE;
+    PY_ELIF;
+    PY_EXCEPT;
+    PY_FROM;
+    PY_FUNCTION;
+    PY_GLOBAL;
+    PY_IMPORT;
+    PY_IN;
+    PY_IS;
+    PY_LAMBDA;
+    PY_LCURLY;
+    PY_MATCH;
+    PY_NONLOCAL;
+    PY_NOT;
+    PY_OR;
+    PY_PASS;
+    PY_RAISE;
+    PY_RCURLY;
+    PY_TYPE;
+    PY_WITH;
+    PY_YIELD;
 }
 
 {
@@ -685,7 +721,7 @@ KeywordLexer(UTF8CharBuffer* pinput, int language, OPTION_TYPE & options,
         { "__strong"        , STRONG           , LANGUAGE_CXX | LANGUAGE_C | LANGUAGE_OBJECTIVE_C },
 
 
-        // Combined C/C++ Mode  at end so overrides defaults
+        // Combined C/C++ Mode at end so overrides defaults
         { "restrict"     , CRESTRICT         , LANGUAGE_CXX },
         { "try"          , CXX_TRY           , LANGUAGE_CXX },
         { "catch"        , CXX_CATCH         , LANGUAGE_CXX },
@@ -694,6 +730,79 @@ KeywordLexer(UTF8CharBuffer* pinput, int language, OPTION_TYPE & options,
         // OpenMp
         { "omp"          , OMP_OMP           , LANGUAGE_C_FAMILY },
 
+        // Python special characters or operators
+        { "}"            , PY_RCURLY         , LANGUAGE_PYTHON },
+        { "{"            , PY_LCURLY         , LANGUAGE_PYTHON },
+        { ":"            , PY_COLON          , LANGUAGE_PYTHON },
+        { "@"            , PY_ATSIGN         , LANGUAGE_PYTHON },
+        { "**"           , EXPONENTIATION    , LANGUAGE_PYTHON },
+        { "..."          , LITERAL_ELLIPSIS  , LANGUAGE_PYTHON },
+        { "->"           , PY_ARROW          , LANGUAGE_PYTHON },
+        { "and"          , PY_AND            , LANGUAGE_PYTHON },
+        { "await"        , PY_AWAIT          , LANGUAGE_PYTHON },
+        { "in"           , PY_IN             , LANGUAGE_PYTHON },
+        { "is"           , PY_IS             , LANGUAGE_PYTHON },
+        { "not"          , PY_NOT            , LANGUAGE_PYTHON },
+        { "or"           , PY_OR             , LANGUAGE_PYTHON },
+
+        // Existing language keywords that are names in Python
+        { "__asm"        , NAME              , LANGUAGE_PYTHON },
+        { "__volatile__" , NAME              , LANGUAGE_PYTHON },
+        { "catch"        , NAME              , LANGUAGE_PYTHON },
+        { "const"        , NAME              , LANGUAGE_PYTHON },
+        { "default"      , NAME              , LANGUAGE_PYTHON },
+        { "do"           , NAME              , LANGUAGE_PYTHON },
+        { "enum"         , NAME              , LANGUAGE_PYTHON },
+        { "extern"       , NAME              , LANGUAGE_PYTHON },
+        { "explicit"     , NAME              , LANGUAGE_PYTHON },
+        { "false"        , NAME              , LANGUAGE_PYTHON },
+        { "goto"         , NAME              , LANGUAGE_PYTHON },
+        { "inline"       , NAME              , LANGUAGE_PYTHON },
+        { "main"         , NAME              , LANGUAGE_PYTHON },
+        { "namespace"    , NAME              , LANGUAGE_PYTHON },
+        { "new"          , NAME              , LANGUAGE_PYTHON },
+        { "omp"          , NAME              , LANGUAGE_PYTHON },
+        { "operator"     , NAME              , LANGUAGE_PYTHON },
+        { "private"      , NAME              , LANGUAGE_PYTHON },
+        { "protected"    , NAME              , LANGUAGE_PYTHON },
+        { "public"       , NAME              , LANGUAGE_PYTHON },
+        { "sizeof"       , NAME              , LANGUAGE_PYTHON },
+        { "static"       , NAME              , LANGUAGE_PYTHON },
+        { "struct"       , NAME              , LANGUAGE_PYTHON },
+        { "switch"       , NAME              , LANGUAGE_PYTHON },
+        { "throw"        , NAME              , LANGUAGE_PYTHON },
+        { "true"         , NAME              , LANGUAGE_PYTHON },
+        { "typedef"      , NAME              , LANGUAGE_PYTHON },
+        { "using"        , NAME              , LANGUAGE_PYTHON },
+        { "virtual"      , NAME              , LANGUAGE_PYTHON },
+        { "volatile"     , NAME              , LANGUAGE_PYTHON },
+
+        // Python
+        { "as"           , PY_ALIAS          , LANGUAGE_PYTHON },
+        { "assert"       , ASSERT            , LANGUAGE_PYTHON },
+        { "async"        , PY_ASYNC          , LANGUAGE_PYTHON },
+        { "case"         , PY_CASE           , LANGUAGE_PYTHON },
+        { "def"          , PY_FUNCTION       , LANGUAGE_PYTHON },
+        { "del"          , PY_DELETE         , LANGUAGE_PYTHON },
+        { "elif"         , PY_ELIF           , LANGUAGE_PYTHON },
+        { "except"       , PY_EXCEPT         , LANGUAGE_PYTHON },
+        { "exec"         , PY_2_EXEC         , LANGUAGE_PYTHON },
+        { "False"        , LITERAL_FALSE     , LANGUAGE_PYTHON },
+        { "finally"      , FINALLY           , LANGUAGE_PYTHON },
+        { "from"         , PY_FROM           , LANGUAGE_PYTHON },
+        { "global"       , PY_GLOBAL         , LANGUAGE_PYTHON },
+        { "import"       , PY_IMPORT         , LANGUAGE_PYTHON },
+        { "lambda"       , PY_LAMBDA         , LANGUAGE_PYTHON },
+        { "match"        , PY_MATCH          , LANGUAGE_PYTHON },
+        { "None"         , LITERAL_NONE      , LANGUAGE_PYTHON },
+        { "nonlocal"     , PY_NONLOCAL       , LANGUAGE_PYTHON },
+        { "pass"         , PY_PASS           , LANGUAGE_PYTHON },
+        { "print"        , PY_2_PRINT        , LANGUAGE_PYTHON },
+        { "raise"        , PY_RAISE          , LANGUAGE_PYTHON },
+        { "True"         , LITERAL_TRUE      , LANGUAGE_PYTHON },
+        { "type"         , PY_TYPE           , LANGUAGE_PYTHON },
+        { "with"         , PY_WITH           , LANGUAGE_PYTHON },
+        { "yield"        , PY_YIELD          , LANGUAGE_PYTHON },
    };
 
     // fill up the literals for the language that we are parsing

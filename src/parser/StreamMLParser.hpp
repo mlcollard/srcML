@@ -192,7 +192,14 @@ private:
             }
 
             // more partial parsing to do
-            srcMLParser::start();
+            switch (getLanguage()) {
+            case LANGUAGE_PYTHON:
+                srcMLParser::start_python();
+                break;
+
+            default:
+                srcMLParser::start();
+            }
 
         } catch (const std::exception&) {
 
@@ -415,6 +422,65 @@ private:
                     pushESkipToken(srcMLParser::SLINECOMMENT);
                     pushSkipToken();
                     srcMLParser::consume();
+                }
+
+                break;
+
+            case srcMLParser::HASHBANG_COMMENT_START:
+
+                pushSSkipToken(srcMLParser::SHASHBANG_COMMENT);
+                pushSkipToken();
+                srcMLParser::consume();
+
+                open_comments.push(srcMLParser::SHASHBANG_COMMENT);
+
+                break;
+
+            case srcMLParser::HASHBANG_COMMENT_END:
+
+                open_comments.pop();
+
+                if (srcMLParser::LT(1)->getText().back() != '\n') {
+                    pushSkipToken();
+                    srcMLParser::consume();
+                    pushESkipToken(srcMLParser::SHASHBANG_COMMENT);
+                } else {
+                    pushESkipToken(srcMLParser::SHASHBANG_COMMENT);
+                    pushSkipToken();
+                    srcMLParser::consume();
+                }
+
+
+                break;
+
+            case srcMLParser::HASHTAG_COMMENT_START:
+
+                pushSSkipToken(srcMLParser::SHASHTAG_COMMENT);
+                pushSkipToken();
+                srcMLParser::consume();
+
+                open_comments.push(srcMLParser::SHASHTAG_COMMENT);
+
+                break;
+
+            case srcMLParser::HASHTAG_COMMENT_END:
+
+                open_comments.pop();
+
+                if (srcMLParser::LT(1)->getText().back() != '\n') {
+                    pushSkipToken();
+                    srcMLParser::consume();
+                    pushESkipToken(srcMLParser::SHASHTAG_COMMENT);
+                } else {
+                    pushESkipToken(srcMLParser::SHASHTAG_COMMENT);
+                    pushSkipToken();
+                    srcMLParser::consume();
+                }
+
+                // null out any inserted terminate after a comment
+                if (srcMLParser::LT(1)->getType() == srcMLParser::TERMINATE &&
+                    srcMLParser::LT(1)->getText() == "") {
+                    srcMLParser::LT(1)->setType(srcMLParser::SNOP);
                 }
 
                 break;

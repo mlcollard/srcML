@@ -26,7 +26,7 @@ class srcMLState {
 public:
 
     /** type of mode for GNU */
-    typedef std::bitset<128> MODE_TYPE;
+    typedef std::bitset<256> MODE_TYPE;
 
     /**
      * srcMLState

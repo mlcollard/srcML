@@ -98,30 +98,44 @@ tokens {
 OPERATORS options { testLiterals = true; } {
     int start = LA(1);
 } : (
-    '#'
-    {
-        if (startline) {
+    // # (C++ or Python), #! (Python)
+    '#' (
+        { (inLanguage(LANGUAGE_PYTHON)) && LA(1) == '!' }?
+            { $setType(HASHBANG_COMMENT_START); changetotextlexer(HASHBANG_COMMENT_END); } |
 
-            $setType(PREPROC); 
+        { inLanguage(LANGUAGE_PYTHON) && LA(1) != '!' }?
+            { $setType(HASHTAG_COMMENT_START); changetotextlexer(HASHTAG_COMMENT_END); } |
 
-            // record that we are on a preprocessor line,
-            // primarily so that unterminated strings in
-            // a preprocessor line will end at the right spot
-            onpreprocline = true; 
-            //firstpreprocline = true;
-        }
-    } |
+        { startline }?
+            {
+                $setType(PREPROC);
+
+                // record that we are on a preprocessor line,
+                // primarily so that unterminated strings in
+                // a preprocessor line will end at the right spot
+                onpreprocline = true;
+                //firstpreprocline = true;
+            }
+    )? |
 
     '+' ('+' | '=')? |
-    '-' ('-' | '=' | '>' ('*')? )?  |
-    '*' ('=')? |
+    '-' ('-' | '=' | '>' ('*')? )? |
+
+    // *, *=, ** (Python), **= (Python)
+    '*' ({ inLanguage(LANGUAGE_PYTHON) }? '*')? ('=')? |
+
     '%' ('=')? |
     '^' ('=')? |
     '|' ('|')? ('=')? |
     '`' |
-    '!' ('=')? |
-    ':' (':')? |
 
+    // !, !=
+    '!' ('=')? |
+
+    // :, := (Python), ::
+    ':' ({ inLanguage(LANGUAGE_PYTHON) }? '=')? (':')? |
+
+    // =, ==, =>
     '=' ('=' | { inLanguage(LANGUAGE_CSHARP) && (lastpos != (getColumn() - 1) || prev == ')' || prev == '#') }? '>')? |
 
     // &, &&, &&=, &=
@@ -130,8 +144,8 @@ OPERATORS options { testLiterals = true; } {
     // >, >>=, >=, not >>
     '>' (('>' '=') => '>' '=')? ('=')? |
 
-    // <, << (C/C++), <=, <<< (CUDA)
-    '<' ('=' | '<' ({ inLanguage(LANGUAGE_CXX) || inLanguage(LANGUAGE_C) }? '<' | '=')? )? |
+    // <, << (C/C++), <=, <<< (CUDA), <> (Python)
+    '<' ('=' | '<' ({ inLanguage(LANGUAGE_CXX) || inLanguage(LANGUAGE_C) }? '<' | '=')? | { inLanguage(LANGUAGE_PYTHON) }? '>' )? |
 
     // match these as individual operators only
     ',' | ';' | '('..')' | '[' | ']' | '{' | '}' | 
@@ -139,6 +153,9 @@ OPERATORS options { testLiterals = true; } {
     // names can start with a @ in C#
     '@' (
 
+        { inLanguage(LANGUAGE_PYTHON) }?
+          '='
+        |
         { inLanguage(LANGUAGE_OBJECTIVE_C) }?
           '(' 
         |
@@ -166,11 +183,12 @@ OPERATORS options { testLiterals = true; } {
         STRING_START )? |
 
     '?' ('?')* | // part of ternary
-    '~'  | // has to be separate if part of name
+
+    '~' | // has to be separate if part of name
 
     '.' ({ inLanguage(LANGUAGE_C_FAMILY) }? '*' | '.' ('.')? | { $setType(CONSTANTS); } CONSTANTS )? |
 
-    '\\' ( EOL { $setType(EOL_BACKSLASH); } )*
+    '\\' ({ inLanguage(LANGUAGE_PYTHON) }? EOL { $setType(EOL_BACKSLASH); } | (EOL { $setType(EOL_BACKSLASH); })*)
     )
     { startline = false; lastpos = getColumn(); prev = start; }
 ;
