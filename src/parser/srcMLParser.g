@@ -11063,6 +11063,14 @@ variable_declaration_type[int type_count] { bool is_compound = false; ENTRY_DEBU
         )*
 
         update_typecount[MODE_VARIABLE_NAME | MODE_INIT]
+
+        {
+            // ensure the type will end in this grammar rule (if not a typedef)
+            if (inTransparentMode(MODE_EAT_TYPE) && !inTransparentMode(MODE_TYPEDEF)) {
+                endDownToMode(MODE_EAT_TYPE);
+                endMode(MODE_EAT_TYPE);
+            }
+        }
 ;
 
 /*
