@@ -5838,6 +5838,7 @@ pattern_check[STMT_TYPE& type, int& token, int& type_count, int& after_token, bo
 
         bool sawtemplate;
         bool sawcontextual;
+        bool sawdcolon;
         int posin = 0;
         int fla = 0;
 
@@ -5853,6 +5854,7 @@ pattern_check[STMT_TYPE& type, int& token, int& type_count, int& after_token, bo
                 inparam,
                 sawtemplate,
                 sawcontextual,
+                sawdcolon,
                 posin
             );
         } catch (...) {
@@ -5972,7 +5974,7 @@ pattern_check[STMT_TYPE& type, int& token, int& type_count, int& after_token, bo
         if (
             type == DESTRUCTOR_DECL
             && (
-                !inTransparentMode(MODE_CLASS)
+                (!inTransparentMode(MODE_CLASS) && !sawdcolon)
                 || inTransparentMode(MODE_FUNCTION_TAIL)
             )
         )
@@ -6066,6 +6068,7 @@ pattern_check_core[
         bool inparam,         /* are we in a parameter */
         bool& sawtemplate,    /* have we seen a template */
         bool& sawcontextual,  /* have we seen a contextual keyword */
+        bool& sawdcolon,      /* have we seen a double colon ("::") for destructor decl */
         int& posin
 ] {
         token = 0;
@@ -6079,7 +6082,8 @@ pattern_check_core[
 
         type = NONE;
         sawtemplate = false;
-        sawcontextual= false;
+        sawcontextual = false;
+        sawdcolon = false;
         posin = 0;
         isdestructor = false; /* global flag detected during name matching */
 
@@ -6480,8 +6484,8 @@ pattern_check_core[
                     // typical type name
                     { !inLanguage(LANGUAGE_CSHARP) || LA(1) != ASYNC }?
                     set_bool[operatorname, false]
-                    compound_name
-                    set_bool[foundpure]
+                    set_bool[sawdcolon, LA(2) == DCOLON]
+                    compound_name set_bool[foundpure]
                     set_bool[isoperator, isoperator || (inLanguage(LANGUAGE_CXX_FAMILY) && operatorname)]
                     set_bool[operatorname, false] |
 
