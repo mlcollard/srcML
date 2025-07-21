@@ -33,7 +33,7 @@
 #   BAKE_SRC="https://github.com/srcML/srcML.git#develop"
 variable "BAKE_SRC" {
   # description = "Location of the source code"
-  default = "https://github.com/srcML/srcML.git#develop"
+  default = "https://github.com/srcML/srcML.git#v1.1.0-beta"
 }
 
 # Override using the environment variable BAKE_PRESET_SUFFIX
