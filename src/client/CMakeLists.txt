@@ -34,14 +34,31 @@ target_include_directories(cli11 SYSTEM INTERFACE ${cli11_SOURCE_DIR})
 
 # ctpl_stl external include
 include(FetchContent)
-FetchContent_Declare(ctpl_stl
-  GIT_REPOSITORY https://github.com/vit-vit/CTPL.git
-  GIT_TAG        v.0.0.2
-  GIT_SHALLOW    TRUE
+FetchContent_Declare(ctpl_stl_src
+    GIT_REPOSITORY https://github.com/vit-vit/CTPL.git
+    GIT_TAG        v.0.0.2
+    GIT_SHALLOW    TRUE
 )
-FetchContent_MakeAvailable(ctpl_stl)
+FetchContent_MakeAvailable(ctpl_stl_src)
+set(MARKER_FILE "${ctpl_stl_src_SOURCE_DIR}/ctpl_stl_patched.marker")
+if(NOT EXISTS ${MARKER_FILE})
+    message(STATUS "Patching CTPL sources")
+
+    # Patch the header file using your patch
+    execute_process(
+        COMMAND ${CMAKE_COMMAND} -E chdir ${ctpl_stl_src_SOURCE_DIR}
+                ${CMAKE_COMMAND} -E env bash -c "patch -p1 < '${CMAKE_CURRENT_SOURCE_DIR}/ctpl_stl.patch'"
+        RESULT_VARIABLE PATCH_RESULT
+    )
+    if(NOT PATCH_RESULT EQUAL 0)
+        message(FATAL_ERROR "Patching CTPL failed with exit code: ${PATCH_RESULT}")
+    endif()
+
+    # Create marker file to indicate patch applied
+    file(WRITE ${MARKER_FILE} "CTPL patched.")
+endif()
 add_library(ctpl_stl INTERFACE IMPORTED)
-target_include_directories(ctpl_stl SYSTEM INTERFACE ${ctpl_stl_SOURCE_DIR})
+target_include_directories(ctpl_stl SYSTEM INTERFACE ${ctpl_stl_src_SOURCE_DIR})
 
 # srcml executable
 file(GLOB CLIENT_SOURCE *.hpp *.cpp)
