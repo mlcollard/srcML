@@ -132,7 +132,7 @@ CONSTANTS :
         'i' { $setType(COMPLEX_NUMBER); } |
 
         { inLanguage(LANGUAGE_PYTHON) }?
-        'j' { $setType(COMPLEX_NUMBER); }
+        ('j' | 'J') { $setType(COMPLEX_NUMBER); }
     )*
     (options { greedy = true; } : NAME)*
     {

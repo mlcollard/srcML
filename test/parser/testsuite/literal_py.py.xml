@@ -144,6 +144,26 @@ newlines'</literal></expr></expr_stmt>
 </unit>
 
 <unit revision="1.0.0" language="Python">
+<expr_stmt><expr><literal type="complex">5J</literal></expr></expr_stmt>
+</unit>
+
+<unit revision="1.0.0" language="Python">
+<expr_stmt><expr><literal type="complex">0J</literal></expr></expr_stmt>
+</unit>
+
+<unit revision="1.0.0" language="Python">
+<expr_stmt><expr><operator>-</operator><literal type="complex">1J</literal></expr></expr_stmt>
+</unit>
+
+<unit revision="1.0.0" language="Python">
+<expr_stmt><expr><literal type="complex">5 + 3J</literal></expr></expr_stmt>
+</unit>
+
+<unit revision="1.0.0" language="Python">
+<expr_stmt><expr><literal type="number">10</literal> <operator>+</operator> <literal type="complex">5 + 3J</literal></expr></expr_stmt>
+</unit>
+
+<unit revision="1.0.0" language="Python">
 <expr_stmt><expr><literal type="number">0b10101</literal></expr></expr_stmt>
 </unit>
 
