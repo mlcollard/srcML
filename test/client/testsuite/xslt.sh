@@ -119,3 +119,14 @@ check sub/b.java.xml "$srcmljava"
 
 srcml --xslt=setlanguage.xsl --xslt-param 'language="Java"' -o sub/b.java.xml < sub/a.cpp.xml
 check sub/b.java.xml "$srcmljava"
+
+# file list references itself
+define xslt_param_error <<- 'STDOUT'
+	srcml: --xslt-param requires --xslt or an XSLT filename
+STDOUT
+
+srcml --xslt-param 'name="a"' sub/a.cpp.xml
+check_exit 1 "$xslt_param_error"
+
+srcml copy.xsl --xslt-param 'NAME=VALUE' sub/a.cpp.xml
+check "$srcml"
