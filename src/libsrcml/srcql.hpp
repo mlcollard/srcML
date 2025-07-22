@@ -8,7 +8,7 @@
 #ifndef SRCQL_HPP
 #define SRCQL_HPP
 
-#define SRCQL_VERSION_NUMBER 1000
+#define SRCQL_VERSION_NUMBER 10000
 #define SRCQL_VERSION_STRING "1.0.0"
 
 // The current version of srcQL as a number
