@@ -45,16 +45,16 @@ variable "distributions" {
   ]
 }
 
-# Override using the environment variable BAKE_CMAKE_VERSION
-# E.g., BAKE_CMAKE_VERSION="3.31.6"
-variable "BAKE_CMAKE_VERSION" {
+# Override using the environment variable SRCML_BAKE_CMAKE_VERSION
+# E.g., SRCML_BAKE_CMAKE_VERSION="3.31.6"
+variable "SRCML_BAKE_CMAKE_VERSION" {
   # description = "CMake version"
   default = "4.0.0"
 }
 
-# Override using the environment variable BAKE_SRCML_VERSION
-# E.g., BAKE_SRCML_VERSION="1.1.0"
-variable "BAKE_SRCML_VERSION" {
+# Override using the environment variable SRCML_BAKE_SRCML_VERSION
+# E.g., SRCML_BAKE_SRCML_VERSION="1.1.0"
+variable "SRCML_BAKE_SRCML_VERSION" {
   # description = "srcML version to embed in image data"
   default = "1.0.0"
 }

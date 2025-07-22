@@ -123,6 +123,7 @@ header "post_include_hpp" {
 #include <Language.hpp>
 #include <ModeStack.hpp>
 #include <srcml_options.hpp>
+#include <cstdlib>
 #undef CONST
 #undef VOID
 #undef DELETE
@@ -137,14 +138,26 @@ using namespace ::std::literals::string_view_literals;
 // Define SRCML_DEBUG_PARSER to use
 #ifdef SRCML_DEBUG_PARSER
 class RuleTrace {
+private:
+    inline static const bool isDisabled =
+        [] {
+            const char* env = std::getenv("SRCML_DEBUG_PARSER_DISABLE");
+            return env && env[0] != '\0';
+        }();
 public:
     RuleTrace(int guessing, int token, int rd, std::string text, const char* fun, int line) :
         guessing(guessing), token(token), rd(rd), text(text), fun(fun), line(line)
     {
+        if (isDisabled)
+            return;
+
         fprintf(stderr, "TRACE: %d %d %d %5s%*s %s (%d)\n", guessing, token, rd, text.data(), rd, "", fun, line);
     }
 
     ~RuleTrace() {
+        if (isDisabled)
+            return;
+
         fprintf(stderr, "  END: %d %d %d %5s%*s %s (%d)\n", guessing, token, rd, text.data(), rd, "", fun, line);
     }
 

@@ -26,76 +26,76 @@
 # * `files` - Download the installer files to a host directory
 # * `logs`  - Download the test logs to a host directory
 
-# Override using the environment variable BAKE_SRC. E.g.,
-#   BAKE_SRC="."
-#   BAKE_SRC="srcml.tar.gz"
-#   BAKE_SRC="https://github.com/srcML/srcML.git"
-#   BAKE_SRC="https://github.com/srcML/srcML.git#develop"
-variable "BAKE_SRC" {
+# Override using the environment variable SRCML_BAKE_SRC. E.g.,
+#   SRCML_BAKE_SRC="."
+#   SRCML_BAKE_SRC="srcml.tar.gz"
+#   SRCML_BAKE_SRC="https://github.com/srcML/srcML.git"
+#   SRCML_BAKE_SRC="https://github.com/srcML/srcML.git#develop"
+variable "SRCML_BAKE_SRC" {
   # description = "Location of the source code"
   default = "https://github.com/srcML/srcML.git#v1.1.0-beta"
 }
 
-# Override using the environment variable BAKE_PRESET_SUFFIX
-# E.g., BAKE_PRESET_SUFFIX="-fast"
-variable "BAKE_PRESET_SUFFIX" {
+# Override using the environment variable SRCML_BAKE_PRESET_SUFFIX
+# E.g., SRCML_BAKE_PRESET_SUFFIX="-fast"
+variable "SRCML_BAKE_PRESET_SUFFIX" {
   # description = "Suffix for the workflow preset"
   default = ""
 }
 
-# Override using the environment variable BAKE_ARCHITECTURE
-# E.g., BAKE_ARCHITECTURE="linux/arm64"
-variable "BAKE_ARCHITECTURE" {
+# Override using the environment variable SRCML_BAKE_ARCHITECTURE
+# E.g., SRCML_BAKE_ARCHITECTURE="linux/arm64"
+variable "SRCML_BAKE_ARCHITECTURE" {
   # description = "Architectures to build on"
   default = "linux/amd64,linux/arm64"
 }
 
-# Override using the environment variable BAKE_DESTINATION_DIR
-# E.g., BAKE_DESTINATION_DIR="../dists"
-variable "BAKE_DESTINATION_DIR" {
+# Override using the environment variable SRCML_BAKE_DESTINATION_DIR
+# E.g., SRCML_BAKE_DESTINATION_DIR="../dists"
+variable "SRCML_BAKE_DESTINATION_DIR" {
   # description = "Local directory for export of packages"
   default = "./dist_packages"
 }
 
-# Override using the environment variable BAKE_CONTEXT_DIR
-# E.g., BAKE_CONTEXT_DIR="~/srcML/docker"
-variable "BAKE_CONTEXT_DIR" {
+# Override using the environment variable SRCML_BAKE_CONTEXT_DIR
+# E.g., SRCML_BAKE_CONTEXT_DIR="~/srcML/docker"
+variable "SRCML_BAKE_CONTEXT_DIR" {
   # description = "Directory of context files"
   default = "./docker"
 }
 
-# Override using the environment variable BAKE_REGISTRY. E.g.,
-#   BAKE_REGISTRY=""         docker buildx bake # Docker Hub
-#   BAKE_REGISTRY="ghcr.io"  docker buildx bake # GitHub Container Registry
-variable "BAKE_REGISTRY" {
+# Override using the environment variable SRCML_BAKE_REGISTRY. E.g.,
+#   SRCML_BAKE_REGISTRY=""         docker buildx bake # Docker Hub
+#   SRCML_BAKE_REGISTRY="ghcr.io"  docker buildx bake # GitHub Container Registry
+variable "SRCML_BAKE_REGISTRY" {
   # description = "Registry domain for default build environments"
   default = ""
 }
 
-# Override using the environment variable BAKE_PACKAGE_REGISTRY. E.g.,
-#   BAKE_PACKAGE_REGISTRY=""         docker buildx bake # Docker Hub
-#   BAKE_PACKAGE_REGISTRY="ghcr.io"  docker buildx bake # GitHub Container Registry
-variable "BAKE_PACKAGE_REGISTRY" {
+# Override using the environment variable SRCML_BAKE_PACKAGE_REGISTRY. E.g.,
+#   SRCML_BAKE_PACKAGE_REGISTRY=""         docker buildx bake # Docker Hub
+#   SRCML_BAKE_PACKAGE_REGISTRY="ghcr.io"  docker buildx bake # GitHub Container Registry
+variable "SRCML_BAKE_PACKAGE_REGISTRY" {
   # description = "Registry domain for the package targets, package and log"
   default = "ghcr.io"
 }
 
 # Placeholder to redefine in docker-bake.override.hcl
-variable "BAKE_SRCML_VERSION" {
+variable "SRCML_BAKE_SRCML_VERSION" {
   # description = "srcML version to embed in image data"
   default = ""
 }
 
 # Placeholder to redefine in docker-bake.override.hcl
-variable "BAKE_CMAKE_VERSION" {
+variable "SRCML_BAKE_CMAKE_VERSION" {
   # description = "CMake version"
   default = ""
 }
 
-# Override using the environment variable BAKE_CACHE
-# E.g., BAKE_CACHE=type=local,src=bake_cache,dest=bake_cache
-# E.g., BAKE_CACHE=""
-variable "BAKE_CACHE" {
+# Override using the environment variable SRCML_BAKE_CACHE
+# E.g., SRCML_BAKE_CACHE=type=local,src=bake_cache,dest=bake_cache
+# E.g., SRCML_BAKE_CACHE=""
+variable "SRCML_BAKE_CACHE" {
   # description = "Cache for build layers"
   default = ""
 }
@@ -114,25 +114,25 @@ group "default" {
 # Context of the Dockerfile
 function "context" {
   params = [id]
-  result = "${BAKE_CONTEXT_DIR}/${id}"
+  result = "${SRCML_BAKE_CONTEXT_DIR}/${id}"
 }
 
 # Context of the Dockerfile
 function "workflowPreset" {
   params = [dist]
-  result = "ci-${dist.workflow}${BAKE_PRESET_SUFFIX}"
+  result = "ci-${dist.workflow}${SRCML_BAKE_PRESET_SUFFIX}"
 }
 
 # Base target for common settings
 target "base" {
-  platforms = split(",", BAKE_ARCHITECTURE)
+  platforms = split(",", SRCML_BAKE_ARCHITECTURE)
   labels = {
-    "org.opencontainers.image.version"  = BAKE_SRCML_VERSION
+    "org.opencontainers.image.version"  = SRCML_BAKE_SRCML_VERSION
     "org.opencontainers.image.licenses" = "GPL-3.0-only"
   }
   pull = true
-  cache-to = [ BAKE_CACHE ]
-  cache-from = [ BAKE_CACHE ]
+  cache-to = [ SRCML_BAKE_CACHE ]
+  cache-from = [ SRCML_BAKE_CACHE ]
 }
 
 # Build images for all Linux distributions
@@ -153,7 +153,7 @@ EOF
   args = {
     TAG          = dist.version_id
     JAVA_TAG     = dist.java_version_id
-    CMAKE_VERSION = BAKE_CMAKE_VERSION
+    CMAKE_VERSION = SRCML_BAKE_CMAKE_VERSION
     CMAKE_BINARY = try(dist.cmake, "")
     JAVA_VERSION = try(dist.java, "")
     OPENSUSE     = try(dist.opensuse, "")
@@ -174,7 +174,7 @@ function "builderStage" {
   result = <<EOF
 FROM ${tagName(dist)} AS builder
 WORKDIR /src
-ADD --link ["${BAKE_SRC}", "."]
+ADD --link ["${SRCML_BAKE_SRC}", "."]
 # RUN cmake --workflow --preset ${workflowPreset(dist)}
 RUN cmake --preset ${workflowPreset(dist)}
 RUN cmake --build --preset ${workflowPreset(dist)}
@@ -191,7 +191,7 @@ EOF
 }
 
 # Packages for all distributions
-# Output to host directory ${BAKE_DESTINATION_DIR}
+# Output to host directory ${SRCML_BAKE_DESTINATION_DIR}
 # Create image whose only contents are the package
 target "build" {
   name = categoryTarget(dist, "build")
@@ -201,7 +201,7 @@ target "build" {
     "org.opencontainers.image.description" = <<EOF
 The srcML build and package for ${dist.name}.
 EOF
-    "org.opencontainers.image.source" = BAKE_SRC
+    "org.opencontainers.image.source" = SRCML_BAKE_SRC
   }
   push = true
   matrix = {
@@ -228,7 +228,7 @@ EOF
 }
 
 # Packages for all distributions
-# Output to host directory ${BAKE_DESTINATION_DIR}
+# Output to host directory ${SRCML_BAKE_DESTINATION_DIR}
 # Create image whose only contents are the package
 target "files" {
   name = categoryTarget(dist, "files")
@@ -247,7 +247,7 @@ ${builderStage(dist)}
 ${installerStage()}
 EOF
   tags     = [categoryTagName(dist, "files")]
-  output   = ["type=local,dest=${BAKE_DESTINATION_DIR}"]
+  output   = ["type=local,dest=${SRCML_BAKE_DESTINATION_DIR}"]
   inherits = ["base"]
 }
 
@@ -273,7 +273,7 @@ EOF
 }
 
 # Test logs for all distributions
-# Output to host directory ${BAKE_DESTINATION_DIR}
+# Output to host directory ${SRCML_BAKE_DESTINATION_DIR}
 target "logs" {
   name = categoryTarget(dist, "logs")
   description = "srcML package logs for ${dist.name}"
@@ -292,7 +292,7 @@ FROM scratch AS dist
 COPY --from=packager /src-build/dist/*.log /
 EOF
   tags      = [categoryTagName(dist, "logs")]
-  output    = ["type=local,dest=${BAKE_DESTINATION_DIR}"]
+  output    = ["type=local,dest=${SRCML_BAKE_DESTINATION_DIR}"]
   inherits  = ["base"]
 }
 
@@ -320,7 +320,7 @@ COPY --from="packager" \
 RUN apt-get install /*.deb
 EOF
   tags     = [categoryTagName(dist, "examples")]
-  # output   = ["type=local,dest=${BAKE_DESTINATION_DIR}"]
+  # output   = ["type=local,dest=${SRCML_BAKE_DESTINATION_DIR}"]
   inherits = ["base"]
 }
 
@@ -346,13 +346,13 @@ function "baseTargetName" {
 # Tag name
 function "tagName" {
   params = [item]
-  result = baseTagName(BAKE_REGISTRY, item.id, item.version_id)
+  result = baseTagName(SRCML_BAKE_REGISTRY, item.id, item.version_id)
 }
 
 # Tag name with a category
 function "categoryTagName" {
   params = [item, category]
-  result = baseTagName(BAKE_PACKAGE_REGISTRY, appendCategory(item.id, category), item.version_id)
+  result = baseTagName(SRCML_BAKE_PACKAGE_REGISTRY, appendCategory(item.id, category), item.version_id)
 }
 
 # Tag name with a category
@@ -364,7 +364,7 @@ function "baseTagName" {
 # Tag name
 function "tagNameAlias" {
   params = [item]
-  result = baseTagName(BAKE_REGISTRY, item.id, try(item.tag, item.version_id))
+  result = baseTagName(SRCML_BAKE_REGISTRY, item.id, try(item.tag, item.version_id))
 }
 
 # Add a category to the id
