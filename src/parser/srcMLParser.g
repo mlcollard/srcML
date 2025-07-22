@@ -6474,10 +6474,14 @@ pattern_check_core[
                     annotation
                     set_int[attribute_count, attribute_count + 1] |
 
+                    // macros in types
+                    (macro_type_detector)=> macro_call_inner |
+
                     // typical type name
                     { !inLanguage(LANGUAGE_CSHARP) || LA(1) != ASYNC }?
                     set_bool[operatorname, false]
-                    compound_name set_bool[foundpure]
+                    compound_name
+                    set_bool[foundpure]
                     set_bool[isoperator, isoperator || (inLanguage(LANGUAGE_CXX_FAMILY) && operatorname)]
                     set_bool[operatorname, false] |
 
@@ -7028,12 +7032,34 @@ class_lead_type_identifier[] { SingleElement element(this); ENTRY_DEBUG } :
 ;
 
 /*
+    Macros with parameters can be used with types.
+    However, this can cause misidentification with other forms including
+    * K&R function parameters
+    * function pointers
+
+    Restricted use for now. May expand over time. Should detect the following
+    as declarations:
+
+    ARRAY(char) b;
+    const ARRAY(char) b;
+    extern ARRAY(char) b;
+*/
+macro_type_detector[] { ENTRY_DEBUG } :
+
+        { inLanguage(LANGUAGE_CXX) || inLanguage(LANGUAGE_C) }?
+        NAME paren_pair NAME (TERMINATE | LCURLY | EQUALS)
+;
+
+/*
   lead_type_identifier
 */
 lead_type_identifier[] { ENTRY_DEBUG } :
         // Commented-out code
         // specifier |
-        // (macro_call_paren identifier)=> macro_call |
+
+        // macros in types
+        (macro_type_detector)=>
+        macro_call |
 
         // typical type name
         {
@@ -9928,6 +9954,16 @@ unchecked_call[] { ENTRY_DEBUG } :
 macro_call_check[] { ENTRY_DEBUG } :
         simple_identifier
         (options { greedy = true; } : paren_pair)*
+;
+
+/*
+  macro_call_check
+
+  Checks for a macro call.
+*/
+macro_call_full_check[] { ENTRY_DEBUG } :
+        simple_identifier
+        paren_pair
 ;
 
 /*
