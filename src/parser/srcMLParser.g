@@ -7643,10 +7643,29 @@ attribute_cpp[] { CompleteElement element(this); ENTRY_DEBUG } :
         LBRACKET
         LBRACKET
 
+        (attribute_using_cpp)*
         attribute_inner_list
 
         RBRACKET
         RBRACKET
+;
+
+/*
+  attribute_using_cpp
+
+  Handles a "using" keyword in a C++11 attribute.
+*/
+attribute_using_cpp[] { CompleteElement element(this); ENTRY_DEBUG } :
+        {
+            // start a new mode to end after the colon
+            startNewMode(MODE_USING);
+
+            startElement(SUSING_DIRECTIVE);
+        }
+
+        USING
+        compound_name
+        COLON
 ;
 
 attribute_c[] { CompleteElement element(this); ENTRY_DEBUG } :
