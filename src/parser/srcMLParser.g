@@ -123,6 +123,7 @@ header "post_include_hpp" {
 #include <Language.hpp>
 #include <ModeStack.hpp>
 #include <srcml_options.hpp>
+#include <cstdlib>
 #undef CONST
 #undef VOID
 #undef DELETE
@@ -137,14 +138,26 @@ using namespace ::std::literals::string_view_literals;
 // Define SRCML_DEBUG_PARSER to use
 #ifdef SRCML_DEBUG_PARSER
 class RuleTrace {
+private:
+    inline static const bool isDisabled =
+        [] {
+            const char* env = std::getenv("SRCML_DEBUG_PARSER_DISABLE");
+            return env && env[0] != '\0';
+        }();
 public:
     RuleTrace(int guessing, int token, int rd, std::string text, const char* fun, int line) :
         guessing(guessing), token(token), rd(rd), text(text), fun(fun), line(line)
     {
+        if (isDisabled)
+            return;
+
         fprintf(stderr, "TRACE: %d %d %d %5s%*s %s (%d)\n", guessing, token, rd, text.data(), rd, "", fun, line);
     }
 
     ~RuleTrace() {
+        if (isDisabled)
+            return;
+
         fprintf(stderr, "  END: %d %d %d %5s%*s %s (%d)\n", guessing, token, rd, text.data(), rd, "", fun, line);
     }
 
@@ -5371,6 +5384,10 @@ statement_part[] {
         }?
         macro_call |
 
+        // macro call in function tail
+        { inLanguage(LANGUAGE_C_FAMILY) && inMode(MODE_FUNCTION_TAIL) }?
+        macro_call |
+
         { inMode(MODE_EXPRESSION | MODE_EXPECT) }?
         expression[type, call_count] |
 
@@ -5842,6 +5859,7 @@ pattern_check[STMT_TYPE& type, int& token, int& type_count, int& after_token, bo
 
         bool sawtemplate;
         bool sawcontextual;
+        bool sawdcolon;
         int posin = 0;
         int fla = 0;
 
@@ -5857,6 +5875,7 @@ pattern_check[STMT_TYPE& type, int& token, int& type_count, int& after_token, bo
                 inparam,
                 sawtemplate,
                 sawcontextual,
+                sawdcolon,
                 posin
             );
         } catch (...) {
@@ -5976,7 +5995,7 @@ pattern_check[STMT_TYPE& type, int& token, int& type_count, int& after_token, bo
         if (
             type == DESTRUCTOR_DECL
             && (
-                !inTransparentMode(MODE_CLASS)
+                (!inTransparentMode(MODE_CLASS) && !sawdcolon)
                 || inTransparentMode(MODE_FUNCTION_TAIL)
             )
         )
@@ -6070,6 +6089,7 @@ pattern_check_core[
         bool inparam,         /* are we in a parameter */
         bool& sawtemplate,    /* have we seen a template */
         bool& sawcontextual,  /* have we seen a contextual keyword */
+        bool& sawdcolon,      /* have we seen a double colon ("::") for destructor decl */
         int& posin
 ] {
         token = 0;
@@ -6083,7 +6103,8 @@ pattern_check_core[
 
         type = NONE;
         sawtemplate = false;
-        sawcontextual= false;
+        sawcontextual = false;
+        sawdcolon = false;
         posin = 0;
         isdestructor = false; /* global flag detected during name matching */
 
@@ -6478,9 +6499,13 @@ pattern_check_core[
                     annotation
                     set_int[attribute_count, attribute_count + 1] |
 
+                    // macros in types
+                    (macro_type_detector)=> macro_call_inner |
+
                     // typical type name
                     { !inLanguage(LANGUAGE_CSHARP) || LA(1) != ASYNC }?
                     set_bool[operatorname, false]
+                    set_bool[sawdcolon, LA(2) == DCOLON]
                     compound_name set_bool[foundpure]
                     set_bool[isoperator, isoperator || (inLanguage(LANGUAGE_CXX_FAMILY) && operatorname)]
                     set_bool[operatorname, false] |
@@ -7032,12 +7057,34 @@ class_lead_type_identifier[] { SingleElement element(this); ENTRY_DEBUG } :
 ;
 
 /*
+    Macros with parameters can be used with types.
+    However, this can cause misidentification with other forms including
+    * K&R function parameters
+    * function pointers
+
+    Restricted use for now. May expand over time. Should detect the following
+    as declarations:
+
+    ARRAY(char) b;
+    const ARRAY(char) b;
+    extern ARRAY(char) b;
+*/
+macro_type_detector[] { ENTRY_DEBUG } :
+
+        { inLanguage(LANGUAGE_CXX) || inLanguage(LANGUAGE_C) }?
+        NAME paren_pair NAME (TERMINATE | LCURLY | EQUALS)
+;
+
+/*
   lead_type_identifier
 */
 lead_type_identifier[] { ENTRY_DEBUG } :
         // Commented-out code
         // specifier |
-        // (macro_call_paren identifier)=> macro_call |
+
+        // macros in types
+        (macro_type_detector)=>
+        macro_call |
 
         // typical type name
         {
@@ -7608,10 +7655,29 @@ attribute_cpp[] { CompleteElement element(this); ENTRY_DEBUG } :
         LBRACKET
         LBRACKET
 
+        (attribute_using_cpp)*
         attribute_inner_list
 
         RBRACKET
         RBRACKET
+;
+
+/*
+  attribute_using_cpp
+
+  Handles a "using" keyword in a C++11 attribute.
+*/
+attribute_using_cpp[] { CompleteElement element(this); ENTRY_DEBUG } :
+        {
+            // start a new mode to end after the colon
+            startNewMode(MODE_USING);
+
+            startElement(SUSING_DIRECTIVE);
+        }
+
+        USING
+        compound_name
+        COLON
 ;
 
 attribute_c[] { CompleteElement element(this); ENTRY_DEBUG } :
@@ -9932,6 +9998,16 @@ unchecked_call[] { ENTRY_DEBUG } :
 macro_call_check[] { ENTRY_DEBUG } :
         simple_identifier
         (options { greedy = true; } : paren_pair)*
+;
+
+/*
+  macro_call_check
+
+  Checks for a macro call.
+*/
+macro_call_full_check[] { ENTRY_DEBUG } :
+        simple_identifier
+        paren_pair
 ;
 
 /*
