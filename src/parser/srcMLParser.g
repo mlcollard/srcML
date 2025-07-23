@@ -5380,6 +5380,10 @@ statement_part[] {
         }?
         macro_call |
 
+        // macro call in function tail
+        { inLanguage(LANGUAGE_C_FAMILY) && inMode(MODE_FUNCTION_TAIL) }?
+        macro_call |
+
         { inMode(MODE_EXPRESSION | MODE_EXPECT) }?
         expression[type, call_count] |
 

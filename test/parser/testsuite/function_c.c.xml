@@ -52,4 +52,12 @@
 <function><type><name><name>enum</name> <name>foo</name></name></type> <name>bar</name><parameter_list>()</parameter_list> <block>{<block_content> <return>return <expr><literal type="number">0</literal></expr>;</return></block_content>}</block></function>
 </unit>
 
+<unit xmlns:cpp="http://www.srcML.org/srcML/cpp" language="C">
+<function><type><specifier>static</specifier> <name>void</name> <name>__foo</name> <modifier>*</modifier></type><name>bar</name><parameter_list>(<parameter><decl><type><name>void</name> <modifier>*</modifier></type><name>a</name></decl></parameter>, <parameter><decl><type><name>int</name></type> <name>b</name></decl></parameter>, <parameter><decl><type><name>unsigned</name> <name>long</name> <modifier>*</modifier></type><name>c</name></decl></parameter>)</parameter_list> <macro><name>__baz</name><argument_list>(<argument>&amp;d</argument>)</argument_list></macro> <block>{<block_content/>}</block></function>
+</unit>
+
+<unit xmlns:cpp="http://www.srcML.org/srcML/cpp" language="C">
+<function><type><name>void</name> <name>__foo</name> <modifier>*</modifier></type><name>bar</name><parameter_list>(<parameter><decl><type><name>void</name> <modifier>*</modifier></type><name>a</name></decl></parameter>, <parameter><decl><type><name>int</name></type> <name>b</name></decl></parameter>, <parameter><decl><type><name>unsigned</name> <name>long</name> <modifier>*</modifier></type><name>c</name></decl></parameter>)</parameter_list> <macro><name>__baz</name><argument_list>(<argument>&amp;d</argument>)</argument_list></macro> <block>{<block_content/>}</block></function>
+</unit>
+
 </unit>
