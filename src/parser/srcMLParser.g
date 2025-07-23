@@ -12561,6 +12561,7 @@ derived[] { CompleteElement element(this); ENTRY_DEBUG } :
             identifier |
 
             variable_identifier
+            (options { greedy = true; } : tripledotop)*
         )
 
         (
