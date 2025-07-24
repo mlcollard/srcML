@@ -89,4 +89,14 @@
 }</block></enum>
 </unit>
 
+<unit language="Java">
+<enum><specifier>public</specifier> enum <name>FooEnum</name> <block>{
+    <decl><name>FOO</name></decl>,
+    <decl><name>BAR</name></decl>;
+
+    <function_decl><annotation>@<name>CEnumValue</name></annotation>
+    <type><specifier>private</specifier> <specifier>native</specifier> <name>int</name></type> <name>getBar</name><parameter_list>()</parameter_list>;</function_decl>
+}</block></enum>
+</unit>
+
 </unit>

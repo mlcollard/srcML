@@ -14,6 +14,10 @@
 <destructor><name><name>A</name><operator>::</operator><name>~A</name></name><parameter_list>(<parameter><decl><type><name>void</name></type></decl></parameter>)</parameter_list> <block>{<block_content/>}</block></destructor>
 </unit>
 
+<unit xmlns:cpp="http://www.srcML.org/srcML/cpp" language="C++">
+<destructor_decl><name><name>foo</name><operator>::</operator><name>~foo</name></name><parameter_list>()</parameter_list>;</destructor_decl>
+</unit>
+
 <!-- internal destructor declarations -->
 <unit xmlns:cpp="http://www.srcML.org/srcML/cpp" language="C++">
 <class>class <name>A</name> <block>{<private type="default"> <destructor_decl><name>~A</name><parameter_list>()</parameter_list>;</destructor_decl> </private>}</block>;</class>

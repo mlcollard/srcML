@@ -930,7 +930,11 @@ start[] { ++start_count; ENTRY_DEBUG_START ENTRY_DEBUG } :
         offside_dedent |
 
         // characters with special actions that usually end currently open elements
-        { !inTransparentMode(MODE_INTERNAL_END_CURLY) }?
+        // special case for blocks (e.g., lambda capture) in lcurly argument lists
+        {
+            !inTransparentMode(MODE_INTERNAL_END_CURLY)
+            || (inMode(MODE_BLOCK_CONTENT) && inTransparentMode(MODE_ARGUMENT | MODE_LIST))
+        }?
         block_end |
 
         terminate |
@@ -5380,6 +5384,10 @@ statement_part[] {
         }?
         macro_call |
 
+        // macro call in function tail
+        { inLanguage(LANGUAGE_C_FAMILY) && inMode(MODE_FUNCTION_TAIL) }?
+        macro_call |
+
         { inMode(MODE_EXPRESSION | MODE_EXPECT) }?
         expression[type, call_count] |
 
@@ -5851,6 +5859,7 @@ pattern_check[STMT_TYPE& type, int& token, int& type_count, int& after_token, bo
 
         bool sawtemplate;
         bool sawcontextual;
+        bool sawdcolon;
         int posin = 0;
         int fla = 0;
 
@@ -5866,6 +5875,7 @@ pattern_check[STMT_TYPE& type, int& token, int& type_count, int& after_token, bo
                 inparam,
                 sawtemplate,
                 sawcontextual,
+                sawdcolon,
                 posin
             );
         } catch (...) {
@@ -5985,7 +5995,7 @@ pattern_check[STMT_TYPE& type, int& token, int& type_count, int& after_token, bo
         if (
             type == DESTRUCTOR_DECL
             && (
-                !inTransparentMode(MODE_CLASS)
+                (!inTransparentMode(MODE_CLASS) && !sawdcolon)
                 || inTransparentMode(MODE_FUNCTION_TAIL)
             )
         )
@@ -6079,6 +6089,7 @@ pattern_check_core[
         bool inparam,         /* are we in a parameter */
         bool& sawtemplate,    /* have we seen a template */
         bool& sawcontextual,  /* have we seen a contextual keyword */
+        bool& sawdcolon,      /* have we seen a double colon ("::") for destructor decl */
         int& posin
 ] {
         token = 0;
@@ -6092,7 +6103,8 @@ pattern_check_core[
 
         type = NONE;
         sawtemplate = false;
-        sawcontextual= false;
+        sawcontextual = false;
+        sawdcolon = false;
         posin = 0;
         isdestructor = false; /* global flag detected during name matching */
 
@@ -6493,8 +6505,8 @@ pattern_check_core[
                     // typical type name
                     { !inLanguage(LANGUAGE_CSHARP) || LA(1) != ASYNC }?
                     set_bool[operatorname, false]
-                    compound_name
-                    set_bool[foundpure]
+                    set_bool[sawdcolon, LA(2) == DCOLON]
+                    compound_name set_bool[foundpure]
                     set_bool[isoperator, isoperator || (inLanguage(LANGUAGE_CXX_FAMILY) && operatorname)]
                     set_bool[operatorname, false] |
 
@@ -6790,6 +6802,7 @@ pattern_check_core[
                 || (
                     inLanguage(LANGUAGE_JAVA)
                     && inMode(MODE_ENUM)
+                    && (type_count - specifier_count - attribute_count - template_count == 0)
                     && (
                         fla == COMMA
                         || fla == TERMINATE
@@ -11131,6 +11144,14 @@ variable_declaration_type[int type_count] { bool is_compound = false; ENTRY_DEBU
         )*
 
         update_typecount[MODE_VARIABLE_NAME | MODE_INIT]
+
+        {
+            // ensure the type will end in this grammar rule (if not a typedef)
+            if (inTransparentMode(MODE_EAT_TYPE) && !inTransparentMode(MODE_TYPEDEF)) {
+                endDownToMode(MODE_EAT_TYPE);
+                endMode(MODE_EAT_TYPE);
+            }
+        }
 ;
 
 /*
@@ -12541,6 +12562,7 @@ derived[] { CompleteElement element(this); ENTRY_DEBUG } :
             identifier |
 
             variable_identifier
+            (options { greedy = true; } : tripledotop)*
         )
 
         (
