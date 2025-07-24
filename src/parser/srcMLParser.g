@@ -13400,7 +13400,7 @@ generic_argument_list_check[] returns [bool is_generic_argument_list] {
 
         int parencount = 0;
         int bracecount = 0;
-
+        bool foundLogicalOperator = false;
         while (LA(1) != antlr::Token::EOF_TYPE) {
             if (LA(1) == RPAREN)
                 --parencount;
@@ -13410,6 +13410,9 @@ generic_argument_list_check[] returns [bool is_generic_argument_list] {
             if (parencount < 0) {
                 break;
             }
+
+            if (LT(1)->getText() == "||" || LT(1)->getText() == "&&")
+                foundLogicalOperator = true;
 
             if (LA(1) == TEMPOPE) {
                 is_generic_argument_list = true;
@@ -13428,6 +13431,31 @@ generic_argument_list_check[] returns [bool is_generic_argument_list] {
                 break;
 
             consume();
+        }
+
+        // Variable template arguments can be confused with common condition
+        // forms, e.g., if (n < 1 || n > 5) {}
+        // So if we are in a condition, make sure that the following token is
+        // not a literal or a name
+        // One issue: if (n < 1 || n > (5)) {} is marked
+        if (is_generic_argument_list && inTransparentMode(MODE_CONDITION)) {
+            consume();
+
+            // if the following is an idenifier or literal, then these were operators
+            if (foundLogicalOperator || identifier_list_tokens_set.member(LA(1)) || literal_tokens_set.member(LA(1))) {
+                is_generic_argument_list = false;
+
+                if (LA(1) == LPAREN) {
+
+                    // skip past the parenthesized part
+                    paren_pair();
+
+                    // if we get past all this and there is more that does not have a
+                    // logical operator
+                    if (LA(1) != RPAREN && LT(1)->getText() != "||" && LT(1)->getText() != "&&")
+                        is_generic_argument_list = true;
+                }
+            }
         }
 
         inputState->guessing--;
@@ -13813,7 +13841,6 @@ template_operators[] { LightweightElement element(this); ENTRY_DEBUG } :
         {
             startElement(SOPERATOR);
         }
-
         (
             OPERATORS | TRETURN | TEMPOPS | EQUAL | MULTOPS | REFOPS | DOTDOT | RVALUEREF |
             QMARK | NEW | DELETE | IN | IS | STACKALLOC | AS | AWAIT | LAMBDA
