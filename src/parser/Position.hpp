@@ -33,13 +33,18 @@ struct Position {
 
     void append(std::string_view text, size_t tabsize) {
 
+        // Update line and column
+        // * When you reach a newline, reset column
+        // * Tabs are expanded
+        // * Unicode continuation characters are ignored
+        // * Combining marks start for the range 0x0300 through 0x036F
         for (auto p = text.begin(); p != text.end(); ++p) {
             if (*p == '\n') {
                 ++line;
                 column = 0;
             } else if (*p == '\t') {
                 column = ((column / tabsize) + 1) * tabsize;
-            } else {
+            } else if ((*p & 0xC0) != 0x80 && (unsigned char)*p != 0xCC) {
                 ++column;
             }
         }
