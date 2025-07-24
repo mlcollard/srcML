@@ -6802,6 +6802,7 @@ pattern_check_core[
                 || (
                     inLanguage(LANGUAGE_JAVA)
                     && inMode(MODE_ENUM)
+                    && (type_count - specifier_count - attribute_count - template_count == 0)
                     && (
                         fla == COMMA
                         || fla == TERMINATE
