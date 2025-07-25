@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<unit xmlns="http://www.srcML.org/srcML/src" language="Java" url="try">
+<unit xmlns="http://www.srcML.org/srcML/src" revision="1.0.0" language="Java" url="try">
 
 <unit revision="1.0.0" language="Java">
 <try>try<init>(<expr/>)</init> <block>{<block_content/>}</block></try>
