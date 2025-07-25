@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<unit xmlns="http://www.srcML.org/srcML/src" revision="1.0.0" url="position_block-content">
+<unit xmlns="http://www.srcML.org/srcML/src" revision="1.0.0" language="C++" url="position_block-content">
 
 <unit revision="1.0.0" language="C++" hash="7b4be3f8609b72080abdd507b169c30616d675c2"><function><type><name>int</name></type> <name>get</name><parameter_list>()</parameter_list> <block>{<block_content>
     <return>return <expr><literal type="number">1</literal></expr>;</return>
