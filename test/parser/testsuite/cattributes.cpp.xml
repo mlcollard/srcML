@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<unit xmlns="http://www.srcML.org/srcML/src" revision="1.0.0" url="c-attributes">
+<unit xmlns="http://www.srcML.org/srcML/src" revision="1.0.0" language="C++" url="c-attributes">
 
 <unit revision="1.0.0" language="C++">
 <decl_stmt><decl><type><name>int</name></type> <name>n</name> <attribute>__attribute__((<expr><name>unused</name></expr>))</attribute></decl>
