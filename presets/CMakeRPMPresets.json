@@ -21,7 +21,11 @@
       "name": "ci-rpm",
       "displayName": "RPM Release",
       "description": "Default build options for RPM release",
-      "inherits": ["ci-base", "ci-rpm-only", "ci-gcc", "ci-sibling-build"]
+      "inherits": ["ci-base", "ci-rpm-only", "ci-gcc", "ci-sibling-build"],
+      "cacheVariables": {
+        // srcml client searches for libsrcml in current directory, sibling lib/ directory
+        "CMAKE_INSTALL_RPATH": "$ORIGIN;$ORIGIN/../lib"
+      }
     }
   ],
   "buildPresets" : [
