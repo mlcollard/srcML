@@ -183,9 +183,9 @@ RUN cpack --preset ${workflowPreset(dist)}
 RUN cmake --build --preset ci-install-package-${dist.workflow}
 FROM packager AS test_client
 RUN cmake --build --preset ci-test-client-${dist.workflow}
-# FROM packager AS test_libsrcml
-# RUN cmake --build --preset ci-test-libsrcml-${dist.workflow}
-FROM packager AS setup_parser_tests
+FROM packager AS test_libsrcml
+RUN cmake --build --preset ci-test-libsrcml-${dist.workflow}
+FROM packager AS test_parser
 RUN cmake --build --preset ci-test-parser-${dist.workflow}
 EOF
 }
@@ -289,7 +289,9 @@ EOF
   dockerfile-inline = <<EOF
 ${builderStage(dist)}
 FROM scratch AS dist
-COPY --from=packager /src-build/dist/*.log /
+COPY --from=test_client /src-build/dist/*.log /
+COPY --from=test_parser /src-build/dist/*.log /
+COPY --from=test_libsrcml /src-build/dist/*.log /
 EOF
   tags      = [categoryTagName(dist, "logs")]
   output    = ["type=local,dest=${SRCML_BAKE_DESTINATION_DIR}"]
