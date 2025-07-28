@@ -298,35 +298,6 @@ EOF
   inherits  = ["base"]
 }
 
-target "examples" {
-  name = categoryTarget(dist, "examples")
-  description = "srcML package for ${dist.name}"
-  labels = {
-    "org.opencontainers.image.title" = "srcML ${dist.name} Package Files"
-    "org.opencontainers.image.description" = <<EOF
-The srcML package files for ${dist.name}.
-EOF
-  }
-  matrix = {
-    dist = distributions
-  }
-  dockerfile-inline = <<EOF
-${builderStage(dist)}
-FROM ${tagName(dist)} AS examples
-COPY --from="packager" \
-  /src-build/dist/*.rpm \
-  /src-build/dist/*.deb \
-  /src-build/dist/*.tar.gz \
-  /src-build/dist/*.bz2 \
-  /
-RUN apt-get install /*.deb
-EOF
-  tags     = [categoryTagName(dist, "examples")]
-  # output   = ["type=local,dest=${SRCML_BAKE_DESTINATION_DIR}"]
-  inherits = ["base"]
-}
-
-
 # Target name
 function "targetName" {
   params = [item]
