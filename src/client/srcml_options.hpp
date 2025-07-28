@@ -14,9 +14,9 @@
 
 class SRCMLOptions {
 public:
-    friend void enable(uint_fast64_t option);
+    friend void enable(unsigned long long option);
 
-    static void set(uint_fast64_t options) {
+    static void set(unsigned long long options) {
 
         opt = options;
     }
@@ -30,12 +30,12 @@ public:
     static uint_fast64_t opt;
 };
 
-inline bool option(uint_fast64_t option) {
+inline bool option(unsigned long long option) {
 
     return SRCMLOptions::get() & option;
 }
 
-inline void enable(uint_fast64_t option) {
+inline void enable(unsigned long long option) {
 
     SRCMLOptions::opt |= option;
 }

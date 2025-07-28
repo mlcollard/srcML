@@ -23,58 +23,58 @@
 #include <libarchive_utilities.hpp>
 
 // Internal srcml command options
-const uint_fast64_t SRCML_COMMAND_LONGINFO                  = 1ULL << 0;
-const uint_fast64_t SRCML_COMMAND_INFO                      = 1ULL << 1;
+const unsigned long long SRCML_COMMAND_LONGINFO                  = 1ull << 0ull;
+const unsigned long long SRCML_COMMAND_INFO                      = 1ull << 1ull;
 
-const uint_fast64_t SRCML_COMMAND_CPP_TEXT_IF0              = 1ULL << 2;
-const uint_fast64_t SRCML_COMMAND_CPP_MARKUP_ELSE           = 1ULL << 3;
-const uint_fast64_t SRCML_COMMAND_QUIET                     = 1ULL << 4;
-const uint_fast64_t SRCML_COMMAND_VERBOSE                   = 1ULL << 5;
-const uint_fast64_t SRCML_COMMAND_VERSION                   = 1ULL << 6;
+const unsigned long long SRCML_COMMAND_CPP_TEXT_IF0              = 1ull << 2ull;
+const unsigned long long SRCML_COMMAND_CPP_MARKUP_ELSE           = 1ull << 3ull;
+const unsigned long long SRCML_COMMAND_QUIET                     = 1ull << 4ull;
+const unsigned long long SRCML_COMMAND_VERBOSE                   = 1ull << 5ull;
+const unsigned long long SRCML_COMMAND_VERSION                   = 1ull << 6ull;
 
-const uint_fast64_t SRCML_COMMAND_XML                       = 1ULL << 7;
-const uint_fast64_t SRCML_COMMAND_SRC                       = 1ULL << 8;
-const uint_fast64_t SRCML_COMMAND_LIST                      = 1ULL << 9;
-const uint_fast64_t SRCML_COMMAND_UNITS                     = 1ULL << 10;
+const unsigned long long SRCML_COMMAND_XML                       = 1ull << 7ull;
+const unsigned long long SRCML_COMMAND_SRC                       = 1ull << 8ull;
+const unsigned long long SRCML_COMMAND_LIST                      = 1ull << 9ull;
+const unsigned long long SRCML_COMMAND_UNITS                     = 1ull << 10ull;
 
-const uint_fast64_t SRCML_COMMAND_TO_DIRECTORY              = 1ULL << 11;
-const uint_fast64_t SRCML_COMMAND_TIMESTAMP                 = 1ULL << 12;
+const unsigned long long SRCML_COMMAND_TO_DIRECTORY              = 1ull << 11ull;
+const unsigned long long SRCML_COMMAND_TIMESTAMP                 = 1ull << 12ull;
 
-const uint_fast64_t SRCML_COMMAND_DISPLAY_SRCML_LANGUAGE    = 1ULL << 13;
-const uint_fast64_t SRCML_COMMAND_DISPLAY_SRCML_URL         = 1ULL << 14;
-const uint_fast64_t SRCML_COMMAND_DISPLAY_SRCML_FILENAME    = 1ULL << 15;
-const uint_fast64_t SRCML_COMMAND_DISPLAY_SRCML_SRC_VERSION = 1ULL << 16;
-const uint_fast64_t SRCML_COMMAND_DISPLAY_SRCML_TIMESTAMP   = 1ULL << 17;
-const uint_fast64_t SRCML_COMMAND_DISPLAY_SRCML_HASH        = 1ULL << 18;
-const uint_fast64_t SRCML_COMMAND_DISPLAY_SRCML_ENCODING    = 1ULL << 19;
+const unsigned long long SRCML_COMMAND_DISPLAY_SRCML_LANGUAGE    = 1ull << 13ull;
+const unsigned long long SRCML_COMMAND_DISPLAY_SRCML_URL         = 1ull << 14ull;
+const unsigned long long SRCML_COMMAND_DISPLAY_SRCML_FILENAME    = 1ull << 15ull;
+const unsigned long long SRCML_COMMAND_DISPLAY_SRCML_SRC_VERSION = 1ull << 16ull;
+const unsigned long long SRCML_COMMAND_DISPLAY_SRCML_TIMESTAMP   = 1ull << 17ull;
+const unsigned long long SRCML_COMMAND_DISPLAY_SRCML_HASH        = 1ull << 18ull;
+const unsigned long long SRCML_COMMAND_DISPLAY_SRCML_ENCODING    = 1ull << 19ull;
 
-const uint_fast64_t SRCML_COMMAND_NO_COLOR                  = 1ULL << 20;
+const unsigned long long SRCML_COMMAND_NO_COLOR                  = 1ull << 20ull;
 
-const uint_fast64_t SRCML_COMMAND_UPDATE                    = 1ULL << 21;
+const unsigned long long SRCML_COMMAND_UPDATE                    = 1ull << 21ull;
 
-const uint_fast64_t SRCML_COMMAND_NOARCHIVE                 = 1ULL << 22;
+const unsigned long long SRCML_COMMAND_NOARCHIVE                 = 1ull << 22ull;
 
-const uint_fast64_t SRCML_DEBUG_MODE                        = 1ULL << 23;
+const unsigned long long SRCML_DEBUG_MODE                        = 1ull << 23ull;
 
-const uint_fast64_t SRCML_TIMING_MODE                       = 1ULL << 24;
+const unsigned long long SRCML_TIMING_MODE                       = 1ull << 24ull;
 
-const uint_fast64_t SRCML_ARCHIVE                           = 1ULL << 25;
+const unsigned long long SRCML_ARCHIVE                           = 1ull << 25ull;
 
-const uint_fast64_t SRCML_HASH                              = 1ULL << 26;
+const unsigned long long SRCML_HASH                              = 1ull << 26ull;
 
-const uint_fast64_t SRCML_COMMAND_XML_RAW                   = 1ULL << 27;
-const uint_fast64_t SRCML_COMMAND_XML_FRAGMENT              = 1ULL << 28;
+const unsigned long long SRCML_COMMAND_XML_RAW                   = 1ull << 27ull;
+const unsigned long long SRCML_COMMAND_XML_FRAGMENT              = 1ull << 28ull;
 
-const uint_fast64_t SRCML_COMMAND_PARSER_TEST               = 1ULL << 29;
+const unsigned long long SRCML_COMMAND_PARSER_TEST               = 1ull << 29ull;
 
-const uint_fast64_t SRCML_COMMAND_CAT_XML                   = 1ULL << 30;
+const unsigned long long SRCML_COMMAND_CAT_XML                   = 1ull << 30ull;
 
-const uint_fast64_t SRCML_COMMAND_NULL                      = 1ULL << 31;
+const unsigned long long SRCML_COMMAND_NULL                      = 1ull << 31ull;
 
-const uint_fast64_t SRCML_COMMAND_HEADER                    = 1ULL << 32;
+const unsigned long long SRCML_COMMAND_SRCQL_WARNING_OFF         = 1ull << 32ull;
 
 // commands that are simple queries on srcml
-const uint_fast64_t SRCML_COMMAND_INSRCML =
+const unsigned long long SRCML_COMMAND_INSRCML =
     SRCML_COMMAND_LONGINFO |
     SRCML_COMMAND_INFO    |
     SRCML_COMMAND_VERSION |
@@ -111,7 +111,8 @@ struct srcml_request_t {
 
     std::optional<std::size_t> stdindex;
 
-    uint_fast64_t command = 0;
+    unsigned long long command = 0ull;
+
     std::optional<int> markup_options;
 
     // unit attributes

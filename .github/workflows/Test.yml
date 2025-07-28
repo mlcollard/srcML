@@ -13,7 +13,7 @@ jobs:
     steps:
 
       - name: Checkout Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Setup Ubuntu
         shell: bash
@@ -22,16 +22,14 @@ jobs:
           sudo apt install antlr libantlr-dev libantlr-java libarchive-dev \
                            libcurl4-openssl-dev libxml2-utils libxslt1-dev \
                            ninja-build
-          curl -L http://www.sdml.cs.kent.edu/build/srcML-1.0.0-Boost.tar.gz | \
-              sudo tar xz -C /usr/local/include
+
 
       - name: Setup macOS
         shell: bash
         if: ${{ matrix.os == 'macos-latest' }}
         run: |
           brew install ninja antlr2 --display-times
-          curl -L http://www.sdml.cs.kent.edu/build/srcML-1.0.0-Boost.tar.gz | \
-            sudo tar xz -C /usr/local/include
+
 
       - name: Setup Windows
         uses: microsoft/setup-msbuild@v1
@@ -111,7 +109,7 @@ jobs:
         run: |
           export SRCML_HOME="/c/Program Files (x86)/srcML/bin"
           ctest -C Release -VV
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         with:
           name: ClientTest.${{ runner.os }}.log
           path: build/Testing/Temporary/LastTest.log
@@ -123,7 +121,7 @@ jobs:
         continue-on-error: true
         run: |
           ctest -VV
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         with:
           name: ClientTest.${{ runner.os }}.log
           path: build/Testing/Temporary/LastTest.log
@@ -143,7 +141,7 @@ jobs:
         continue-on-error: true
         run: |
           ctest -C Release -R ^test_
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         with:
           name: libsrcmlTest.${{ runner.os }}.log
           path: build/Testing/Temporary/LastTest.log
@@ -169,7 +167,7 @@ jobs:
         run: |
           srcml --parser-test test/parser/testsuite | tee ParserTest.log
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         with:
           name: ParserTest.${{ runner.os }}.log
           path: build/ParserTest.log

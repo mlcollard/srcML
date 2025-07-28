@@ -189,6 +189,7 @@ srcml_request_t parseCLI11(int argc, char* argv[]) {
     std::optional<std::string> xsltParamCache;
 
     // positional arguments, i.e., input files
+    bool isXSLTFilename = false;
     auto xsltEntry = srcml_request.transformations.begin();
     app.add_option_function<std::vector<std::string>>("InputFiles", [&](const std::vector<std::string>&) {}, "")
         ->group("")
@@ -202,7 +203,7 @@ srcml_request_t parseCLI11(int argc, char* argv[]) {
 
             // xslt transformation file
             if (input.extension == ".xsl"sv) {
-
+                isXSLTFilename = true;
                 xsltEntry = srcml_request.transformations.insert(srcml_request.transformations.begin(), src_prefix_add_uri("xslt", src_prefix_resource(input.filename)));
                 if (xsltParamCache) {
                     srcml_request.transformations.insert(std::next(xsltEntry), src_prefix_add_uri("xslt-param", *xsltParamCache));
@@ -567,7 +568,7 @@ srcml_request_t parseCLI11(int argc, char* argv[]) {
     }
 
     app.add_option("--srcql",
-        "Apply SRCQL query to each individual srcML unit")
+        "Apply SRCQL query to each individual srcML unit. Query must be in single quotes, e.g., 'FIND int $V;', to prevent shell variable expansion")
         ->type_name("SRCQL")
         ->group("QUERY & TRANSFORMATION");
 
@@ -582,6 +583,10 @@ srcml_request_t parseCLI11(int argc, char* argv[]) {
                 srcml_request.xpath_query_support.insert(srcml_request.xpath_query_support.begin(), std::make_pair(std::nullopt,std::nullopt));
             });
     }
+
+    app.add_flag_callback("--srcql-warning-off,-F", [&]() { srcml_request.command |= SRCML_COMMAND_SRCQL_WARNING_OFF; },
+        "Turn off warning for srcql queries that have no logical variables")
+        ->group("QUERY & TRANSFORMATION");
 
     app.add_option("--attribute",
         "Insert attribute PRE:NAME=\"VALUE\" into element results of XPath query in original unit")
@@ -663,21 +668,25 @@ srcml_request_t parseCLI11(int argc, char* argv[]) {
             srcml_request.xpath_query_support.back().first = element{ value.substr(0, elemn_index), value.substr(elemn_index + 1) };
         });
 
-    auto xslt =
+    bool isXSLTOption = false;
     app.add_option("--xslt",
         "Apply the XSLT program FILE to each unit, where FILE can be a url")
         ->type_name("FILE")
         ->group("QUERY & TRANSFORMATION")
         ->each([&](std::string value) {
+            isXSLTOption = true;
             xsltEntry = srcml_request.transformations.insert(srcml_request.transformations.begin(), src_prefix_add_uri("xslt", value));
         });
 
+    bool isXSLTParam = false;
     app.add_option("--xslt-param",
         "Passes the string parameter NAME with UTF-8 encoded string VALUE to the XSLT program")
         ->type_name("NAME=\"VALUE\"")
         ->group("QUERY & TRANSFORMATION")
         // ->needs(xslt)
         ->each([&](std::string value) {
+            isXSLTParam = true;
+
             // insert after the xslt entry
             auto entry = src_prefix_add_uri("xslt-param", value);
             if (srcml_request.transformations.empty()) {
@@ -775,9 +784,34 @@ srcml_request_t parseCLI11(int argc, char* argv[]) {
         exit(CLI_STATUS_ERROR);
     }
 
+    // A srcql query should have at least one logical variable
+    for (const auto& trans : srcml_request.transformations) {
+
+        auto [protocol, resource] = src_prefix_split_uri(trans);
+
+        if (protocol != "srcql"sv)
+            continue;
+
+        if (!(srcml_request.command & SRCML_COMMAND_SRCQL_WARNING_OFF) && resource.find('$') == std::string::npos) {
+            std::cerr << "\033[31msrcml: WARNING The srcql query '" << resource << "'\n" <<
+                "does not contain a srcql logical variable that starts with a \033[1m$\033[0m.\n"
+                "\033[31mIf your srcql query was meant to contain a logical variable, then enclose the\n"
+                "entire query in single quotes, not double quotes, to prevent shell variable\n"
+                "expansion. If not, you can safely ignore this message or disable it with the\n"
+                "option \033[1;31m--srcql-warning-off\033[0m \033[31mor \033[1;31m-F\033[0m\033[31m.\033[0m\n\n";
+            break;
+        }
+    }
+
     // make sure --text has an indication of language
     if (isText && language->empty() && filename->empty()) {
         SRCMLstatus(ERROR_MSG, "srcml: --text requires --language or --filename to determine source language");
+        exit(CLI_STATUS_ERROR);
+    }
+
+    // The --xslt-param requires either a --xslt option or an XSL filename
+    if (isXSLTParam && !isXSLTOption && !isXSLTFilename) {
+        SRCMLstatus(ERROR_MSG, "srcml: --xslt-param requires --xslt or an XSLT filename");
         exit(CLI_STATUS_ERROR);
     }
 

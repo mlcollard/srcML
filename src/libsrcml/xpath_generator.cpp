@@ -17,7 +17,8 @@ std::vector<std::string> split(std::string str, std::string delim) {
         if (sub != "") { res.push_back(sub); }
         pos = end + delim.size();
     }
-    res.push_back(str.substr(pos,str.size()-pos));
+    std::string sub = str.substr(pos,str.size()-pos);
+    if (sub != "") { res.push_back(sub); }
     return res;
 }
 
@@ -167,6 +168,9 @@ XPathNode* XPathGenerator::get_xpath_from_argument(std::string src_query) {
     srcml_unit_free(converter);
 
     bool change_from_macro = pat_to_srcml.find("macro") != std::string::npos;
+    bool extract_expr_from_expr_stmt = language == "Python" &&
+                                       pat_to_srcml.find("<",1) == pat_to_srcml.find("<expr_stmt>") &&
+                                       pat_to_srcml.find("<expr_stmt>") == pat_to_srcml.rfind("<expr_stmt>");
 
     if (change_from_macro) {
         srcml_unit* macro_change = srcml_unit_create(holder);
@@ -177,6 +181,12 @@ XPathNode* XPathGenerator::get_xpath_from_argument(std::string src_query) {
 
         srcml_unit_free(macro_change);
     }
+
+    if (extract_expr_from_expr_stmt) {
+        pat_to_srcml.replace(pat_to_srcml.find("<expr_stmt>"),11,"");
+        pat_to_srcml.replace(pat_to_srcml.find("</expr_stmt>"),12,"");
+    }
+
 
     srcml_archive_close(holder);
     srcml_archive_free(holder);
@@ -192,6 +202,7 @@ XPathNode* XPathGenerator::get_xpath_from_argument(std::string src_query) {
     XPathNode* xpath_root = new XPathNode();
     convert_traverse(srcml_root, xpath_root);
     organize_add_calls(xpath_root);
+    add_sibling_count_predicates(xpath_root);
     // add_bucket_clears(xpath_root);
     return xpath_root;
 }
@@ -430,7 +441,17 @@ std::string XPathGenerator::convert() {
         }
     }
 
-    assert(operations.size() == source_exprs.size()-1);
+    // Check if provided query was invalid
+    if (operations.size() != source_exprs.size()-1) {
+        // Invalid query, return ""
+        return "";
+    }
+    for (auto expr : source_exprs) {
+        if (expr->to_string() == "") {
+            // Invalid query, return ""
+            return "";
+        }
+    }
 
     // WHERE NOT and WHERE COUNT and WITH
     for (size_t i = 0; i < operations.size(); ++i) {
@@ -801,8 +822,59 @@ void XPathGenerator::organize_add_calls(XPathNode* x_node) {
     if (x_node->is_variable_node()) {
         x_node->add_child(x_node->pop_child_beginning());
     }
-    for (auto xnode : x_node->get_children()) {
-        organize_add_calls(xnode);
+    for (auto child : x_node->get_children()) {
+        organize_add_calls(child);
+    }
+}
+
+// Counts all following-sibling chains and adds a predicate which pre-enforces (>=) this count
+void XPathGenerator::add_sibling_count_predicates(XPathNode* x_node) {
+    // Loop through children, look for a "following-sibling" predicate
+    bool sibling_pred_found = false;
+    for (auto child : x_node->get_children()) {
+        if (child->get_type() == PREDICATE && child->get_text().find("following-sibling") == 0) {
+            sibling_pred_found = true;
+        }
+    }
+    if (sibling_pred_found) {
+        std::map<std::string,int> sibling_map;
+        bool loop = true;
+        XPathNode* current_node = x_node;
+        while (loop) {
+            bool found = false;
+            for (auto child : current_node->get_children()) {
+                if (child->get_type() == PREDICATE && child->get_text().find("following-sibling") == 0) {
+                    found = true;
+                    XPathNode* copy = new XPathNode(*child,true);
+                    copy->set_type(NO_CONN);
+                    std::string sibling_text = copy->to_string();
+                    delete copy;
+                    if (sibling_map.find(sibling_text) == sibling_map.end()) {
+                        sibling_map.insert(std::make_pair(sibling_text,0));
+                    }
+                    sibling_map.at(sibling_text)++;
+                    current_node = child;
+                    break;
+                }
+            }
+            if (!found) {
+                loop = false;
+            }
+        }
+
+        std::string insert_text = "";
+        for (auto sibling : sibling_map) {
+            insert_text += "count(" + sibling.first + ") >= " + std::to_string(sibling.second) + " and ";
+        }
+        insert_text.erase(insert_text.end()-5,insert_text.end());
+
+        XPathNode* sibling_predicate = new XPathNode(insert_text,PREDICATE);
+        x_node->add_child_beginning(sibling_predicate);
+    }
+
+    // Recursive call on children
+    for (auto child : x_node->get_children()) {
+        add_sibling_count_predicates(child);
     }
 }
 
@@ -841,7 +913,7 @@ void XPathGenerator::convert_traverse(xmlNode* top_xml_node, XPathNode* x_node) 
             // If not a variable node
             if (!is_variable_node(node)) {
                 // Special check for converting expr_stmt patterns to include decl_stmt
-                if (get_full_name(node) == "src:expr_stmt" && get_full_name(node->children) == "src:expr" && xmlChildElementCount(node->children) == 1 && get_full_name(node->children->children) == "src:name") {
+                if (!is_no_decl_language() && get_full_name(node) == "src:expr_stmt" && get_full_name(node->children) == "src:expr" && xmlChildElementCount(node->children) == 1 && get_full_name(node->children->children) == "src:name") {
 
                     if (x_node->get_parent() == nullptr) {
                         x_node->set_type(PARENTHESES);
@@ -854,7 +926,7 @@ void XPathGenerator::convert_traverse(xmlNode* top_xml_node, XPathNode* x_node) 
                     }
                 }
                 // Special check for converting expr patterns to include decls
-                else if (get_full_name(node) == "src:expr" && xmlChildElementCount(node) == 1 && get_full_name(node->children) == "src:name") {
+                else if (!is_no_decl_language() && get_full_name(node) == "src:expr" && xmlChildElementCount(node) == 1 && get_full_name(node->children) == "src:name") {
 
                     if (x_node->get_parent() == nullptr) {
                         x_node->set_type(PARENTHESES);
@@ -935,6 +1007,7 @@ void XPathGenerator::convert_traverse(xmlNode* top_xml_node, XPathNode* x_node) 
             }
 
         }
+
 
         // Create new XPath node as child of current. 
         // ONLY DO IF NEXT CHILD IS A VALID ELEMENT,
@@ -1027,4 +1100,8 @@ void XPathGenerator::get_variable_info(std::string_view text, std::string& varia
     std::string s = extract_variable(std::string(text));
     variable = s.substr(0,s.find("_"));
     order = stoi(s.substr(s.find("_")+1,s.length()-1));
+}
+
+bool XPathGenerator::is_no_decl_language() {
+    return language == "Python";
 }

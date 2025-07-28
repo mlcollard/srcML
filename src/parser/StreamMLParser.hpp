@@ -97,6 +97,26 @@ public:
         if((srcMLParser::getMode() & srcMLParser::MODE_ISSUE_EMPTY_AT_POP).any())
             pushSToken(id);
 
+        // grab any c-attribute in the skipped tokens and output those before the end token
+        if (!inAttribute && ((srcMLParser::getMode() & srcMLParser::MODE_INCLUDE_ATTRIBUTE) != 0ull)) {
+
+            // find the last SATTRIBUTE, which is the end token of any c-attributes
+            auto rend = std::find_if(skiptb.rbegin(), skiptb.rend(),
+                [](const antlr::RefToken& tok) {
+                    return tok->getType() == srcMLParser::SATTRIBUTE;
+                });
+            if (rend != skiptb.rend()) {
+
+                // Convert reverse iterator to regular iterator
+                auto end = rend.base();
+
+                // flush the prefix that includes all attributes (and the whitespace before them)
+                // to the output buffer
+                output().insert(output().end(), std::make_move_iterator(skiptb.begin()), std::make_move_iterator(end));
+                skiptb.erase(skiptb.begin(), end);
+            }
+        }
+
         pushEToken(id);
         srcMLParser::currentState().pop();
     }
@@ -166,12 +186,20 @@ private:
         try {
 
             if (consumeSkippedToken()) {
+
                 flushSkip();
                 return;
             }
 
             // more partial parsing to do
-            srcMLParser::start();
+            switch (getLanguage()) {
+            case LANGUAGE_PYTHON:
+                srcMLParser::start_python();
+                break;
+
+            default:
+                srcMLParser::start();
+            }
 
         } catch (const std::exception&) {
 
@@ -398,6 +426,65 @@ private:
 
                 break;
 
+            case srcMLParser::HASHBANG_COMMENT_START:
+
+                pushSSkipToken(srcMLParser::SHASHBANG_COMMENT);
+                pushSkipToken();
+                srcMLParser::consume();
+
+                open_comments.push(srcMLParser::SHASHBANG_COMMENT);
+
+                break;
+
+            case srcMLParser::HASHBANG_COMMENT_END:
+
+                open_comments.pop();
+
+                if (srcMLParser::LT(1)->getText().back() != '\n') {
+                    pushSkipToken();
+                    srcMLParser::consume();
+                    pushESkipToken(srcMLParser::SHASHBANG_COMMENT);
+                } else {
+                    pushESkipToken(srcMLParser::SHASHBANG_COMMENT);
+                    pushSkipToken();
+                    srcMLParser::consume();
+                }
+
+
+                break;
+
+            case srcMLParser::HASHTAG_COMMENT_START:
+
+                pushSSkipToken(srcMLParser::SHASHTAG_COMMENT);
+                pushSkipToken();
+                srcMLParser::consume();
+
+                open_comments.push(srcMLParser::SHASHTAG_COMMENT);
+
+                break;
+
+            case srcMLParser::HASHTAG_COMMENT_END:
+
+                open_comments.pop();
+
+                if (srcMLParser::LT(1)->getText().back() != '\n') {
+                    pushSkipToken();
+                    srcMLParser::consume();
+                    pushESkipToken(srcMLParser::SHASHTAG_COMMENT);
+                } else {
+                    pushESkipToken(srcMLParser::SHASHTAG_COMMENT);
+                    pushSkipToken();
+                    srcMLParser::consume();
+                }
+
+                // null out any inserted terminate after a comment
+                if (srcMLParser::LT(1)->getType() == srcMLParser::TERMINATE &&
+                    srcMLParser::LT(1)->getText() == "") {
+                    srcMLParser::LT(1)->setType(srcMLParser::SNOP);
+                }
+
+                break;
+
             default:
                 // skipped tokens are put on a special buffer
                 pushSkipToken();
@@ -474,6 +561,39 @@ private:
             inskip = false;
             return true;
 
+        }
+
+        // c attribute
+        if (!inAttribute && srcMLParser::LA(1) == srcMLParser::C_ATTRIBUTE) {
+
+            inAttribute = true;
+
+            // use preprocessor token buffers
+            pouttb = &pretb;
+            pskiptb = &skippretb;
+
+            // parse c attribute
+            try {
+
+                srcMLParser::attribute_c();
+
+            } catch(...) {}
+
+            // flush remaining whitespace from preprocessor handling onto preprocessor buffer
+            pretb.insert(pretb.end(), std::make_move_iterator(skippretb.begin()), std::make_move_iterator(skippretb.end()));
+            skippretb.clear();
+
+            // move back to normal buffer
+            pskiptb = &skiptb;
+            pouttb = &tb;
+
+            // put preprocessor buffer into skipped buffer
+            skiptb.insert(skiptb.end(), std::make_move_iterator(pretb.begin()), std::make_move_iterator(pretb.end()));
+            pretb.clear();
+
+            inAttribute = false;
+
+            return true;
         }
 
         if (srcMLParser::LA(1) == srcMLParser::VISUAL_CXX_ASM) {
@@ -766,6 +886,9 @@ private:
 
     /** if in a skip */
     bool inskip = false;
+
+    /** if in an attribute */
+    bool inAttribute = false;
 
     /** token buffer */
     std::deque<antlr::RefToken> tb;
