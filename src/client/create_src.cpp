@@ -245,18 +245,6 @@ void create_src(const srcml_request_t& srcml_request,
                 }
             }
 
-            // output the text header if requested
-            if (option(SRCML_COMMAND_HEADER)) {
-
-                const auto header = createYAMLHeader(arch.get(), unit.get(), count == 0);
-                write(destination, header.data(), header.size());
-            }
-
-            if (count && !option(SRCML_COMMAND_NULL)) {
-                if (lastchar != '\n' && write(1, "\n", 1) == -1) {
-                    SRCMLstatus(ERROR_MSG, "Unable to write to stdout");
-                    break;
-
             while (1) {
                 std::unique_ptr<srcml_unit> unit(srcml_archive_read_unit(arch.get()));
                 if (srcml_request.unit && !unit) {
@@ -282,6 +270,20 @@ void create_src(const srcml_request_t& srcml_request,
                         SRCMLstatus(ERROR_MSG, "Unable to write to stdout");
                         break;
                     }
+                }
+
+                if (count && !option(SRCML_COMMAND_NULL)) {
+                    if (lastchar != '\n' && write(1, "\n", 1) == -1) {
+                        SRCMLstatus(ERROR_MSG, "Unable to write to stdout");
+                        break;
+                    }
+                }
+
+                // output the text header if requested
+                if (option(SRCML_COMMAND_HEADER)) {
+
+                    const auto header = createYAMLHeader(arch.get(), unit.get(), count == 0);
+                    write(destination, header.data(), header.size());
                 }
 
                 if (count && !option(SRCML_COMMAND_NULL)) {

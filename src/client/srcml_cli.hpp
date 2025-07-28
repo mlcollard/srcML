@@ -73,6 +73,8 @@ const unsigned long long SRCML_COMMAND_NULL                      = 1ull << 31ull
 
 const unsigned long long SRCML_COMMAND_SRCQL_WARNING_OFF         = 1ull << 32ull;
 
+const unsigned long long SRCML_COMMAND_HEADER                    = 1ull << 33ull;
+
 // commands that are simple queries on srcml
 const unsigned long long SRCML_COMMAND_INSRCML =
     SRCML_COMMAND_LONGINFO |
