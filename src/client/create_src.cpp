@@ -125,73 +125,75 @@ void create_src(const srcml_request_t& srcml_request,
             src_output_filesystem(arch.get(), destination, log);
         }
 
-    } else if (input_sources.size() == 1 && contains<int>(destination) &&
+    } else if (input_sources.size() >= 1 && contains<int>(destination) &&
                destination.compressions.empty() && destination.archives.empty()) {
 
         // srcml->src extract to stdout
-
-        auto arch(srcml_read_open_internal(input_sources[0], srcml_request.revision));
-
-        // move to the correct unit
-        for (int i = 1; i < srcml_request.unit; ++i) {
-            if (!srcml_archive_skip_unit(arch.get())) {
-                SRCMLstatus(ERROR_MSG, "Requested unit %s out of range.", srcml_request.unit);
-                exit(1);
-            }
-        }
-
         int count = 0;
         char lastchar = '\0';
-        while (1) {
-            std::unique_ptr<srcml_unit> unit(srcml_archive_read_unit(arch.get()));
-            if (srcml_request.unit && !unit) {
-                SRCMLstatus(ERROR_MSG, "Requested unit %s out of range.", srcml_request.unit);
-                exit(1);
-            }
-            if (!unit)
-                break;
+        for (auto& input_source : input_sources) {
 
-            // set encoding for source output
-            // NOTE: How this is done may change in the future
-            if (srcml_request.src_encoding)
-                srcml_archive_set_src_encoding(arch.get(), srcml_request.src_encoding->data());
+            auto arch(srcml_read_open_internal(input_source, srcml_request.revision));
 
-            // if requested eol, then use that
-            if (srcml_request.eol)
-                srcml_unit_set_eol(unit.get(), *srcml_request.eol);
-
-            // before source null output separator
-            if (count && option(SRCML_COMMAND_NULL)) {
-                if (write(1, "", 1) == -1) {
-                    SRCMLstatus(ERROR_MSG, "Unable to write to stdout");
-                    break;
+            // move to the correct unit
+            for (int i = 1; i < srcml_request.unit; ++i) {
+                if (!srcml_archive_skip_unit(arch.get())) {
+                    SRCMLstatus(ERROR_MSG, "Requested unit %s out of range.", srcml_request.unit);
+                    exit(1);
                 }
             }
 
-            if (count && !option(SRCML_COMMAND_NULL)) {
-                if (lastchar != '\n' && write(1, "\n", 1) == -1) {
-                    SRCMLstatus(ERROR_MSG, "Unable to write to stdout");
-                    break;
+            while (1) {
+                std::unique_ptr<srcml_unit> unit(srcml_archive_read_unit(arch.get()));
+                if (srcml_request.unit && !unit) {
+                    SRCMLstatus(ERROR_MSG, "Requested unit %s out of range.", srcml_request.unit);
+                    exit(1);
                 }
+                if (!unit)
+                    break;
+
+                // set encoding for source output
+                // NOTE: How this is done may change in the future
+                if (srcml_request.src_encoding)
+                    srcml_archive_set_src_encoding(arch.get(), srcml_request.src_encoding->data());
+
+                // if requested eol, then use that
+                if (srcml_request.eol)
+                    srcml_unit_set_eol(unit.get(), *srcml_request.eol);
+
+                // before source null output separator
+                if (count && option(SRCML_COMMAND_NULL)) {
+                    if (write(1, "", 1) == -1) {
+                        SRCMLstatus(ERROR_MSG, "Unable to write to stdout");
+                        break;
+                    }
+                }
+
+                if (count && !option(SRCML_COMMAND_NULL)) {
+                    if (lastchar != '\n' && write(1, "\n", 1) == -1) {
+                        SRCMLstatus(ERROR_MSG, "Unable to write to stdout");
+                        break;
+                    }
+                }
+
+                // unparse directly to the destintation
+                srcml_unit_unparse_fd(unit.get(), destination);
+
+                // after source newline
+                if (!option(SRCML_COMMAND_NULL)) {
+                    const auto size = srcml_unit_get_src_size(unit.get());
+                    lastchar = size ? srcml_unit_get_src(unit.get())[size - 1] : '\0';
+                }
+
+                // get out if only one unit
+                if (srcml_request.unit)
+                    break;
+
+                ++count;
             }
-
-            // unparse directly to the destintation
-            srcml_unit_unparse_fd(unit.get(), destination);
-
-            // after source newline
-            if (!option(SRCML_COMMAND_NULL)) {
-                const auto size = srcml_unit_get_src_size(unit.get());
-                lastchar = size ? srcml_unit_get_src(unit.get())[size - 1] : '\0';
-            }
-
-            // get out if only one unit
-            if (srcml_request.unit)
-                break;
-
-            ++count;
         }
 
-        if ((count > 2 || !srcml_request.transformations.empty()) && !option(SRCML_COMMAND_NULL)) {
+        if ((count >= 2 || !srcml_request.transformations.empty()) && !option(SRCML_COMMAND_NULL)) {
             if (lastchar != '\n' && write(1, "\n", 1) == -1) {
                 SRCMLstatus(ERROR_MSG, "Unable to write to stdout");
                 exit(1);

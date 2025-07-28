@@ -120,4 +120,12 @@
 <attribute>[[<expr><name>noreturn</name></expr>]]</attribute>
 </unit>
 
+<unit xmlns="http://www.srcML.org/srcML/src" revision="1.0.0" language="C++">
+<using>using <attribute>[[<expr><name>deprecated</name></expr>]]</attribute> <name>f</name>;</using>
+</unit>
+
+<unit xmlns="http://www.srcML.org/srcML/src" revision="1.0.0" language="C++">
+<namespace>namespace <attribute>[[<expr><name>deprecated</name></expr>]]</attribute> <name>f</name>;</namespace>
+</unit>
+
 </unit>
