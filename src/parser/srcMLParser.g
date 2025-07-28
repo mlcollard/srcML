@@ -4021,6 +4021,7 @@ namespace_definition[] { ENTRY_DEBUG } :
 
         (namespace_inline_specifier)*
         NAMESPACE
+        (attribute_cpp)*
 ;
 
 /*
@@ -4071,6 +4072,7 @@ namespace_directive[] { ENTRY_DEBUG } :
         )*
 
         USING
+        (attribute_cpp)*
 ;
 
 /*
