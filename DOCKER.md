@@ -1,6 +1,6 @@
 # Docker
 
-[Direct Linux build of local files]: #direct-linux-build
+[Direct Linux build of local files]: #direct-linux-build-of-local-files
 [Build local srcML on a Linux distribution]: #build-srcml-on-a-linux-distribution
 [Debug srcML on a Linux distribution]: #debug-srcml-on-a-linux-distribution
 [Architecture]: #architecture
@@ -8,7 +8,7 @@
 
 srcML uses Docker images to build, package, and test on Linux. 
 
-If your host is not Linux (macOS or Windows), or you want to debug or build srcML on another distribution or version, the easiest way is to use these docker images.
+If your host is not Linux (macOS or Windows), or your host is Linux and you want to debug or build srcML on another distribution or version, the easiest way is to use these docker images.
 
 We currently support multiple versions of Ubuntu, Fedora, and OpenSUSE. For the complete list, see the variable `distributions` in the file _docker-bake.override.hcl_.
 
@@ -20,7 +20,7 @@ We currently support multiple versions of Ubuntu, Fedora, and OpenSUSE. For the 
 
 **Note** All commands shown below must be entered in the root of the source directory, _srcML_. They cannot be used from the build directory.
 
-## Direct Linux Build
+## Direct Linux build of local files
 
 The build environment docker images provide all the necessary software to build, generate packages, and test for a specific Linux distribution. You can directly use the image with docker:
 
@@ -28,9 +28,13 @@ The build environment docker images provide all the necessary software to build,
 docker run -v "${PWD}":/srcML --workdir /Build -it srcml/ubuntu:24.04
 ```
 
-This puts you in a shell in the /Build directory in a container with your current changes where you can enter your build commands.
+This puts you in a shell in the /Build directory in a container with your current changes where you can enter your build commands, such as running cmake
 
-The direct `docker run` command is quite complex, and this is only the start of configuration. To make it much easier you can use services defined in `docker compose`. See [Build srcML on a Linux distribution].
+```console
+root@b3c55c4d55f8:/Build# cmake /srcML
+```
+
+The direct `docker run` command is quite complex, and this is just the beginning of possible configurations. To make it much easier, you can use services defined in `docker compose`. See [Build srcML on a Linux distribution].
 
 ## Build srcML on Linux
 
@@ -79,7 +83,7 @@ docker compose up ubuntu_24_04
 ran the automated workflow preset. However, you can interact with the container:
 
 ```console
-docker compose up ubuntu_24_04 /bin/bash
+docker compose run ubuntu_24_04 /bin/bash
 ```
 
 This gives you a shell into the container. You can enter any command, but the source files (and directory) are read-only. A good first step is to use the configure preset:
@@ -88,9 +92,9 @@ This gives you a shell into the container. You can enter any command, but the so
 root@04285c4739e5:/srcML\# cmake --preset ci-ubuntu
 ```
 
-From there you can go to the _/srcML-Build_ directory and enter commands.
+From there, you can go to the _/srcML-build_ directory and enter commands.
 
-As you change the source code on the host, the change is reflected in the container's _/srcML_ directory.
+As you modify the source code on the host, the changes are reflected in the container's _/srcML_ directory.
 
 ## Use the Build Image Directly
 
