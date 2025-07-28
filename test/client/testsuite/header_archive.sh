@@ -319,6 +319,3 @@ check projectRootOutput.xml
 
 cat projectRoot.txt | srcml
 check projectRootOutput.xml
-
-# cat projectRoot.txt | srcml | srcml --header
-# check projectRoot.txt
