@@ -24,6 +24,77 @@
 
 using namespace ::std::literals::string_view_literals;
 
+/*
+    Parse a YAML header. Assume the entire header is passed, including the '---' demarcations
+*/
+std::unordered_map<std::string_view, std::string_view> parseYAMLHeader(std::string_view header) {
+
+    // remove start and end blocks of header
+    header.remove_prefix(4);
+    header.remove_suffix(4);
+
+    // process each key-value pair
+    std::unordered_map<std::string_view, std::string_view> keyValuePairs;
+    int lineSize = 0;
+    while (!header.empty()) {
+
+        // current line
+        const auto eol = header.find('\n');
+        if (eol <= 0)
+            break;
+        std::string_view line(header.begin(), eol);
+        lineSize = line.size();
+
+        // trim leading whitespace
+        line.remove_prefix(line.find_first_not_of(' '));
+
+        // remove any comments
+        const auto commentStart = line.find('#');
+        if (commentStart != line.npos)
+            line.remove_suffix(line.size() - commentStart);
+
+        // find the key-value separator skipping over quoted keys
+        int startPos = 0;
+        if (line[0] == '"') {
+            const auto endKey = line.find('"', 1);
+            if (endKey != line.npos)
+                startPos = endKey + 1;
+        }
+        const auto separator = line.find(':', startPos);
+        if (separator != line.npos) {
+
+            // split into rough key and value
+            std::string_view key = line.substr(0, separator);
+            std::string_view value = line.substr(separator + 1);
+
+            // trim tailing whitespaces from key
+            key.remove_suffix(key.size() - key.find_last_not_of(' ') - 1);
+
+            // trim whitespaces from value
+            value.remove_prefix(value.find_first_not_of(' '));
+            value.remove_suffix(value.size() - value.find_last_not_of(' ') - 1);
+
+            // remove optional quotes
+            if (key.front() == '\"') {
+                key.remove_prefix(1);
+                key.remove_suffix(key.back() == '\"');
+            }
+            if (value.front() == '\"') {
+                value.remove_prefix(1);
+                value.remove_suffix(value.back() == '\"');
+            }
+
+            // insert polished key-value
+            keyValuePairs[key] = value;
+        }
+
+        // completed this line
+        header.remove_prefix(lineSize + 1);
+    }
+
+    return keyValuePairs;
+}
+
 archive* libarchive_input_file(const srcml_input_src& input_file) {
 
     if (input_file.parchive) {
@@ -107,9 +178,17 @@ int src_input_libarchive(ParseQueue& queue,
     // this is to prevent trying to open, with srcml_archive_open_filename(), a non-srcml file,
     // which then hangs
     // Note: may need to fix in libsrcml
-    if ((!contains<int>(input_file) && !contains<FILE*>(input_file) && input_file.compressions.empty() && input_file.archives.empty() && !srcml_check_extension(input_file.plainfile.data())) | input_file.skip) {
+    if ((!contains<int>(input_file) && !option(SRCML_COMMAND_HEADER) && !contains<FILE*>(input_file) && input_file.compressions.empty() && input_file.archives.empty() && !srcml_check_extension(input_file.plainfile.data())) | input_file.skip) {
+
+
         // if we are not verbose, then just end this attemp
         if (!(option(SRCML_COMMAND_VERBOSE))) {
+
+            if (!input_file.exists) {
+                std::string s("srcml: Unable to open file ");
+                s += src_prefix_resource(input_file.filename);
+                SRCMLstatus(WARNING_MSG, s);
+            }
             return 0;
         }
 
@@ -128,6 +207,7 @@ int src_input_libarchive(ParseQueue& queue,
         prequest->srcml_arch = srcml_arch;
         prequest->language = "";
         prequest->status = SRCML_STATUS_UNSET_LANGUAGE;
+        prequest->exists = input_file.exists;
 
         // schedule for parsing
         queue.schedule(prequest);
@@ -223,18 +303,6 @@ int src_input_libarchive(ParseQueue& queue,
         if (language.empty())
             if (const char* l = srcml_archive_check_extension(srcml_arch, input_file.extension.data()))
                 language = l;
-
-        // stdin, single files require a explicit filename
-        if (language.empty() && input_file.filename == "stdin://-"sv) {
-            SRCMLstatus(ERROR_MSG, "Language required for stdin single files");
-            exit(1);
-        }
-
-        // if we don't have a language, and are not verbose, then just end this attemp
-        if (language.empty() && !(option(SRCML_COMMAND_VERBOSE))) {
-            ++count;
-            continue;
-        }
 
         std::optional<std::string_view> svBuffer = inBuffer;
         inBuffer.remove_prefix(inBuffer.size());
@@ -341,7 +409,87 @@ schedule:
                 }
             }
 
-            // schedule for parsing
+            // process a YAML header
+            auto& buffer = prequest->buffer;
+            if (buffer.size() > 7 && buffer[0] == '-' && buffer[1] == '-' && buffer[2] == '-') {
+
+                auto endpos = std::search(buffer.begin() + 3, buffer.end(), "---"sv.begin(), "---"sv.end());
+                if (endpos != buffer.end()) {
+
+                    std::string header(buffer.begin(), endpos + 3 + 1);
+                    auto parsedData = parseYAMLHeader(header);
+
+                    bool isHeader = false;
+                    for (const auto& [key, value] : parsedData) {
+                        if (value == "http://www.srcML.org/srcML/src") {
+                            isHeader = true;
+                            break;
+                        }
+                    }
+
+                    if (isHeader) {
+                        buffer.erase(buffer.begin(), buffer.begin() + header.size());
+
+                        // filename
+                        auto search = parsedData.find("filename");
+                        if (search != parsedData.end()) {
+                            prequest->filename = search->second;
+                        }
+
+                        // language
+                        search = parsedData.find("language");
+                        if (search != parsedData.end()) {
+                            prequest->language = search->second;
+                        }
+
+                        // src-version
+                        search = parsedData.find("src-version");
+                        if (search != parsedData.end()) {
+                            prequest->version = search->second;
+                        }
+
+                        // url on the archive
+                        search = parsedData.find("url");
+                        if (search != parsedData.end()) {
+                            srcml_archive_set_url(prequest->srcml_arch, std::string(search->second).data());
+                        }
+
+                        // register namespaces
+                        for (const auto &kv : parsedData) {
+
+                            if (kv.first.substr(0, "xmlns:"sv.size()) == "xmlns:"sv) {
+
+                                const std::string prefix(kv.first.substr("xmlns:"sv.size()));
+                                const std::string url(kv.second);
+                                srcml_unit_register_namespace(prequest->unit.get(), prefix.data(), url.data());
+                            }
+                        }
+
+                        // register attributes
+                        for (const auto &kv : parsedData) {
+                            if (kv.first.substr(0, "xmlns:"sv.size()) != "xmlns:"sv) {
+                                const auto separator = kv.first.find(':');
+                                if (separator != kv.first.npos) {
+
+                                    const std::string prefix(kv.first.substr(0, separator));
+                                    const std::string name(kv.first.substr(separator + 1));
+                                    std::string value(kv.second);
+                                    srcml_unit_add_attribute(prequest->unit.get(), prefix.c_str(), name.c_str(), value.c_str());
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // stdin, single files require a explicit filename
+            if (prequest->language.empty() && input_file.filename == "stdin://-"sv) {
+                SRCMLstatus(ERROR_MSG, "Language required for stdin single files");
+                exit(1);
+            }
+
+            prequest->status = !prequest->language.empty() ? 0 : SRCML_STATUS_UNSET_LANGUAGE;
+
             queue.schedule(prequest);
 
             ++count;

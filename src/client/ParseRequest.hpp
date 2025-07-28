@@ -38,6 +38,7 @@ struct ParseRequest {
     bool needsparsing = true;
     srcml_transform_result* results = nullptr;
     std::shared_ptr<srcml_archive> input_archive;
+    bool exists = true;
 };
 
 #endif
