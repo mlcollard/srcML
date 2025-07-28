@@ -706,7 +706,15 @@ srcml_request_t parseCLI11(int argc, char* argv[]) {
 
     // separate output with nulls
     app.add_flag_callback("--print0,-Z",    [&]() { srcml_request.command |= SRCML_COMMAND_NULL; },
-        "Separate output with an ASCII NULL ('\0')")
+        "Separate output with an ASCII NUL ('\\0')")
+        ->group("EXTRACTING SOURCE CODE");
+
+    // separate output with nulls
+    app.add_flag_callback("--header,-H",    [&]() {
+            srcml_request.command |= SRCML_COMMAND_HEADER;
+            srcml_request.command |= SRCML_COMMAND_NULL;
+        },
+        "On source output, it adds a YAML header block and automatically enables --print0; on input, it indicates a file contains YAML headers")
         ->group("EXTRACTING SOURCE CODE");
 
     // debug

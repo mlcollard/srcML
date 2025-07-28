@@ -327,7 +327,7 @@ public :
      * if collecting attributes.
      */
     virtual void startUnit(const char* /* localname */, const char* /* prefix */, const char* /* URI */,
-                           int /* num_namespaces */, const xmlChar** /* namespaces */, int num_attributes,
+                           int num_namespaces, const xmlChar** namespaces, int num_attributes,
                            const xmlChar** attributes) {
 
 #ifdef SRCSAX_DEBUG
@@ -377,6 +377,17 @@ public :
         state->loc = 0;
 
         state->collect_unit_body = collect_unit_body;
+
+        // collect namespaces
+        for (int pos = 0; pos < num_namespaces; ++pos) {
+
+            std::string_view nsPrefix = (const char*) namespaces[pos * 2] ? (const char*) namespaces[pos * 2] : "";
+            std::string nsURI = (const char*) namespaces[pos * 2 + 1] ? (const char*) namespaces[pos * 2 + 1] : "";
+
+            srcml_uri_normalize(nsURI);
+
+            srcml_unit_register_namespace(unit, nsPrefix.data(), nsURI.data());
+        }
 
         if (terminate)
             stop_parser();

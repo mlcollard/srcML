@@ -117,7 +117,7 @@
 </unit>
 
 <unit xmlns:cpp="http://www.srcML.org/srcML/cpp" revision="1.0.0" language="C++">
-<attribute>[[<expr><name>noreturn</name></expr>]]</attribute>
+<decl_stmt><decl><type><name>int</name> <attribute>[[<expr><name>noreturn</name></expr>]]</attribute></type> <name>f</name></decl>;</decl_stmt>
 </unit>
 
 <unit xmlns="http://www.srcML.org/srcML/src" revision="1.0.0" language="C++">

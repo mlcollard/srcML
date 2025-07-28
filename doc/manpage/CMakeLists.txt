@@ -127,6 +127,9 @@ set(PRETTY_FLAG_LONG "pretty")
 set(NULL_SEPARATOR_LONG "print0")
 set(NULL_SEPARATOR_SHORT "Z")
 
+set(HEADER_BLOCK_LONG "header")
+set(HEADER_BLOCK_SHORT "H")
+
 set(SRCQL_WARNING_OFF_FLAG_LONG "srcql-warning-off")
 set(SRCQL_WARNING_OFF_FLAG_SHORT "F")
 
