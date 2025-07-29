@@ -126,7 +126,7 @@ struct srcml_unit {
     /** source encoding */
     std::optional<std::string> encoding;
     /** an attribute for a revision */
-    std::optional<std::string> revision = srcml_version_string();
+    std::optional<std::string> revision; // = srcml_version_string();
     /** an attribute for a language */
     std::optional<std::string> language;
     /** an attribute name for a file */
