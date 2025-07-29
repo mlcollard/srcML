@@ -16,6 +16,7 @@
 #include <input_curl.hpp>
 #include <SRCMLStatus.hpp>
 #include <libarchive_utilities.hpp>
+#include <unordered_map>
 #include <string_view>
 #include <stdio.h>
 #include <string_view>
