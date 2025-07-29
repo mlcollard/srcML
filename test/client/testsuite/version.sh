@@ -16,8 +16,8 @@ define output <<- 'STDOUT'
 	srcml Java: 1.0.0
 	srcml Python: 1.0.0
 	srcml Objective-C: 1.0.0
-	srcml client: 1.1.0
-	libsrcml: 1.1.0
+	srcml client: 1.0.0
+	libsrcml: 1.0.0
 STDOUT
 
 srcml -V
