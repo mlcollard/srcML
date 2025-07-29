@@ -56,7 +56,7 @@ variable "SRCML_BAKE_CMAKE_VERSION" {
 # E.g., SRCML_BAKE_SRCML_VERSION="1.1.0"
 variable "SRCML_BAKE_SRCML_VERSION" {
   # description = "srcML version to embed in image data"
-  default = "1.1.0"
+  default = "1.0.0"
 }
 
 # Ubuntu build images
