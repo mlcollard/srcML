@@ -120,11 +120,11 @@
 <decl_stmt><decl><type><name>int</name> <attribute>[[<expr><name>noreturn</name></expr>]]</attribute></type> <name>f</name></decl>;</decl_stmt>
 </unit>
 
-<unit xmlns="http://www.srcML.org/srcML/src" revision="1.0.0" language="C++">
+<unit xmlns:cpp="http://www.srcML.org/srcML/cpp" revision="1.0.0" language="C++">
 <using>using <attribute>[[<expr><name>deprecated</name></expr>]]</attribute> <name>f</name>;</using>
 </unit>
 
-<unit xmlns="http://www.srcML.org/srcML/src" revision="1.0.0" language="C++">
+<unit xmlns:cpp="http://www.srcML.org/srcML/cpp" revision="1.0.0" language="C++">
 <namespace>namespace <attribute>[[<expr><name>deprecated</name></expr>]]</attribute> <name>f</name>;</namespace>
 </unit>
 
