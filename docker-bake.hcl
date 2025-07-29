@@ -33,7 +33,7 @@
 #   SRCML_BAKE_SRC="https://github.com/srcML/srcML.git#develop"
 variable "SRCML_BAKE_SRC" {
   # description = "Location of the source code"
-  default = "https://github.com/srcML/srcML.git#develop"
+  default = "https://github.com/srcML/srcML.git#v1.1.0-beta"
 }
 
 # Override using the environment variable SRCML_BAKE_PRESET_SUFFIX
@@ -183,9 +183,9 @@ RUN cpack --preset ${workflowPreset(dist)}
 RUN cmake --build --preset ci-install-package-${dist.workflow}
 FROM packager AS test_client
 RUN cmake --build --preset ci-test-client-${dist.workflow}
-# FROM packager AS test_libsrcml
-# RUN cmake --build --preset ci-test-libsrcml-${dist.workflow}
-FROM packager AS setup_parser_tests
+FROM packager AS test_libsrcml
+RUN cmake --build --preset ci-test-libsrcml-${dist.workflow}
+FROM packager AS test_parser
 RUN cmake --build --preset ci-test-parser-${dist.workflow}
 EOF
 }
@@ -289,41 +289,14 @@ EOF
   dockerfile-inline = <<EOF
 ${builderStage(dist)}
 FROM scratch AS dist
-COPY --from=packager /src-build/dist/*.log /
+COPY --from=test_client /src-build/dist/*.log /
+COPY --from=test_parser /src-build/dist/*.log /
+COPY --from=test_libsrcml /src-build/dist/*.log /
 EOF
   tags      = [categoryTagName(dist, "logs")]
   output    = ["type=local,dest=${SRCML_BAKE_DESTINATION_DIR}"]
   inherits  = ["base"]
 }
-
-target "examples" {
-  name = categoryTarget(dist, "examples")
-  description = "srcML package for ${dist.name}"
-  labels = {
-    "org.opencontainers.image.title" = "srcML ${dist.name} Package Files"
-    "org.opencontainers.image.description" = <<EOF
-The srcML package files for ${dist.name}.
-EOF
-  }
-  matrix = {
-    dist = distributions
-  }
-  dockerfile-inline = <<EOF
-${builderStage(dist)}
-FROM ${tagName(dist)} AS examples
-COPY --from="packager" \
-  /src-build/dist/*.rpm \
-  /src-build/dist/*.deb \
-  /src-build/dist/*.tar.gz \
-  /src-build/dist/*.bz2 \
-  /
-RUN apt-get install /*.deb
-EOF
-  tags     = [categoryTagName(dist, "examples")]
-  # output   = ["type=local,dest=${SRCML_BAKE_DESTINATION_DIR}"]
-  inherits = ["base"]
-}
-
 
 # Target name
 function "targetName" {

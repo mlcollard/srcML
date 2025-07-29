@@ -267,14 +267,14 @@ void create_src(const srcml_request_t& srcml_request,
                 // before source null output separator
                 if (count && option(SRCML_COMMAND_NULL)) {
                     if (write(1, "", 1) == -1) {
-                        SRCMLstatus(ERROR_MSG, "Unable to write to stdout");
+                        SRCMLstatus(ERROR_MSG, "Unable to write null to stdout");
                         break;
                     }
                 }
 
                 if (count && !option(SRCML_COMMAND_NULL)) {
                     if (lastchar != '\n' && write(1, "\n", 1) == -1) {
-                        SRCMLstatus(ERROR_MSG, "Unable to write to stdout");
+                        SRCMLstatus(ERROR_MSG, "Unable to write last character to stdout");
                         break;
                     }
                 }
@@ -283,7 +283,10 @@ void create_src(const srcml_request_t& srcml_request,
                 if (option(SRCML_COMMAND_HEADER)) {
 
                     const auto header = createYAMLHeader(arch.get(), unit.get(), count == 0);
-                    write(destination, header.data(), header.size());
+                    if (write(destination, header.data(), header.size()) == -1) {
+                        SRCMLstatus(ERROR_MSG, "Unable to write header to stdout");
+                        break;
+                    }
                 }
 
                 if (count && !option(SRCML_COMMAND_NULL)) {
