@@ -792,6 +792,9 @@ std::string XPathGenerator::convert() {
 
     std::string xpath = source_exprs[0]->to_string();
 
+    // Free the xpath tree
+    delete source_exprs[0];
+
     return xpath;
 }
 
