@@ -1,86 +1,82 @@
+// SPDX-License-Identifier: GPL-3.0-only
 /**
  * @file srcml_cli.hpp
  *
- * @copyright Copyright (C) 2014 srcML, LLC. (www.srcML.org)
+ * @copyright Copyright (C) 2014-2024 srcML, LLC. (www.srcML.org)
  *
  * This file is part of the srcml command-line client.
- *
- * The srcML Toolkit is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * The srcML Toolkit is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with the srcml command-line client; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 #ifndef SRCML_CLI_HPP
 #define SRCML_CLI_HPP
 
-#include <srcml.h>
+// #include <srcml.h>
 #include <string>
 #include <vector>
-#include <boost/optional.hpp>
+#include <optional>
 #include <iostream>
 #include <utility>
 #include <map>
 #include <srcml_input_src.hpp>
+#include <string_view>
+#include <memory>
+#include <libarchive_utilities.hpp>
 
 // Internal srcml command options
-const int SRCML_COMMAND_LONGINFO                  = 1<<0;
-const int SRCML_COMMAND_INFO                      = 1<<1;
+const unsigned long long SRCML_COMMAND_LONGINFO                  = 1ull << 0ull;
+const unsigned long long SRCML_COMMAND_INFO                      = 1ull << 1ull;
 
-const int SRCML_COMMAND_CPP_TEXT_IF0              = 1<<2;
-const int SRCML_COMMAND_CPP_MARKUP_ELSE           = 1<<3;
-const int SRCML_COMMAND_QUIET                     = 1<<4;
-const int SRCML_COMMAND_VERBOSE                   = 1<<5;
-const int SRCML_COMMAND_VERSION                   = 1<<6;
+const unsigned long long SRCML_COMMAND_CPP_TEXT_IF0              = 1ull << 2ull;
+const unsigned long long SRCML_COMMAND_CPP_MARKUP_ELSE           = 1ull << 3ull;
+const unsigned long long SRCML_COMMAND_QUIET                     = 1ull << 4ull;
+const unsigned long long SRCML_COMMAND_VERBOSE                   = 1ull << 5ull;
+const unsigned long long SRCML_COMMAND_VERSION                   = 1ull << 6ull;
 
-const int SRCML_COMMAND_XML                       = 1<<7;
-const int SRCML_COMMAND_SRC                       = 1<<8;
-const int SRCML_COMMAND_LIST                      = 1<<9;
-const int SRCML_COMMAND_UNITS                     = 1<<10;
+const unsigned long long SRCML_COMMAND_XML                       = 1ull << 7ull;
+const unsigned long long SRCML_COMMAND_SRC                       = 1ull << 8ull;
+const unsigned long long SRCML_COMMAND_LIST                      = 1ull << 9ull;
+const unsigned long long SRCML_COMMAND_UNITS                     = 1ull << 10ull;
 
-const int SRCML_COMMAND_TO_DIRECTORY              = 1<<11;
-const int SRCML_COMMAND_TIMESTAMP                 = 1<<12;
+const unsigned long long SRCML_COMMAND_TO_DIRECTORY              = 1ull << 11ull;
+const unsigned long long SRCML_COMMAND_TIMESTAMP                 = 1ull << 12ull;
 
-const int SRCML_COMMAND_DISPLAY_SRCML_LANGUAGE    = 1<<13;
-const int SRCML_COMMAND_DISPLAY_SRCML_URL         = 1<<14;
-const int SRCML_COMMAND_DISPLAY_SRCML_FILENAME    = 1<<15;
-const int SRCML_COMMAND_DISPLAY_SRCML_SRC_VERSION = 1<<16;
-const int SRCML_COMMAND_DISPLAY_SRCML_TIMESTAMP   = 1<<17;
-const int SRCML_COMMAND_DISPLAY_SRCML_HASH        = 1<<18;
-const int SRCML_COMMAND_DISPLAY_SRCML_ENCODING    = 1<<19;
+const unsigned long long SRCML_COMMAND_DISPLAY_SRCML_LANGUAGE    = 1ull << 13ull;
+const unsigned long long SRCML_COMMAND_DISPLAY_SRCML_URL         = 1ull << 14ull;
+const unsigned long long SRCML_COMMAND_DISPLAY_SRCML_FILENAME    = 1ull << 15ull;
+const unsigned long long SRCML_COMMAND_DISPLAY_SRCML_SRC_VERSION = 1ull << 16ull;
+const unsigned long long SRCML_COMMAND_DISPLAY_SRCML_TIMESTAMP   = 1ull << 17ull;
+const unsigned long long SRCML_COMMAND_DISPLAY_SRCML_HASH        = 1ull << 18ull;
+const unsigned long long SRCML_COMMAND_DISPLAY_SRCML_ENCODING    = 1ull << 19ull;
 
-const int SRCML_COMMAND_NO_COLOR                  = 1<<20;
+const unsigned long long SRCML_COMMAND_NO_COLOR                  = 1ull << 20ull;
 
-const int SRCML_COMMAND_UPDATE                    = 1<<21;
+const unsigned long long SRCML_COMMAND_UPDATE                    = 1ull << 21ull;
 
-const int SRCML_COMMAND_NOARCHIVE                 = 1<<22;
+const unsigned long long SRCML_COMMAND_NOARCHIVE                 = 1ull << 22ull;
 
-const int SRCML_DEBUG_MODE                        = 1<<23;
+const unsigned long long SRCML_DEBUG_MODE                        = 1ull << 23ull;
 
-const int SRCML_TIMING_MODE                       = 1<<24;
+const unsigned long long SRCML_TIMING_MODE                       = 1ull << 24ull;
 
-const int SRCML_ARCHIVE                           = 1<<25;
+const unsigned long long SRCML_ARCHIVE                           = 1ull << 25ull;
 
-const int SRCML_HASH                              = 1<<26;
+const unsigned long long SRCML_HASH                              = 1ull << 26ull;
 
-const int SRCML_COMMAND_XML_RAW                   = 1<<27;
-const int SRCML_COMMAND_XML_FRAGMENT              = 1<<28;
+const unsigned long long SRCML_COMMAND_XML_RAW                   = 1ull << 27ull;
+const unsigned long long SRCML_COMMAND_XML_FRAGMENT              = 1ull << 28ull;
 
-const int SRCML_COMMAND_PARSER_TEST               = 1<<29;
+const unsigned long long SRCML_COMMAND_PARSER_TEST               = 1ull << 29ull;
 
-const int SRCML_COMMAND_CAT_XML                   = 1<<30;
+const unsigned long long SRCML_COMMAND_CAT_XML                   = 1ull << 30ull;
+
+const unsigned long long SRCML_COMMAND_NULL                      = 1ull << 31ull;
+
+const unsigned long long SRCML_COMMAND_SRCQL_WARNING_OFF         = 1ull << 32ull;
+
+const unsigned long long SRCML_COMMAND_HEADER                    = 1ull << 33ull;
 
 // commands that are simple queries on srcml
-const int SRCML_COMMAND_INSRCML =
+const unsigned long long SRCML_COMMAND_INSRCML =
     SRCML_COMMAND_LONGINFO |
     SRCML_COMMAND_INFO    |
     SRCML_COMMAND_VERSION |
@@ -92,7 +88,7 @@ const int SRCML_COMMAND_INSRCML =
     SRCML_COMMAND_DISPLAY_SRCML_FILENAME |
     SRCML_COMMAND_DISPLAY_SRCML_SRC_VERSION |
     SRCML_COMMAND_DISPLAY_SRCML_ENCODING |
-    SRCML_COMMAND_DISPLAY_SRCML_TIMESTAMP | 
+    SRCML_COMMAND_DISPLAY_SRCML_TIMESTAMP |
     SRCML_COMMAND_DISPLAY_SRCML_HASH;
 
 // Error Codes
@@ -101,50 +97,51 @@ const int CLI_STATUS_ERROR = 1;
 const int CLI_STATUS_INTERNAL_ERROR = 2;
 
 struct attribute {
-    boost::optional<std::string> prefix;
-    boost::optional<std::string> name;
-    boost::optional<std::string> value;
+    std::optional<std::string> prefix;
+    std::optional<std::string> name;
+    std::optional<std::string> value;
 };
 
 struct element {
-    boost::optional<std::string> prefix;
-    boost::optional<std::string> name;
+    std::optional<std::string> prefix;
+    std::optional<std::string> name;
 };
 
 // request for srcml client processing
 struct srcml_request_t {
     srcml_input_t input_sources;
 
-    boost::optional<int> stdindex;
+    std::optional<std::size_t> stdindex;
 
-    int command = 0;
-    boost::optional<int> markup_options;
+    unsigned long long command = 0ull;
+
+    std::optional<int> markup_options;
 
     // unit attributes
-    boost::optional<std::string> att_language;
-    boost::optional<std::string> att_filename;
-    boost::optional<std::string> att_url;
-    boost::optional<std::string> att_xml_encoding;
-    boost::optional<std::string> att_version;
+    std::optional<std::string> att_language;
+    std::optional<std::string> att_filename;
+    std::optional<std::string> att_url;
+    std::optional<std::string> att_xml_encoding;
+    std::optional<std::string> att_version;
 
-    boost::optional<std::string> src_encoding;
-    
-    boost::optional<int> eol;
+    std::optional<std::string> src_encoding;
 
-    boost::optional<std::string> external;
+    std::optional<size_t> eol;
+
+    std::optional<std::string> external;
 
     srcml_output_dest output_filename;
 
     //filelist:// prefix
     std::vector<std::string> files_from;
     std::vector<std::string> language_ext;
-    int tabs;
+    size_t tabs;
 
     // xml namespaces
-    boost::optional<std::string> xmlns_prefix_query;
+    std::optional<std::string> xmlns_prefix_query;
 
     // xml processing attributes
-    boost::optional<std::string> xml_processing;    
+    std::optional<std::string> xml_processing;
 
     std::map<std::string,std::string> xmlns_namespaces;
 
@@ -153,14 +150,14 @@ struct srcml_request_t {
 
     // srcml transformation
     std::vector<std::string> transformations;
-    std::vector< std::pair< boost::optional<element>, boost::optional<attribute> > > xpath_query_support;
+    std::vector< std::pair< std::optional<element>, std::optional<attribute> > > xpath_query_support;
 
     int unit = 0;
     int max_threads;
 
-    boost::optional<std::string> pretty_format;
+    std::optional<std::string> pretty_format;
 
-    boost::optional<size_t> revision;
+    std::optional<size_t> revision;
 
     // pre-input
     char buf[4] = { 0 };
@@ -168,74 +165,6 @@ struct srcml_request_t {
 };
 
 // parse the CLI options into a srcml client request
-srcml_request_t parseCLI(int argc, char* argv[]);
 srcml_request_t parseCLI11(int argc, char* argv[]);
-
-inline std::ostream& operator<<(std::ostream& out, const srcml_request_t srcml_request) {
-
-    out << "INPUT SOURCES:\n";
-    for (auto& input : srcml_request.input_sources) {
-        out << input;
-    }
-
-    // boost::optional<int> stdindex;
-    out << "stdindex: " << (srcml_request.stdindex ? *srcml_request.stdindex : -1) << '\n';
-
-    out << "SRCML_OPTION_CPP: " << (*srcml_request.markup_options & SRCML_OPTION_CPP) << '\n';
-    out << "SRCML_COMMAND_XML_FRAGMENT: " << (srcml_request.command & SRCML_COMMAND_XML_FRAGMENT) << '\n';
-    // int command;
-    // boost::optional<int> markup_options;
-
-    // // unit attributes
-    out << "att_language: " << (srcml_request.att_language ? *srcml_request.att_language : "") << '\n';
-    out << "att_filename: " << (srcml_request.att_filename ? *srcml_request.att_filename : "") << '\n';
-    out << "att_url: " << (srcml_request.att_url ? *srcml_request.att_url : "") << '\n';
-    out << "att_xml_encoding: " << (srcml_request.att_xml_encoding ? *srcml_request.att_xml_encoding : "") << '\n';
-    out << "att_version: " << (srcml_request.att_version ? *srcml_request.att_version : "") << '\n';
-
-    // boost::optional<std::string> src_encoding;
-    
-    // boost::optional<std::string> eol;
-
-    // boost::optional<std::string> external;
-
-    out << "output_filename: " << srcml_request.output_filename << '\n';
-
-    // //filelist:// prefix
-    // std::vector<std::string> files_from;
-    // std::vector<std::string> language_ext;
-
-    out << "tabs: " << srcml_request.tabs << '\n';
-
-    // // xml namespaces
-    // boost::optional<std::string> xmlns_prefix_query;
-
-    // // xml processing attributes
-    // boost::optional<std::string> xml_processing;    
-
-    // std::map<std::string,std::string> xmlns_namespaces;
-
-    // // Use for checking for overwriting standard namespaces ("", cpp)
-    // std::map<std::string,std::string> xmlns_namespace_uris;
-
-    // // srcml transformation
-    // std::vector<std::string> transformations;
-    // std::vector< std::pair< boost::optional<element>, boost::optional<attribute> > > xpath_query_support;
-
-    out << "unit: " << srcml_request.unit << '\n';
-    // int unit = 0;
-    // int max_threads;
-
-    // boost::optional<std::string> pretty_format;
-
-    // boost::optional<size_t> revision;
-
-    // // pre-input
-    // char buf[4] = { 0 };
-    // size_t bufsize = 0;
-
-
-    return out;
-}
 
 #endif

@@ -44,10 +44,14 @@ cd $TEMPDIR
 export PATH=.:$PATH
 
 if [[ "$OSTYPE" == 'msys' ]]; then
-	SRCML=$SRCML_HOME/srcml
+    EOL="\r\n"
+    export PATH=$PATH:"/c/Program Files/srcML/bin/"
+    SRCML="$SRCML_HOME/srcml.exe"
+    export MSYS2_ARG_CONV_EXCL="*"
 	diff='diff -Z '
 else
-	diff='diff'   
+    EOL="\n"
+	diff='diff '
 	if [ -z "$SRCML"]; then
 
 	    if [ -e "/usr/bin/srcml" ]; then
@@ -61,12 +65,9 @@ else
 	fi
 fi
 
-
-
 function srcml () {
-    $SRCML "$@"
+    "$SRCML" "$@"
 }
-
 # turn history on so we can output the command issued
 # note that the fc command accesses the history
 set -o history
@@ -92,8 +93,13 @@ define() {
     eval $1=\${$1//REVISION/${REVISION}}
 }
 
-# variable $1 is set to the contents of file $2
-readfile() { ${1}="$(< $2)"; }
+# variable $1 is set to the contents of stdin
+defineXML() {
+
+    define $1
+
+    echo "${!1}" | xmllint --noout /dev/stdin
+}
 
 # file with name $1 is created from the contents of string variable $2
 # created files are recorded so that cleanup can occur
@@ -106,6 +112,8 @@ createfile() {
 }
 
 rmfile() { rm -f ${1}; }
+
+rmdir()  { rm -fr ${1}; }
 
 # capture stdout and stderr
 capture_output() {
@@ -133,6 +141,7 @@ message() {
 
 # output filenames for capturing stdout and stderr from the command
 base=$(basename $0 .sh)
+
 typeset STDERR=.stderr_$base
 typeset STDOUT=.stdout_$base
 
@@ -150,6 +159,10 @@ check() {
 
     set -e
 
+    # testfile pattern
+    line=$(caller | cut -d' ' -f1)
+    TEMPFILE=$PWD'/.test.'$line
+
     # return stdout and stderr to standard streams
     uncapture_output
 
@@ -159,31 +172,49 @@ check() {
     # check <filename> stdoutstr stderrstr
     if [ $# -ge 3 ]; then
 
-        $diff <(echo -en "$2") $1
-        $diff <(echo -en "$3") $STDERR
+        tmpfile2=$TEMPFILE.2
+        echo -en "$2" > $tmpfile2
+        $diff $tmpfile2 $1
+
+        tmpfile3=$TEMPFILE.3
+        echo -en "$3" > $tmpfile3
+        $diff $tmpfile3 $STDERR
 
     # check <filename> stdoutstr
     # note: empty string reports as a valid file
     elif [ $# -ge 2 ] && [ "$1" != "" ] && [ -e "$1" ]; then
 
-        $diff <(echo -en "$2") $1
+        tmpfile2=$TEMPFILE.2
+        echo -en "$2" > $tmpfile2
+        $diff $tmpfile2 $1
+
         [ ! -s $STDERR ]
 
     # check stdoutstr stderrstr
     elif [ $# -ge 2 ]; then
 
-        $diff <(echo -en "$1") $STDOUT
-        $diff <(echo -en "$2") $STDERR
+        tmpfile1=$TEMPFILE.1
+        echo -en "$1" > $tmpfile1
+        $diff $tmpfile1 $STDOUT
+
+        tmpfile2=$TEMPFILE.2
+        echo -en "$2" > $tmpfile2
+        $diff $tmpfile2 $STDERR
 
     # check <filename>
     elif [ $# -ge 1 ] && [ "$1" != "" ] && [ -e "$1" ]; then
+
         $diff $1 $STDOUT
+
         [ ! -s $STDERR ]
 
     # check stdoutstr
     elif [ $# -ge 1 ]; then
 
-        $diff <(echo -en "$1") $STDOUT
+        tmpfile1=$TEMPFILE.1
+        echo -en "$1" > $tmpfile1
+        $diff $tmpfile1 $STDOUT
+
         [ ! -s $STDERR ]
 
     else
@@ -257,18 +288,30 @@ check_exit() {
 
     set -e
 
+    # testfile pattern
+    line=$(caller | cut -d' ' -f1)
+    TEMPFILE=$PWD'/.test.'$line
+
     if [ $# -eq 2 ]; then
-        $diff <(echo -en "$2") $STDERR
+        tmpfile2=$TEMPFILE.2
+        echo -en "$2" > $tmpfile2
+        $diff $tmpfile2 $STDERR
+
         [ ! -s $STDOUT ]
     fi
 
     if [ $# -eq 3 ]; then
-        $diff <(echo -en "$2") $STDOUT
-        $diff <(echo -en "$3") $STDERR
+        tmpfile2=$TEMPFILE.2
+        echo -en "$2" > $tmpfile2
+        $diff $tmpfile2 $STDOUT
+
+        tmpfile3=$TEMPFILE.3
+        echo -en "$3" > $tmpfile3
+        $diff $tmpfile3 $STDERR
     fi
 
     set +e
-    
+
     # return to capturing stdout and stderr
     capture_output
 
@@ -306,10 +349,13 @@ xmlcheck() {
 
     set -e
 
-    if [ "${1:0:1}" != "<" ]; then
-        xmllint --noout ${1}
-    else
-        echo "${1}" | xmllint --noout /dev/stdin
+    if command -v xmllint &> /dev/null; then
+
+        if [ "${1:0:1}" != "<" ]; then
+            xmllint --noout ${1}
+        else
+            echo "${1}" | xmllint --noout /dev/stdin
+        fi;
     fi;
 
     set +e

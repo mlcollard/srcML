@@ -1,10 +1,15 @@
 #!/bin/bash
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# @file directory_input.sh
+#
+# @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
 
 # test framework
 source $(dirname $BASH_SOURCE)/framework_test.sh
 
 # test directory input
-define output <<- 'STDOUT'
+defineXML output <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" url="dir">
 
@@ -21,38 +26,34 @@ define output <<- 'STDOUT'
 	<expr_stmt><expr><name>a</name></expr>;</expr_stmt></unit>
 
 	</unit>
-	STDOUT
+STDOUT
 
-xmlcheck "$output"
-
-define output2 <<- 'STDOUT'
+defineXML output2 <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" url="dir2">
 
 	<unit revision="REVISION" language="C++" filename="dir2/a.cpp" hash="095856ebb2712a53a4eac934fd6e69fef8e06008">
 	<expr_stmt><expr><name>a</name></expr>;</expr_stmt></unit>
 
-	<unit revision="REVISION" language="C++" filename="dir2/b.cpp.bz2" hash="127b042b36b196e169310240b313dd9fc065ccf2">
+	<unit revision="REVISION" language="C++" filename="dir2/b.cpp" hash="127b042b36b196e169310240b313dd9fc065ccf2">
 	<expr_stmt><expr><name>b</name></expr>;</expr_stmt></unit>
 
-	<unit revision="REVISION" language="C++" filename="dir2/c.cpp.bz2.gz" hash="b3b530fc0b5ee90a1e6ca6bb15d22907cde385cb">
+	<unit revision="REVISION" language="C++" filename="dir2/c.cpp" hash="b3b530fc0b5ee90a1e6ca6bb15d22907cde385cb">
 	<expr_stmt><expr><name>c</name></expr>;</expr_stmt></unit>
 
-	<unit revision="REVISION" language="C++" filename="dir2/g.cpp.gz" hash="b32a0d6d08d49cdc2d76c5ab27c57a1f5e988884">
+	<unit revision="REVISION" language="C++" filename="dir2/g.cpp" hash="b32a0d6d08d49cdc2d76c5ab27c57a1f5e988884">
 	<expr_stmt><expr><name>g</name></expr>;</expr_stmt></unit>
 
-	<unit revision="REVISION" language="C++" filename="dir2/h.cpp.gz.bz2" hash="704111c5fce3e467dd1089d211912d1da40c8439">
+	<unit revision="REVISION" language="C++" filename="dir2/h.cpp" hash="704111c5fce3e467dd1089d211912d1da40c8439">
 	<expr_stmt><expr><name>h</name></expr>;</expr_stmt></unit>
 
 	<unit revision="REVISION" language="C++" filename="dir2/q.cpp" hash="e4493c14f70ceb409026adfdbbbbb6ce580cf5a9">
 	<expr_stmt><expr><name>q</name></expr>;</expr_stmt></unit>
 
 	</unit>
-	STDOUT
+STDOUT
 
-xmlcheck "$output2"
-
-define output3 <<- 'STDOUT'
+defineXML output3 <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" url="symtest">
 
@@ -66,16 +67,16 @@ define output3 <<- 'STDOUT'
 	<expr_stmt><expr><name>c</name></expr>;</expr_stmt></unit>
 
 	</unit>
-	STDOUT
-
-xmlcheck "$output3"
-
+STDOUT
 
 # directory of just source
 createfile dir/file.aj "\na;"
 createfile dir/file.c  "\na;"
 createfile dir/file.cpp "\na;"
 createfile dir/file.java "\na;"
+
+uncapture_output
+capture_output
 
 # Check typical source directory
 srcml dir --quiet -o dir/dir.xml
@@ -170,19 +171,23 @@ check dir2/dir2.xml "$output2"
 srcml dir2 --quiet
 check "$output2"
 
-#Ensure proper behavior with symbolic links (ignore them)
+# Ensure proper behavior with symbolic links (ignore them)
+if [[ "$OSTYPE" == 'msys' ]]; then
+    exit 0
+fi
+
+uncapture_output
 createfile symtest/a.cpp "\na;"
 createfile symtest/b.cpp "\nb;"
 createfile symtest/c.cpp "\nc;"
 
 ln -s $(pwd)/symtest symtest/slink
 ln -s $(pwd)/symtest/b.cpp symtest/sim_b.cpp
+capture_output
 
 srcml symtest --quiet -o symtest/symtest.xml
 check symtest/symtest.xml "$output3"
 
-#Cleanup
-rm -rf symtest
-rm -rf dir
-rm -rf dir2
-
+rmdir symtest
+rmdir dir
+rmdir dir2

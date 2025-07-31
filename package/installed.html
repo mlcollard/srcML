@@ -3,26 +3,25 @@
 <head>
 
 <style>
-p {
-	font-size : 10pt;
+p, li {
+    font-size : 9pt;
 }
 body { font-family: Helvetica, Sans-Serif; }
 
 code {
-	margin-left: 1em;
-	padding-left: 1em;
-	padding-bottom : 1em;
-	margin-bottom : 1em;
+    margin-left: 1em;
+    padding-left: 1em;
+    padding-bottom : 1em;
+    margin-bottom : 1em;
 }
 </style>
 </head>
 <body>
 
-<h2>srcml</h2>
+<p>For details on the srcml command-line program, please refer to the man page (man srcml). Here's some examples of how to use it:</p>
 
-<p>The srcml command-line program is now installed. Consult the man page (<code>man srcml</code>) for more information. Example usage:</p>
-
-<pre><code class="console"># Convert from a source file to srcML
+<pre><code class="console">
+# Convert from a source file to srcML
 srcml main.cpp -o main.cpp.xml
 
 # Convert from srcML back to source code
@@ -37,15 +36,17 @@ srcml --verbose project -o project.xml
 
 <br/>
 
-<h2>Development</h2>
-
-<p>If you installed the Development package, you can write applications directly using libsrcml. The package includes:</p>
+<p>If you installed the libsrcml development package, you have the ability to write applications that directly use libsrcml. This contains the following:
+</p>
 
 <ul>
-<li><code>srcml.h</code> Include file</li>
-<li><code>libsrcml.a</code> Static library</li>
-<li>Examples in /usr/local/share/srcml</li>
+<li>The include file <code>srcml.h</code></li>
+<li>The static library <code>libsrcml.a</code></li>
+<li>CMake configuration files</li>
 </ul>
 
-</body>
+<br/>
+
+<p>
+In addition, the libsrcml examples are installed in /usr/local/share/srcml</p></body>
 </html>

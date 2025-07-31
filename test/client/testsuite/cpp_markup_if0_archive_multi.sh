@@ -1,4 +1,9 @@
 #!/bin/bash
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# @file cpp_markup_if0_archive_multi.sh
+#
+# @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
 
 # test framework
 source $(dirname "$0")/framework_test.sh
@@ -9,9 +14,9 @@ define input <<- 'INPUT'
 	#if 0
 	break;
 	#endif
-	INPUT
+INPUT
 
-define fnomarkupif0 <<- 'STDOUT'
+defineXML fnomarkupif0 <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -28,9 +33,9 @@ define fnomarkupif0 <<- 'STDOUT'
 	</unit>
 
 	</unit>
-	STDOUT
+STDOUT
 
-define fmarkupif0 <<- 'STDOUT'
+defineXML fmarkupif0 <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" options="CPP_MARKUP_IF0">
 
@@ -47,14 +52,10 @@ define fmarkupif0 <<- 'STDOUT'
 	</unit>
 
 	</unit>
-	STDOUT
-
-xmlcheck "$fnomarkupif0"
-xmlcheck "$fmarkupif0"
+STDOUT
 
 createfile sub/a.cpp "$input"
 createfile sub/b.cpp "$input"
-
 
 # use default, where if 0 sections are not marked up
 srcml sub/a.cpp sub/b.cpp
@@ -80,7 +81,6 @@ check sub/b.xml "$fnomarkupif0"
 
 srcml sub/a.cpp sub/b.cpp -o sub/b.xml
 check sub/b.xml "$fnomarkupif0"
-
 
 # markup if0 regions
 srcml sub/a.cpp sub/b.cpp --cpp-markup-if0
@@ -184,4 +184,3 @@ check sub/b.xml "$fmarkupif0"
 
 srcml -o sub/b.xml --cpp-markup-if0 sub/a.cpp sub/b.cpp
 check sub/b.xml "$fmarkupif0"
-

@@ -1,11 +1,16 @@
 #!/bin/bash
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# @file pos_tabs_archive_multi.sh
+#
+# @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
 
 # test framework
 source $(dirname "$0")/framework_test.sh
 
 # test tabs
 
-define fsrcml <<- 'STDOUT'
+defineXML fsrcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:pos="http://www.srcML.org/srcML/position" revision="REVISION" pos:tabs="4">
 
@@ -14,9 +19,8 @@ define fsrcml <<- 'STDOUT'
 	<unit revision="REVISION" language="C++" filename="sub/b.cpp" pos:tabs="4" hash="da39a3ee5e6b4b0d3255bfef95601890afd80709"/>
 
 	</unit>
-	STDOUT
+STDOUT
 
-xmlcheck "$fsrcml"
 createfile sub/a.cpp ""
 createfile sub/b.cpp ""
 
@@ -47,11 +51,11 @@ check sub/a.cpp.xml "$fsrcml"
 srcml --tabs 4 -o sub/a.cpp.xml sub/a.cpp sub/b.cpp --archive --position
 check sub/a.cpp.xml "$fsrcml"
 
-srcml --tabs 4 -o sub/a.cpp.xml --archive sub/a.cpp sub/b.cpp --position 
+srcml --tabs 4 -o sub/a.cpp.xml --archive sub/a.cpp sub/b.cpp --position
 check sub/a.cpp.xml "$fsrcml"
 
-srcml --tabs 4 --position --archive -o sub/a.cpp.xml sub/a.cpp sub/b.cpp 
+srcml --tabs 4 --position --archive -o sub/a.cpp.xml sub/a.cpp sub/b.cpp
 check sub/a.cpp.xml "$fsrcml"
 
-srcml --position --archive --tabs 4 -o sub/a.cpp.xml sub/a.cpp sub/b.cpp 
+srcml --position --archive --tabs 4 -o sub/a.cpp.xml sub/a.cpp sub/b.cpp
 check sub/a.cpp.xml "$fsrcml"

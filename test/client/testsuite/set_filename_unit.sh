@@ -1,4 +1,9 @@
 #!/bin/bash
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# @file set_filename_unit.sh
+#
+# @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
 
 # test framework
 source $(dirname "$0")/framework_test.sh
@@ -7,12 +12,11 @@ source $(dirname "$0")/framework_test.sh
 
 ##
 # filename flag
-define output <<- 'STDOUT'
+defineXML output <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++" filename="foo.cpp"/>
-	STDOUT
+STDOUT
 
-xmlcheck "$output"
 createfile sub/a.cpp ""
 
 srcml sub/a.cpp -f "foo.cpp"
@@ -29,7 +33,6 @@ check sub/a.cpp.xml "$output"
 
 srcml -f 'foo.cpp' sub/a.cpp -o sub/a.cpp.xml
 check sub/a.cpp.xml "$output"
-
 
 # standard input
 echo -n "" | srcml -l C++ -f foo.cpp

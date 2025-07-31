@@ -1,31 +1,19 @@
+// SPDX-License-Identifier: GPL-3.0-only
 /**
  * @file input_curl.hpp
  *
- * @copyright Copyright (C) 2014 srcML, LLC. (www.srcML.org)
+ * @copyright Copyright (C) 2014-2024 srcML, LLC. (www.srcML.org)
  *
  * This file is part of the srcml command-line client.
- *
- * The srcML Toolkit is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * The srcML Toolkit is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with the srcml command-line client; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 #ifndef input_curl_HPP
 #define input_curl_HPP
 
 #include <srcml_input_src.hpp>
+#include <string_view>
 
-bool curl_supported(const std::string& input_protocol);
+bool curl_supported(std::string_view input_protocol);
 
 // adjust input for libcurl and libarchive decompressions
 int input_curl(srcml_input_src& input);

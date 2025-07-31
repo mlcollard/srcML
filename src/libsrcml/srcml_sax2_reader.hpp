@@ -1,21 +1,8 @@
+// SPDX-License-Identifier: GPL-3.0-only
 /**
  * @file srcml_sax2_reader.hpp
  *
- * @copyright Copyright (C) 2013-2014 srcML, LLC. (www.srcML.org)
- *
- * The srcML Toolkit is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * The srcML Toolkit is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with the srcML Toolkit; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ * @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
  */
 
 #ifndef INCLUDED_SRCML_SAX2_READER_HPP
@@ -26,7 +13,6 @@
 #include <srcSAXController.hpp>
 
 #include <srcml_types.hpp>
-#include <srcml_macros.hpp>
 #include <srcml.h>
 
 #include <libxml/xmlreader.h>
@@ -35,7 +21,7 @@
 #include <string>
 #include <vector>
 #include <thread>
-#include <boost/optional.hpp>
+#include <optional>
 
 /**
  * thread_args
@@ -46,10 +32,10 @@
 struct thread_args {
 
     /** control for sax processing */
-    srcSAXController* control;
+    srcSAXController* control = nullptr;
 
     /** handler with hooks for sax processing */
-    srcml_reader_handler* handler;
+    srcml_reader_handler* handler = nullptr;
 };
 
 /**

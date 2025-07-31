@@ -1,10 +1,15 @@
 #!/bin/bash
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# @file show_timestamp_archive.sh
+#
+# @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
 
 # test framework
 source $(dirname "$0")/framework_test.sh
 
 # test get directory
-define archive <<- 'STDOUT'
+defineXML archive <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -13,12 +18,10 @@ define archive <<- 'STDOUT'
 	</unit>
 
 	</unit>
-	STDOUT
+STDOUT
 
-xmlcheck "$archive"
 createfile sub/archive.cpp.xml "$archive"
 
-# TODO: issue #1042
 srcml --show-timestamp sub/archive.cpp.xml
 check
 
@@ -26,7 +29,7 @@ srcml --show-timestamp < sub/archive.cpp.xml
 check
 
 # empty
-define empty <<- 'STDOUT'
+defineXML empty <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -35,9 +38,8 @@ define empty <<- 'STDOUT'
 	</unit>
 
 	</unit>
-	STDOUT
+STDOUT
 
-xmlcheck "$empty"
 createfile sub/archive.cpp.xml "$empty"
 
 srcml --show-timestamp sub/archive.cpp.xml
@@ -47,7 +49,7 @@ srcml --show-timestamp < sub/archive.cpp.xml
 check
 
 # none
-define none <<- 'STDIN'
+defineXML none <<- 'STDIN'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -56,9 +58,8 @@ define none <<- 'STDIN'
 	</unit>
 
 	</unit>
-	STDIN
+STDIN
 
-xmlcheck "$none"
 createfile sub/archive.cpp.xml "$none"
 
 srcml --show-timestamp sub/archive.cpp.xml
@@ -66,4 +67,3 @@ check
 
 srcml --show-timestamp < sub/archive.cpp.xml
 check
-

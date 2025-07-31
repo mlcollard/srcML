@@ -1,31 +1,14 @@
+// SPDX-License-Identifier: GPL-3.0-only
 /**
  * @file test_srcml_global.cpp
  *
- * @copyright Copyright (C) 2013-2014 srcML, LLC. (www.srcML.org)
+ * @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
  *
- * The srcML Toolkit is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
  *
- * The srcML Toolkit is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with the srcML Toolkit; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ * Test cases for global functions
  */
 
-/*
-
-  Test cases for global functions
-*/
-
 #include <srcml.h>
-
-#include <srcml_macros.hpp>
 
 #include <string>
 #include <fstream>
@@ -60,10 +43,6 @@ std::string srcml_full = R"(<?xml version="1.0" encoding="UTF-8" standalone="yes
 )";
 
 int main(int, char* argv[]) {
-
-  //  assert(srcml_get_options() & SRCML_OPTION_HASH);
-//    srcml_disable_option(SRCML_OPTION_HASH);
-  //  global_unit.hash = "56f54d1636dfec63c3e1586e5e4bdc9a455bb9f6";
 
     std::ofstream src_file("a.cpp");
     src_file << src;
@@ -173,16 +152,16 @@ int main(int, char* argv[]) {
 
     srcml_cleanup_globals();
 
-    UNLINK("a.cpp");
-    UNLINK("project.xml");
-    UNLINK("project.srcML");
-    UNLINK("project_c.xml");
-    UNLINK("project");
-    UNLINK("project_full.xml");
-    UNLINK("project.cpp.xml");
-    UNLINK("project.c.xml");
-    UNLINK("inta.cpp");
-    UNLINK("project_full.cpp.xml");
+    unlink("a.cpp");
+    unlink("project.xml");
+    unlink("project.srcML");
+    unlink("project_c.xml");
+    unlink("project");
+    unlink("project_full.xml");
+    unlink("project.cpp.xml");
+    unlink("project.c.xml");
+    unlink("inta.cpp");
+    unlink("project_full.cpp.xml");
 
     return 0;
 }

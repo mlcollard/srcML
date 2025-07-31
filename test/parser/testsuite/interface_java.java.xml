@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<unit xmlns="http://www.srcML.org/srcML/src" revision="1.0.0" url="interface">
+<unit xmlns="http://www.srcML.org/srcML/src" revision="1.0.0" language="Java" url="interface">
 
 <unit revision="1.0.0" language="Java">
 <interface>interface <name>A</name> <block>{}</block></interface>

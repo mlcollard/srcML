@@ -1,19 +1,24 @@
 #!/bin/bash
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# @file cpp_nomarkup_else_file.sh
+#
+# @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
 
 # test framework
 source $(dirname "$0")/framework_test.sh
 
 # test --cpp-nomarkup-else
 define input <<- 'INPUT'
-	
+
 	#if A
 	break;
 	#else
 	return;
 	#endif
-	INPUT
+INPUT
 
-define markup_else <<- 'STDOUT'
+defineXML markup_else <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:cpp="http://www.srcML.org/srcML/cpp" revision="REVISION" language="C++">
 	<cpp:if>#<cpp:directive>if</cpp:directive> <expr><name>A</name></expr></cpp:if>
@@ -22,9 +27,9 @@ define markup_else <<- 'STDOUT'
 	<return>return;</return>
 	<cpp:endif>#<cpp:directive>endif</cpp:directive></cpp:endif>
 	</unit>
-	STDOUT
+STDOUT
 
-define fmarkup_else <<- 'STDOUT'
+defineXML fmarkup_else <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:cpp="http://www.srcML.org/srcML/cpp" revision="REVISION" language="C++" filename="sub/a.cpp">
 	<cpp:if>#<cpp:directive>if</cpp:directive> <expr><name>A</name></expr></cpp:if>
@@ -33,10 +38,9 @@ define fmarkup_else <<- 'STDOUT'
 	<return>return;</return>
 	<cpp:endif>#<cpp:directive>endif</cpp:directive></cpp:endif>
 	</unit>
-	STDOUT
+STDOUT
 
-
-define nomarkup_else <<- 'STDOUT'
+defineXML nomarkup_else <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:cpp="http://www.srcML.org/srcML/cpp" revision="REVISION" language="C++" options="CPP_TEXT_ELSE">
 	<cpp:if>#<cpp:directive>if</cpp:directive> <expr><name>A</name></expr></cpp:if>
@@ -45,9 +49,9 @@ define nomarkup_else <<- 'STDOUT'
 	return;
 	<cpp:endif>#<cpp:directive>endif</cpp:directive></cpp:endif>
 	</unit>
-	STDOUT
+STDOUT
 
-define fnomarkup_else <<- 'STDOUT'
+defineXML fnomarkup_else <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:cpp="http://www.srcML.org/srcML/cpp" revision="REVISION" language="C++" filename="sub/a.cpp" options="CPP_TEXT_ELSE">
 	<cpp:if>#<cpp:directive>if</cpp:directive> <expr><name>A</name></expr></cpp:if>
@@ -56,13 +60,7 @@ define fnomarkup_else <<- 'STDOUT'
 	return;
 	<cpp:endif>#<cpp:directive>endif</cpp:directive></cpp:endif>
 	</unit>
-	STDOUT
-
-xmlcheck "$markup_else"
-xmlcheck "$fmarkup_else"
-xmlcheck "$nomarkup_else"
-xmlcheck "$fnomarkup_else"
-
+STDOUT
 
 createfile sub/a.cpp "$input"
 
@@ -84,7 +82,6 @@ check sub/b.cpp.xml "$fmarkup_else"
 
 srcml -o sub/b.cpp.xml sub/a.cpp
 check sub/b.cpp.xml "$fmarkup_else"
-
 
 # don't markup else
 srcml -l C++ --cpp-nomarkup-else < sub/a.cpp
@@ -128,4 +125,3 @@ check sub/b.cpp.xml "$fnomarkup_else"
 
 srcml --cpp-nomarkup-else -o sub/b.cpp.xml sub/a.cpp
 check sub/b.cpp.xml "$fnomarkup_else"
-

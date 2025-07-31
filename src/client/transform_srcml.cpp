@@ -1,23 +1,10 @@
+// SPDX-License-Identifier: GPL-3.0-only
 /**
  * @file transform_srcml.hpp
  *
- * @copyright Copyright (C) 2014 srcML, LLC. (www.srcML.org)
+ * @copyright Copyright (C) 2014-2024 srcML, LLC. (www.srcML.org)
  *
  * This file is part of the srcml command-line client.
- *
- * The srcML Toolkit is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * The srcML Toolkit is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with the srcml command-line client; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 #include <transform_srcml.hpp>
@@ -27,42 +14,7 @@
 #include <string>
 #include <SRCMLStatus.hpp>
 
-#include <regex>
-
-/*
-    normalize the xpath 
-    src:function -> //src:function
-    count(src:function) -> count(//src:function)
-    //src:function -> //src:function
-    call(src:function) -> call(//src:function)
-*/
-std::string normalize_xpath(std::string nxpath) {
-
-    // match function call to adjust where "//" is inserted
-    static std::regex funcstart("^\\s*[a-zA-Z0-9:-_]*\\s*\\(\\s*");
-
-    // just check if the start looks like a function call
-    size_t axispos = 0;
-    while (true) {
-
-        std::smatch start;
-        std::string rest = nxpath.substr(axispos);
-        std::regex_search(rest, start, funcstart);
-        if (start.size() == 0)
-            break;
-
-        axispos += start.str(0).size();
-    }
-
-    // check axis part for starting context
-    if (nxpath[axispos] != '/') {
-        nxpath.insert(axispos, "//");
-    }
-
-    return nxpath;
-}
-
-int apply_xpath(srcml_archive* in_arch, srcml_archive* out_arch, const std::string& transform_input, const std::pair< boost::optional<element>, boost::optional<attribute> >& xpath_support, const std::map<std::string,std::string>& xmlns_namespaces) {
+int apply_xpath(srcml_archive* in_arch, srcml_archive* out_arch, std::string_view transform_input, const std::pair< std::optional<element>, std::optional<attribute> >& xpath_support, const std::map<std::string,std::string>& xmlns_namespaces) {
 
     auto element = xpath_support.first;
     auto attribute = xpath_support.second;
@@ -72,95 +24,183 @@ int apply_xpath(srcml_archive* in_arch, srcml_archive* out_arch, const std::stri
     if (element){
 
         // check first if namespace is already declared on the output archive
-        element_uri = srcml_archive_get_uri_from_prefix(out_arch, element->prefix->c_str());
+        element_uri = srcml_archive_get_uri_from_prefix(out_arch, element->prefix->data());
 
         // if not, check on the input archive
         if (!element_uri) {
-            element_uri = srcml_archive_get_uri_from_prefix(in_arch, element->prefix->c_str());
+            element_uri = srcml_archive_get_uri_from_prefix(in_arch, element->prefix->data());
         }
 
         if (!element_uri) {
             auto it = xmlns_namespaces.find(*(element->prefix));
             if (it != xmlns_namespaces.end())
-                element_uri = it->second.c_str();
+                element_uri = it->second.data();
         }
 
         // make sure we found it somewhere
         if (!element_uri) {
-            SRCMLstatus(WARNING_MSG, "srcml: no uri exists for prefix \"" + std::string(element->prefix->c_str()) + "\"");
-            // @todo Can this be a return?
-            exit(1);
+            SRCMLstatus(WARNING_MSG, "srcml: no uri exists for prefix \"" + *element->prefix + "\"");
+            return -1;
         }
     }
 
     // Check attribute namespace
     char const * attribute_uri = 0;
     if (attribute) {
-        attribute_uri = srcml_archive_get_uri_from_prefix(out_arch, attribute->prefix->c_str());
+        attribute_uri = srcml_archive_get_uri_from_prefix(out_arch, attribute->prefix->data());
 
         // if not declared, check for xmlns from cli
         if (!attribute_uri) {
             auto it = xmlns_namespaces.find(*(attribute->prefix));
             if (it != xmlns_namespaces.end())
-                attribute_uri = it->second.c_str();
+                attribute_uri = it->second.data();
         }
 
         if (!attribute_uri) {
-            SRCMLstatus(WARNING_MSG, "srcml: no uri exists for prefix \"" + std::string(attribute->prefix->c_str()) + "\"");
-            // @todo Can this be a return?
-            exit(1);
+            SRCMLstatus(WARNING_MSG, "srcml: no uri exists for prefix \"" + *attribute->prefix + "\"");
+            return -1;
         }
     }
 
-    // for xpath the output archive is always a non-solo unit
-    // @todo This doesn't make sense in all cases, and should be revisited
-    srcml_archive_disable_solitary_unit(out_arch);
-
-    // normalize the path so that it is "//"
-    std::string nxpath = normalize_xpath(transform_input.c_str());
+    // save for future xpath normalization
+    std::string nxpath(transform_input);
 
     // Call appropriate XPath transform
     if (element && attribute) {
 
-        int status = srcml_append_transform_xpath_element(in_arch, nxpath.c_str(),
-            element->prefix->c_str(),
+        int status = srcml_append_transform_xpath_element(in_arch, nxpath.data(),
+            element->prefix->data(),
             element_uri,
-            element->name->c_str());
+            element->name->data());
         if (status != SRCML_STATUS_OK)
             return -1;
 
-        return srcml_append_transform_xpath_attribute(in_arch, nxpath.c_str(),
-            attribute->prefix->c_str(),
+        return srcml_append_transform_xpath_attribute(in_arch, nxpath.data(),
+            attribute->prefix->data(),
             attribute_uri,
-            attribute->name->c_str(),
-            attribute->value->c_str());
+            attribute->name->data(),
+            attribute->value->data());
 
     } else if (element) {
 
-        return srcml_append_transform_xpath_element(in_arch, nxpath.c_str(),
-            element->prefix->c_str(),
+        return srcml_append_transform_xpath_element(in_arch, nxpath.data(),
+            element->prefix->data(),
             element_uri,
-            element->name->c_str());
+            element->name->data());
 
     } else if (attribute) {
 
-        return srcml_append_transform_xpath_attribute(in_arch, nxpath.c_str(),
-            attribute->prefix->c_str(),
+        return srcml_append_transform_xpath_attribute(in_arch, nxpath.data(),
+            attribute->prefix->data(),
             attribute_uri,
-            attribute->name->c_str(),
-            attribute->value->c_str());
+            attribute->name->data(),
+            attribute->value->data());
 
     } else {
 
-        return srcml_append_transform_xpath(in_arch, nxpath.c_str());
+        // for xpath individual results the output archive is always a non-solo unit
+        srcml_archive_disable_solitary_unit(out_arch);
+
+        return srcml_append_transform_xpath(in_arch, nxpath.data());
     }
 }
 
-int apply_xslt(srcml_archive* in_arch, const std::string& transform_input) {
+int apply_srcql(srcml_archive* in_arch, srcml_archive* out_arch, std::string_view transform_input, const std::pair< std::optional<element>, std::optional<attribute> >& srcql_support, const std::map<std::string,std::string>& xmlns_namespaces) {
+
+    auto element = srcql_support.first;
+    auto attribute = srcql_support.second;
+
+    // Check element namespace
+    char const * element_uri = 0;
+    if (element){
+
+        // check first if namespace is already declared on the output archive
+        element_uri = srcml_archive_get_uri_from_prefix(out_arch, element->prefix->data());
+
+        // if not, check on the input archive
+        if (!element_uri) {
+            element_uri = srcml_archive_get_uri_from_prefix(in_arch, element->prefix->data());
+        }
+
+        if (!element_uri) {
+            auto it = xmlns_namespaces.find(*(element->prefix));
+            if (it != xmlns_namespaces.end())
+                element_uri = it->second.data();
+        }
+
+        // make sure we found it somewhere
+        if (!element_uri) {
+            SRCMLstatus(WARNING_MSG, "srcml: no uri exists for prefix \"" + *element->prefix + "\"");
+            return -1;
+        }
+    }
+
+    // Check attribute namespace
+    char const * attribute_uri = 0;
+    if (attribute) {
+        attribute_uri = srcml_archive_get_uri_from_prefix(out_arch, attribute->prefix->data());
+
+        // if not declared, check for xmlns from cli
+        if (!attribute_uri) {
+            auto it = xmlns_namespaces.find(*(attribute->prefix));
+            if (it != xmlns_namespaces.end())
+                attribute_uri = it->second.data();
+        }
+
+        if (!attribute_uri) {
+            SRCMLstatus(WARNING_MSG, "srcml: no uri exists for prefix \"" + *attribute->prefix + "\"");
+            return -1;
+        }
+    }
+
+    // save for future srcql normalization
+    std::string nsrcql(transform_input);
+
+    // Call appropriate XPath transform
+    if (element && attribute) {
+
+        int status = srcml_append_transform_srcql_element(in_arch, nsrcql.data(),
+            element->prefix->data(),
+            element_uri,
+            element->name->data());
+        if (status != SRCML_STATUS_OK)
+            return -1;
+
+        return srcml_append_transform_srcql_attribute(in_arch, nsrcql.data(),
+            attribute->prefix->data(),
+            attribute_uri,
+            attribute->name->data(),
+            attribute->value->data());
+
+    } else if (element) {
+
+        return srcml_append_transform_srcql_element(in_arch, nsrcql.data(),
+            element->prefix->data(),
+            element_uri,
+            element->name->data());
+
+    } else if (attribute) {
+
+        return srcml_append_transform_srcql_attribute(in_arch, nsrcql.data(),
+            attribute->prefix->data(),
+            attribute_uri,
+            attribute->name->data(),
+            attribute->value->data());
+
+    } else {
+
+        // for srcql individual results the output archive is always a non-solo unit
+        srcml_archive_disable_solitary_unit(out_arch);
+
+        return srcml_append_transform_srcql(in_arch, nsrcql.data());
+    }
+}
+
+int apply_xslt(srcml_archive* in_arch, std::string_view transform_input) {
 
     // xslt has file input, which may need to be processed
     int status;
-    srcml_input_src xslt_file(transform_input.c_str());
+    srcml_input_src xslt_file(transform_input.data());
     input_file(xslt_file);
 
     if (contains<int>(xslt_file))
@@ -168,16 +208,16 @@ int apply_xslt(srcml_archive* in_arch, const std::string& transform_input) {
     else if (contains<FILE*>(xslt_file))
         status = srcml_append_transform_xslt_FILE(in_arch, xslt_file);
     else
-        status = srcml_append_transform_xslt_filename(in_arch, xslt_file.c_str());
+        status = srcml_append_transform_xslt_filename(in_arch, xslt_file.data());
 
     return status;
 }
 
-int apply_relaxng(srcml_archive* in_arch, const std::string& transform_input) {
+int apply_relaxng(srcml_archive* in_arch, std::string_view transform_input) {
 
     // relaxng has file input, which may need to be processed
     int status;
-    srcml_input_src relaxng_file(transform_input.c_str());
+    srcml_input_src relaxng_file(transform_input.data());
     input_file(relaxng_file);
 
     if (contains<int>(relaxng_file))
@@ -185,7 +225,7 @@ int apply_relaxng(srcml_archive* in_arch, const std::string& transform_input) {
     else if (contains<FILE*>(relaxng_file))
         status = srcml_append_transform_relaxng_FILE(in_arch, relaxng_file);
     else
-        status = srcml_append_transform_relaxng_filename(in_arch, relaxng_file.c_str());
+        status = srcml_append_transform_relaxng_filename(in_arch, relaxng_file.data());
 
     return status;
 }

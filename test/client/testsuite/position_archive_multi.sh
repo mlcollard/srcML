@@ -1,10 +1,15 @@
 #!/bin/bash
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# @file position_archive_multi.sh
+#
+# @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
 
 # test framework
 source $(dirname "$0")/framework_test.sh
 
 # test position
-define fsrcml <<- 'STDOUT'
+defineXML fsrcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:pos="http://www.srcML.org/srcML/position" revision="REVISION" pos:tabs="8">
 
@@ -13,9 +18,8 @@ define fsrcml <<- 'STDOUT'
 	<unit revision="REVISION" language="C++" filename="sub/b.cpp" pos:tabs="8" hash="da39a3ee5e6b4b0d3255bfef95601890afd80709"/>
 
 	</unit>
-	STDOUT
+STDOUT
 
-xmlcheck "$fsrcml"
 createfile sub/a.cpp ""
 createfile sub/b.cpp ""
 

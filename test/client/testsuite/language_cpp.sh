@@ -1,4 +1,9 @@
 #!/bin/bash
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# @file language_cpp.sh
+#
+# @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
 
 # test framework
 source $(dirname "$0")/framework_test.sh
@@ -7,18 +12,16 @@ source $(dirname "$0")/framework_test.sh
 
 ##
 # language flg
-define srcml <<- 'STDOUT'
+defineXML srcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++"/>
-	STDOUT
+STDOUT
 
-define fsrcml <<- 'STDOUT'
+defineXML fsrcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++" filename="sub/a.cpp"/>
-	STDOUT
+STDOUT
 
-xmlcheck "$fsrcml"
-xmlcheck "$srcml"
 createfile sub/a.cpp ""
 
 srcml -l "C++" sub/a.cpp

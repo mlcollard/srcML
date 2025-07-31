@@ -1,30 +1,15 @@
+// SPDX-License-Identifier: GPL-3.0-only
 /**
  * @file sax2_srcsax_handler.hpp
  *
- * @copyright Copyright (C) 2013-2014 srcML, LLC. (www.srcML.org)
- *
- * This file is part of the srcML SAX2 Framework.
- *
- * The srcML SAX2 Framework is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * The srcML SAX2 Framework is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with the srcML SAX2 Framework; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ * @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
  */
 
 #ifndef INCLUDED_SAX2_SRCSAX_HANDLER_HPP
 #define INCLUDED_SAX2_SRCSAX_HANDLER_HPP
 
 #include <srcsax.hpp>
-#include <boost/optional.hpp>
+#include <optional>
 
 #include <libxml/parser.h>
 
@@ -33,7 +18,7 @@
 
 /**
  * srcMLMode
- * 
+ *
  * Enum of srcML parsing modes.
  */
 enum srcMLMode {
@@ -82,7 +67,7 @@ struct sax2_srcsax_handler {
     bool collect_unit_body = true;
 
     bool callupper = true;
-    
+
     std::string rootnsstr;
     std::string rootstarttag;
 
@@ -93,9 +78,15 @@ struct sax2_srcsax_handler {
 
     int loc = 0;
 
-    boost::optional<std::string> cpp_prefix;
+    std::optional<std::string> cpp_prefix;
 
     bool rootcalled = false;
+
+    // libxml2 places elements into a dictionary
+    // once initialized, can compare pointers instead of strings
+    const xmlChar* UNIT_ENTRY = nullptr;
+    const xmlChar* MACRO_LIST_ENTRY = nullptr;
+    const xmlChar* ESCAPE_ENTRY = nullptr;
 };
 
 /**

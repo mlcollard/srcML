@@ -1,31 +1,12 @@
+// SPDX-License-Identifier: GPL-3.0-only
 /**
  * @file srcml_sax2_reader.cpp
  *
- * @copyright Copyright (C) 2013-2014 srcML, LLC. (www.srcML.org)
- *
- * The srcML Toolkit is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * The srcML Toolkit is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with the srcML Toolkit; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ * @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
  */
 
 #include <srcml_sax2_reader.hpp>
-
-#include <srcmlns.hpp>
-#include <srcml.h>
-
 #include <stdlib.h>
-#include <cstring>
-
 #include <iostream>
 
 /**
@@ -44,14 +25,12 @@ static void* start_routine(thread_args* args) {
 
         if (!(error.error_code == XML_ERR_EXTRA_CONTENT || error.error_code == XML_ERR_DOCUMENT_END)) {
 
-            // TODO: Make sure error code is passed back, so that SRCML_STATUS_OK is not returned
-            // See #1218
-            fprintf(stderr, "Error Parsing: %s\n", error.message.c_str());
+            fprintf(stderr, "Error Parsing: %s\n", error.message.data());
 
             args->handler->done();
         }
 
-        // might have to release a lock here or set is_done;
+        // might have to release a lock here or set is_done
     }
 
     return 0;
@@ -83,7 +62,7 @@ srcml_sax2_reader::srcml_sax2_reader(srcml_archive* archive, std::unique_ptr<xml
 srcml_sax2_reader::~srcml_sax2_reader() {
 
     handler.stop();
-    
+
     if (thread.joinable()) {
         try {
             thread.join();

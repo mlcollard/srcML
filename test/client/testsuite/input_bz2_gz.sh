@@ -1,4 +1,9 @@
 #!/bin/bash
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# @file input_bz2_gz.sh
+#
+# @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
 
 # test framework
 source $(dirname "$0")/framework_test.sh
@@ -7,43 +12,37 @@ source $(dirname "$0")/framework_test.sh
 define src <<- 'STDOUT'
 
 	a;
-	STDOUT
+STDOUT
 
-define empty_output <<- 'STDOUT'
+defineXML empty_output <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION"/>
-	STDOUT
+STDOUT
 
-define foutput <<- 'STDOUT'
+defineXML foutput <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++" filename="archive/a.cpp.bz2.gz">
+	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++" filename="archive/a.cpp">
 	<expr_stmt><expr><name>a</name></expr>;</expr_stmt>
 	</unit>
-	STDOUT
+STDOUT
 
-define output <<- 'STDOUT'
+defineXML output <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++">
 	<expr_stmt><expr><name>a</name></expr>;</expr_stmt>
 	</unit>
-	STDOUT
+STDOUT
 
-define archive_output <<- 'STDOUT'
+defineXML archive_output <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
-	<unit revision="REVISION" language="C++" filename="archive/a.cpp.bz2.gz" hash="1a2c5d67e6f651ae10b7673c53e8c502c97316d6">
+	<unit revision="REVISION" language="C++" filename="archive/a.cpp" hash="1a2c5d67e6f651ae10b7673c53e8c502c97316d6">
 	<expr_stmt><expr><name>a</name></expr>;</expr_stmt>
 	</unit>
 
 	</unit>
-	STDOUT
-
-xmlcheck "$archive_output"
-xmlcheck "$foutput"
-xmlcheck "$output"
-xmlcheck "$empty_output"
-
+STDOUT
 
 createfile archive/a.cpp "$src"
 bzip2 -c archive/a.cpp > archive/a.cpp.bz2
@@ -96,7 +95,6 @@ check archive/empty.xml "$empty_output"
 srcml --files-from empty.txt.bz2.gz -o archive/compressed_empty.xml
 check archive/compressed_empty.xml "$empty_output"
 
-
 rmfile list.txt
 rmfile list.txt.bz2
 rmfile list.txt.bz2.gz
@@ -106,7 +104,6 @@ rmfile empty.txt.bz2.gz
 rmfile archive/a.cpp
 rmfile archive/a.cpp.bz2
 rmfile archive/a.cpp.bz2.gz
-
 
 # srcml --> src
 srcml archive/a.cpp.xml

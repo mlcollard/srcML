@@ -1,27 +1,17 @@
+// SPDX-License-Identifier: GPL-3.0-only
 /**
  * @file language_extension_registry.cpp
  *
- * @copyright Copyright (C) 2014 srcML, LLC. (www.srcML.org)
+ * @copyright Copyright (C) 2014-2024 srcML, LLC. (www.srcML.org)
  *
  * This file is part of the srcML Toolkit.
- *
- * The srcML Toolkit is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * The srcML Toolkit is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with the srcML Toolkit; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 #include <language_extension_registry.hpp>
 #include <algorithm>
+#include <string_view>
+
+using namespace ::std::literals::string_view_literals;
 
 /**
 * language_extension_registry
@@ -50,6 +40,10 @@ language_extension_registry::language_extension_registry() : registered_language
     { "java", Language::LANGUAGE_JAVA },
     { "aj",   Language::LANGUAGE_JAVA },
     { "cs",   Language::LANGUAGE_CSHARP },
+    { "py",   Language::LANGUAGE_PYTHON },
+    { "pyi",  Language::LANGUAGE_PYTHON },
+    { "pyw",  Language::LANGUAGE_PYTHON },
+    { "pyz",  Language::LANGUAGE_PYTHON },
     /* { "m",    Language::LANGUAGE_OBJECTIVE_C | Language::LANGUAGE_C } */ }), use_cpp_for_c(false)
     {}
 
@@ -66,7 +60,7 @@ language_extension_registry::~language_extension_registry() {}
  * @param extension the found extension returned passed by reference
  *
  * Gets the language extension from a filename with path.
- * 
+ *
  * @returns if successsful.
  */
 bool get_language_extension(const char * const inpath, std::string & extension)
@@ -75,7 +69,7 @@ bool get_language_extension(const char * const inpath, std::string & extension)
 
     // remove any .gz extension
     // FIXME: Why are we doing this? Could be many types of these kind of extensions
-    if ((path.size() > 3) && (path.substr(path.size() - 3) == ".gz"))
+    if ((path.size() > 3) && (path.substr(path.size() - 3) == ".gz"sv))
         path.resize(path.size() - 3);
 
     // get the proper extension, not including the '.'
@@ -88,7 +82,7 @@ bool get_language_extension(const char * const inpath, std::string & extension)
     }
 }
 
-/** 
+/**
  * register_user_ext
  * @param ext the file extension
  * @param language interger representation of language to associated with extention
@@ -108,7 +102,7 @@ bool language_extension_registry::register_user_ext(const char* ext, int languag
     return true;
 }
 
-/** 
+/**
  * register_user_ext
  * @param ext the file extension
  * @param language string representation of language to associated with extention
@@ -136,19 +130,25 @@ bool language_extension_registry::register_user_ext(const char* ext, const char*
  *
  * @returns the numeric representation of the currently registered language from the given filename.
  */
-int language_extension_registry::get_language_from_filename(const char* const path) const { 
+int language_extension_registry::get_language_from_filename(const char* const path) const {
 
     // extract the (pure) extension
     std::string extension;
     bool success = get_language_extension(path, extension);
-
-    if (!success) return 0;
+    if (!success)
+        return 0;
 
     // custom extensions
-    for (int i = (int)(registered_languages.size() - 1); i >= 0; --i) {
-        if (get_extension(registered_languages[i]) == extension)
-            return get_language(registered_languages[i]) == Language::LANGUAGE_NONE ? 0 :
-                get_language(registered_languages[i]) == Language::LANGUAGE_C && use_cpp_for_c ? Language::LANGUAGE_CXX : get_language(registered_languages[i]);
+    // search from the back
+    auto result = std::find_if(registered_languages.rbegin(), registered_languages.rend(), [extension](const language_extension& le){ return le.first == extension; });
+    if (result != registered_languages.rend()) {
+            if (result->second == Language::LANGUAGE_NONE)
+                return 0;
+
+            if (result->second == Language::LANGUAGE_C && use_cpp_for_c)
+                return Language::LANGUAGE_CXX;
+
+            return result->second;
     }
 
     return 0;
@@ -157,10 +157,10 @@ int language_extension_registry::get_language_from_filename(const char* const pa
 /**
  * register_standar_file_extensions
   *
- * Register the standard file extensions for all languages. 
+ * Register the standard file extensions for all languages.
  */
-void language_extension_registry::register_standard_file_extensions()
-{
+void language_extension_registry::register_standard_file_extensions() {
+
     register_user_ext("c",    Language::LANGUAGE_C);
     register_user_ext("h",    Language::LANGUAGE_C);
     register_user_ext("i",    Language::LANGUAGE_C);
@@ -181,12 +181,14 @@ void language_extension_registry::register_standard_file_extensions()
     register_user_ext("ii",   Language::LANGUAGE_CXX);
 
     register_user_ext("java", Language::LANGUAGE_JAVA);
-
     register_user_ext("aj",   Language::LANGUAGE_JAVA);
 
     register_user_ext("cs",   Language::LANGUAGE_CSHARP);
 
-    /* register_user_ext("m",   Language::LANGUAGE_OBJECTIVE_C | Language::LANGUAGE_C); */
+    register_user_ext("py",   Language::LANGUAGE_PYTHON);
+    register_user_ext("pyi",  Language::LANGUAGE_PYTHON);
+    register_user_ext("pyw",  Language::LANGUAGE_PYTHON);
+    register_user_ext("pyz",  Language::LANGUAGE_PYTHON);
 }
 
 /**
@@ -198,7 +200,6 @@ void language_extension_registry::register_standard_file_extensions()
 void language_extension_registry::c_is_cpp(bool use_cpp) {
 
     use_cpp_for_c = use_cpp;
-
 }
 
 /**
@@ -214,7 +215,6 @@ language_extension language_extension_registry::at(unsigned int pos) const {
     if(pos >= size()) throw language_extension_registry_error();
 
     return registered_languages.at(pos);
-
 }
 
 /**
@@ -227,22 +227,21 @@ language_extension language_extension_registry::at(unsigned int pos) const {
 unsigned int language_extension_registry::size() const {
 
     return (unsigned int)registered_languages.size();
-
 }
 
 /**
  * last
  *
  * Get the last language/extension pair at given position.
- * 
+ *
  * @returns the last language/extension pair at given position.
  */
 language_extension language_extension_registry::last() const {
 
-    if(size() == 0) throw language_extension_registry_error();
+    if (size() == 0)
+        throw language_extension_registry_error();
 
     return registered_languages.back();
-
 }
 
 /**
@@ -253,7 +252,6 @@ language_extension language_extension_registry::last() const {
  */
 void language_extension_registry::append(language_extension_registry registry) {
 
-    for(std::vector<language_extension>::const_iterator itr = registry.registered_languages.begin(); itr != registry.registered_languages.end(); ++itr)
-        registered_languages.push_back(*itr);
-
+    for(auto& language : registry.registered_languages)
+        registered_languages.push_back(language);
 }

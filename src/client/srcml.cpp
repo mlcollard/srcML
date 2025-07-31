@@ -1,23 +1,10 @@
+// SPDX-License-Identifier: GPL-3.0-only
 /**
  * @file srcml.cpp
  *
- * @copyright Copyright (C) 2014 srcML, LLC. (www.srcML.org)
+ * @copyright Copyright (C) 2014-2024 srcML, LLC. (www.srcML.org)
  *
  * This file is part of the srcml command-line client.
- *
- * The srcML Toolkit is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * The srcML Toolkit is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with the srcml command-line client; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 #include <srcml.h>
@@ -31,13 +18,14 @@
 #include <Timer.hpp>
 #include <SRCMLStatus.hpp>
 #include <curl/curl.h>
-#include <boost/version.hpp>
 #include <iostream>
 #include <csignal>
 #include <cmath>
 #include <TraceLog.hpp>
+#include <stdin_libarchive.hpp>
+#include <input_archive.hpp>
 
-#ifndef _MSC_BUILD
+#ifndef _MSC_VER
 #include <sys/uio.h>
 #include <unistd.h>
 #endif
@@ -50,46 +38,50 @@ namespace {
     bool request_create_src        (const srcml_request_t&);
 }
 
-int main(int argc, char * argv[]) {
+const int SRCML_CLIENT_VERSION_NUMBER = 10000;
+const char* SRCML_CLIENT_VERSION_STRING = "1.0.0";
+
+int main(int argc, char* argv[]) {
 
     Timer runtime = Timer();
 
     // parse the command line
     auto srcml_request = parseCLI11(argc, argv);
 
- //   std::cout << srcml_request;
-
     // global access to options
     SRCMLOptions::set(srcml_request.command);
 
     // version
     if (option(SRCML_COMMAND_VERSION)) {
-        std::cout << "srcml " << srcml_version_string() << '\n'
-                  << "libsrcml " << srcml_version_string() << '\n'
-                  << archive_version_string() << '\n';
+
+        // output the supported srcML source-code languages
+        for (size_t i = 0; i < srcml_get_language_list_size(); ++i) {
+            std::cout << "srcml " << srcml_get_language_list(i) << ": " << srcml_markup_version_string(srcml_get_language_list(i)) << '\n';
+        }
+
+        std::cout << "srcml client: " << SRCML_CLIENT_VERSION_STRING << '\n'
+                  << "libsrcml: " << srcml_libsrcml_version_string() << '\n';
         return 0;
     }
 
     // debug info
     if (srcml_request.command & SRCML_DEBUG_MODE) {
         SRCMLstatus(DEBUG_MSG) << "Library Versions: " << '\n'
-                               << "srcml " << srcml_version_string() << '\n'
-                               << "libsrcml " << srcml_version_string() << '\n'
+                               << "srcml markup " << srcml_markup_version_string("C++") << '\n'
+                               << "srcml client " << SRCML_CLIENT_VERSION_STRING << '\n'
+                               << "libsrcml " << srcml_libsrcml_version_string() << '\n'
                                <<  archive_version_string() << '\n'
-                               << "libcurl " << curl_version_info(CURLVERSION_NOW)->version << '\n'
-                               << "libboost " << BOOST_LIB_VERSION << '\n';
+                               << "libcurl " << curl_version_info(CURLVERSION_NOW)->version << '\n';
     }
 
     // for a single file request, copy the unit number to that input source
     if (srcml_request.input_sources.size() == 1 && srcml_request.unit != 0)
         srcml_request.input_sources[0].unit = srcml_request.unit;
 
-    // determine if stdin is srcML or src
-    if (srcml_request.stdindex) {
+    // stdin from a terminal is not allowed
+    if (srcml_request.stdindex && isatty(0)) {
 
-        // stdin from a terminal is not allowed
-        if (isatty(0)) {
-            fprintf(stderr, R"(srcml typically accepts input from standard input from a pipe, not a terminal.
+        fprintf(stderr, R"(srcml typically accepts input from standard input from a pipe, not a terminal.
 Typical usage includes:
 
     # convert from a source file to srcML
@@ -101,20 +93,32 @@ Typical usage includes:
     # pipe in source code
     echo "int i = 1;" | srcml --language C++
 
-    # convert from srcML back to source code 
+    # convert from srcML back to source code
     srcml main.cpp.xml -o main.cpp
 
 Consider using the --text option for direct entry of text.
 
 See `srcml --help` for more information.
 )");
-            exit(1);
-        }
-
-        // determine source or srcML input based on --language
-        srcml_request.input_sources[*srcml_request.stdindex].state = srcml_request.att_language ? SRC : SRCML;
+        exit(1);
     }
- 
+
+    // determine if stdin is srcML or src
+    if (srcml_request.stdindex) {
+
+        // pre-read stdin to determine if source code or srcML
+        auto& stdInput = srcml_request.input_sources[*srcml_request.stdindex];
+        open_stdin_libarchive(stdInput);
+
+        // determine source or srcML input based on content
+        stdInput.state = stdInput.issrcML ? SRCML : SRC;
+
+        // for srcML stdin, convert from libarchive input (should just be compression)
+        if (stdInput.issrcML) {
+            stdInput.fd = input_archive(stdInput);
+        }
+    }
+
     /*
         Setup the internal pipeline of possible steps:
         * creating srcml from src files and input srcml files, and transforming srcml
@@ -145,6 +149,7 @@ See `srcml --help` for more information.
 
     // step (srcml|src)->compressed
     if (request_output_compression(srcml_request)) {
+
 #if ARCHIVE_VERSION_NUMBER >= 3002000
         pipeline.push_back(compress_srcml);
 #else
@@ -170,7 +175,7 @@ See `srcml --help` for more information.
                                << "Real Time: " << realtime << "ms\n";
         if (TraceLog::totalLOC() > 0) {
             SRCMLstatus(DEBUG_MSG) << "LOC: " << TraceLog::totalLOC() << '\n'
-                                   << "KLOC/s: " << (realtime > 0 ? std::round(TraceLog::totalLOC() / realtime) : 0) << '\n';
+                                   << "KLOC/s: " << (realtime > 0 ? std::round((double) TraceLog::totalLOC() / realtime) : 0) << '\n';
         }
 
         SRCMLstatus(DEBUG_MSG) << "Status: " << (SRCMLStatus::errors() ? 1 : 0) << '\n';

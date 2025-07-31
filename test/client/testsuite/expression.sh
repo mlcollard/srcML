@@ -1,34 +1,33 @@
 #!/bin/bash
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# @file expression.sh
+#
+# @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
 
 # test framework
 source $(dirname "$0")/framework_test.sh
 
 # test expression_mode
-define sxmlfile <<- 'STDOUT'
+defineXML sxmlfile <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++"><expr><name>a</name></expr></unit>
-	STDOUT
+STDOUT
 
-define fsxmlfile <<- 'STDOUT'
+defineXML fsxmlfile <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++" filename="sub/a.cpp"><expr><name>a</name></expr></unit>
-	STDOUT
+STDOUT
 
-define expr_stmt_sxmlfile <<- 'STDOUT'
+defineXML expr_stmt_sxmlfile <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++"><expr_stmt><expr><name>b</name></expr>;</expr_stmt></unit>
-	STDOUT
+STDOUT
 
-define expr_stmt_fsxmlfile <<- 'STDOUT'
+defineXML expr_stmt_fsxmlfile <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++" filename="sub/b.cpp"><expr_stmt><expr><name>b</name></expr>;</expr_stmt></unit>
-	STDOUT
-
-xmlcheck "$sxmlfile"
-xmlcheck "$fsxmlfile"
-xmlcheck "$expr_stmt_sxmlfile"
-xmlcheck "$expr_stmt_fsxmlfile"
-
+STDOUT
 
 createfile sub/a.cpp "a"
 createfile sub/b.cpp "b;"
@@ -61,7 +60,6 @@ check sub/a.cpp.xml "$sxmlfile"
 
 srcml sub/a.cpp -o sub/a.cpp.xml
 check sub/a.cpp.xml "$fsxmlfile"
-
 
 # within expression statement
 srcml sub/b.cpp

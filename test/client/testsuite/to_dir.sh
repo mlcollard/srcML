@@ -1,16 +1,21 @@
 #!/bin/bash
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# @file to_dir.sh
+#
+# @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
 
 # test framework
 source $(dirname "$0")/framework_test.sh
 
 # test
-define srcml <<- 'STDOUT'
+defineXML srcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++" filename="sub/a.cpp"><expr_stmt><expr><name>a</name></expr>;</expr_stmt>
 	</unit>
-  STDOUT
+STDOUT
 
-define nestedfile <<- 'STDOUT'
+defineXML nestedfile <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -21,21 +26,22 @@ define nestedfile <<- 'STDOUT'
 	</unit>
 
 	</unit>
-  STDOUT
+STDOUT
 
 define output <<- 'STDERR'
-	    1 sub/a.cpp
-	    2 sub/b.cpp
-  STDERR
+	1
+	sub/a.cpp
+	2
+	sub/b.cpp
 
-xmlcheck "$srcml"
-xmlcheck "$nestedfile"
+	Source Files: 0\tOther Files: 0\tErrors: 0\tTotal Files: 0
+STDERR
+
 createfile a.cpp.xml "$srcml"
 rmfile sub/a.cpp
 
 srcml --verbose --to-dir=. a.cpp.xml
-
-check sub/a.cpp "a;" "    1 sub/a.cpp"
+check sub/a.cpp "a;\n" "1\nsub/a.cpp\n\nSource Files: 0\tOther Files: 0\tErrors: 0\tTotal Files: 0\n"
 
 createfile a.cpp.xml "$nestedfile"
 
@@ -43,14 +49,13 @@ rmfile sub/a.cpp
 rmfile sub/b.cpp
 
 srcml --verbose --to-dir=. a.cpp.xml
-check sub/a.cpp "a;" "$output"
-check sub/b.cpp "b;"
+check sub/a.cpp "a;\n" "$output"
+check sub/b.cpp "b;\n"
 
 rmfile sub/a.cpp
 rmfile sub/b.cpp
 
 srcml --verbose --to-dir '.' a.cpp.xml
 
-check sub/a.cpp "a;" "$output"
-check sub/b.cpp "b;"
-
+check sub/a.cpp "a;\n" "$output"
+check sub/b.cpp "b;\n"

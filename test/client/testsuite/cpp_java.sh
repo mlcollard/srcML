@@ -1,4 +1,9 @@
 #!/bin/bash
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# @file cpp_java.sh
+#
+# @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
 
 # test framework
 source $(dirname "$0")/framework_test.sh
@@ -6,20 +11,17 @@ source $(dirname "$0")/framework_test.sh
 # test
 ##
 # empty with debug
-define output <<- 'STDOUT'
+defineXML output <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:cpp="http://www.srcML.org/srcML/cpp" revision="REVISION" language="Java"><cpp:define>#<cpp:directive>define</cpp:directive></cpp:define>
 	</unit>
-	STDOUT
+STDOUT
 
-define foutput <<- 'STDOUT'
+defineXML foutput <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:cpp="http://www.srcML.org/srcML/cpp" revision="REVISION" language="Java" filename="sub/a.java"><cpp:define>#<cpp:directive>define</cpp:directive></cpp:define>
 	</unit>
-	STDOUT
-
-xmlcheck "$output"
-xmlcheck "$foutput"
+STDOUT
 
 createfile sub/a.java "#define\n"
 

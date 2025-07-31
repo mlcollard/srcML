@@ -1,19 +1,24 @@
 #!/bin/bash
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# @file cpp_nomarkup_else_archive_single.sh
+#
+# @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
 
 # test framework
 source $(dirname "$0")/framework_test.sh
 
 # test --cpp-nomarkup-else
 define input <<- 'INPUT'
-	
+
 	#if A
 	break;
 	#else
 	return;
 	#endif
-	INPUT
+INPUT
 
-define markup_else <<- 'STDOUT'
+defineXML markup_else <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -26,9 +31,9 @@ define markup_else <<- 'STDOUT'
 	</unit>
 
 	</unit>
-	STDOUT
+STDOUT
 
-define fmarkup_else <<- 'STDOUT'
+defineXML fmarkup_else <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -41,10 +46,9 @@ define fmarkup_else <<- 'STDOUT'
 	</unit>
 
 	</unit>
-	STDOUT
+STDOUT
 
-
-define nomarkup_else <<- 'STDOUT'
+defineXML nomarkup_else <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" options="CPP_TEXT_ELSE">
 
@@ -57,9 +61,9 @@ define nomarkup_else <<- 'STDOUT'
 	</unit>
 
 	</unit>
-	STDOUT
+STDOUT
 
-define fnomarkup_else <<- 'STDOUT'
+defineXML fnomarkup_else <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" options="CPP_TEXT_ELSE">
 
@@ -72,12 +76,7 @@ define fnomarkup_else <<- 'STDOUT'
 	</unit>
 
 	</unit>
-	STDOUT
-
-xmlcheck "$markup_else"
-xmlcheck "$fmarkup_else"
-xmlcheck "$nomarkup_else"
-xmlcheck "$fnomarkup_else"
+STDOUT
 
 createfile sub/a.cpp "$input"
 
@@ -129,7 +128,6 @@ check sub/b.cpp.xml "$fmarkup_else"
 
 srcml --archive -o sub/b.cpp.xml sub/a.cpp
 check sub/b.cpp.xml "$fmarkup_else"
-
 
 # don't markup else
 srcml -l C++ --cpp-nomarkup-else --archive < sub/a.cpp
@@ -287,4 +285,3 @@ check sub/b.cpp.xml "$fnomarkup_else"
 
 srcml --archive --cpp-nomarkup-else -o sub/b.cpp.xml sub/a.cpp
 check sub/b.cpp.xml "$fnomarkup_else"
-

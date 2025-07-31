@@ -1,9 +1,14 @@
 #!/bin/bash
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# @file unit_srcml.sh
+#
+# @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
 
 # test framework
 source $(dirname "$0")/framework_test.sh
 
-define nestedfile <<- 'STDIN'
+defineXML nestedfile <<- 'STDIN'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -16,17 +21,14 @@ define nestedfile <<- 'STDIN'
 	</unit>
 
 	</unit>
-	STDIN
+STDIN
 
-define sxmlfile1 <<- 'STDOUT'
+defineXML sxmlfile1 <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++" filename="sub/a.cpp" hash="1a2c5d67e6f651ae10b7673c53e8c502c97316d6">
 	<expr_stmt><expr><name>a</name></expr>;</expr_stmt>
 	</unit>
-	STDOUT
-
-xmlcheck "$nestedfile"
-xmlcheck "$sxmlfile1"
+STDOUT
 
 srcml -X --unit "1" - <<< "$nestedfile"
 check "$sxmlfile1"
@@ -34,34 +36,32 @@ check "$sxmlfile1"
 srcml -X --unit "1" <<< "$nestedfile"
 check "$sxmlfile1"
 
-define sxmlfile2 <<- 'STDOUT'
+defineXML sxmlfile2 <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++" filename="sub/b.cpp" hash="aecf18b52d520ab280119febd8ff6c803135ddfc">
 	<expr_stmt><expr><name>b</name></expr>;</expr_stmt>
 	</unit>
-	STDOUT
+STDOUT
 
-define sxmlfile2fragment <<- 'STDOUT'
+defineXML sxmlfile2fragment <<- 'STDOUT'
 	<unit revision="REVISION" language="C++" filename="sub/b.cpp" hash="aecf18b52d520ab280119febd8ff6c803135ddfc">
 	<expr_stmt><expr><name>b</name></expr>;</expr_stmt>
 	</unit>
-	STDOUT
+STDOUT
 
 define sxmlfile2raw <<- 'STDOUT'
-	
+
 	<expr_stmt><expr><name>b</name></expr>;</expr_stmt>
-	STDOUT
+STDOUT
 
 define sxmlfile2src <<- 'STDOUT'
-	
+
 	b;
-	STDOUT
+STDOUT
 
-# @todo This should be a single newline.
+# single newline
 define emptysrc <<- 'STDOUT'
-	STDOUT
-
-xmlcheck "$sxmlfile2"
+STDOUT
 
 srcml -X --unit "2" - <<< "$nestedfile"
 check "$sxmlfile2"
@@ -77,4 +77,3 @@ check "$sxmlfile2src"
 
 srcml --text="" --filename="sub/b.cpp" -l C++ --hash | srcml
 check "$emptysrc"
-

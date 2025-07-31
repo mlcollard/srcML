@@ -1,22 +1,10 @@
+// SPDX-License-Identifier: GPL-3.0-only
 /**
  * @file srcsax.hpp
  *
- * @copyright Copyright (C) 2013-2014 srcML, LLC. (www.srcML.org)
- *
- * srcSAX is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * srcSAX is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with the srcML Toolkit; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ * @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
  */
+
 #ifndef INCLUDED_SRCSAX_HPP
 #define INCLUDED_SRCSAX_HPP
 
@@ -42,10 +30,10 @@ public:
     void (*srcsax_error)(const char* message, int error_code);
 
     /** is the document an archive */
-    int is_archive;
+    bool is_archive;
 
     /** the xml documents encoding */
-    const char* encoding;
+    const char* encoding = nullptr;
 
     /* Internal context handling NOT FOR PUBLIC USE */
 

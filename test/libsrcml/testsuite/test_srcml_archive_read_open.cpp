@@ -1,31 +1,14 @@
+// SPDX-License-Identifier: GPL-3.0-only
 /**
  * @file test_srcml_archive_read_open.cpp
  *
- * @copyright Copyright (C) 2013-2014 srcML, LLC. (www.srcML.org)
+ * @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
  *
- * The srcML Toolkit is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
  *
- * The srcML Toolkit is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with the srcML Toolkit; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ * Test cases for srcml_archive_read_open_*
  */
 
-/*
-
-  Test cases for read open for archives
-*/
-
 #include <srcml.h>
-    
-#include <srcml_macros.hpp>
 
 #include <fstream>
 
@@ -38,13 +21,14 @@
 
 #include <dassert.hpp>
 
-int read_callback(void * context, char* buffer, int len) {
-    return (int)fread(buffer, 1, len, (FILE*)context);
+extern "C" {
+    int read_callback(void * context, char* buffer, int len) {
+        return (int)fread(buffer, 1, (size_t)len, (FILE*)context);
+    }
 
-}
-
-int close_callback(void * context UNUSED) {
-    return 0;
+    int close_callback(void * /* context */) {
+        return 0;
+    }
 }
 
 int main(int, char* argv[]) {
@@ -265,7 +249,7 @@ int main(int, char* argv[]) {
     */
 
     {
-        int fd = OPEN("project.xml", O_RDONLY, 0);
+        int fd = open("project.xml", O_RDONLY, 0);
 
         srcml_archive* archive = srcml_archive_create();
         dassert(srcml_archive_read_open_fd(archive, fd), SRCML_STATUS_OK);
@@ -276,11 +260,10 @@ int main(int, char* argv[]) {
 
         srcml_archive_close(archive);
         srcml_archive_free(archive);
-        CLOSE(fd);
     }
 
     {
-        int fd = OPEN("project_single.xml", O_RDONLY, 0);
+        int fd = open("project_single.xml", O_RDONLY, 0);
 
         srcml_archive* archive = srcml_archive_create();
         dassert(srcml_archive_read_open_fd(archive, fd), SRCML_STATUS_OK);
@@ -292,34 +275,30 @@ int main(int, char* argv[]) {
 
         srcml_archive_close(archive);
         srcml_archive_free(archive);
-        CLOSE(fd);
     }
 
     {
-        int fd = OPEN("project_ns.xml", O_RDONLY, 0);
+        int fd = open("project_ns.xml", O_RDONLY, 0);
 
         srcml_archive* archive = srcml_archive_create();
         dassert(srcml_archive_read_open_fd(archive, fd), SRCML_STATUS_OK);
 
         dassert(srcml_archive_get_namespace_prefix(archive, 0), std::string("s"));
         dassert(srcml_archive_get_options(archive), 0);
-
         srcml_archive_close(archive);
         srcml_archive_free(archive);
-        CLOSE(fd);
     }
 
     {
         srcml_archive* archive = srcml_archive_create();
         dassert(srcml_archive_read_open_fd(archive, -1), SRCML_STATUS_INVALID_ARGUMENT);
-
         srcml_archive_free(archive);
     }
 
     {
-        int fd = OPEN("project_ns.xml", O_RDONLY, 0);
+        int fd = open("project_ns.xml", O_RDONLY, 0);
         dassert(srcml_archive_read_open_fd(0, fd), SRCML_STATUS_INVALID_ARGUMENT);
-        CLOSE(fd);
+        close(fd);
     }
 
     /*
@@ -393,9 +372,9 @@ int main(int, char* argv[]) {
         fclose(file);
     }
 
-    UNLINK("project.xml");
-    UNLINK("project_single.xml");
-    UNLINK("project_ns.xml");
+    unlink("project.xml");
+    unlink("project_single.xml");
+    unlink("project_ns.xml");
 
     srcml_cleanup_globals();
 

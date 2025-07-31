@@ -1,10 +1,15 @@
 #!/bin/bash
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# @file xmlns_archive_multi.sh
+#
+# @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
 
 # test framework
 source $(dirname "$0")/framework_test.sh
 
 # default
-define foosrcml <<- 'STDOUT'
+defineXML foosrcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<bar:unit xmlns:bar="http://www.srcML.org/srcML/src" xmlns="http://www.foo.com" revision="REVISION">
 
@@ -13,10 +18,8 @@ define foosrcml <<- 'STDOUT'
 	<bar:unit revision="REVISION" language="C++" filename="sub/b.cpp" hash="9a1e1d3d0e27715d29bcfbf72b891b3ece985b36"><bar:expr_stmt><bar:expr><bar:name>b</bar:name></bar:expr>;</bar:expr_stmt></bar:unit>
 
 	</bar:unit>
-	STDOUT
+STDOUT
 
-# this and the other xmlcheck are failing, causing the test to fail.
-xmlcheck "$foosrcml"
 createfile sub/a.cpp "a;"
 createfile sub/b.cpp "b;"
 
@@ -84,7 +87,7 @@ srcml -o sub/a.xml sub/a.cpp sub/b.cpp --xmlns="http://www.foo.com" --xmlns:bar=
 check sub/a.xml "$foosrcml"
 
 # with prefix
-define fooprefixsrcml <<- 'STDOUT'
+defineXML fooprefixsrcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:foo="http://www.foo.com" revision="REVISION">
 
@@ -93,9 +96,7 @@ define fooprefixsrcml <<- 'STDOUT'
 	<unit revision="REVISION" language="C++" filename="sub/b.cpp" hash="9a1e1d3d0e27715d29bcfbf72b891b3ece985b36"><expr_stmt><expr><name>b</name></expr>;</expr_stmt></unit>
 
 	</unit>
-	STDOUT
-
-xmlcheck "$fooprefixsrcml"
+STDOUT
 
 srcml --xmlns:foo="http://www.foo.com" sub/a.cpp sub/b.cpp
 check "$fooprefixsrcml"
@@ -159,4 +160,3 @@ check sub/a.xml "$fooprefixsrcml"
 
 srcml -o sub/a.xml sub/a.cpp sub/b.cpp --xmlns:foo="http://www.foo.com"
 check sub/a.xml "$fooprefixsrcml"
-

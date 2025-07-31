@@ -1,27 +1,12 @@
+// SPDX-License-Identifier: GPL-3.0-only
 /**
  * @file srcml_translator.hpp
  *
- * @copyright Copyright (C) 2003-2014 srcML, LLC. (www.srcML.org)
+ * @copyright Copyright (C) 2003-2024 srcML, LLC. (www.srcML.org)
  *
  * This file is part of the srcML Toolkit.
  *
- * The srcML Toolkit is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * The srcML Toolkit is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with the srcML Toolkit; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- */
-
-/*
-  Class for straight forward source code to srcML translation
+ * Class for straight forward source code to srcML translation
 */
 
 #ifndef SRCML_TRANSLATOR_HPP
@@ -30,8 +15,7 @@
 #include <Language.hpp>
 #include <srcMLOutput.hpp>
 #include <srcml_types.hpp>
-#include <srcml_macros.hpp>
-#include <srcml.h>
+#include <srcml_options.hpp>
 
 #include <string>
 
@@ -60,15 +44,15 @@ public:
                      const char* xml_encoding,
                      OPTION_TYPE& op,
                      const Namespaces& namespaces,
-                     boost::optional<std::pair<std::string, std::string> > processing_instruction,
+                     std::optional<std::pair<std::string, std::string> > processing_instruction,
                      size_t tabsize,
                      int language,
                      const char* revision,
                      const char* url,
                      const char* filename,
                      const char* version,
-                     const std::vector<std::string>& attributes,
-                     const char* timestamp, 
+                     const Attributes& attributes,
+                     const char* timestamp,
                      const char* hash,
                      const char* encoding);
 
@@ -121,7 +105,7 @@ private:
     const char* encoding = nullptr;
 
     /** an array of name-value attribute pairs */
-    const std::vector<std::string>& attributes;
+    const Attributes& attributes;
 
     Namespaces namespaces;
 
@@ -144,7 +128,7 @@ private:
 
     /** mark if have outputted starting unit tag for by element writing */
     bool is_outputting_unit = false;
-    
+
 public:
     /** track depth for by element writing */
     int output_unit_depth = 0;

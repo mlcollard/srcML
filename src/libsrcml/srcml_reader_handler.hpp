@@ -1,21 +1,8 @@
+// SPDX-License-Identifier: GPL-3.0-only
 /**
  * @file srcml_reader_handler.hpp
  *
- * @copyright Copyright (C) 2013-2014 srcML, LLC. (www.srcML.org)
- *
- * The srcML Toolkit is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * The srcML Toolkit is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with the srcML Toolkit; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ * @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
  */
 
 #ifndef INCLUDED_SRCML_READER_HANDLER_HPP
@@ -25,7 +12,6 @@
 #include <sax2_srcsax_handler.hpp>
 
 #include <srcml_types.hpp>
-#include <srcml_macros.hpp>
 #include <srcml.h>
 
 #include <unit_utilities.hpp>
@@ -35,20 +21,23 @@
 #include <srcmlns.hpp>
 
 #include <string>
+#include <string_view>
 #include <vector>
 #include <stack>
 
-#include <cstring>
-
 #include <mutex>
 #include <condition_variable>
-#include <boost/optional.hpp>
+#include <optional>
+
+using namespace ::std::literals::string_view_literals;
 
 #define ATTR_LOCALNAME(pos) (pos * 5)
 #define ATTR_PREFIX(pos) (pos * 5 + 1)
 #define ATTR_URI(pos) (pos * 5 + 2)
 #define ATTR_VALUE_START(pos) (pos * 5 + 3)
 #define ATTR_VALUE_END(pos) (pos * 5 + 4)
+
+#undef SRCSAX_DEBUG
 
 /**
  * srcsax_attribute
@@ -58,16 +47,16 @@
 struct attribute_t {
 
     /** attribute name */
-    boost::optional<std::string> localname;
+    std::optional<std::string> localname;
 
     /** attribute namespace prefix */
-    boost::optional<std::string> prefix;
+    std::optional<std::string> prefix;
 
     /** attribute namespace uri */
-    boost::optional<std::string> uri;
+    std::optional<std::string> uri;
 
     /** attribute value */
-    boost::optional<std::string> value;
+    std::optional<std::string> value;
 };
 
 /**
@@ -123,8 +112,6 @@ public :
      * Constructor.  Sets up mutex, conditions and state.
      */
     srcml_reader_handler() {
-
-//          archive->options &= ~SRCML_OPTION_HASH;
     }
 
     /**
@@ -132,7 +119,7 @@ public :
      *
      * Destructor, deletes mutex and conditions.
      */
-    ~srcml_reader_handler() {
+    virtual ~srcml_reader_handler() {
      }
 
     /**
@@ -198,7 +185,7 @@ public :
     void done() {
 
         is_done = true;
-        
+
         cond.notify_one();
     }
 
@@ -245,7 +232,7 @@ public :
      *
      * Overidden startRoot to handle collection of root attributes. Stop before continue
      */
-    virtual void startRoot(const char* localname, const char* prefix, const char* URI,
+    virtual void startRoot(const char* /* localname */, const char* /* prefix */, const char* /* URI */,
                            int num_namespaces, const xmlChar** namespaces, int num_attributes,
                            const xmlChar** attributes) {
 
@@ -258,67 +245,67 @@ public :
 
         // collect attributes
         for (int pos = 0; pos < num_attributes; ++pos) {
-            std::string attribute = (const char*) attributes[pos * 5];
-            std::string value((const char *)attributes[pos * 5 + 3], attributes[pos * 5 + 4] - attributes[pos * 5 + 3]);
+            std::string_view prefix = attributes[pos * 5 + 1] ? ((const char*) attributes[pos * 5 + 1]) : "";
+            std::string_view attribute = (const char*) attributes[pos * 5];
+            std::string value((const char *)attributes[pos * 5 + 3], static_cast<std::size_t>(attributes[pos * 5 + 4] - attributes[pos * 5 + 3]));
 
             // Note: these are ignore instead of placing in attributes.
-            if (attribute == "timestamp")
+            if (attribute == "timestamp"sv)
                 ;
-            else if (attribute == "language")
+            else if (attribute == "language"sv)
                 ;
-            else if (attribute == "revision")
+            else if (attribute == "revision"sv)
                 archive->revision = value;
-            else if (attribute == "filename")
+            else if (attribute == "filename"sv)
                 ;
-            else if (attribute == "url") {
-                srcml_archive_set_url(archive, value.c_str());
+            else if (attribute == "url"sv) {
+                srcml_archive_set_url(archive, value.data());
 
             }
-            else if (attribute == "version")
-                srcml_archive_set_version(archive, value.c_str());
-            else if (attribute == "tabs")
-                archive->tabstop = atoi(value.c_str());
-            else if (attribute == "options") {
+            else if (attribute == "version"sv)
+                srcml_archive_set_version(archive, value.data());
+            else if (attribute == "tabs"sv)
+                archive->tabstop = static_cast<std::size_t>(atoi(value.data()));
+            else if (attribute == "options"sv) {
 
-                while(!value.empty()) {
+                std::size_t commaPos = 0;
+                std::size_t prevCommaPos = 0;
+                while(prevCommaPos < value.size()) {
 
-                    std::string::size_type pos = value.find(",");
-                    std::string option = value.substr(0, pos);
-                    if (pos == std::string::npos)
-                        value = "";
-                    else
-                        value = value.substr(value.find(",") + 1);
+                    commaPos = value.find(",", commaPos);
+                    std::string_view option(&value[prevCommaPos], commaPos - prevCommaPos);
+                    prevCommaPos = commaPos;
+                    ++prevCommaPos;
 
-                    if (option == "XMLDECL")
+                    if (option == "XMLDECL"sv)
                         archive->options |= SRCML_OPTION_NO_XML_DECL;
-                    else if (option == "NAMESPACEDECL")
+                    else if (option == "NAMESPACEDECL"sv)
                         archive->options |= SRCML_OPTION_NAMESPACE_DECL;
-                    else if (option == "CPP_TEXT_ELSE")
+                    else if (option == "CPP_TEXT_ELSE"sv)
                         archive->options |= SRCML_OPTION_CPP_TEXT_ELSE;
-                    else if (option == "CPP_MARKUP_IF0")
+                    else if (option == "CPP_MARKUP_IF0"sv)
                         archive->options |= SRCML_OPTION_CPP_MARKUP_IF0;
-                    else if (option == "LINE")
+                    else if (option == "LINE"sv)
                         archive->options |= SRCML_OPTION_LINE;
                 }
 
-            } else if (attribute == "hash") 
+            } else if (attribute == "hash"sv)
                 ;
             else {
 
-                archive->attributes.push_back(attribute);
-                archive->attributes.push_back(value);
+                archive->attributes.emplace_back("", prefix, attribute, value);
             }
         }
 
         // collect namespaces
         for (int pos = 0; pos < num_namespaces; ++pos) {
 
-            std::string prefix = (const char*) namespaces[pos * 2] ? (const char*) namespaces[pos * 2] : "";
-            std::string uri = (const char*) namespaces[pos * 2 + 1] ? (const char*) namespaces[pos * 2 + 1] : "";
+            std::string_view nsPrefix = (const char*) namespaces[pos * 2] ? (const char*) namespaces[pos * 2] : "";
+            std::string nsURI = (const char*) namespaces[pos * 2 + 1] ? (const char*) namespaces[pos * 2 + 1] : "";
 
-            srcml_uri_normalize(uri);
+            srcml_uri_normalize(nsURI);
 
-            srcml_archive_register_namespace(archive, prefix.c_str(), uri.c_str());
+            srcml_archive_register_namespace(archive, nsPrefix.data(), nsURI.data());
         }
 
 #ifdef SRCSAX_DEBUG
@@ -339,7 +326,7 @@ public :
      * Overidden startUnit to handle collection of Unit attributes and tag. Stop before continue
      * if collecting attributes.
      */
-    virtual void startUnit(const char* localname, const char* prefix, const char* URI,
+    virtual void startUnit(const char* /* localname */, const char* /* prefix */, const char* /* URI */,
                            int num_namespaces, const xmlChar** namespaces, int num_attributes,
                            const xmlChar** attributes) {
 
@@ -348,10 +335,9 @@ public :
 #endif
 
         // pause
-        // @todo this may need to change because, meta tags have separate call now
         if (!read_root) {
 
-            {                
+            {
                 std::unique_lock<std::mutex> lock(mutex);
 
                 if (terminate)
@@ -359,7 +345,7 @@ public :
                 wait_root = false;
                 cond.notify_one();
                 cond.wait(lock);
-                read_root = true;        
+                read_root = true;
             }
 
             if (terminate) {
@@ -389,8 +375,19 @@ public :
         }
 
         state->loc = 0;
-        
+
         state->collect_unit_body = collect_unit_body;
+
+        // collect namespaces
+        for (int pos = 0; pos < num_namespaces; ++pos) {
+
+            std::string_view nsPrefix = (const char*) namespaces[pos * 2] ? (const char*) namespaces[pos * 2] : "";
+            std::string nsURI = (const char*) namespaces[pos * 2 + 1] ? (const char*) namespaces[pos * 2 + 1] : "";
+
+            srcml_uri_normalize(nsURI);
+
+            srcml_unit_register_namespace(unit, nsPrefix.data(), nsURI.data());
+        }
 
         if (terminate)
             stop_parser();
@@ -409,7 +406,7 @@ public :
      * Overidden endRoot to indicate done with parsing and
         free any waiting process.
      */
-    virtual void endRoot(const char* localname, const char* prefix, const char* URI) {
+    virtual void endRoot(const char* /* localname */, const char* /* prefix */, const char* /* URI */) {
 
 #ifdef SRCSAX_DEBUG
         fprintf(stderr, "HERE: %s %s %d '%s'\n", __FILE__, __FUNCTION__, __LINE__, (const char *)localname);
@@ -439,7 +436,7 @@ public :
      *
      * Overidden endUnit to collect srcml and stop parsing.  Clear collect srcML after pause.
      */
-    virtual void endUnit(const char* localname, const char* prefix, const char* URI) {
+    virtual void endUnit(const char* /* localname */, const char* /* prefix */, const char* /* URI */) {
 
 #ifdef SRCSAX_DEBUG
         fprintf(stderr, "HERE: %s %s %d '%s'\n", __FILE__, __FUNCTION__, __LINE__, (const char *)localname);
@@ -466,16 +463,15 @@ public :
 
                 // namespaces probably aren't create yet
                 if (!unit->namespaces) {
-                    unit->namespaces = default_namespaces;
+                    unit->namespaces = starting_namespaces;
                 }
 
                 // set the found prefix, plus mark it as used
-                auto&& view = unit->namespaces->get<nstags::uri>();
-                auto it = view.find(SRCML_CPP_NS_URI);
-                if (it != view.end()) {
-                    view.modify(it, [](Namespace& thisns){ thisns.flags |= NS_USED; });
+                auto it = findNSURI(*unit->namespaces, SRCML_CPP_NS_URI);
+                if (it != unit->namespaces->end()) {
+                    it->flags |= NS_USED;
                 } else {
-                    unit->namespaces->push_back({ state->cpp_prefix->c_str(), SRCML_CPP_NS_URI, NS_USED | NS_STANDARD });
+                    unit->namespaces->emplace_back(state->cpp_prefix->data(), SRCML_CPP_NS_URI, NS_USED | NS_STANDARD);
                 }
             }
 
@@ -494,7 +490,6 @@ public :
 #endif
     }
 
-
     /**
      * metaTag
      * @param localname the name of the element tag
@@ -508,30 +503,30 @@ public :
      * SAX handler function for a meta tags.
      * Overide for desired behaviour.
      */
-    virtual void metaTag(const char* localname, const char* prefix, const char* URI,
-                           int num_namespaces, const xmlChar** namespaces, int num_attributes,
+    virtual void metaTag(const char* localname, const char* /* prefix */, const char* /* URI */,
+                           int /* num_namespaces */, const xmlChar** /* namespaces */, int num_attributes,
                            const xmlChar** attributes) {
 
-        if (strcmp(localname, "macro-list") == 0) {
+        if (localname == "macro-list"sv) {
 
             std::string token;
             std::string type;
 
             for (int pos = 0; pos < num_attributes; ++pos) {
 
-                if (strcmp((const char*) attributes[ATTR_LOCALNAME(pos)], "token") == 0)
-                    token.append((const char*) attributes[ATTR_VALUE_START(pos)], attributes[ATTR_VALUE_END(pos)] - attributes[ATTR_VALUE_START(pos)]);
-                else if (strcmp((const char*) attributes[ATTR_LOCALNAME(pos)], "type") == 0)
-                    type.append((const char*) attributes[ATTR_VALUE_START(pos)], attributes[ATTR_VALUE_END(pos)] - attributes[ATTR_VALUE_START(pos)]);
+                if ((const char*) attributes[ATTR_LOCALNAME(pos)] == "token"sv)
+                    token.append((const char*) attributes[ATTR_VALUE_START(pos)], static_cast<std::size_t>(attributes[ATTR_VALUE_END(pos)] - attributes[ATTR_VALUE_START(pos)]));
+                else if ((const char*) attributes[ATTR_LOCALNAME(pos)] == "type"sv)
+                    type.append((const char*) attributes[ATTR_VALUE_START(pos)], static_cast<std::size_t>(attributes[ATTR_VALUE_END(pos)] - attributes[ATTR_VALUE_START(pos)]));
             }
 
             if (token != "" && type != "") {
 
-                archive->user_macro_list.push_back(token);
-                archive->user_macro_list.push_back(type);
+                archive->user_macro_list.push_back(std::move(token));
+                archive->user_macro_list.push_back(std::move(type));
             }
 
-        } 
+        }
     }
 
     /**
@@ -542,8 +537,8 @@ public :
      * Overrident processingInstruction to collect srcML.
      */
     virtual void processingInstruction(const char* target, const char* data) {
-        
-        srcml_archive_set_processing_instruction(archive, (const char*)target, (const char *)data);
+
+        srcml_archive_set_processing_instruction(archive, (const char*)target, (const char*)data);
 
     }
 

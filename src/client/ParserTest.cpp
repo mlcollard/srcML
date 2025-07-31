@@ -1,23 +1,10 @@
+// SPDX-License-Identifier: GPL-3.0-only
 /**
  * @file ParserTest.hpp
  *
- * @copyright Copyright (C) 2019 srcML, LLC. (www.srcML.org)
+ * @copyright Copyright (C) 2019-2024 srcML, LLC. (www.srcML.org)
  *
  * This file is part of the srcml command-line client.
- *
- * The srcML Toolkit is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * The srcML Toolkit is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with the srcml command-line client; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 #include <ParseRequest.hpp>
@@ -29,13 +16,10 @@
 #include <iomanip>
 #include <ParserTest.hpp>
 #include <sstream>
-#include <cstring>
 #include <algorithm>
 #include <srcml_cli.hpp>
 #include <srcml_options.hpp>
 #include <srcml_utilities.hpp>
-
-#define str2arg(s) s, (int) strlen(s)
 
 void ParserTest::entry(const ParseRequest* request, srcml_archive* archive, srcml_unit* unit) {
 
@@ -58,7 +42,7 @@ void ParserTest::entry(const ParseRequest* request, srcml_archive* archive, srcm
         sout << '\n' << std::setw(FIELD_WIDTH_LANGUAGE) << std::left << unit_language;
         sout << std::setw(FIELD_WIDTH_URL) << std::left << url;
 
-        srcml_archive_write_string(archive, sout.str().c_str(), (int) sout.str().size());
+        srcml_archive_write_string(archive, sout.str().data(), (int) sout.str().size());
 
         line_count = 0;
     }
@@ -92,7 +76,7 @@ void ParserTest::entry(const ParseRequest* request, srcml_archive* archive, srcm
     if (line_count >= 75) {
         std::ostringstream sout;
         sout << '\n' << std::setw(FIELD_WIDTH_LANGUAGE) << " " << std::setw(FIELD_WIDTH_URL) << std::left << "...";
-        srcml_archive_write_string(archive, sout.str().c_str(), (int) sout.str().size());
+        srcml_archive_write_string(archive, sout.str().data(), (int) sout.str().size());
 
         line_count = 0;
     }
@@ -102,11 +86,11 @@ void ParserTest::entry(const ParseRequest* request, srcml_archive* archive, srcm
     if (ssout == sxml) {
         std::ostringstream output;
         output << (color ? "\033[0;33m" : "") << count << (color ? "\033[0m" : "");
-        srcml_archive_write_string(archive, output.str().c_str(), (int) output.str().size());
+        srcml_archive_write_string(archive, output.str().data(), (int) output.str().size());
     } else {
         std::ostringstream output;
         output << (color ? "\033[0;31m" : "-") << count << (color ? "\033[0m" : "");
-        srcml_archive_write_string(archive, output.str().c_str(), (int) output.str().size());
+        srcml_archive_write_string(archive, output.str().data(), (int) output.str().size());
 
         ++failed;
         ++misses[unit_language];
@@ -144,7 +128,7 @@ void ParserTest::entry(const ParseRequest* request, srcml_archive* archive, srcm
                 off.first = std::next(off.first);
                 off.second = std::next(off.second);
             }
-            
+
             // remove the common end of the strings
             sxml.resize(sxml.size() - std::distance(sxml.rbegin(), endoff.first));
             ssout.resize(ssout.size() - std::distance(ssout.rbegin(), endoff.second));
@@ -173,8 +157,6 @@ void ParserTest::entry(const ParseRequest* request, srcml_archive* archive, srcm
     srcml_archive_write_string(archive, " ", 1);
 
     free(buffer);
- //   srcml_unit_free(unit);
-
 }
 
 void ParserTest::report(srcml_archive* archive) {
@@ -184,15 +166,17 @@ void ParserTest::report(srcml_archive* archive) {
     bool color = !(SRCMLOptions::get() & SRCML_COMMAND_NO_COLOR);
 
     // error report
-    srcml_archive_write_string(archive, str2arg("\n\nErrors:\n"));
+    std::string_view errorsHeader = "\n\nErrors:\n";
+    srcml_archive_write_string(archive, errorsHeader.data(), (int) errorsHeader.size());
     for (const auto& err : errors) {
-        srcml_archive_write_string(archive, err.c_str(), (int) err.size());
+        srcml_archive_write_string(archive, err.data(), (int) err.size());
     }
     // summary report
-    srcml_archive_write_string(archive, str2arg("\n\nSummary:\n"));
+    std::string_view summaryHeader = "\n\nSummary:\n";
+    srcml_archive_write_string(archive, summaryHeader.data(), (int) summaryHeader.size());
     std::sort(summary.begin(), summary.end());
     for (const auto& err : summary) {
-        srcml_archive_write_string(archive, err.c_str(), (int) err.size());
+        srcml_archive_write_string(archive, err.data(), (int) err.size());
         srcml_archive_write_string(archive, "\n", 1);
     }
     double percent = double(failed * 100) / total;
@@ -204,20 +188,20 @@ void ParserTest::report(srcml_archive* archive) {
     else
         sout << "<1";
     sout << "%" << '\n';
-    srcml_archive_write_string(archive, sout.str().c_str(), (int) sout.str().size());
+    srcml_archive_write_string(archive, sout.str().data(), (int) sout.str().size());
 
     for (auto& kv : ltotal) {
-        double percent = double(misses[kv.first] * 100) / kv.second;
-        std::ostringstream sout;
-        sout << "        " << std::setw(FIELD_WIDTH_LANGUAGE) << std::left << kv.first << std::setw(6) << std::right << misses[kv.first] << std::setw(6) << std::right << kv.second << '\t';
-        sout << std::setw(4) << std::right;
-        if (percent == 0 || percent >= 1)
-            sout << std::setprecision(2) << percent;
+        double missesPercent = double(misses[kv.first] * 100) / kv.second;
+        std::ostringstream out;
+        out << "        " << std::setw(FIELD_WIDTH_LANGUAGE) << std::left << kv.first << std::setw(6) << std::right << misses[kv.first] << std::setw(6) << std::right << kv.second << '\t';
+        out << std::setw(4) << std::right;
+        if (missesPercent == 0 || missesPercent >= 1)
+            out << std::setprecision(2) << missesPercent;
         else
-            sout << "<1";
-        sout << "%" << '\n';
+            out << "<1";
+        out << "%" << '\n';
 
-        srcml_archive_write_string(archive, sout.str().c_str(), (int) sout.str().size());
+        srcml_archive_write_string(archive, out.str().data(), static_cast<int>(out.str().size()));
     }
 }
 

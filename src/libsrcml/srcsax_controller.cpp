@@ -1,37 +1,24 @@
+// SPDX-License-Identifier: GPL-3.0-only
 /**
  * @file srcsax_controller.cpp
  *
- * @copyright Copyright (C) 2013-2014 srcML, LLC. (www.srcML.org)
- *
- * srcSAX is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * srcSAX is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with the srcML Toolkit; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ * @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
  */
+
 #include <srcsax.hpp>
 #include <sax2_srcsax_handler.hpp>
 
 #include <libxml/parserInternals.h>
 
 #include <functional>
-#include <cstring>
 
-/** 
+/**
  * libxml_error
  *
  * Silence/catch/default libxml2 errors.
  */
 static void libxml_error(void * /*ctx*/, const char* msg, ...) {
-    
+
     va_list vl;
     va_start(vl, msg);
     vfprintf(stderr, msg, vl);
@@ -54,13 +41,10 @@ static xmlParserCtxtPtr srcsax_create_parser_context(xmlParserInputBufferPtr buf
  */
 srcsax_context* srcsax_create_context_parser_input_buffer(std::unique_ptr<xmlParserInputBuffer> input) {
 
-    if (input == 0)
+    if (!input)
         return 0;
 
     const char* encoding = nullptr;
-
-    xmlGenericErrorFunc error_handler = (xmlGenericErrorFunc) libxml_error;
-    initGenericErrorDefaultFunc(&error_handler);
 
     srcsax_context* context = nullptr;
     try {
@@ -71,11 +55,14 @@ srcsax_context* srcsax_create_context_parser_input_buffer(std::unique_ptr<xmlPar
 
     context->input = std::move(input);
 
-    xmlParserCtxtPtr libxml2_context = srcsax_create_parser_context(context->input.get(), encoding ? xmlParseCharEncoding(encoding) : XML_CHAR_ENCODING_NONE);
+    xmlParserCtxtPtr libxml2_context = srcsax_create_parser_context(context->input.release(), encoding ? xmlParseCharEncoding(encoding) : XML_CHAR_ENCODING_NONE);
     if (libxml2_context == nullptr) {
         delete context;
         return 0;
     }
+
+    xmlGenericErrorFunc error_handler = (xmlGenericErrorFunc) libxml_error;
+    xmlSetGenericErrorFunc(libxml2_context, error_handler);
 
     context->libxml2_context = libxml2_context;
 
@@ -93,10 +80,6 @@ void srcsax_free_context(srcsax_context* context) {
 
     if (context == 0)
         return;
-
-    xmlParserInputPtr stream = inputPop(context->libxml2_context);
-    stream->buf = 0;
-    xmlFreeInputStream(stream);
 
     if (context->libxml2_context)
         xmlFreeParserCtxt(context->libxml2_context);
@@ -133,9 +116,9 @@ int srcsax_parse(srcsax_context* context) {
 
     if (status != 0 && context->srcsax_error) {
 
-        xmlErrorPtr ep = xmlCtxtGetLastError(context->libxml2_context);
+        auto ep = xmlCtxtGetLastError(context->libxml2_context);
 
-        auto str_length = strlen(ep->message);
+        auto str_length = std::string_view(ep->message).size();
         ep->message[str_length - 1] = '\0';
 
         context->srcsax_error((const char *)ep->message, ep->code);
@@ -164,7 +147,7 @@ xmlParserCtxtPtr srcsax_create_parser_context(xmlParserInputBufferPtr buffer_inp
 
     xmlCtxtUseOptions(ctxt, XML_PARSE_COMPACT | XML_PARSE_HUGE | XML_PARSE_NODICT);
 
-    xmlParserInputPtr input = xmlNewIOInputStream(ctxt, buffer_input, enc); //xmlNewInputStream(ctxt);
+    xmlParserInputPtr input = xmlNewIOInputStream(ctxt, buffer_input, enc);
     if (input == 0) {
         xmlFreeParserCtxt(ctxt);
         return 0;

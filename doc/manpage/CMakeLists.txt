@@ -1,21 +1,10 @@
+# SPDX-License-Identifier: GPL-3.0-only
 ##
 # @file CMakeLists.txt
-#
-# @copyright Copyright (C) 2013-2014 srcML, LLC. (www.srcML.org)
 # 
-# The srcML Toolkit is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
+# @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
 # 
-# The srcML Toolkit is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-# 
-# You should have received a copy of the GNU General Public License
-# along with the srcML Toolkit; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+# CMake files for the client manpage
 
 add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/srcml.1.gz
     COMMAND gzip -n -9 -f ${CMAKE_BINARY_DIR}/srcml.1
@@ -38,9 +27,10 @@ endif()
 # Requires permission by default user
 add_custom_target(publish_manpage COMMAND rsync --inplace ${CMAKE_BINARY_DIR}/srcml.1.gz gehry.sdml.cs.kent.edu:/var/www/html/sdml/build/${REMOTE_MANPAGE_NAME})
 
-find_program(RONN_EXE REQUIRED NAMES ronn ronn.exe PATHS /bin /usr/bin ~/gems/bin/ronn ${WINDOWS_DEP_PATH}/bin)
+find_program(PANDOC_EXE REQUIRED NAMES pandoc pandoc.exe)
 
 # Configure file properties used to configure the file srcml.cfg
+set(CLIENT_VERSION "1.0.0")
 set(HELP_FLAG_LONG "help")
 set(HELP_FLAG_SHORT "h")
 set(VERSION_FLAG_LONG "version")
@@ -51,7 +41,6 @@ set(QUIET_FLAG_LONG "quiet")
 set(QUIET_FLAG_SHORT "q")
 set(OUTPUT_FLAG_LONG "output")
 set(OUTPUT_FLAG_SHORT "o")
-# @todo Missing in doc
 set(JOBS_FLAG_LONG "jobs")
 set(JOBS_FLAG_SHORT "j")
 
@@ -71,6 +60,7 @@ set(OUTPUT_XML_FRAGMENT_FLAG_LONG "output-srcml-outer")
 set(OUTPUT_XML_RAW_FLAG_LONG "output-srcml-inner")
 set(POSITION_FLAG_LONG "position")
 set(TABS_FLAG "tabs")
+set(EXPAND_TABS_FLAG "expand-tabs")
 set(CPP_FLAG_LONG "cpp")
 set(CPP_MARKUP_IF0_FLAG_LONG "cpp-markup-if0")
 set(CPP_NO_MARKUP_ELSE_FLAG_LONG "cpp-no-markup-else")
@@ -106,6 +96,7 @@ set(OUTPUT_SRC_FLAG_LONG "output-src")
 set(OUTPUT_SRC_FLAG_SHORT "S")
 set(TO_DIR_FLAG_LONG "to-dir")
 set(XPATH_OPTION_LONG "xpath")
+set(SRCQL_OPTION_LONG "srcql")
 set(ATTRIBUTE_LONG "attribute")
 set(ELEMENT_LONG "element")
 set(XSLT_LONG "xslt")
@@ -133,17 +124,28 @@ set(STATUS_ERROR "1")
 set(STATUS_INTERNAL_ERROR "2")
 set(PRETTY_FLAG_LONG "pretty")
 
-# Custom commands for creating things using the ronn executable
+set(NULL_SEPARATOR_LONG "print0")
+set(NULL_SEPARATOR_SHORT "Z")
+
+set(HEADER_BLOCK_LONG "header")
+set(HEADER_BLOCK_SHORT "H")
+
+set(SRCQL_WARNING_OFF_FLAG_LONG "srcql-warning-off")
+set(SRCQL_WARNING_OFF_FLAG_SHORT "F")
+
+# Custom commands for creating things using pandoc
 configure_file(${CMAKE_SOURCE_DIR}/doc/manpage/srcml.cfg ${CMAKE_BINARY_DIR}/srcml.md)
 add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/srcml.1
-    COMMAND ${RONN_EXE} ${CMAKE_BINARY_DIR}/srcml.1.md --manual=srcml
+    COMMAND ${PANDOC_EXE} -s -t man ${CMAKE_BINARY_DIR}/srcml.1.md --output ${CMAKE_BINARY_DIR}/srcml.1
+    COMMENT "Generating ${CMAKE_BINARY_DIR}/srcml.1"
     DEPENDS ${CMAKE_BINARY_DIR}/srcml.1.md
 )
 
 configure_file(${CMAKE_SOURCE_DIR}/doc/manpage/srcml.cfg ${CMAKE_BINARY_DIR}/srcml.1.md)
 add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/srcml.html 
-    COMMAND ${RONN_EXE} ${CMAKE_BINARY_DIR}/srcml.md --manual=srcml
-    DEPENDS ${CMAKE_BINARY_DIR}/srcml.md
+    COMMAND ${PANDOC_EXE} -s -t html ${CMAKE_BINARY_DIR}/srcml.1.md --output ${CMAKE_BINARY_DIR}/srcml.html
+    COMMENT "Generating ${CMAKE_BINARY_DIR}/srcml.html"
+    DEPENDS ${CMAKE_BINARY_DIR}/srcml.1.md
 )
 
 add_custom_target(doc_manpage ALL DEPENDS ${CMAKE_BINARY_DIR}/srcml.1.gz ${CMAKE_BINARY_DIR}/srcml.html)

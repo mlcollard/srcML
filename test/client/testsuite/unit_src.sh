@@ -1,10 +1,14 @@
 #!/bin/bash
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# @file unit_src.sh
+#
+# @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
 
 # test framework
 source $(dirname "$0")/framework_test.sh
 
-
-define nestedfile <<- 'STDOUT'
+defineXML nestedfile <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -17,9 +21,9 @@ define nestedfile <<- 'STDOUT'
 	</unit>
 
 	</unit>
-  STDOUT
+STDOUT
 
-define nestedfilesrc <<- 'STDOUT'
+defineXML nestedfilesrc <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<src:unit xmlns:src="http://www.srcML.org/srcML/src">
 
@@ -32,22 +36,14 @@ define nestedfilesrc <<- 'STDOUT'
 	</src:unit>
 
 	</src:unit>
-  STDOUT
-
-xmlcheck "$nestedfile"
-xmlcheck "$nestedfilesrc"
-
-# Deprecated warning message
-define deprecated_warning <<- 'STDERR'
-	srcml: use of option --units or -n is deprecated
-STDERR
+STDOUT
 
 # test
-srcml --units <<< "$nestedfile"
-check "2" "$deprecated_warning"
+srcml --show-unit-count <<< "$nestedfile"
+check "2\n"
 
-srcml --units <<< "$nestedfilesrc"
-check "2" "$deprecated_warning"
+srcml --show-unit-count <<< "$nestedfilesrc"
+check "2\n"
 
 srcml -U "1" <<< "$nestedfile"
 check $'\na;\n'

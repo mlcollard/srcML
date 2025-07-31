@@ -1,22 +1,25 @@
 #!/bin/bash
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# @file set_src-version_unit.sh
+#
+# @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
 
 # test framework
 source $(dirname "$0")/framework_test.sh
 
 # test src-version_attribute
-define srcml <<- 'STDOUT'
+defineXML srcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++" version="1.0"/>
-	STDOUT
+STDOUT
 
 # file input
-define fsrcml <<- 'STDOUT'
+defineXML fsrcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++" filename="sub/a.cpp" version="1.0"/>
-	STDOUT
+STDOUT
 
-xmlcheck "$srcml"
-xmlcheck "$fsrcml"
 createfile sub/a.cpp ""
 
 srcml sub/a.cpp -s "1.0"
@@ -46,4 +49,3 @@ check "$srcml"
 
 echo -n "" | srcml -l C++ --src-version=1.0
 check "$srcml"
-

@@ -1,23 +1,10 @@
+// SPDX-License-Identifier: GPL-3.0-only
 /**
  * @file decompress_srcml.cpp
  *
- * @copyright Copyright (C) 2014 srcML, LLC. (www.srcML.org)
+ * @copyright Copyright (C) 2014-2024 srcML, LLC. (www.srcML.org)
  *
  * This file is part of the srcml command-line client.
- *
- * The srcML Toolkit is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * The srcML Toolkit is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with the srcml command-line client; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 #include <decompress_srcml.hpp>
@@ -25,16 +12,18 @@
 #include <archive.h>
 #include <input_curl.hpp>
 #include <SRCMLStatus.hpp>
-#include <memory>
 #include <libarchive_utilities.hpp>
+#include <string_view>
+
+using namespace ::std::literals::string_view_literals;
 
 namespace {
 
-    bool curl_supported_file(const std::string& input_protocol) {
+    bool curl_supported_file(std::string_view input_protocol) {
         const char* const* curl_types = curl_version_info(CURLVERSION_NOW)->protocols;
         for (int i = 0; curl_types[i] != nullptr; ++i) {
-            std::string curl(curl_types[i]);
-            if (curl != "file" && curl == input_protocol.c_str())
+            std::string_view curl(curl_types[i]);
+            if (curl != "file"sv && curl == input_protocol)
                 return true;
         }
         return false;
@@ -47,8 +36,15 @@ void decompress_srcml(const srcml_request_t& /* srcml_request */,
 
     std::unique_ptr<archive> libarchive_srcml(archive_read_new());
 
-    // just a bunch of bytes
+    archive_read_support_format_ar(libarchive_srcml.get());
+    archive_read_support_format_cpio(libarchive_srcml.get());
+    archive_read_support_format_gnutar(libarchive_srcml.get());
+    archive_read_support_format_iso9660(libarchive_srcml.get());
+    archive_read_support_format_tar(libarchive_srcml.get());
+    archive_read_support_format_xar(libarchive_srcml.get());
+    archive_read_support_format_zip(libarchive_srcml.get());
     archive_read_support_format_raw(libarchive_srcml.get());
+    archive_read_support_format_empty(libarchive_srcml.get());
 
     // File Formats
     archive_read_support_format_7zip(libarchive_srcml.get());
@@ -73,11 +69,19 @@ void decompress_srcml(const srcml_request_t& /* srcml_request */,
         if (!input_curl(uninput))
             exit(1);
 
-        status = archive_read_open_fd(libarchive_srcml.get(), uninput, buffer_size);
+#if WIN32
+        // In Windows, the archive_read_open_fd() does not seem to work. The input is read as an empty archive,
+        // or cut short. 
+        // So for Windwos, convert to a FILE*. Note sure when to close the FILE*
+        FILE* f = fdopen(*(uninput.fd), "r");
+        status = archive_read_open_FILE(libarchive_srcml.get(), f);
+#else
+        status = archive_read_open_fd(libarchive_srcml.get(), *(uninput.fd), buffer_size);
+#endif
 
     } else {
 
-        status = archive_read_open_filename(libarchive_srcml.get(), input_sources[0].resource.c_str(), buffer_size);
+        status = archive_read_open_filename(libarchive_srcml.get(), input_sources[0].resource.data(), buffer_size);
     }
     if (status != ARCHIVE_OK) {
         SRCMLstatus(ERROR_MSG, std::to_string(status));

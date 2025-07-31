@@ -1,11 +1,16 @@
 #!/bin/bash
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# @file remote_srcml_unit.sh
+#
+# @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
 
 # test framework
 source $(dirname "$0")/framework_test.sh
 
 define srca <<- 'STDOUT'
 	a;
-	STDOUT
+STDOUT
 
 # input from a valid remote srcml file
 srcml https://raw.githubusercontent.com/srcML/test-data/1.0.0/srcml/unit.xml

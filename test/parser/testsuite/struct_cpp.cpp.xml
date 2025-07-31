@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<unit xmlns="http://www.srcML.org/srcML/src" revision="1.0.0" url="struct">
+<unit xmlns="http://www.srcML.org/srcML/src" revision="1.0.0" language="C++" url="struct">
 
 <unit xmlns:cpp="http://www.srcML.org/srcML/cpp" revision="1.0.0" language="C++">
 <struct>struct <name>A</name> <block>{<public type="default">
@@ -53,6 +53,15 @@ struct <name>A</name> <block>{<public type="default">
 
 <unit xmlns:cpp="http://www.srcML.org/srcML/cpp" revision="1.0.0" language="C++">
 <struct_decl>struct <name>a</name>, <name>b</name>, <name>c</name>;</struct_decl>
+</unit>
+
+<unit xmlns:cpp="http://www.srcML.org/srcML/cpp" revision="1.0.0" language="C++">
+<struct><template>template<parameter_list>&lt;<parameter><type><name>class</name><modifier>...</modifier></type> <name>Args</name></parameter>&gt;</parameter_list></template>
+struct <name>B</name> <super_list>: <super><name>Args</name><modifier>...</modifier></super></super_list> <block>{<public type="default"/>}</block>;</struct>
+</unit>
+
+<unit xmlns:cpp="http://www.srcML.org/srcML/cpp" revision="1.0.0" language="C++">
+<struct>struct <name>B</name> <super_list>: <super><name>Args</name><modifier>...</modifier></super></super_list> <block>{<public type="default"/>}</block>;</struct>
 </unit>
 
 </unit>

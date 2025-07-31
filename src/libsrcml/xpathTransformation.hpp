@@ -1,35 +1,16 @@
- /**
+// SPDX-License-Identifier: GPL-3.0-only
+/**
  * @file xpathTransformation.hpp
  *
- * @copyright Copyright (C) 2008-2014 srcML, LLC. (www.srcML.org)
+ * @copyright Copyright (C) 2008-2024 srcML, LLC. (www.srcML.org)
  *
  * This file is part of the srcML Toolkit.
- *
- * The srcML Toolkit is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * The srcML Toolkit is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with the srcML Toolkit; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 #ifndef INCLUDED_XPATHTRANSFORMATION_HPP
 #define INCLUDED_XPATHTRANSFORMATION_HPP
 
 #include <libxml/parser.h>
-
-#include <srcmlns.hpp>
-
-#if defined(__GNUG__) && !defined(__MINGW32__) && !defined(NO_DLLOAD)
-#include <dlfcn.h>
-#endif
 
 #include <Transformation.hpp>
 #include <srcml_translator.hpp>
@@ -83,6 +64,11 @@ public :
     xpathTransformation(srcml_archive* oarchive, const char* xpath, const char* element_prefix, const char* element_uri, const char* element,
                         const char* attr_prefix, const char* attr_uri, const char* attr_name, const char* attr_value);
 
+    /*
+     * Destructor
+     */
+    ~xpathTransformation();
+
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
@@ -121,12 +107,18 @@ public :
      * apply
      *
      * Apply XPath expression, writing results.
-     * 
+     *
      * @returns true on success false on failure.
      */
     virtual TransformationResult apply(xmlDocPtr doc, int position) const;
 
     void addElementXPathResults(xmlDocPtr doc, xmlXPathObjectPtr result_nodes) const;
+
+    // element namespace
+    xmlNsPtr element_ns = nullptr;
+
+    // attribute namespace
+    xmlNsPtr attr_ns = nullptr;
 
 public:
     std::string xpath;
@@ -140,6 +132,9 @@ public:
     xmlXPathCompExprPtr compiled_xpath = nullptr;
 
     static const char* const simple_xpath_attribute_name;
+
+private:
+    xmlXPathContextPtr createContext(xmlDocPtr doc) const;
 };
 
 #endif

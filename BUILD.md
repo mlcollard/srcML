@@ -1,123 +1,99 @@
 # Building srcML
 
-srcML is built using cmake, www.cmake.org, (version 2.8.12 or above) and currently supports builds for
-macOS, Fedora, Ubuntu, CentOS, OpenSUSE, and Windows Visual Studio.
+srcML is built using cmake, www.cmake.org (version 3.28 or above), and currently supports builds for
+macOS, Fedora, Ubuntu, OpenSUSE, and Windows Visual Studio.
 
-Out of source builds (builds outside the source directory) are required. In source builds are not supported.
+Out-of-source builds (builds outside the source directory) are required, and in-source builds are not supported.
+
+For full configuration, use a presets for your platform: ci-ubuntu, ci-rpm, macOS, and ci-msvc.
 
 ## Unix
 
 To generate a makefile in your build directory:
 
-    cmake <path_to_srcml>
+```console
+cmake <path_to_srcml> --preset <platform_preset>
+```
 
- The following make commands are supported with their usual meaning
+For Linux, assuming a sibling build directory:
 
-    make  
-    make clean  
-    make test  
-    make install
+```console
+cmake ../srcML --preset ci-linux
+```
 
- Client tests are enabled by default, while libsrcml and parser tests are disabled by default.
- These tests can be enabled/disabled via the cmake command, e.g. with a parallel source directory,
+The following targets are supported with their usual meaning.
 
-    cmake -DBUILD_CLIENT_TESTS=OFF -DBUILD_LIBSRCML_TESTS=ON -DBUILD_PARSER_TESTS=ON ../srcML
+```console
+make
+make clean
+make test
+make install
+```
 
- You may need to run `ldconfig` to get the link to the libsrcml shared library path up to date
+Client tests are enabled by default, while libsrcml and parser tests are turned off by default. These tests can be turned on/off via the cmake command.
+
+```console
+cmake . -DBUILD_CLIENT_TESTS=OFF -DBUILD_LIBSRCML_TESTS=ON -DBUILD_PARSER_TESTS=ON
+```
 
 ### macOS
 
 The main packages required may be installed via brew:
 
-    brew install antlr2 boost cmake
+```console
+brew install cmake
+```
 
-The srcML client requires at least LibArchive 3. macOS includes version 2.8. Because of this, LibArchive is
-statically linked into the client. There are two options
+Libarchive greater than 3.0.0 is required. For macOS previous to Catalina (19.*.*), libarchive.a 3.3.* must be statically included. Use brew to install a more recent version:
 
-* Use brew to install a more recent version:
-
-    `brew install libarchive`
-
-* Download and build LibArchive in a directory `libarchive` parallel to the source directory, typically \~/libarchive
+```console
+brew install libarchive
+```
 
 To generate srcML documentation:
 
-    brew install man2html doxygen
+```console
+brew install man2html doxygen
+```
 
-Additional packages that may not needed, but are recommended (for timing etc.):
+Additional packages that may not needed but are recommended (for timing, etc.):
 
-    brew install coreutils gnu-sed gnu-time
+```
+brew install coreutils gnu-sed gnu-time
+```
 
 #### Linux
 
-Linux builds for Ubuntu, Fedora, CentOS and OpenSUSE are supported.
+Linux builds for Ubuntu, Fedora, and OpenSUSE are supported.
 
 To find what is needed, it is recommended to consult these dockerfiles for the particular distribution:
 
-* [Ubuntu](https://github.com/srcML/Docker/blob/ubuntu_latest/base/Dockerfile)
-* [Fedora](https://github.com/srcML/Docker/blob/fedora_latest/base/Dockerfile)
-* [CentOS](https://github.com/srcML/Docker/blob/centos_latest/base/Dockerfile)
-* [OpenSUSE](https://github.com/srcML/Docker/blob/opensuse_latest/base/Dockerfile)
+* [Ubuntu](./docker/ubuntu/Dockerfile)
+* [Fedora](./docker/fedora/Dockerfile)
+* [OpenSUSE](./docker/opensuse/Dockerfile)
 
-Commands to install what is needed can be adapted from these, and they are tested to work. You will also find dockerfiles for older versions of these distributions.
+Commands to install what is needed can be adapted from these.
 
 ## Windows Using MSVC
 
-Building in Windows requires that you have MSVC installed. Visual Studio 2017 or newer is known to work, while older versions have not been tested. This build only supports 64-bit binaries.
-
-## Packages
+Necessary tools include:
 
 * [Java JRE/JDK](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
 * [CMake](http://www.cmake.org)
 * [Visual Studio 2017 or later](https://www.visualstudio.com/downloads/)
-* Zipped [Visual Studio 2017 Build Dependencies](http://www.sdml.cs.kent.edu/build/VS2017_Dependencies-06_20_18.zip)
 
-##### Instructions
-* Install Visual Studio 2017 or newer, CMake
-* Locate the source code for srcML
-* Extract the zipped build dependencies
-    * The extracted folder will be named deps, and its structure will look like the following:
-    ```
-        deps/
-            debug/
-            include/
-            release/
-            tools/
-    ```        
-    * When copied into the srcML source code directory the result should look like the following:
-    ```
-        srcML/
-                BUILD.md
-                package/
-                CMakeLists.txt
-                COPYING.txt
-                CTestConfig.cmake
-                deps/
-                    include/
-                    tools/
-                    x64/
-                doc/
-                ...etc...
-    ```
-* NOTES:
-    * Building srcml should be done in a separate directory external to the source code to avoid issues
-* Graphical Interface Build:
-    * Open the CMake GUI program.
-    * Browser for the srcML source code directory and your target build directory
-    * Hit configure and select the appropriate Visual Studio version and x64 architecture as the target system.
-    * Click Generate
-    * Open srcML.sln with Visual Studio located in your the target build directory
-    * Right click Project "ALL_BUILD" and choose "build"
-* Command Line Buid:
-    * Generate the build files in your target build directory.
-    ```
-        cmake [path to srcML source directory] -G [target visual studio version and architecture]   
-        ex. cmake ..\srcML\ -G "Visual Studio 15 2017 Win64"
-    ```
-    * Execute the build.
-    ```
-        cmake --build . --config [build mode]
-        ex. cmake --build . --config release
-    ```
+Building in Windows requires MSVC. Dependencies are handled via [vcpkg](vcpkg.io), see the [vcpkg installation directions](https://learn.microsoft.com/en-us/vcpkg/get_started/get-started?pivots=shell-cmd). As with the other platforms, srcml should use an out-of-source build.
 
-* Once built, locate the build folder. Within that folder there is now a directory named `bin` containing the release or debug versions of srcML executable and library along with all other dependencies.
+First, generate the build files in your target build directory. Using the preset sets up the use of vcpkg:
+
+```console
+cmake [path to srcML source directory] --preset ci-msvc
+```
+
+Second, build. Doing so via cmake means you do not have to know the build program name or location:
+
+```console
+cmake --build . --config release
+```
+
+The directory `bin` in the build folder contains the srcML executable along with all other dependencies.

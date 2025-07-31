@@ -1,43 +1,40 @@
+// SPDX-License-Identifier: GPL-3.0-only
 /*!
  * @file KeywordLexer.g
  *
- * @copyright Copyright (C) 2004-2014  srcML, LLC. (www.srcML.org)
+ * @copyright Copyright (C) 2004-2024 srcML, LLC. (www.srcML.org)
  *
  * This file is part of the srcML translator.
- *
- * The srcML translator is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * The srcML translator is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with the srcML translator; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 header "pre_include_hpp" {
-    #include <cstring>
-    #pragma GCC diagnostic ignored "-Wunknown-pragmas"
-    #pragma GCC diagnostic ignored "-Wunknown-warning-option"
-    #pragma GCC diagnostic ignored "-Wunused-parameter"
+}
+
+header "pre_include_cpp" {
+#if defined(__GNUC__)
+#endif
+#ifdef __clang__
+#endif
+#if defined(__GNUC__) && !defined(__clang__)
     #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+#endif
+#ifdef _MSC_VER
+    #pragma warning(disable : 4365)  // 'argument': conversion from 'int' to 'unsigned int', signed/unsigned mismatch
+    #pragma warning(disable : 4101)  // 'pe' unreferenced local variable
+    #pragma warning(disable : 4456)  // declaration of 'theRetToken' hides previous local declaration
+    #pragma warning(disable : 4242) // 'argument': conversion from 'int' to 'char'
+#endif
 }
 
 header {
     #include <string>
-    #include "Language.hpp"
-    #include "UTF8CharBuffer.hpp"
-    #include "antlr/TokenStreamSelector.hpp"
-    #include "CommentTextLexer.hpp"
-    #include "srcMLToken.hpp"
-    #include <srcml_types.hpp>
-    #include <srcml_macros.hpp>
-    #include <srcml.h>
+    #include <string_view>
+    #include <unordered_map>
+    #include <Language.hpp>
+    #include <UTF8CharBuffer.hpp>
+    #include <antlr/TokenStreamSelector.hpp>
+    #include <CommentTextLexer.hpp>
+    #include <srcMLToken.hpp>
     #undef CONST
     #undef VOID
     #undef DELETE
@@ -45,14 +42,32 @@ header {
     #undef OUT
     #undef IN
     #undef THIS
+
+    using namespace ::std::literals::string_view_literals;
 }
 
 header "post_include_cpp" {
 
-void KeywordLexer::changetotextlexer(int typeend, const std::string delim) {
+void KeywordLexer::changetotextlexer(int typeend, std::string delim) {
 
     selector->push("text"); 
     ((CommentTextLexer* ) (selector->getStream("text")))->init(typeend, onpreprocline, atstring, delim, isline, line_number, options);
+}
+
+int KeywordLexer::testLiteralsTable(int ttype) const {
+
+    const auto p = srcMLLiterals.find(text);
+    if (p != srcMLLiterals.end())
+        return p->second;
+    return ttype;
+}
+
+int KeywordLexer::testLiteralsTable(const std::string& txt, int ttype) const {
+
+    const auto p = srcMLLiterals.find(txt);
+    if (p != srcMLLiterals.end())
+        return p->second;
+    return ttype;
 }
 
 }
@@ -205,6 +220,7 @@ tokens {
     MUTABLE;
     VOLATILE;
     TRANSIENT;
+    C_ATTRIBUTE;
 
     // Java tokens
     IMPORT;
@@ -221,6 +237,7 @@ tokens {
     STRICTFP;
     NULLLITERAL;
     ASSERT;
+    RECORD;
 
     // C# tokens
     FOREACH;
@@ -298,6 +315,42 @@ tokens {
     OMP_OMP;
 
     ASSIGNMENT; // +=, -=, etc.
+
+    // Python
+    EXPONENTIATION;
+    LITERAL_ELLIPSIS;
+    LITERAL_NONE;
+    PY_2_EXEC;
+    PY_2_PRINT;
+    PY_ALIAS;
+    PY_AND;
+    PY_ARROW;
+    PY_ASYNC;
+    PY_ATSIGN;
+    PY_AWAIT;
+    PY_CASE;
+    PY_COLON;
+    PY_DELETE;
+    PY_ELIF;
+    PY_EXCEPT;
+    PY_FROM;
+    PY_FUNCTION;
+    PY_GLOBAL;
+    PY_IMPORT;
+    PY_IN;
+    PY_IS;
+    PY_LAMBDA;
+    PY_LCURLY;
+    PY_MATCH;
+    PY_NONLOCAL;
+    PY_NOT;
+    PY_OR;
+    PY_PASS;
+    PY_RAISE;
+    PY_RCURLY;
+    PY_TYPE;
+    PY_WITH;
+    PY_YIELD;
 }
 
 {
@@ -315,9 +368,12 @@ public:
     int currentmode;
 
 // map from text of literal to token number, adjusted to language
-struct keyword { char const * const text; int token; int language; };
+struct keyword { std::string_view text; int token; int language; };
 
-void changetotextlexer(int typeend, const std::string delimiter = "");
+void changetotextlexer(int typeend, std::string delimiter = "");
+
+virtual int testLiteralsTable(int ttype) const;
+virtual int testLiteralsTable(const std::string& txt, int ttype) const;
 
 KeywordLexer(UTF8CharBuffer* pinput, int language, OPTION_TYPE & options,
              std::vector<std::string> user_macro_list)
@@ -328,135 +384,135 @@ KeywordLexer(UTF8CharBuffer* pinput, int language, OPTION_TYPE & options,
        setLine(getLine() + (1 << 16));
     setTokenObjectFactory(srcMLToken::factory);
 
-    // @todo check for exception
     for (std::vector<std::string>::size_type i = 0; i < user_macro_list.size(); i += 2) {
-        if (user_macro_list[i + 1] == "src:macro")
-            literals[user_macro_list[i].c_str()] = MACRO_NAME;
-        else if (user_macro_list[i + 1] == "src:name")
-            literals[user_macro_list[i].c_str()] = MACRO_TYPE_NAME;
-        else if (user_macro_list[i + 1] == "src:type")
-            literals[user_macro_list[i].c_str()] = MACRO_TYPE_NAME;
-        else if (user_macro_list[i + 1] == "src:case")
-            literals[user_macro_list[i].c_str()] = MACRO_CASE;
-        else if (user_macro_list[i + 1] == "src:label")
-            literals[user_macro_list[i].c_str()] = MACRO_LABEL;
-        else if (user_macro_list[i + 1] == "src:specifier")
-            literals[user_macro_list[i].c_str()] = MACRO_SPECIFIER;
+        if (user_macro_list[i + 1] == "src:macro"sv)
+            literals[user_macro_list[i].data()] = MACRO_NAME;
+        else if (user_macro_list[i + 1] == "src:name"sv)
+            literals[user_macro_list[i].data()] = MACRO_TYPE_NAME;
+        else if (user_macro_list[i + 1] == "src:type"sv)
+            literals[user_macro_list[i].data()] = MACRO_TYPE_NAME;
+        else if (user_macro_list[i + 1] == "src:case"sv)
+            literals[user_macro_list[i].data()] = MACRO_CASE;
+        else if (user_macro_list[i + 1] == "src:label"sv)
+            literals[user_macro_list[i].data()] = MACRO_LABEL;
+        else if (user_macro_list[i + 1] == "src:specifier"sv)
+            literals[user_macro_list[i].data()] = MACRO_SPECIFIER;
     }
 
     constexpr const keyword keyword_map[] = {
         // common keywords
-        { "if"           , IF            , LANGUAGE_ALL }, 
-        { "else"         , ELSE          , LANGUAGE_ALL }, 
+        { "if"           , IF            , LANGUAGE_ALL },
+        { "else"         , ELSE          , LANGUAGE_ALL },
 
-        { "while"        , WHILE         , LANGUAGE_ALL }, 
-        { "for"          , FOR           , LANGUAGE_ALL }, 
-        { "do"           , DO            , LANGUAGE_ALL }, 
+        { "while"        , WHILE         , LANGUAGE_ALL },
+        { "for"          , FOR           , LANGUAGE_ALL },
+        { "do"           , DO            , LANGUAGE_ALL },
 
-        { "break"        , BREAK         , LANGUAGE_ALL }, 
-        { "continue"     , CONTINUE      , LANGUAGE_ALL }, 
+        { "break"        , BREAK         , LANGUAGE_ALL },
+        { "continue"     , CONTINUE      , LANGUAGE_ALL },
 
-        { "switch"       , SWITCH        , LANGUAGE_ALL }, 
-        { "case"         , CASE          , LANGUAGE_ALL }, 
-        { "default"      , DEFAULT       , LANGUAGE_ALL }, 
+        { "switch"       , SWITCH        , LANGUAGE_ALL },
+        { "case"         , CASE          , LANGUAGE_ALL },
+        { "default"      , DEFAULT       , LANGUAGE_ALL },
 
-        { "return"       , RETURN        , LANGUAGE_ALL }, 
+        { "return"       , RETURN        , LANGUAGE_ALL },
 
-        { "enum"         , ENUM          , LANGUAGE_ALL }, 
+        { "enum"         , ENUM          , LANGUAGE_ALL },
 
-        { "static"       , STATIC        , LANGUAGE_ALL }, 
-        { "const"        , CONST         , LANGUAGE_ALL }, 
+        { "static"       , STATIC        , LANGUAGE_ALL },
+        { "const"        , CONST         , LANGUAGE_ALL },
  
         // operators and special characters
-        { ")"            , RPAREN        , LANGUAGE_ALL }, 
-        { ";"            , TERMINATE     , LANGUAGE_ALL }, 
-        { "("            , LPAREN        , LANGUAGE_ALL }, 
-        { "~"            , DESTOP        , LANGUAGE_ALL }, 
-        { ":"            , COLON         , LANGUAGE_ALL }, 
-        { "}"            , RCURLY        , LANGUAGE_ALL }, 
-        { ","            , COMMA         , LANGUAGE_ALL }, 
-        { "]"            , RBRACKET      , LANGUAGE_ALL }, 
-        { "{"            , LCURLY        , LANGUAGE_ALL }, 
-        { "["            , LBRACKET      , LANGUAGE_ALL }, 
+        { ")"            , RPAREN        , LANGUAGE_ALL },
+        { ";"            , TERMINATE     , LANGUAGE_ALL },
+        { "("            , LPAREN        , LANGUAGE_ALL },
+        { "~"            , DESTOP        , LANGUAGE_ALL },
+        { ":"            , COLON         , LANGUAGE_ALL },
+        { "}"            , RCURLY        , LANGUAGE_ALL },
+        { ","            , COMMA         , LANGUAGE_ALL },
+        { "]"            , RBRACKET      , LANGUAGE_ALL },
+        { "{"            , LCURLY        , LANGUAGE_ALL },
+        { "["            , LBRACKET      , LANGUAGE_ALL },
 
-        { "<"            , TEMPOPS       , LANGUAGE_ALL }, 
+        { "<"            , TEMPOPS       , LANGUAGE_ALL },
         { ">"            , TEMPOPE       , LANGUAGE_ALL },
-        { "&"            , REFOPS        , LANGUAGE_ALL }, 
-        { "="            , EQUAL         , LANGUAGE_ALL }, 
+        { "&"            , REFOPS        , LANGUAGE_ALL },
+        { "="            , EQUAL         , LANGUAGE_ALL },
 
-        { "."            , PERIOD        , LANGUAGE_ALL }, 
-        { "*"            , MULTOPS       , LANGUAGE_ALL }, 
-        { "*="           , ASSIGNMENT    , LANGUAGE_ALL }, 
-        { "%="           , ASSIGNMENT    , LANGUAGE_ALL }, 
-        { "/="           , ASSIGNMENT    , LANGUAGE_ALL }, 
-        { "/"            , OPERATORS     , LANGUAGE_ALL }, 
-        { "^"            , BLOCKOP       , LANGUAGE_ALL }, 
-        { "^="           , ASSIGNMENT    , LANGUAGE_ALL }, 
-        { "|="           , ASSIGNMENT    , LANGUAGE_ALL }, 
-        { "||="          , ASSIGNMENT    , LANGUAGE_ALL }, 
-        { "+="           , ASSIGNMENT    , LANGUAGE_ALL }, 
-        { "-="           , ASSIGNMENT    , LANGUAGE_ALL }, 
-        { "->"           , TRETURN       , LANGUAGE_ALL }, 
-        { "->*"          , MPDEREF       , LANGUAGE_ALL }, 
-        { "?"            , QMARK         , LANGUAGE_ALL }, 
-        { ".."           , DOTDOT        , LANGUAGE_ALL }, 
-        { "..."          , DOTDOTDOT     , LANGUAGE_ALL }, 
-        { "&="           , ASSIGNMENT    , LANGUAGE_ALL }, 
-        { "&&="          , ASSIGNMENT    , LANGUAGE_ALL }, 
-        { ">>="          , ASSIGNMENT    , LANGUAGE_ALL }, 
-        { "<<="          , ASSIGNMENT    , LANGUAGE_ALL }, 
-        { ".*"           , DOTDEREF      , LANGUAGE_C_FAMILY }, 
-        { "-"            , MSPEC         , LANGUAGE_JAVA }, 
-        { "+"            , CSPEC         , LANGUAGE_JAVA }, 
-        { "<<<"          , CUDA          , LANGUAGE_C | LANGUAGE_CXX }, 
-        { "=>"           , LAMBDA        , LANGUAGE_CSHARP }, 
-        { "@"            , ATSIGN        , LANGUAGE_ALL }, 
-        { "u\""          , STRING_START  , LANGUAGE_ALL }, 
-        { "u8\""         , STRING_START  , LANGUAGE_ALL }, 
-        { "U\""          , STRING_START  , LANGUAGE_ALL }, 
-        { "L\""          , STRING_START  , LANGUAGE_ALL }, 
-        { "R\""          , STRING_START  , LANGUAGE_CXX }, 
-        { "LR\""         , STRING_START  , LANGUAGE_CXX }, 
-        { "uR\""         , STRING_START  , LANGUAGE_CXX }, 
-        { "UR\""         , STRING_START  , LANGUAGE_CXX }, 
-        { "u8R\""        , STRING_START  , LANGUAGE_CXX }, 
+        { "."            , PERIOD        , LANGUAGE_ALL },
+        { "*"            , MULTOPS       , LANGUAGE_ALL },
+        { "*="           , ASSIGNMENT    , LANGUAGE_ALL },
+        { "%="           , ASSIGNMENT    , LANGUAGE_ALL },
+        { "/="           , ASSIGNMENT    , LANGUAGE_ALL },
+        { "/"            , OPERATORS     , LANGUAGE_ALL },
+        { "^"            , BLOCKOP       , LANGUAGE_ALL },
+        { "^="           , ASSIGNMENT    , LANGUAGE_ALL },
+        { "|="           , ASSIGNMENT    , LANGUAGE_ALL },
+        { "||="          , ASSIGNMENT    , LANGUAGE_ALL },
+        { "+="           , ASSIGNMENT    , LANGUAGE_ALL },
+        { "-="           , ASSIGNMENT    , LANGUAGE_ALL },
+        { "->"           , TRETURN       , LANGUAGE_ALL },
+        { "->*"          , MPDEREF       , LANGUAGE_ALL },
+        { "?"            , QMARK         , LANGUAGE_ALL },
+        { ".."           , DOTDOT        , LANGUAGE_ALL },
+        { "..."          , DOTDOTDOT     , LANGUAGE_ALL },
+        { "&="           , ASSIGNMENT    , LANGUAGE_ALL },
+        { "&&="          , ASSIGNMENT    , LANGUAGE_ALL },
+        { ">>="          , ASSIGNMENT    , LANGUAGE_ALL },
+        { "<<="          , ASSIGNMENT    , LANGUAGE_ALL },
+        { ".*"           , DOTDEREF      , LANGUAGE_C_FAMILY },
+        { "-"            , MSPEC         , LANGUAGE_JAVA },
+        { "+"            , CSPEC         , LANGUAGE_JAVA },
+        { "<<<"          , CUDA          , LANGUAGE_C | LANGUAGE_CXX },
+        { "=>"           , LAMBDA        , LANGUAGE_CSHARP },
+        { "@"            , ATSIGN        , LANGUAGE_ALL },
+        { "u\""          , STRING_START  , LANGUAGE_ALL },
+        { "u8\""         , STRING_START  , LANGUAGE_ALL },
+        { "U\""          , STRING_START  , LANGUAGE_ALL },
+        { "L\""          , STRING_START  , LANGUAGE_ALL },
+        { "R\""          , STRING_START  , LANGUAGE_CXX },
+        { "LR\""         , STRING_START  , LANGUAGE_CXX },
+        { "uR\""         , STRING_START  , LANGUAGE_CXX },
+        { "UR\""         , STRING_START  , LANGUAGE_CXX },
+        { "u8R\""        , STRING_START  , LANGUAGE_CXX },
 
         // C and C++ specific keywords
-        { "main"         , MAIN           , LANGUAGE_C_FAMILY }, 
+        { "main"         , MAIN           , LANGUAGE_C_FAMILY },
 
-        { "typedef"      , TYPEDEF        , LANGUAGE_C_FAMILY }, 
+        { "typedef"      , TYPEDEF        , LANGUAGE_C_FAMILY },
 
-        { "include"      , INCLUDE        , LANGUAGE_C_FAMILY | LANGUAGE_JAVA }, 
-        { "define"       , DEFINE         , LANGUAGE_C_FAMILY | LANGUAGE_JAVA }, 
-        { "elif"         , ELIF           , LANGUAGE_C_FAMILY | LANGUAGE_JAVA }, 
-        { "endif"        , ENDIF          , LANGUAGE_C_FAMILY | LANGUAGE_JAVA }, 
-        { "error"        , ERRORPREC      , LANGUAGE_C_FAMILY | LANGUAGE_JAVA }, 
-        { "warning"      , WARNING        , LANGUAGE_C_FAMILY | LANGUAGE_JAVA }, 
-        { "ifdef"        , IFDEF          , LANGUAGE_C_FAMILY | LANGUAGE_JAVA }, 
-        { "ifndef"       , IFNDEF         , LANGUAGE_C_FAMILY | LANGUAGE_JAVA }, 
-        { "line"         , LINE           , LANGUAGE_C_FAMILY | LANGUAGE_JAVA }, 
-        { "pragma"       , PRAGMA         , LANGUAGE_C_FAMILY | LANGUAGE_JAVA }, 
-        { "undef"        , UNDEF          , LANGUAGE_C_FAMILY | LANGUAGE_JAVA }, 
+        { "include"      , INCLUDE        , LANGUAGE_C_FAMILY | LANGUAGE_JAVA },
+        { "define"       , DEFINE         , LANGUAGE_C_FAMILY | LANGUAGE_JAVA },
+        { "elif"         , ELIF           , LANGUAGE_C_FAMILY | LANGUAGE_JAVA },
+        { "endif"        , ENDIF          , LANGUAGE_C_FAMILY | LANGUAGE_JAVA },
+        { "error"        , ERRORPREC      , LANGUAGE_C_FAMILY | LANGUAGE_JAVA },
+        { "warning"      , WARNING        , LANGUAGE_C_FAMILY | LANGUAGE_JAVA },
+        { "ifdef"        , IFDEF          , LANGUAGE_C_FAMILY | LANGUAGE_JAVA },
+        { "ifndef"       , IFNDEF         , LANGUAGE_C_FAMILY | LANGUAGE_JAVA },
+        { "line"         , LINE           , LANGUAGE_C_FAMILY | LANGUAGE_JAVA },
+        { "pragma"       , PRAGMA         , LANGUAGE_C_FAMILY | LANGUAGE_JAVA },
+        { "undef"        , UNDEF          , LANGUAGE_C_FAMILY | LANGUAGE_JAVA },
 
-        { "union"        , UNION          , LANGUAGE_C | LANGUAGE_CXX }, 
-        { "struct"       , STRUCT         , LANGUAGE_C_FAMILY }, 
-        { "void"         , VOID           , LANGUAGE_ALL }, 
+        { "union"        , UNION          , LANGUAGE_C | LANGUAGE_CXX },
+        { "struct"       , STRUCT         , LANGUAGE_C_FAMILY },
+        { "void"         , VOID           , LANGUAGE_ALL },
 
-        { "inline"       , INLINE         , LANGUAGE_C_FAMILY }, 
-        { "extern"       , EXTERN         , LANGUAGE_C_FAMILY }, 
+        { "inline"       , INLINE         , LANGUAGE_C_FAMILY },
+        { "extern"       , EXTERN         , LANGUAGE_C_FAMILY },
 
         { "asm"          , ASM            , LANGUAGE_C_FAMILY },
         { "__asm__"      , ASM            , LANGUAGE_C_FAMILY },
-        { "__asm"        , VISUAL_CXX_ASM , LANGUAGE_C_FAMILY }, 
+        { "__asm"        , VISUAL_CXX_ASM , LANGUAGE_C_FAMILY },
 
-        { "goto"         , GOTO           , LANGUAGE_ALL }, 
-        { "sizeof"       , SIZEOF         , LANGUAGE_C_FAMILY }, 
+        { "goto"         , GOTO           , LANGUAGE_ALL },
+        { "sizeof"       , SIZEOF         , LANGUAGE_C_FAMILY },
 
-        { "register"     , REGISTER       , LANGUAGE_C | LANGUAGE_CXX }, 
-        { "mutable"      , MUTABLE        , LANGUAGE_CXX }, 
-        { "volatile"     , VOLATILE       , LANGUAGE_ALL }, 
+        { "register"     , REGISTER       , LANGUAGE_C | LANGUAGE_CXX },
+        { "mutable"      , MUTABLE        , LANGUAGE_CXX },
+        { "volatile"     , VOLATILE       , LANGUAGE_ALL },
         { "__volatile__" , VOLATILE       , LANGUAGE_C_FAMILY  },
         { "auto"         , AUTO           , LANGUAGE_CXX | LANGUAGE_C },
+        { "__attribute__", C_ATTRIBUTE    , LANGUAGE_CXX | LANGUAGE_C },
 
         // C keywords
         { "restrict"       , RESTRICT          , LANGUAGE_C },
@@ -471,160 +527,161 @@ KeywordLexer(UTF8CharBuffer* pinput, int language, OPTION_TYPE & options,
         { "_Thread_local"  , THREAD_LOCAL      , LANGUAGE_C },
 
         // exception handling
-        { "try"          , TRY           , LANGUAGE_OO }, 
-        { "catch"        , CATCH         , LANGUAGE_OO }, 
-        { "throw"        , THROW         , LANGUAGE_OO }, 
+        { "try"          , TRY           , LANGUAGE_OO },
+        { "catch"        , CATCH         , LANGUAGE_OO },
+        { "throw"        , THROW         , LANGUAGE_OO },
 
         // class
-        { "class"        , CLASS         , LANGUAGE_OO }, 
-        { "public"       , PUBLIC        , LANGUAGE_OO }, 
-        { "private"      , PRIVATE       , LANGUAGE_OO }, 
-        { "protected"    , PROTECTED     , LANGUAGE_OO }, 
+        { "class"        , CLASS         , LANGUAGE_OO },
+        { "public"       , PUBLIC        , LANGUAGE_OO },
+        { "private"      , PRIVATE       , LANGUAGE_OO },
+        { "protected"    , PROTECTED     , LANGUAGE_OO },
 
-        { "new"          , NEW           , LANGUAGE_OO }, 
+        { "new"          , NEW           , LANGUAGE_OO },
 
         // Qt
-        { "signals"      , SIGNAL        , LANGUAGE_CXX }, 
-        { "foreach"      , FOREACH       , LANGUAGE_CXX }, 
+        { "signals"      , SIGNAL        , LANGUAGE_CXX },
+        { "foreach"      , FOREACH       , LANGUAGE_CXX },
         { "forever"      , FOREVER       , LANGUAGE_CXX },
-        { "emit"         , EMIT          , LANGUAGE_CXX },  
+        { "emit"         , EMIT          , LANGUAGE_CXX }, 
 
         // C++ specific keywords
-        { "virtual"      , VIRTUAL       , LANGUAGE_CXX_FAMILY }, 
-        { "friend"       , FRIEND        , LANGUAGE_CXX }, 
-        { "operator"     , OPERATOR      , LANGUAGE_CXX_FAMILY }, 
-        { "explicit"     , EXPLICIT      , LANGUAGE_CXX_FAMILY }, 
+        { "virtual"      , VIRTUAL       , LANGUAGE_CXX_FAMILY },
+        { "friend"       , FRIEND        , LANGUAGE_CXX },
+        { "operator"     , OPERATOR      , LANGUAGE_CXX_FAMILY },
+        { "explicit"     , EXPLICIT      , LANGUAGE_CXX_FAMILY },
         
         // namespaces
-        { "namespace"    , NAMESPACE     , LANGUAGE_CXX_FAMILY }, 
-        { "using"        , USING         , LANGUAGE_CXX_FAMILY }, 
+        { "namespace"    , NAMESPACE     , LANGUAGE_CXX_FAMILY },
+        { "using"        , USING         , LANGUAGE_CXX_FAMILY },
         
         // templates
-        { "template"     , TEMPLATE      , LANGUAGE_CXX }, 
+        { "template"     , TEMPLATE      , LANGUAGE_CXX },
         
-        { "delete"       , DELETE        , LANGUAGE_CXX }, 
+        { "delete"       , DELETE        , LANGUAGE_CXX },
         
         // special C++ operators
-        { "::"           , DCOLON        , LANGUAGE_CXX_FAMILY }, 
-        { "&&"           , RVALUEREF     , LANGUAGE_CXX_FAMILY }, 
+        { "::"           , DCOLON        , LANGUAGE_CXX_FAMILY },
+        { "&&"           , RVALUEREF     , LANGUAGE_CXX_FAMILY },
 
         // special C++ constant values
-        { "false"        , LITERAL_FALSE         , LANGUAGE_OO }, 
-        { "true"         , LITERAL_TRUE          , LANGUAGE_OO }, 
+        { "false"        , LITERAL_FALSE         , LANGUAGE_OO },
+        { "true"         , LITERAL_TRUE          , LANGUAGE_OO },
 
         // C++ specifiers
         { "final"         , FINAL          , LANGUAGE_CXX },
         { "override"      , OVERRIDE       , LANGUAGE_CXX },
  
         // C++ specific keywords
-        { "constexpr"        , CONSTEXPR        , LANGUAGE_CXX }, 
-        { "noexcept"         , NOEXCEPT         , LANGUAGE_CXX }, 
-        { "thread_local"     , THREAD_LOCAL     , LANGUAGE_CXX }, 
-        { "nullptr"          , NULLPTR          , LANGUAGE_CXX }, 
-        { "decltype"         , DECLTYPE         , LANGUAGE_CXX }, 
-        { "alignas"          , ALIGNAS          , LANGUAGE_CXX }, 
-        { "typename"         , TYPENAME         , LANGUAGE_CXX }, 
-        { "alignof"          , ALIGNOF          , LANGUAGE_CXX }, 
+        { "constexpr"        , CONSTEXPR        , LANGUAGE_CXX },
+        { "noexcept"         , NOEXCEPT         , LANGUAGE_CXX },
+        { "thread_local"     , THREAD_LOCAL     , LANGUAGE_CXX },
+        { "nullptr"          , NULLPTR          , LANGUAGE_CXX },
+        { "decltype"         , DECLTYPE         , LANGUAGE_CXX },
+        { "alignas"          , ALIGNAS          , LANGUAGE_CXX },
+        { "typename"         , TYPENAME         , LANGUAGE_CXX },
+        { "alignof"          , ALIGNOF          , LANGUAGE_CXX },
         { "typeid"           , TYPEID           , LANGUAGE_CXX },
-        { "const_cast"       , CONST_CAST       , LANGUAGE_CXX }, 
+        { "const_cast"       , CONST_CAST       , LANGUAGE_CXX },
         { "dynamic_cast"     , DYNAMIC_CAST     , LANGUAGE_CXX },
         { "reinterpret_cast" , REINTERPRET_CAST , LANGUAGE_CXX },
         { "static_cast"      , STATIC_CAST      , LANGUAGE_CXX },
         { "static_assert"    , STATIC_ASSERT    , LANGUAGE_CXX },
 
         // C++ alternative operators
-        { "and"           , OPERATORS        , LANGUAGE_CXX }, 
-        { "and_eq"        , OPERATORS        , LANGUAGE_CXX }, 
-        { "bitand"        , OPERATORS        , LANGUAGE_CXX }, 
-        { "bitor"         , OPERATORS        , LANGUAGE_CXX }, 
-        { "compl"         , OPERATORS        , LANGUAGE_CXX }, 
-        { "not"           , OPERATORS        , LANGUAGE_CXX }, 
-        { "not_eq"        , OPERATORS        , LANGUAGE_CXX }, 
-        { "or"            , OPERATORS        , LANGUAGE_CXX }, 
-        { "or_eq"         , OPERATORS        , LANGUAGE_CXX }, 
-        { "xor"           , OPERATORS        , LANGUAGE_CXX }, 
-        { "xor_eq"        , OPERATORS        , LANGUAGE_CXX }, 
+        { "and"           , OPERATORS        , LANGUAGE_CXX },
+        { "and_eq"        , OPERATORS        , LANGUAGE_CXX },
+        { "bitand"        , OPERATORS        , LANGUAGE_CXX },
+        { "bitor"         , OPERATORS        , LANGUAGE_CXX },
+        { "compl"         , OPERATORS        , LANGUAGE_CXX },
+        { "not"           , OPERATORS        , LANGUAGE_CXX },
+        { "not_eq"        , OPERATORS        , LANGUAGE_CXX },
+        { "or"            , OPERATORS        , LANGUAGE_CXX },
+        { "or_eq"         , OPERATORS        , LANGUAGE_CXX },
+        { "xor"           , OPERATORS        , LANGUAGE_CXX },
+        { "xor_eq"        , OPERATORS        , LANGUAGE_CXX },
 
         // Java specific keywords
-        { "throws"        , THROWS        , LANGUAGE_JAVA }, 
-        { "finally"       , FINALLY       , LANGUAGE_JAVA }, 
-        { "interface"     , INTERFACE     , LANGUAGE_JAVA }, 
-        { "extends"       , EXTENDS       , LANGUAGE_JAVA }, 
-        { "implements"    , IMPLEMENTS    , LANGUAGE_JAVA }, 
-        { "super"         , SUPER         , LANGUAGE_JAVA }, 
-        { "import"        , IMPORT        , LANGUAGE_JAVA }, 
-        { "package"       , PACKAGE       , LANGUAGE_JAVA }, 
-        { "final"         , FINAL         , LANGUAGE_JAVA }, 
+        { "throws"        , THROWS        , LANGUAGE_JAVA },
+        { "finally"       , FINALLY       , LANGUAGE_JAVA },
+        { "interface"     , INTERFACE     , LANGUAGE_JAVA },
+        { "extends"       , EXTENDS       , LANGUAGE_JAVA },
+        { "implements"    , IMPLEMENTS    , LANGUAGE_JAVA },
+        { "super"         , SUPER         , LANGUAGE_JAVA },
+        { "import"        , IMPORT        , LANGUAGE_JAVA },
+        { "package"       , PACKAGE       , LANGUAGE_JAVA },
+        { "final"         , FINAL         , LANGUAGE_JAVA },
         { "abstract"      , ABSTRACT      , LANGUAGE_JAVA },
         { "synchronized"  , SYNCHRONIZED  , LANGUAGE_JAVA },
         { "native"        , NATIVE        , LANGUAGE_JAVA },
         { "strictfp"      , STRICTFP      , LANGUAGE_JAVA },
-        { "transient"     , TRANSIENT     , LANGUAGE_JAVA }, 
-        { "|"             , BAR           , LANGUAGE_JAVA }, 
-        { "@"             , ATSIGN        , LANGUAGE_JAVA }, 
-        { "null"          , NULLLITERAL   , LANGUAGE_JAVA }, 
-        { "instanceof"    , OPERATORS     , LANGUAGE_JAVA }, 
-        { "assert"        , ASSERT        , LANGUAGE_JAVA }, 
+        { "transient"     , TRANSIENT     , LANGUAGE_JAVA },
+        { "|"             , BAR           , LANGUAGE_JAVA },
+        { "@"             , ATSIGN        , LANGUAGE_JAVA },
+        { "null"          , NULLLITERAL   , LANGUAGE_JAVA },
+        { "instanceof"    , OPERATORS     , LANGUAGE_JAVA },
+        { "assert"        , ASSERT        , LANGUAGE_JAVA },
+        { "record"        , RECORD        , LANGUAGE_JAVA },
 
 
         // C# specific keywords
-        { "foreach"       , FOREACH       , LANGUAGE_CSHARP }, 
-        { "ref"           , REF           , LANGUAGE_CSHARP }, 
-        { "out"           , OUT           , LANGUAGE_CSHARP }, 
-        { "in"            , IN            , LANGUAGE_CSHARP }, 
-        { "lock"          , LOCK          , LANGUAGE_CSHARP }, 
-        { "is"            , IS            , LANGUAGE_CSHARP }, 
-        { "internal"      , INTERNAL      , LANGUAGE_CSHARP }, 
-        { "sealed"        , SEALED        , LANGUAGE_CSHARP }, 
-        { "override"      , OVERRIDE      , LANGUAGE_CSHARP }, 
-        { "explicit"      , EXPLICIT      , LANGUAGE_CSHARP }, 
-        { "implicit"      , IMPLICIT      , LANGUAGE_CSHARP }, 
-        { "stackalloc"    , STACKALLOC    , LANGUAGE_CSHARP }, 
-        { "as"            , AS            , LANGUAGE_CSHARP }, 
-        { "interface"     , INTERFACE     , LANGUAGE_CSHARP }, 
-        { "delegate"      , DELEGATE      , LANGUAGE_CSHARP }, 
-        { "fixed"         , FIXED         , LANGUAGE_CSHARP }, 
-        { "checked"       , CHECKED       , LANGUAGE_CSHARP }, 
-        { "unchecked"     , UNCHECKED     , LANGUAGE_CSHARP }, 
-        { "finally"       , FINALLY       , LANGUAGE_CSHARP }, 
-        { "region"        , REGION        , LANGUAGE_CSHARP }, 
-        { "endregion"     , ENDREGION     , LANGUAGE_CSHARP }, 
-        { "unsafe"        , UNSAFE        , LANGUAGE_CSHARP }, 
-        { "readonly"      , READONLY      , LANGUAGE_CSHARP }, 
-        { "partial"       , PARTIAL       , LANGUAGE_CSHARP }, 
-        { "get"           , GET           , LANGUAGE_CSHARP }, 
-        { "set"           , SET           , LANGUAGE_CSHARP }, 
-        { "add"           , ADD           , LANGUAGE_CSHARP }, 
-        { "remove"        , REMOVE        , LANGUAGE_CSHARP }, 
-        { "await"         , AWAIT         , LANGUAGE_CSHARP }, 
-        { "abstract"      , ABSTRACT      , LANGUAGE_CSHARP }, 
-        { "event"         , EVENT         , LANGUAGE_CSHARP }, 
-        { "async"         , ASYNC         , LANGUAGE_CSHARP }, 
-        { "this"          , THIS          , LANGUAGE_CSHARP }, 
-        { "yield"         , YIELD         , LANGUAGE_CSHARP }, 
+        { "foreach"       , FOREACH       , LANGUAGE_CSHARP },
+        { "ref"           , REF           , LANGUAGE_CSHARP },
+        { "out"           , OUT           , LANGUAGE_CSHARP },
+        { "in"            , IN            , LANGUAGE_CSHARP },
+        { "lock"          , LOCK          , LANGUAGE_CSHARP },
+        { "is"            , IS            , LANGUAGE_CSHARP },
+        { "internal"      , INTERNAL      , LANGUAGE_CSHARP },
+        { "sealed"        , SEALED        , LANGUAGE_CSHARP },
+        { "override"      , OVERRIDE      , LANGUAGE_CSHARP },
+        { "explicit"      , EXPLICIT      , LANGUAGE_CSHARP },
+        { "implicit"      , IMPLICIT      , LANGUAGE_CSHARP },
+        { "stackalloc"    , STACKALLOC    , LANGUAGE_CSHARP },
+        { "as"            , AS            , LANGUAGE_CSHARP },
+        { "interface"     , INTERFACE     , LANGUAGE_CSHARP },
+        { "delegate"      , DELEGATE      , LANGUAGE_CSHARP },
+        { "fixed"         , FIXED         , LANGUAGE_CSHARP },
+        { "checked"       , CHECKED       , LANGUAGE_CSHARP },
+        { "unchecked"     , UNCHECKED     , LANGUAGE_CSHARP },
+        { "finally"       , FINALLY       , LANGUAGE_CSHARP },
+        { "region"        , REGION        , LANGUAGE_CSHARP },
+        { "endregion"     , ENDREGION     , LANGUAGE_CSHARP },
+        { "unsafe"        , UNSAFE        , LANGUAGE_CSHARP },
+        { "readonly"      , READONLY      , LANGUAGE_CSHARP },
+        { "partial"       , PARTIAL       , LANGUAGE_CSHARP },
+        { "get"           , GET           , LANGUAGE_CSHARP },
+        { "set"           , SET           , LANGUAGE_CSHARP },
+        { "add"           , ADD           , LANGUAGE_CSHARP },
+        { "remove"        , REMOVE        , LANGUAGE_CSHARP },
+        { "await"         , AWAIT         , LANGUAGE_CSHARP },
+        { "abstract"      , ABSTRACT      , LANGUAGE_CSHARP },
+        { "event"         , EVENT         , LANGUAGE_CSHARP },
+        { "async"         , ASYNC         , LANGUAGE_CSHARP },
+        { "this"          , THIS          , LANGUAGE_CSHARP },
+        { "yield"         , YIELD         , LANGUAGE_CSHARP },
         { "params"        , PARAMS        , LANGUAGE_CSHARP },
         { "null"          , NULLLITERAL   , LANGUAGE_CSHARP },
         { "typeof"        , TYPEOF        , LANGUAGE_CSHARP },
         { "alias"         , ALIAS         , LANGUAGE_CSHARP },
 
         // C# linq
-        { "from"          , FROM          , LANGUAGE_CSHARP }, 
-        { "where"         , WHERE         , LANGUAGE_CSHARP }, 
-        { "select"        , SELECT        , LANGUAGE_CSHARP }, 
-        { "let"           , LET           , LANGUAGE_CSHARP }, 
-        { "orderby"       , ORDERBY       , LANGUAGE_CSHARP }, 
-        { "ascending"     , ASCENDING     , LANGUAGE_CSHARP }, 
-        { "descending"    , DESCENDING    , LANGUAGE_CSHARP }, 
-        { "group"         , GROUP         , LANGUAGE_CSHARP }, 
-        { "by"            , BY            , LANGUAGE_CSHARP }, 
-        { "join"          , JOIN          , LANGUAGE_CSHARP }, 
-        { "on"            , ON            , LANGUAGE_CSHARP }, 
-        { "equals"        , EQUALS        , LANGUAGE_CSHARP }, 
+        { "from"          , FROM          , LANGUAGE_CSHARP },
+        { "where"         , WHERE         , LANGUAGE_CSHARP },
+        { "select"        , SELECT        , LANGUAGE_CSHARP },
+        { "let"           , LET           , LANGUAGE_CSHARP },
+        { "orderby"       , ORDERBY       , LANGUAGE_CSHARP },
+        { "ascending"     , ASCENDING     , LANGUAGE_CSHARP },
+        { "descending"    , DESCENDING    , LANGUAGE_CSHARP },
+        { "group"         , GROUP         , LANGUAGE_CSHARP },
+        { "by"            , BY            , LANGUAGE_CSHARP },
+        { "join"          , JOIN          , LANGUAGE_CSHARP },
+        { "on"            , ON            , LANGUAGE_CSHARP },
+        { "equals"        , EQUALS        , LANGUAGE_CSHARP },
         { "into"          , INTO          , LANGUAGE_CSHARP },
 
         // Objective-C
-        { "@interface"           , ATINTERFACE         , LANGUAGE_OBJECTIVE_C }, 
-        { "@implementation"      , ATIMPLEMENTATION    , LANGUAGE_OBJECTIVE_C }, 
+        { "@interface"           , ATINTERFACE         , LANGUAGE_OBJECTIVE_C },
+        { "@implementation"      , ATIMPLEMENTATION    , LANGUAGE_OBJECTIVE_C },
         { "@protocol"            , ATPROTOCOL          , LANGUAGE_OBJECTIVE_C },
         { "@end"                 , ATEND               , LANGUAGE_OBJECTIVE_C },
         { "@private"             , PRIVATE             , LANGUAGE_OBJECTIVE_C },
@@ -664,25 +721,100 @@ KeywordLexer(UTF8CharBuffer* pinput, int language, OPTION_TYPE & options,
         { "__strong"        , STRONG           , LANGUAGE_CXX | LANGUAGE_C | LANGUAGE_OBJECTIVE_C },
 
 
-        // Combined C/C++ Mode  at end so overrides defaults
+        // Combined C/C++ Mode at end so overrides defaults
         { "restrict"     , CRESTRICT         , LANGUAGE_CXX },
         { "try"          , CXX_TRY           , LANGUAGE_CXX },
         { "catch"        , CXX_CATCH         , LANGUAGE_CXX },
         { "class"        , CXX_CLASS         , LANGUAGE_CXX },
 
         // OpenMp
-        { "omp"          , OMP_OMP           , LANGUAGE_C_FAMILY }, 
+        { "omp"          , OMP_OMP           , LANGUAGE_C_FAMILY },
 
+        // Python special characters or operators
+        { "}"            , PY_RCURLY         , LANGUAGE_PYTHON },
+        { "{"            , PY_LCURLY         , LANGUAGE_PYTHON },
+        { ":"            , PY_COLON          , LANGUAGE_PYTHON },
+        { "@"            , PY_ATSIGN         , LANGUAGE_PYTHON },
+        { "**"           , EXPONENTIATION    , LANGUAGE_PYTHON },
+        { "..."          , LITERAL_ELLIPSIS  , LANGUAGE_PYTHON },
+        { "->"           , PY_ARROW          , LANGUAGE_PYTHON },
+        { "and"          , PY_AND            , LANGUAGE_PYTHON },
+        { "await"        , PY_AWAIT          , LANGUAGE_PYTHON },
+        { "in"           , PY_IN             , LANGUAGE_PYTHON },
+        { "is"           , PY_IS             , LANGUAGE_PYTHON },
+        { "not"          , PY_NOT            , LANGUAGE_PYTHON },
+        { "or"           , PY_OR             , LANGUAGE_PYTHON },
+
+        // Existing language keywords that are names in Python
+        { "__asm"        , NAME              , LANGUAGE_PYTHON },
+        { "__volatile__" , NAME              , LANGUAGE_PYTHON },
+        { "catch"        , NAME              , LANGUAGE_PYTHON },
+        { "const"        , NAME              , LANGUAGE_PYTHON },
+        { "default"      , NAME              , LANGUAGE_PYTHON },
+        { "do"           , NAME              , LANGUAGE_PYTHON },
+        { "enum"         , NAME              , LANGUAGE_PYTHON },
+        { "extern"       , NAME              , LANGUAGE_PYTHON },
+        { "explicit"     , NAME              , LANGUAGE_PYTHON },
+        { "false"        , NAME              , LANGUAGE_PYTHON },
+        { "goto"         , NAME              , LANGUAGE_PYTHON },
+        { "inline"       , NAME              , LANGUAGE_PYTHON },
+        { "main"         , NAME              , LANGUAGE_PYTHON },
+        { "namespace"    , NAME              , LANGUAGE_PYTHON },
+        { "new"          , NAME              , LANGUAGE_PYTHON },
+        { "omp"          , NAME              , LANGUAGE_PYTHON },
+        { "operator"     , NAME              , LANGUAGE_PYTHON },
+        { "private"      , NAME              , LANGUAGE_PYTHON },
+        { "protected"    , NAME              , LANGUAGE_PYTHON },
+        { "public"       , NAME              , LANGUAGE_PYTHON },
+        { "sizeof"       , NAME              , LANGUAGE_PYTHON },
+        { "static"       , NAME              , LANGUAGE_PYTHON },
+        { "struct"       , NAME              , LANGUAGE_PYTHON },
+        { "switch"       , NAME              , LANGUAGE_PYTHON },
+        { "throw"        , NAME              , LANGUAGE_PYTHON },
+        { "true"         , NAME              , LANGUAGE_PYTHON },
+        { "typedef"      , NAME              , LANGUAGE_PYTHON },
+        { "using"        , NAME              , LANGUAGE_PYTHON },
+        { "virtual"      , NAME              , LANGUAGE_PYTHON },
+        { "volatile"     , NAME              , LANGUAGE_PYTHON },
+
+        // Python
+        { "as"           , PY_ALIAS          , LANGUAGE_PYTHON },
+        { "assert"       , ASSERT            , LANGUAGE_PYTHON },
+        { "async"        , PY_ASYNC          , LANGUAGE_PYTHON },
+        { "case"         , PY_CASE           , LANGUAGE_PYTHON },
+        { "def"          , PY_FUNCTION       , LANGUAGE_PYTHON },
+        { "del"          , PY_DELETE         , LANGUAGE_PYTHON },
+        { "elif"         , PY_ELIF           , LANGUAGE_PYTHON },
+        { "except"       , PY_EXCEPT         , LANGUAGE_PYTHON },
+        { "exec"         , PY_2_EXEC         , LANGUAGE_PYTHON },
+        { "False"        , LITERAL_FALSE     , LANGUAGE_PYTHON },
+        { "finally"      , FINALLY           , LANGUAGE_PYTHON },
+        { "from"         , PY_FROM           , LANGUAGE_PYTHON },
+        { "global"       , PY_GLOBAL         , LANGUAGE_PYTHON },
+        { "import"       , PY_IMPORT         , LANGUAGE_PYTHON },
+        { "lambda"       , PY_LAMBDA         , LANGUAGE_PYTHON },
+        { "match"        , PY_MATCH          , LANGUAGE_PYTHON },
+        { "None"         , LITERAL_NONE      , LANGUAGE_PYTHON },
+        { "nonlocal"     , PY_NONLOCAL       , LANGUAGE_PYTHON },
+        { "pass"         , PY_PASS           , LANGUAGE_PYTHON },
+        { "print"        , PY_2_PRINT        , LANGUAGE_PYTHON },
+        { "raise"        , PY_RAISE          , LANGUAGE_PYTHON },
+        { "True"         , LITERAL_TRUE      , LANGUAGE_PYTHON },
+        { "type"         , PY_TYPE           , LANGUAGE_PYTHON },
+        { "with"         , PY_WITH           , LANGUAGE_PYTHON },
+        { "yield"        , PY_YIELD          , LANGUAGE_PYTHON },
    };
 
     // fill up the literals for the language that we are parsing
     for (unsigned int i = 0; i < (sizeof(keyword_map) / sizeof(keyword_map[0])); ++i)
-        if (inLanguage(keyword_map[i].language))
-            literals[keyword_map[i].text] = keyword_map[i].token;
+        if (inLanguage(keyword_map[i].language)) {
+            srcMLLiterals[keyword_map[i].text] = keyword_map[i].token;
+        }
 }
 
 private:
     antlr::TokenStreamSelector* selector;
+    std::unordered_map<std::string_view, int> srcMLLiterals;
 public:
     void setSelector(antlr::TokenStreamSelector* selector_) {
         selector = selector_;

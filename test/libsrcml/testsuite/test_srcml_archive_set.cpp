@@ -1,27 +1,12 @@
+// SPDX-License-Identifier: GPL-3.0-only
 /**
  * @file test_srcml_archive_set.cpp
  *
- * @copyright Copyright (C) 2013-2014 srcML, LLC. (www.srcML.org)
+ * @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
  *
- * The srcML Toolkit is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
  *
- * The srcML Toolkit is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with the srcML Toolkit; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ * Test cases for srcml_archive_set_*.
  */
-
-/*
-
-  Test cases for srcml_archive_set_*.
-*/
 
 #include <srcml.h>
 
@@ -145,27 +130,20 @@ int main(int, char* argv[]) {
 
     {
         srcml_archive* archive = srcml_archive_create();
-//        archive->options = 0;
-
-        dassert(srcml_archive_set_options(archive, 1 | 2 | 4), SRCML_STATUS_OK);
-
-//        dassert(archive->options, (1 | 2 | 4));
+        dassert(srcml_archive_set_options(archive, SRCML_OPTION_CPP), SRCML_STATUS_OK);
+        srcml_archive_get_options(archive);
         srcml_archive_free(archive);
     }
 
     {
         srcml_archive* archive = srcml_archive_create();
-//        archive->options = 0;
-
-        dassert(srcml_archive_set_options(archive, 1 | 2 | 4), SRCML_STATUS_OK);
-        dassert(srcml_archive_set_options(archive, 1), SRCML_STATUS_OK);
-
-//        dassert(archive->options, 1);
+        dassert(srcml_archive_set_options(archive, SRCML_OPTION_CPP | SRCML_OPTION_NO_XML_DECL), SRCML_STATUS_OK);
+        srcml_archive_get_options(archive);
         srcml_archive_free(archive);
     }
 
     {
-        dassert(srcml_archive_set_options(0, 1 | 2 | 4), SRCML_STATUS_INVALID_ARGUMENT);
+        dassert(srcml_archive_set_options(0, SRCML_OPTION_CPP | SRCML_OPTION_NO_XML_DECL), SRCML_STATUS_INVALID_ARGUMENT);
     }
 
     /*
@@ -174,33 +152,15 @@ int main(int, char* argv[]) {
 
     {
         srcml_archive* archive = srcml_archive_create();
-//        archive->options = 0;
-
-        srcml_archive_enable_option(archive, 1);
-
-//        dassert(archive->options, 1);
+        dassert(srcml_archive_enable_option(archive, SRCML_OPTION_CPP), SRCML_STATUS_OK);
         srcml_archive_free(archive);
     }
 
     {
         srcml_archive* archive = srcml_archive_create();
-//        archive->options = 0;
-
-        dassert(srcml_archive_set_options(archive, 1 | 2), SRCML_STATUS_OK);
-        srcml_archive_enable_option(archive, 4);
-
-//        dassert(archive->options, (1 | 2 | 4));
-        srcml_archive_free(archive);
-    }
-
-    {
-        srcml_archive* archive = srcml_archive_create();
-//        archive->options = 0;
-
-        dassert(srcml_archive_set_options(archive, 1), SRCML_STATUS_OK);
-        srcml_archive_enable_option(archive, 2 | 4);
-
-//        dassert(archive->options, (1 | 2 | 4));
+        srcml_archive_set_options(archive, SRCML_OPTION_CPP | SRCML_OPTION_NO_XML_DECL);
+        dassert(srcml_archive_enable_option(archive, SRCML_OPTION_STORE_ENCODING), SRCML_STATUS_OK);
+        dassert(srcml_archive_get_options(archive), (SRCML_OPTION_CPP | SRCML_OPTION_NO_XML_DECL | SRCML_OPTION_STORE_ENCODING));
         srcml_archive_free(archive);
     }
 
@@ -214,44 +174,32 @@ int main(int, char* argv[]) {
 
     {
         srcml_archive* archive = srcml_archive_create();
-//        archive->options = 0;
+        dassert(srcml_archive_disable_option(archive, 0), SRCML_STATUS_OK);
+        dassert(srcml_archive_get_options(archive), 0);
+        srcml_archive_free(archive);
+    }
 
+    {
+        srcml_archive* archive = srcml_archive_create();
+        srcml_archive_set_options(archive, SRCML_OPTION_CPP | SRCML_OPTION_NO_XML_DECL | SRCML_OPTION_STORE_ENCODING);
         srcml_archive_disable_option(archive, 0);
-
-//        dassert(archive->options, 0);
+        dassert(srcml_archive_get_options(archive), (SRCML_OPTION_CPP | SRCML_OPTION_NO_XML_DECL | SRCML_OPTION_STORE_ENCODING));
         srcml_archive_free(archive);
     }
 
     {
         srcml_archive* archive = srcml_archive_create();
-//        archive->options = 0;
-
-        dassert(srcml_archive_set_options(archive, 1 | 2 | 4), SRCML_STATUS_OK);
-        srcml_archive_disable_option(archive, 0);
-
-//        dassert(archive->options, (1 | 2 | 4));
+        srcml_archive_set_options(archive, SRCML_OPTION_CPP | SRCML_OPTION_NO_XML_DECL | SRCML_OPTION_STORE_ENCODING);
+        dassert(srcml_archive_disable_option(archive, SRCML_OPTION_CPP), SRCML_STATUS_OK);
+        dassert(srcml_archive_get_options(archive), (SRCML_OPTION_NO_XML_DECL | SRCML_OPTION_STORE_ENCODING));
         srcml_archive_free(archive);
     }
 
     {
         srcml_archive* archive = srcml_archive_create();
-//        archive->options = 0;
-
-        dassert(srcml_archive_set_options(archive, 1 | 2 | 4), SRCML_STATUS_OK);
-        srcml_archive_disable_option(archive, 2);
-
-//        dassert(archive->options, (1 | 4));
-        srcml_archive_free(archive);
-    }
-
-    {
-        srcml_archive* archive = srcml_archive_create();
-//        archive->options = 0;
-
-        dassert(srcml_archive_set_options(archive, 1 | 2 | 4), SRCML_STATUS_OK);
-        srcml_archive_disable_option(archive, 1 | 2);
-
-//        dassert(archive->options, 4);
+        srcml_archive_set_options(archive, SRCML_OPTION_CPP | SRCML_OPTION_NO_XML_DECL | SRCML_OPTION_STORE_ENCODING);
+        dassert(srcml_archive_disable_option(archive, SRCML_OPTION_NO_XML_DECL | SRCML_OPTION_STORE_ENCODING), SRCML_STATUS_OK);
+        dassert(srcml_archive_get_options(archive), SRCML_OPTION_CPP);
         srcml_archive_free(archive);
     }
 
@@ -267,8 +215,7 @@ int main(int, char* argv[]) {
         srcml_archive* archive = srcml_archive_create();
 
         dassert(srcml_archive_set_tabstop(archive, 4), SRCML_STATUS_OK);
-
-//        dassert(archive->tabstop, 4);
+        dassert(srcml_archive_get_tabstop(archive), 4);
         srcml_archive_free(archive);
     }
 
@@ -284,9 +231,7 @@ int main(int, char* argv[]) {
         srcml_archive* archive = srcml_archive_create();
 
         srcml_archive_register_file_extension(archive, "foo", "C++");
-
-//        dassert(get_extension(archive->registered_languages.last()), "foo");
-//        dassert(get_language(archive->registered_languages.last()), 2);
+        dassert(srcml_archive_check_extension(archive, "main.foo"), std::string("C++"));
         srcml_archive_free(archive);
     }
 
@@ -324,7 +269,7 @@ int main(int, char* argv[]) {
 
         srcml_archive_register_namespace(archive, "foo", "bar");
 
-        int pos = srcml_archive_get_namespace_size(archive) - 1;
+        size_t pos = srcml_archive_get_namespace_size(archive) - 1;
         dassert(srcml_archive_get_namespace_prefix(archive, pos), std::string("foo"));
         dassert(srcml_archive_get_namespace_uri(archive, pos) , std::string("bar"));
 
@@ -336,7 +281,7 @@ int main(int, char* argv[]) {
 
         srcml_archive_register_namespace(archive, "foo", "http://www.srcML.org/srcML/src");
 
-        int pos = srcml_archive_get_namespace_size(archive) - 1;
+        size_t pos = srcml_archive_get_namespace_size(archive) - 1;
         dassert(srcml_archive_get_namespace_prefix(archive, pos), std::string("foo"));
         dassert(srcml_archive_get_namespace_uri(archive, pos) , std::string("http://www.srcML.org/srcML/src"));
 
@@ -361,6 +306,158 @@ int main(int, char* argv[]) {
 
     {
         dassert(srcml_archive_register_namespace(0, "foo", "bar"), SRCML_STATUS_INVALID_ARGUMENT);
+    }
+
+    /*
+      srcml_archive_add_attribute
+    */
+
+    {
+        srcml_archive* archive = srcml_archive_create();
+        srcml_archive_register_namespace(archive, "metric", "https://www.srcml.org/test/metric");
+
+        dassert(srcml_archive_add_attribute(archive, "metric", "complexity", "high"), SRCML_STATUS_OK);
+        dassert(srcml_archive_get_attribute_size(archive), 1);
+        dassert(srcml_archive_get_attribute_prefix(archive, 0), std::string("metric"));
+        dassert(srcml_archive_get_attribute_name(archive, 0) , std::string("complexity"));
+        dassert(srcml_archive_get_attribute_value(archive, 0) , std::string("high"));
+
+        srcml_archive_close(archive);
+        srcml_archive_free(archive);
+    }
+
+    {
+        srcml_archive* archive = srcml_archive_create();
+        srcml_archive_register_namespace(archive, "metric", "https://www.srcml.org/test/metric");
+
+        dassert(srcml_archive_add_attribute(archive, "metric", "complexity", "high"), SRCML_STATUS_OK);
+        dassert(srcml_archive_get_attribute_size(archive), 1);
+
+        char* s = 0;
+        size_t size = 0;
+        srcml_archive_write_open_memory(archive, &s, &size);
+        srcml_archive_close(archive);
+        srcml_archive_free(archive);
+
+        std::string srcml = R"(<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.srcML.org/srcML/src" xmlns:metric="https://www.srcml.org/test/metric" revision=")" SRCML_VERSION_STRING R"(" metric:complexity="high"/>
+)";
+        dassert(std::string(s, size), srcml);
+
+        srcml_memory_free(s);
+    }
+
+    {
+        srcml_archive* archive = srcml_archive_create();
+        srcml_archive_register_namespace(archive, "metric", "https://www.srcml.org/test/metric");
+
+        dassert(srcml_archive_add_attribute(archive, "metric", "complexity", "high"), SRCML_STATUS_OK);
+        dassert(srcml_archive_get_attribute_size(archive), 1);
+
+        char* s = 0;
+        size_t size = 0;
+        srcml_archive_write_open_memory(archive, &s, &size);
+        srcml_unit* unit = srcml_unit_create(archive);
+        srcml_unit_set_language(unit, "C++");
+        srcml_unit_parse_memory(unit, "", 0);
+        srcml_archive_write_unit(archive, unit);
+        srcml_unit_free(unit);
+        srcml_archive_close(archive);
+        srcml_archive_free(archive);
+
+        std::string srcml = R"(<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.srcML.org/srcML/src" xmlns:metric="https://www.srcml.org/test/metric" revision=")" SRCML_VERSION_STRING R"(" metric:complexity="high">
+
+<unit revision=")" SRCML_VERSION_STRING R"(" language="C++" hash="da39a3ee5e6b4b0d3255bfef95601890afd80709"/>
+
+</unit>
+)";
+        dassert(std::string(s, size), srcml);
+
+        srcml_memory_free(s);
+    }
+
+    {
+        srcml_archive* archive = srcml_archive_create();
+        srcml_archive_register_namespace(archive, "metric", "https://www.srcml.org/test/metric");
+
+        dassert(srcml_archive_add_attribute(archive, "metric", "complexity", "high"), SRCML_STATUS_OK);
+        dassert(srcml_archive_get_attribute_size(archive), 1);
+        dassert(srcml_archive_add_attribute(archive, "metric", "loc", "5"), SRCML_STATUS_OK);
+        dassert(srcml_archive_get_attribute_size(archive), 2);
+
+        dassert(srcml_archive_get_attribute_prefix(archive, 0), std::string("metric"));
+        dassert(srcml_archive_get_attribute_name(archive, 0) , std::string("complexity"));
+        dassert(srcml_archive_get_attribute_value(archive, 0) , std::string("high"));
+
+        dassert(srcml_archive_get_attribute_prefix(archive, 1), std::string("metric"));
+        dassert(srcml_archive_get_attribute_name(archive, 1) , std::string("loc"));
+        dassert(srcml_archive_get_attribute_value(archive, 1) , std::string("5"));
+
+        srcml_archive_free(archive);
+    }
+
+    {
+        srcml_archive* archive = srcml_archive_create();
+        srcml_archive_register_namespace(archive, "metric", "https://www.srcml.org/test/metric");
+
+        dassert(srcml_archive_add_attribute(archive, "metric", "complexity", "high"), SRCML_STATUS_OK);
+        dassert(srcml_archive_get_attribute_size(archive), 1);
+        dassert(srcml_archive_add_attribute(archive, "metric", "loc", "5"), SRCML_STATUS_OK);
+        dassert(srcml_archive_get_attribute_size(archive), 2);
+
+        char* s = 0;
+        size_t size = 0;
+        srcml_archive_write_open_memory(archive, &s, &size);
+        srcml_archive_close(archive);
+        srcml_archive_free(archive);
+
+        std::string srcml = R"(<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<unit xmlns="http://www.srcML.org/srcML/src" xmlns:metric="https://www.srcml.org/test/metric" revision=")" SRCML_VERSION_STRING R"(" metric:complexity="high" metric:loc="5"/>
+)";
+        dassert(std::string(s, size), srcml);
+
+        srcml_memory_free(s);
+    }
+
+    {
+        srcml_archive* archive = srcml_archive_create();
+
+        dassert(srcml_archive_add_attribute(archive, 0, "complexity", "high"), SRCML_STATUS_INVALID_ARGUMENT);
+        dassert(srcml_archive_get_attribute_size(archive), 0);
+
+        srcml_archive_free(archive);
+    }
+
+    {
+        srcml_archive* archive = srcml_archive_create();
+
+        dassert(srcml_archive_add_attribute(archive, "metric", 0, "high"), SRCML_STATUS_INVALID_ARGUMENT);
+        dassert(srcml_archive_get_attribute_size(archive), 0);
+
+        srcml_archive_free(archive);
+    }
+
+    {
+        srcml_archive* archive = srcml_archive_create();
+
+        dassert(srcml_archive_add_attribute(archive, "metric", "complexity", 0), SRCML_STATUS_INVALID_ARGUMENT);
+        dassert(srcml_archive_get_attribute_size(archive), 0);
+
+        srcml_archive_free(archive);
+    }
+
+    {
+        dassert(srcml_archive_add_attribute(0, "metric", "complexity", "high"), SRCML_STATUS_INVALID_ARGUMENT);
+    }
+
+    {
+        srcml_archive* archive = srcml_archive_create();
+
+        dassert(srcml_archive_add_attribute(archive, "metric", "complexity", "high"), SRCML_STATUS_UNASSIGNED_PREFIX);
+        dassert(srcml_archive_get_attribute_size(archive), 0);
+
+        srcml_archive_free(archive);
     }
 
     /*

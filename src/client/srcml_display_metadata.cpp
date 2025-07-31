@@ -1,23 +1,10 @@
+// SPDX-License-Identifier: GPL-3.0-only
 /**
  * @file srcml_display_info.cpp
  *
- * @copyright Copyright (C) 2014 srcML, LLC. (www.srcML.org)
+ * @copyright Copyright (C) 2014-2024 srcML, LLC. (www.srcML.org)
  *
  * This file is part of the srcml command-line client.
- *
- * The srcML Toolkit is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * The srcML Toolkit is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with the srcml command-line client; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 #include <srcml_display_metadata.hpp>
@@ -28,16 +15,12 @@
 #include <srcml_options.hpp>
 #include <iostream>
 #include <iomanip>
-#include <cstring>
 #include <srcml_utilities.hpp>
 
 namespace {
 
-    const char* value(const char* call) {
-        if (call)
-            return call;
-        else
-            return "";
+    std::string_view value(const char* call) {
+        return call ? call : "";
     }
 
     // display all files in srcml archive
@@ -48,25 +31,25 @@ namespace {
         std::cout << (xml_encoding ? xml_encoding : "(null)") << '\n';
 
         int numUnits = 0;
+        long LOC = 0;
         while (true) {
             std::unique_ptr<srcml_unit> unit(srcml_archive_read_unit(srcml_arch));
             if (!unit)
                 break;
 
             ++numUnits;
-            std::cout << std::setw(5) << numUnits; // << " " 
-                      // << value(srcml_unit_get_filename(unit.get())) << '\t'
-                      // << value(srcml_unit_get_language(unit.get())) << '\t'
-                      // << value(srcml_unit_get_hash(unit.get())) << '\n';
-
+            std::cout << std::setw(5) << numUnits;
             std::cout << std::setw(5) << std::right << value(srcml_unit_get_language(unit.get())) ;
             std::cout << ' ' << std::setw(5) << std::right << srcml_unit_get_loc(unit.get());
             std::cout << ' ' << value(srcml_unit_get_hash(unit.get()));
             std::cout << ' ' << value(srcml_unit_get_filename(unit.get()));
             std::cout << '\n';
-            // TODO: Other parts of verbose here. Have to collect.
+
+            // total LOC
+            LOC += srcml_unit_get_loc(unit.get());
         }
-        std::cout << "Total: " << numUnits << '\n';
+        std::cout << "units: " << numUnits << '\n';
+        std::cout << "LOC: " << LOC << '\n';
     }
 
     void srcml_display_info(srcml_archive* srcml_arch, bool long_info) {
@@ -138,7 +121,7 @@ namespace {
 
         return numUnits;
     }
-     
+
 }
 
 void srcml_display_metadata(const srcml_request_t& srcml_request, const srcml_input_t& src_input, const srcml_output_dest&) {
@@ -163,7 +146,7 @@ void srcml_display_metadata(const srcml_request_t& srcml_request, const srcml_in
         else if (contains<FILE*>(input)){
             status = srcml_archive_read_open_FILE(srcml_arch.get(), input);
         } else {
-            status = srcml_archive_read_open_filename(srcml_arch.get(), (src_prefix_resource(input).c_str()));
+            status = srcml_archive_read_open_filename(srcml_arch.get(), (src_prefix_resource(input).data()));
         }
         if (status != SRCML_STATUS_OK) {
             SRCMLstatus(ERROR_MSG, "srcml input cannot not be opened.");
@@ -231,7 +214,7 @@ void srcml_display_metadata(const srcml_request_t& srcml_request, const srcml_in
         }
 
         if (srcml_request.xmlns_prefix_query) {
-            const char* prefix = srcml_archive_get_prefix_from_uri(srcml_arch.get(), srcml_request.xmlns_prefix_query->c_str());
+            const char* prefix = srcml_archive_get_prefix_from_uri(srcml_arch.get(), srcml_request.xmlns_prefix_query->data());
             if (prefix) {
                 std::cout << prefix << '\n';
             }

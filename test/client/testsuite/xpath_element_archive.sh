@@ -1,10 +1,15 @@
 #!/bin/bash
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# @file xpath_element_archive.sh
+#
+# @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
 
 # test framework
 source $(dirname "$0")/framework_test.sh
 
 # test setting the attribute on xpath query results
-define result <<- 'STDOUT'
+defineXML result <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:pre="foo.com" revision="REVISION">
 
@@ -15,9 +20,8 @@ define result <<- 'STDOUT'
 	</unit>
 
 	</unit>
-	STDOUT
+STDOUT
 
-xmlcheck "$result"
 createfile a.cpp "a;
 "
 createfile b.cpp "b;

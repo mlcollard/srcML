@@ -1,4 +1,9 @@
 #!/bin/bash
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# @file metadata_order.sh
+#
+# @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
 
 # test framework
 source $(dirname "$0")/framework_test.sh
@@ -7,15 +12,13 @@ source $(dirname "$0")/framework_test.sh
 ##
 # Test order of metadata option order
 
-define srcml <<- 'STDOUT'
+defineXML srcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++" url="sub" filename="a.cpp" version="1.0"/>
-	STDOUT
+STDOUT
 
-xmlcheck "$srcml"
 createfile sub/a.cpp.xml "$srcml"
 
-# TODO: Add get-hash and get-timestamp
 options=( --show-language --show-url --show-filename --show-src-version --show-encoding )
 
 size="${#options[@]}"
@@ -26,7 +29,7 @@ define values <<- 'STDOUT'
 	filename="a.cpp"
 	language="C++"
 	version="1.0"
-	STDOUT
+STDOUT
 
 index=-1
 
@@ -36,7 +39,6 @@ new_arg() {
 
 	# Assign argument based on index value into options
 	val="${options[(($index % $size))]} ${options[(($[$index+1] % $size))]} ${options[(($[$index+2] % $size))]} ${options[(($[$index+3] % $size))]} ${options[(($[$index+4] % $size))]}"
-	message "$val"
 
 }
 
@@ -48,6 +50,13 @@ check "$values"
 srcml $val < sub/a.cpp.xml
 check "$values"
 
+new_arg
+
+srcml $val sub/a.cpp.xml
+check "$values"
+
+srcml $val < sub/a.cpp.xml
+check "$values"
 
 new_arg
 
@@ -57,7 +66,6 @@ check "$values"
 srcml $val < sub/a.cpp.xml
 check "$values"
 
-
 new_arg
 
 srcml $val sub/a.cpp.xml
@@ -66,7 +74,6 @@ check "$values"
 srcml $val < sub/a.cpp.xml
 check "$values"
 
-
 new_arg
 
 srcml $val sub/a.cpp.xml
@@ -74,14 +81,3 @@ check "$values"
 
 srcml $val < sub/a.cpp.xml
 check "$values"
-
-
-new_arg
-
-srcml $val sub/a.cpp.xml
-check "$values"
-
-srcml $val < sub/a.cpp.xml
-check "$values"
-
-

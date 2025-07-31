@@ -1,4 +1,9 @@
 #!/bin/bash
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# @file cpp_file.sh
+#
+# @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
 
 # test framework
 source $(dirname "$0")/framework_test.sh
@@ -13,30 +18,27 @@ define input <<- 'INPUT'
 	#else
 	return;
 	#endif
-    INPUT
+INPUT
 
-define output <<- 'STDOUT'
+defineXML output <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:cpp="http://www.srcML.org/srcML/cpp" revision="REVISION" language="Java"><cpp:if>#<cpp:directive>if</cpp:directive> <expr><name>A</name></expr></cpp:if>
 	<break>break;</break>
 	<cpp:else>#<cpp:directive>else</cpp:directive></cpp:else>
 	<return>return;</return>
 	<cpp:endif>#<cpp:directive>endif</cpp:directive></cpp:endif>
-    </unit>
-	STDOUT
-xmlcheck "$output"
+	</unit>
+STDOUT
 
-define foutput <<- 'STDOUT'
+defineXML foutput <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:cpp="http://www.srcML.org/srcML/cpp" revision="REVISION" language="Java" filename="sub/a.java">
-	<cpp:if>#<cpp:directive>if</cpp:directive> <expr><name>A</name></expr></cpp:if>
+	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:cpp="http://www.srcML.org/srcML/cpp" revision="REVISION" language="Java" filename="sub/a.java"><cpp:if>#<cpp:directive>if</cpp:directive> <expr><name>A</name></expr></cpp:if>
 	<break>break;</break>
 	<cpp:else>#<cpp:directive>else</cpp:directive></cpp:else>
 	<return>return;</return>
 	<cpp:endif>#<cpp:directive>endif</cpp:directive></cpp:endif>
 	</unit>
-	STDOUT
-xmlcheck "$foutput"
+STDOUT
 
 createfile sub/a.java "$input"
 
@@ -65,28 +67,28 @@ createfile sub/a.java "$input"
 #srcml -cpp -l Java -o sub/a.java.xml <<< "$input"
 #check sub/a.java.xml "$output"
 
-echo "$input" | srcml -l Java --cpp
+echo -n "$input" | srcml -l Java --cpp
 check "$output"
 
-echo "$input" | srcml --cpp -l Java
+echo -n "$input" | srcml --cpp -l Java
 check "$output"
 
-echo "$input" | srcml -l Java --cpp -o sub/a.java.xml
+echo -n "$input" | srcml -l Java --cpp -o sub/a.java.xml
 check sub/a.java.xml "$output"
 
-echo "$input" | srcml -l Java -o sub/a.java.xml --cpp
+echo -n "$input" | srcml -l Java -o sub/a.java.xml --cpp
 check sub/a.java.xml "$output"
 
-echo "$input" | srcml --cpp -l Java -o sub/a.java.xml
+echo -n "$input" | srcml --cpp -l Java -o sub/a.java.xml
 check sub/a.java.xml "$output"
 
-echo "$input" | srcml --cpp -o sub/a.java.xml -l Java
+echo -n "$input" | srcml --cpp -o sub/a.java.xml -l Java
 check sub/a.java.xml "$output"
 
-echo "$input" | srcml -o sub/a.java.xml -l Java --cpp
+echo -n "$input" | srcml -o sub/a.java.xml -l Java --cpp
 check sub/a.java.xml "$output"
 
-echo "$input" | srcml -o sub/a.java.xml --cpp -l Java
+echo -n "$input" | srcml -o sub/a.java.xml --cpp -l Java
 check sub/a.java.xml "$output"
 
 # from file - options after input
@@ -146,10 +148,10 @@ check sub/a.java.xml "$foutput"
 srcml -l Java --cpp sub/a.java -o sub/a.java.xml
 check sub/a.java.xml "$foutput"
 
-srcml -l Java -o sub/a.java.xml sub/a.java --cpp 
+srcml -l Java -o sub/a.java.xml sub/a.java --cpp
 check sub/a.java.xml "$foutput"
 
-srcml -o sub/a.java.xml -l Java sub/a.java --cpp 
+srcml -o sub/a.java.xml -l Java sub/a.java --cpp
 check sub/a.java.xml "$foutput"
 
 srcml -o sub/a.java.xml --cpp sub/a.java -l Java
@@ -167,7 +169,7 @@ check sub/a.java.xml "$foutput"
 srcml -l Java sub/a.java -o sub/a.java.xml --cpp
 check sub/a.java.xml "$foutput"
 
-srcml -o sub/a.java.xml sub/a.java -l Java --cpp 
+srcml -o sub/a.java.xml sub/a.java -l Java --cpp
 check sub/a.java.xml "$foutput"
 
 srcml -o sub/a.java.xml sub/a.java --cpp -l Java
@@ -175,4 +177,3 @@ check sub/a.java.xml "$foutput"
 
 srcml --cpp sub/a.java -o sub/a.java.xml -l Java
 check sub/a.java.xml "$foutput"
-

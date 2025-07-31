@@ -1,10 +1,15 @@
 #!/bin/bash
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# @file remote_src_archived.sh
+#
+# @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
 
 # test framework
 source $(dirname "$0")/framework_test.sh
 
 # direct input from a remote source, with various compressions
-define srcml_with_url <<- 'STDOUT'
+defineXML srcml_with_url <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" url="test">
 
@@ -12,48 +17,51 @@ define srcml_with_url <<- 'STDOUT'
 	</unit>
 
 	</unit>
-	STDOUT
-
+STDOUT
 
 # archive/compression mix
-srcml https://github.com/srcML/test-data/raw/master/source/a.cpp.cpio --url="test"
+srcml https://raw.githubusercontent.com/srcML/test-data/1.0.0/source/a.cpp.cpio --url="test"
 check "$srcml_with_url"
 
-srcml https://github.com/srcML/test-data/raw/master/source/a.cpp.cpio.bz2 --url="test"
+srcml https://raw.githubusercontent.com/srcML/test-data/1.0.0/source/a.cpp.cpio.bz2 --url="test"
 check "$srcml_with_url"
 
-srcml https://github.com/srcML/test-data/raw/master/source/a.cpp.cpio.gz --url="test"
+srcml https://raw.githubusercontent.com/srcML/test-data/1.0.0/source/a.cpp.cpio.gz --url="test"
 check "$srcml_with_url"
 
-srcml https://github.com/srcML/test-data/raw/master/source/a.cpp.tar.bz2 --url="test"
+srcml https://raw.githubusercontent.com/srcML/test-data/1.0.0/source/a.cpp.tar.bz2 --url="test"
 check "$srcml_with_url"
 
-srcml https://github.com/srcML/test-data/raw/master/source/a.cpp.tar.gz --url="test"
+srcml https://raw.githubusercontent.com/srcML/test-data/1.0.0/source/a.cpp.tar.gz --url="test"
 check "$srcml_with_url"
 
-srcml https://github.com/srcML/test-data/raw/master/source/a.cpp.tar --url="test"
+srcml https://raw.githubusercontent.com/srcML/test-data/1.0.0/source/a.cpp.tar --url="test"
 check "$srcml_with_url"
 
-srcml https://github.com/srcML/test-data/raw/master/source/a.cpp.tbz2 --url="test"
+srcml https://raw.githubusercontent.com/srcML/test-data/1.0.0/source/a.cpp.tbz2 --url="test"
 check "$srcml_with_url"
 
-srcml https://github.com/srcML/test-data/raw/master/source/a.cpp.tgz --url="test"
+srcml https://raw.githubusercontent.com/srcML/test-data/1.0.0/source/a.cpp.tgz --url="test"
 check "$srcml_with_url"
 
-srcml https://github.com/srcML/test-data/raw/master/source/a.cpp.zip --url="test"
+srcml https://raw.githubusercontent.com/srcML/test-data/1.0.0/source/a.cpp.zip --url="test"
 check "$srcml_with_url"
 
-srcml https://github.com/srcML/test-data/raw/master/source/a.cpp.zip.bz2 --url="test"
+srcml https://raw.githubusercontent.com/srcML/test-data/1.0.0/source/a.cpp.zip.bz2 --url="test"
 check "$srcml_with_url"
 
-srcml https://github.com/srcML/test-data/raw/master/source/a.cpp.zip.gz --url="test"
+srcml https://raw.githubusercontent.com/srcML/test-data/1.0.0/source/a.cpp.zip.gz --url="test"
 check "$srcml_with_url"
 
 # empty direct remote source input with various compressions
-define empty_srcml_with_url <<- 'STDOUT'
-       <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-       <unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++" url="test" filename="test"/>
-       STDOUT
+defineXML empty_srcml_with_url <<- 'STDOUT'
+	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+	<unit xmlns="http://www.srcML.org/srcML/src" revision="1.0.0" url="test">
+
+	<unit revision="1.0.0" language="C++" filename="empty.cpp" hash="da39a3ee5e6b4b0d3255bfef95601890afd80709"/>
+
+	</unit>
+STDOUT
 
 # archive/compressed mix
 srcml https://github.com/srcML/test-data/raw/master/empty/empty.cpp.cpio --url="test"

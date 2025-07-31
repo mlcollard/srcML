@@ -1,22 +1,25 @@
 #!/bin/bash
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# @file set_url_unit.sh
+#
+# @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
 
 # test framework
 source $(dirname "$0")/framework_test.sh
 
 # test on standard in
-define output <<- 'STDOUT'
+defineXML output <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++" url="bar"/>
-	STDOUT
+STDOUT
 
 # test on file
-define fsrcml <<- 'STDOUT'
+defineXML fsrcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++" url="bar" filename="sub/a.cpp"/>
-	STDOUT
+STDOUT
 
-xmlcheck "$output"
-xmlcheck "$fsrcml"
 createfile sub/a.cpp ""
 
 echo -n "" | srcml -l C++ --url bar
@@ -25,10 +28,10 @@ check "$output"
 echo -n "" | srcml -l C++ --url=bar
 check "$output"
 
-srcml --url "bar" sub/a.cpp 
+srcml --url "bar" sub/a.cpp
 check "$fsrcml"
 
-srcml --url "bar" sub/a.cpp 
+srcml --url "bar" sub/a.cpp
 check "$fsrcml"
 
 srcml --url="bar" sub/a.cpp

@@ -1,10 +1,15 @@
 #!/bin/bash
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# @file files_from_uri.sh
+#
+# @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
 
 # test framework
 source $(dirname "$0")/framework_test.sh
 
 # files from
-define nestedfile <<- 'STDOUT'
+defineXML nestedfile <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -15,32 +20,33 @@ define nestedfile <<- 'STDOUT'
 	<expr_stmt><expr><name>b</name></expr>;</expr_stmt></unit>
 
 	</unit>
-	STDOUT
-
-xmlcheck "$nestedfile"
+STDOUT
 
 createfile sub/a.cpp "
 a;"
 createfile sub/b.cpp "
 b;"
 
+srcml --files-from "https://raw.githubusercontent.com/srcML/test-data/1.0.0/filelist/file-list.txt"
+check "$nestedfile"
+
 srcml --files-from "https://raw.githubusercontent.com/srcML/test-data/1.0.0/filelist/file-list.txt" -o sub/both.xml
 check sub/both.xml "$nestedfile"
 
 # compressed remote filelist
-define empty_srcml_with_url <<- 'STDOUT'
+defineXML empty_srcml_with_url <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION"/>
-	STDOUT
+STDOUT
 
-srcml --files-from https://github.com/srcML/test-data/raw/master/empty/empty.txt.bz2
+srcml --files-from https://raw.githubusercontent.com/srcML/test-data/1.0.0/empty/empty.txt.bz2
 check "$empty_srcml_with_url"
 
-srcml --files-from https://github.com/srcML/test-data/raw/master/empty/empty.txt.gz
+srcml --files-from https://raw.githubusercontent.com/srcML/test-data/1.0.0/empty/empty.txt.gz
 check "$empty_srcml_with_url"
 
-srcml --files-from https://github.com/srcML/test-data/raw/master/empty/empty.txt.bz2.gz
+srcml --files-from https://raw.githubusercontent.com/srcML/test-data/1.0.0/empty/empty.txt.bz2.gz
 check "$empty_srcml_with_url"
 
-srcml --files-from https://github.com/srcML/test-data/raw/master/empty/empty.txt.gz.bz2
+srcml --files-from https://raw.githubusercontent.com/srcML/test-data/1.0.0/empty/empty.txt.gz.bz2
 check "$empty_srcml_with_url"

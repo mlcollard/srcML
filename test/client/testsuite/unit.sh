@@ -1,4 +1,9 @@
 #!/bin/bash
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# @file unit.sh
+#
+# @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
 
 # test framework
 source $(dirname "$0")/framework_test.sh
@@ -7,28 +12,28 @@ source $(dirname "$0")/framework_test.sh
 
 define sfile1 <<- 'STDOUT'
 	a;
-	STDOUT
+STDOUT
 
 define sfile2 <<- 'STDOUT'
 	b;
-	STDOUT
+STDOUT
 
-define sxmlfile1 <<- 'STDOUT'
+defineXML sxmlfile1 <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++" filename="a.cpp"><expr_stmt><expr><name>a</name></expr>;</expr_stmt>
 	</unit>
-	STDOUT
+STDOUT
 
-define sxmlfile2 <<- 'STDOUT'
+defineXML sxmlfile2 <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++" filename="b.cpp"><expr_stmt><expr><name>b</name></expr>;</expr_stmt>
 	</unit>
-	STDOUT
+STDOUT
 
-define nestedfile <<- 'STDOUT'
+defineXML nestedfile <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
-	
+
 	<unit revision="REVISION" language="C++" filename="a.cpp"><expr_stmt><expr><name>a</name></expr>;</expr_stmt>
 	</unit>
 
@@ -36,11 +41,8 @@ define nestedfile <<- 'STDOUT'
 	</unit>
 
 	</unit>
-	STDOUT
+STDOUT
 
-xmlcheck "$sxmlfile1"
-xmlcheck "$sxmlfile2"
-xmlcheck "$nestedfile"
 createfile sub/a.cpp.xml "$nestedfile"
 
 srcml sub/a.cpp.xml -U "1"
@@ -58,7 +60,7 @@ check sub/a.cpp "$sfile1"
 srcml --unit "1" sub/a.cpp.xml -o sub/a.cpp
 check sub/a.cpp "$sfile1"
 
-srcml sub/a.cpp.xml -U "2" 
+srcml sub/a.cpp.xml -U "2"
 check "$sfile2"
 
 srcml sub/a.cpp.xml --unit "2"
@@ -73,7 +75,6 @@ check sub/b.cpp "$sfile2"
 srcml --unit "2" sub/a.cpp.xml -o sub/b.cpp
 check sub/b.cpp "$sfile2"
 
-
 # check xml and unit option
 srcml -X --unit "1" sub/a.cpp.xml
 check "$sxmlfile1"
@@ -84,7 +85,7 @@ check sub/b.cpp.xml "$sxmlfile1"
 srcml -X --unit "1" sub/a.cpp.xml -o sub/b.cpp.xml
 check sub/b.cpp.xml "$sxmlfile1"
 
-srcml -X --unit "2" sub/a.cpp.xml 
+srcml -X --unit "2" sub/a.cpp.xml
 check "$sxmlfile2"
 
 srcml -X --unit "2" -o sub/b.cpp.xml < sub/a.cpp.xml

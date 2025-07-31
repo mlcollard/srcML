@@ -1,26 +1,19 @@
+// SPDX-License-Identifier: GPL-3.0-only
 /*!
  * @file OperatorLexer.g
  *
- * @copyright Copyright (C) 2004-2014  srcML, LLC. (www.srcML.org)
+ * @copyright Copyright (C) 2004-2024 srcML, LLC. (www.srcML.org)
  *
  * This file is part of the srcML translator.
- *
- * The srcML translator is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * The srcML translator is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with the srcML translator; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 header {
+#ifndef _MSC_VER
+#else
+    #pragma warning(disable : 4456) // declaration of 'theRetToken' hides previous local declaration
+    #pragma warning(disable : 4242) // 'argument': conversion from 'int' to 'char'
+#endif
+
    #include <iostream>
 }
 
@@ -105,30 +98,44 @@ tokens {
 OPERATORS options { testLiterals = true; } {
     int start = LA(1);
 } : (
-    '#'
-    {
-        if (startline) {
+    // # (C++ or Python), #! (Python)
+    '#' (
+        { (inLanguage(LANGUAGE_PYTHON)) && LA(1) == '!' }?
+            { $setType(HASHBANG_COMMENT_START); changetotextlexer(HASHBANG_COMMENT_END); } |
 
-            $setType(PREPROC); 
+        { inLanguage(LANGUAGE_PYTHON) && LA(1) != '!' }?
+            { $setType(HASHTAG_COMMENT_START); changetotextlexer(HASHTAG_COMMENT_END); } |
 
-            // record that we are on a preprocessor line,
-            // primarily so that unterminated strings in
-            // a preprocessor line will end at the right spot
-            onpreprocline = true; 
-            //firstpreprocline = true;
-        }
-    } |
+        { startline }?
+            {
+                $setType(PREPROC);
+
+                // record that we are on a preprocessor line,
+                // primarily so that unterminated strings in
+                // a preprocessor line will end at the right spot
+                onpreprocline = true;
+                //firstpreprocline = true;
+            }
+    )? |
 
     '+' ('+' | '=')? |
-    '-' ('-' | '=' | '>' ('*')? )?  |
-    '*' ('=')? |
+    '-' ('-' | '=' | '>' ('*')? )? |
+
+    // *, *=, ** (Python), **= (Python)
+    '*' ({ inLanguage(LANGUAGE_PYTHON) }? '*')? ('=')? |
+
     '%' ('=')? |
     '^' ('=')? |
     '|' ('|')? ('=')? |
     '`' |
-    '!' ('=')? |
-    ':' (':')? |
 
+    // !, !=
+    '!' ('=')? |
+
+    // :, := (Python), ::
+    ':' ({ inLanguage(LANGUAGE_PYTHON) }? '=')? (':')? |
+
+    // =, ==, =>
     '=' ('=' | { inLanguage(LANGUAGE_CSHARP) && (lastpos != (getColumn() - 1) || prev == ')' || prev == '#') }? '>')? |
 
     // &, &&, &&=, &=
@@ -137,8 +144,8 @@ OPERATORS options { testLiterals = true; } {
     // >, >>=, >=, not >>
     '>' (('>' '=') => '>' '=')? ('=')? |
 
-    // <, << (C/C++), <=, <<< (CUDA)
-    '<' ('=' | '<' ({ inLanguage(LANGUAGE_CXX) | inLanguage(LANGUAGE_C) }? '<' | '=')? )? |
+    // <, << (C/C++), <=, <<< (CUDA), <> (Python)
+    '<' ('=' | '<' ({ inLanguage(LANGUAGE_CXX) || inLanguage(LANGUAGE_C) }? '<' | '=')? | { inLanguage(LANGUAGE_PYTHON) }? '>' )? |
 
     // match these as individual operators only
     ',' | ';' | '('..')' | '[' | ']' | '{' | '}' | 
@@ -146,6 +153,9 @@ OPERATORS options { testLiterals = true; } {
     // names can start with a @ in C#
     '@' (
 
+        { inLanguage(LANGUAGE_PYTHON) }?
+          '='
+        |
         { inLanguage(LANGUAGE_OBJECTIVE_C) }?
           '(' 
         |
@@ -173,11 +183,12 @@ OPERATORS options { testLiterals = true; } {
         STRING_START )? |
 
     '?' ('?')* | // part of ternary
-    '~'  | // has to be separate if part of name
+
+    '~' | // has to be separate if part of name
 
     '.' ({ inLanguage(LANGUAGE_C_FAMILY) }? '*' | '.' ('.')? | { $setType(CONSTANTS); } CONSTANTS )? |
 
-    '\\' ( EOL { $setType(EOL_BACKSLASH); } )*
+    '\\' ({ inLanguage(LANGUAGE_PYTHON) }? EOL { $setType(EOL_BACKSLASH); } | (EOL { $setType(EOL_BACKSLASH); })*)
     )
     { startline = false; lastpos = getColumn(); prev = start; }
 ;

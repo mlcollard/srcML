@@ -1,4 +1,9 @@
 #!/bin/bash
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# @file input_tar_gz.sh
+#
+# @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
 
 # test framework
 source $(dirname "$0")/framework_test.sh
@@ -7,9 +12,9 @@ source $(dirname "$0")/framework_test.sh
 define src <<- 'STDOUT'
 
 	a;
-	STDOUT
+STDOUT
 
-define foutput <<- 'STDOUT'
+defineXML foutput <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" url="archive/a.cpp.tar.gz">
 
@@ -18,9 +23,9 @@ define foutput <<- 'STDOUT'
 	</unit>
 
 	</unit>
-	STDOUT
+STDOUT
 
-define output <<- 'STDOUT'
+defineXML output <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -29,9 +34,9 @@ define output <<- 'STDOUT'
 	</unit>
 
 	</unit>
-	STDOUT
+STDOUT
 
-define archive_output <<- 'STDOUT'
+defineXML archive_output <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -40,17 +45,12 @@ define archive_output <<- 'STDOUT'
 	</unit>
 
 	</unit>
-	STDOUT
-
-xmlcheck "$archive_output"
-xmlcheck "$foutput"
-xmlcheck "$output"
+STDOUT
 
 createfile archive/a.cpp "$src"
 tar -czf archive/a.cpp.tar.gz archive/a.cpp
 
 createfile list.txt "archive/a.cpp.tar.gz"
-
 
 # src --> srcml
 srcml archive/a.cpp.tar.gz -o archive/a.cpp.xml
@@ -65,7 +65,6 @@ check "$output"
 srcml -l C++ -o archive/a.cpp.xml < archive/a.cpp.tar.gz
 check archive/a.cpp.xml "$output"
 
-
 # files from
 srcml --files-from list.txt
 check "$archive_output"
@@ -79,7 +78,6 @@ rmfile list.txt
 rmfile archive/a.cpp
 rmfile archive/a.cpp.tar
 rmfile archive/a.cpp.tar.gz
-
 
 # srcml --> src
 srcml archive/a.cpp.xml

@@ -1,10 +1,15 @@
 #!/bin/bash
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# @file xpath_select_comment.sh
+#
+# @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
 
 # test framework
 source $(dirname "$0")/framework_test.sh
 
 # test
-define input <<- 'INPUT'
+defineXML input <<- 'INPUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -17,9 +22,9 @@ define input <<- 'INPUT'
 	</unit>
 
 	</unit>
-	INPUT
+INPUT
 
-define output <<- 'OUTPUT'
+defineXML output <<- 'OUTPUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -28,10 +33,7 @@ define output <<- 'OUTPUT'
 	<unit revision="REVISION" language="C++" filename="b.cpp" item="1"><!-- Comment Two --></unit>
 
 	</unit>
-	OUTPUT
-
-xmlcheck "$input"
-xmlcheck "$output"
+OUTPUT
 
 createfile sub/archive.xml "$input"
 

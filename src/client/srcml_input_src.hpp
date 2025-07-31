@@ -1,23 +1,10 @@
+// SPDX-License-Identifier: GPL-3.0-only
 /**
  * @file srcml_input_src.hpp
  *
- * @copyright Copyright (C) 2014-2017 srcML, LLC. (www.srcML.org)
+ * @copyright Copyright (C) 2014-2024 srcML, LLC. (www.srcML.org)
  *
  * This file is part of the srcml command-line client.
- *
- * The srcML Toolkit is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * The srcML Toolkit is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with the srcml command-line client; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 #ifndef SRCML_INPUT_SRC_HPP
@@ -25,16 +12,19 @@
 
 #include <srcml.h>
 #include <string>
+#include <string_view>
 #include <list>
 #include <vector>
 #include <sstream>
-#include <boost/optional.hpp>
+#include <optional>
 #include <src_prefix.hpp>
 #include <algorithm>
 #include <src_archive.hpp>
 #include <archive.h>
 #include <sys/stat.h>
 #include <numeric>
+#include <libarchive_utilities.hpp>
+#include <memory>
 
 #ifdef WIN32
 #include <io.h>
@@ -42,11 +32,6 @@
 #define STDOUT_FILENO   1       /* standard output file descriptor */
 #define STDERR_FILENO   2       /* standard error file descriptor */
 #endif
-
-//#ifdef _MSC_BUILD
-//#include <BaseTsd.h>
-//typedef SSIZE_T ssize_t;
-//#endif
 
 class srcml_input_src;
 
@@ -58,44 +43,55 @@ enum STATES { INDETERMINATE, SRC, SRCML };
 class srcml_input_src {
 public:
 
-    srcml_input_src() : unit(0) {}
-    srcml_input_src(const std::string& other);
-    srcml_input_src(const std::string& other, int fds);
+    srcml_input_src() {}
+    srcml_input_src(std::string_view other);
+    srcml_input_src(std::string_view other, int fds);
     srcml_input_src(int fds);
 
-    srcml_input_src& operator=(const std::string& other);
+    srcml_input_src& operator=(std::string_view other);
     srcml_input_src& operator=(FILE* other);
     srcml_input_src& operator=(int other);
 
+    operator std::string() const { return resource; }
     operator const std::string&() const { return resource; }
+    operator std::string_view() const { return resource; }
     operator FILE*() const { return *fileptr; }
     operator int() const { return *fd; }
 
-    bool operator==(const std::string& other) const { return other == filename; }
+    bool operator==(std::string_view other) const { return other == filename; }
     bool operator!=(const char* other) const { return filename != other; }
 
-    const char* c_str() const { return resource.c_str(); }
+    const char* data() const { return resource.data(); }
 
     std::string filename;
+    // only used by filesystem input
+    std::string prefix;
     std::string protocol;
     std::string resource;
     std::string plainfile;
     std::string extension;
-    boost::optional<FILE*> fileptr;
-    boost::optional<int> fd;
-    archive* arch;
-    enum STATES state;
+    std::optional<FILE*> fileptr;
+    std::optional<int> fd;
+    archive* arch = nullptr;
+    enum STATES state = INDETERMINATE;
     std::list<std::string> compressions;
     std::list<std::string> archives;
-    bool isdirectory;
-    bool exists;
-    bool isdirectoryform;
-    bool skip;
-    int unit;
+    bool isdirectory = false;
+    bool exists = false;
+    bool isdirectoryform = false;
+    bool skip = false;
+    int unit = 0;
+
+    // pre-read of stdin
+    bool preReadLibarchive = false;
+    archive* parchive = nullptr;
+    archive_entry* pentry = nullptr;
+    std::string_view buffer;
+    bool issrcML = false;
 };
 
 struct srcMLReadArchiveError {
-    srcMLReadArchiveError(int status, const std::string& emsg)
+    srcMLReadArchiveError(int status, std::string_view emsg)
     : status(status), errmsg(emsg) {}
     int status;
     std::string errmsg;

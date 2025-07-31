@@ -1,4 +1,9 @@
 #!/bin/bash
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# @file input_gz_bz2.sh
+#
+# @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
 
 # test framework
 source $(dirname "$0")/framework_test.sh
@@ -7,42 +12,37 @@ source $(dirname "$0")/framework_test.sh
 define src <<- 'STDOUT'
 
 	a;
-	STDOUT
+STDOUT
 
-define empty_output <<- 'STDOUT'
+defineXML empty_output <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION"/>
-	STDOUT
+STDOUT
 
-define foutput <<- 'STDOUT'
+defineXML foutput <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++" filename="archive/a.cpp.gz.bz2">
+	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++" filename="archive/a.cpp">
 	<expr_stmt><expr><name>a</name></expr>;</expr_stmt>
 	</unit>
-	STDOUT
+STDOUT
 
-define output <<- 'STDOUT'
+defineXML output <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++">
 	<expr_stmt><expr><name>a</name></expr>;</expr_stmt>
 	</unit>
-	STDOUT
+STDOUT
 
-define archive_output <<- 'STDOUT'
+defineXML archive_output <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
-	<unit revision="REVISION" language="C++" filename="archive/a.cpp.gz.bz2" hash="1a2c5d67e6f651ae10b7673c53e8c502c97316d6">
+	<unit revision="REVISION" language="C++" filename="archive/a.cpp" hash="1a2c5d67e6f651ae10b7673c53e8c502c97316d6">
 	<expr_stmt><expr><name>a</name></expr>;</expr_stmt>
 	</unit>
 
 	</unit>
-	STDOUT
-
-xmlcheck "$archive_output"
-xmlcheck "$foutput"
-xmlcheck "$output"
-xmlcheck "$empty_output"
+STDOUT
 
 createfile archive/a.cpp "$src"
 gzip -c archive/a.cpp > archive/a.cpp.gz
@@ -55,7 +55,6 @@ bzip2 -c list.txt.gz > list.txt.gz.bz2
 createfile empty.txt " "
 gzip -c empty.txt > empty.txt.gz
 bzip2 -c empty.txt.gz > empty.txt.gz.bz2
-
 
 # src --> srcml
 srcml archive/a.cpp.gz.bz2 -o archive/a.cpp.xml
@@ -70,7 +69,6 @@ check "$output"
 srcml -l C++ -o archive/a.cpp.xml < archive/a.cpp.gz.bz2
 check archive/a.cpp.xml "$output"
 
-
 # files from
 srcml --files-from list.txt
 check "$archive_output"
@@ -83,7 +81,6 @@ check archive/list.xml "$archive_output"
 
 srcml --files-from list.txt.gz.bz2 -o archive/compressed_list.xml
 check archive/compressed_list.xml "$archive_output"
-
 
 # files from empty
 srcml --files-from empty.txt
@@ -98,7 +95,6 @@ check archive/empty.xml "$empty_output"
 srcml --files-from empty.txt.gz.bz2 -o archive/compressed_empty.xml
 check archive/compressed_empty.xml "$empty_output"
 
-
 rmfile list.txt
 rmfile list.txt.gz
 rmfile list.txt.gz.b2
@@ -108,7 +104,6 @@ rmfile empty.txt.gz.b2
 rmfile archive/a.cpp
 rmfile archive/a.cpp.gz
 rmfile archive/a.cpp.gz.bz2
-
 
 # srcml --> src
 srcml archive/a.cpp.xml

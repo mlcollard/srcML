@@ -1,4 +1,17 @@
 #!/bin/bash
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# @file output_gz.sh
+#
+# @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
+
+libversion=$(srcml --version | tail -1)
+libversion=${libversion:10}
+numversion=$(printf "%d%03d%03d" ${libversion:1:1} ${libversion:3:1} ${libversion:5:1})
+if [[ $numversion -lt 3002000 ]]; then
+	echo "Test Skipped: Output as gz not available on this platform"
+	exit 0
+fi
 
 # test framework
 source $(dirname "$0")/framework_test.sh
@@ -8,9 +21,9 @@ source $(dirname "$0")/framework_test.sh
 define sfile <<- 'STDOUT'
 
 	a;
-	STDOUT
+STDOUT
 
-define sxmlfile <<- 'STDOUT'
+defineXML sxmlfile <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -19,17 +32,14 @@ define sxmlfile <<- 'STDOUT'
 	</unit>
 
 	</unit>
-	STDOUT
+STDOUT
 
-define xmlfile <<- 'STDOUT'
+defineXML xmlfile <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++" filename="sub/a.cpp">
 	<expr_stmt><expr><name>a</name></expr>;</expr_stmt>
 	</unit>
-	STDOUT
-
-xmlcheck "$sxmlfile"
-xmlcheck "$xmlfile"
+STDOUT
 
 # src --> srcml
 createfile sub/a.cpp "$sfile"
@@ -51,16 +61,3 @@ check "$sxmlfile"
 
 srcml --archive sub/a.cpp -o sub/a.cpp.xml.gz && gunzip -c sub/a.cpp.xml.gz
 check "$sxmlfile"
-
-# TODO: issue #1057 - cannot gz a raw source output file
-# srcml --> src
-# createfile sub/a.cpp.xml "$xmlfile"
-
-#srcml sub/a.cpp.xml -o sub/a.cpp.gz && gunzip -c sub/a.cpp.gz
-#check "$sfile"
-
-#srcml --archive sub/a.cpp.xml -o sub/a.cpp.gz && gunzip -c sub/a.cpp.gz
-#check "$sfile"
-
-#srcml -o sub/a.cpp.gz  && gunzip -c sub/a.cpp.gz
-#check "$sfile"

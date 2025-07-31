@@ -1,44 +1,32 @@
+// SPDX-License-Identifier: GPL-3.0-only
 /**
  * @file srcMLOutput.hpp
  *
- * @copyright Copyright (C) 2003-2017 srcML, LLC. (www.srcML.org)
+ * @copyright Copyright (C) 2003-2024 srcML, LLC. (www.srcML.org)
  *
  * This file is part of the srcML Toolkit.
  *
- * The srcML Toolkit is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * The srcML Toolkit is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with the srcML Toolkit; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ * XML output
  */
-
-/**
-   XML output
-*/
 
 #ifndef SRCMLOUTPUT_HPP
 #define SRCMLOUTPUT_HPP
 
-#include "antlr/Token.hpp"
-#include "srcMLParserTokenTypes.hpp"
-#include <antlr/TokenStream.hpp>
-#include "StreamMLParser.hpp"
-#include "TokenStream.hpp"
-#include "srcMLException.hpp"
+#include <antlr/Token.hpp>
+#include <TokenStream.hpp>
+#include <srcMLException.hpp>
 #include <string>
+#include <string_view>
 #include <unordered_map>
-#include "srcmlns.hpp"
+#include <srcml_options.hpp>
 #include <libxml/xmlwriter.h>
+#include <srcmlns.hpp>
+#include <Position.hpp>
+#include <optional>
+#include <stack>
+#include <queue>
 
-/** 
+/**
  * anonymous enum for prefix positions
  */
 enum PREFIXES { SRC,
@@ -60,43 +48,52 @@ struct Element {
 };
 
 /**
- * srcMLOutput
- *
  * Class for output of srcML. Consumes produced tokens.
  * progressively running the srcML parser and consuming tokens i.e. like a pull parser.
  */
-class srcMLOutput : public srcMLParserTokenTypes {
+class srcMLOutput {
 public:
+
     // constructor
-    srcMLOutput(TokenStream* ints,
+    srcMLOutput(TokenStream* stream,
                 xmlOutputBuffer * output_buffer,
                 const char* language,
                 const char* encoding,
                 OPTION_TYPE& option,
-                const std::vector<std::string>& attributes,
-                const boost::optional<std::pair<std::string, std::string>>& processing_instruction,
+                const Attributes& attributes,
+                const std::optional<std::pair<std::string, std::string>>& processing_instruction,
                 size_t tabsize);
 
+    // initialize the namespaces
     void initNamespaces(const Namespaces& namespaces);
 
-     /**
-     * getWriter
-     *
-     * Get the current writer
-     */
+    // current writer
     inline xmlTextWriter * getWriter() {
         return xout;
     }
 
     // same srcml file can be generated from multiple input token streams
-    void setTokenStream(TokenStream& ints);
+    void setTokenStream(TokenStream& stream);
 
+    // output the XML declaration
     void outputXMLDecl();
 
+    // output a processing instruction
     void outputProcessingInstruction();
 
+    // output the namespaces
+    void outputNamespaces();
+
+    // output the unit separator
     void outputUnitSeparator();
 
+    // output the macro list
+    void outputMacroList();
+
+    // set the macro list
+    void setMacroList(std::vector<std::string>& macros);
+
+    // current namespaces
     const Namespaces& getNamespaces() const { return namespaces; }
 
     // start a unit element with the passed metadata
@@ -105,7 +102,7 @@ public:
                    const char* unit_version, const char* unit_timestamp,
                    const char* unit_hash,
                    const char* encoding,
-                   const std::vector<std::string> & attributes,
+                   const Attributes& attributes,
                    bool output_macrolist);
 
     // consume the entire tokenstream with output of srcml
@@ -118,96 +115,103 @@ public:
     // destructor
     ~srcMLOutput();
 
+public:
+    // output xml writer
+    xmlTextWriter* xout = nullptr;
+
+    // output buffer
+    xmlOutputBuffer* output_buffer = nullptr;
+
 private:
-    // standard processing of text
+
+    // output a token
     void processText(const antlr::RefToken& token);
-    void processText(const std::string&);
+
+    // output a string
+    void processText(std::string_view);
+
+    // output a c-string
     void processText(const char* s, int size);
 
     // adds the position attributes to a token
     void addPosition(const antlr::RefToken& token);
 
-public:
-    /** token stream input */
+    // token stream input
     TokenStream* input = nullptr;
 
-    /** output xml writer */
-    xmlTextWriter* xout = nullptr;
-    
-    /** output buffer */
-    xmlOutputBuffer* output_buffer = nullptr;
-
-    /** unit attribute language */
+    // unit attribute language
     const char* unit_language = nullptr;
 
-    /** unit attribute revision */
+    // unit attribute revision
     const char* unit_revision = nullptr;
 
-    /** unit attribute url */
+    // unit attribute url
     const char* unit_url = nullptr;
 
-    /** unit attribute filename */
+    // unit attribute filename
     const char* unit_filename = nullptr;
 
-    /** unit attribute version */
+    // unit attribute version
     const char* unit_version = nullptr;
 
-    /** unit attribute timestamp */
+    // unit attribute timestamp
     const char* unit_timestamp = nullptr;
 
-    /** unit attribute hash */
+    // unit attribute hash
     const char* unit_hash = nullptr;
 
-    /** unit attribute encoding */
+    // unit attribute encoding
     const char* unit_encoding = nullptr;
 
-    /** output options */
-    // @todo Bad design, but making it a value breaks cpp namespace
-    // have to figure out why the options are being changed later
+    // output options
     OPTION_TYPE& options;
 
-    /** xml encoding */
+    // xml encoding
     const char* xml_encoding = nullptr;
 
-    /* namespaces declared and used */
+    // namespaces declared and used
     Namespaces namespaces;
 
-    /** an array of name-value attribute pairs */
-    const std::vector<std::string> unit_attributes;
+    // archive namespaces
+    Namespaces archiveNamespaces;
 
-    /** pre-root processing instruction */
-    boost::optional<std::pair<std::string, std::string> > processing_instruction;
+    // attributes added
+    Attributes attributes;
 
-    /** number of open elements */
-    int openelementcount = 0;
+    // pre-root processing instruction
+    std::optional<std::pair<std::string, std::string> > processing_instruction;
 
-    /** the tabstop size */
+    // the tabstop size
     size_t tabsize = 0;
 
-    /** number of units output or depth into archive */
+    // number of units output or depth into archive
     int depth = 0;
 
-    /** user defined macro list */
+    // user defined macro list
     std::vector<std::string> user_macro_list;
 
-    void outputNamespaces(xmlTextWriterPtr xout, const OPTION_TYPE& options, int depth);
+    // if output was started
+    bool startedOutput = false;
 
-    void setMacroList(std::vector<std::string> & list);
+    // queue tokens for position calculation
+    std::deque<antlr::RefToken> tokenQueue;
 
-    void outputMacroList();
+    // stack of start elements for position calculation
+    std::stack<antlr::RefToken> startElementStack;
 
-    bool didwrite = false;
-
-private:
+    // record position for <type prev=""/>
+    Position lastTypeEndPosition;
+    Position lastTypeStartPosition;
 
     // token handler
-    void processToken(const antlr::RefToken& token, const char* name, const char* prefix, const char* attr_name1, const char* attr_value1,
-                                const char* attr_name2, const char* attr_value2);
+    void processToken(const antlr::RefToken& token, const char* name, const char* prefix,
+                      const char* attr_name1, const char* attr_value1,
+                      const char* attr_name2, const char* attr_value2);
 
-    int consume_next();
-
+    // output a token
     void outputToken(const antlr::RefToken& token);
 
+    // map token to output element
     static const std::unordered_map<int, Element> process;
 };
 

@@ -1,33 +1,20 @@
+// SPDX-License-Identifier: GPL-3.0-only
 /**
  * @file srcml_unit.cpp
  *
- * @copyright Copyright (C) 2013-2014 srcML, LLC. (www.srcML.org)
- *
- * The srcML Toolkit is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * The srcML Toolkit is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with the srcML Toolkit; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ * @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
  */
 
-#include <srcml.h>
 #include <srcml_types.hpp>
+#include <srcml_options.hpp>
 #include <srcml_translator.hpp>
 #include <srcml_sax2_reader.hpp>
 #include <UTF8CharBuffer.hpp>
 #include <memory>
 #include <libxml2_utilities.hpp>
-#include <cstring>
 #include <fcntl.h>
-#include <srcml_macros.hpp>
+#include <functional>
+#include <string_view>
 
 /******************************************************************************
  *                                                                            *
@@ -50,7 +37,10 @@ int srcml_unit_set_src_encoding(struct srcml_unit* unit, const char* encoding) {
     if (unit == nullptr)
         return SRCML_STATUS_INVALID_ARGUMENT;
 
-    unit->encoding = encoding ? std::string(encoding) : decltype(unit->encoding)();
+    if (encoding)
+        unit->encoding = encoding;
+    else
+        unit->encoding = decltype(unit->encoding)();
 
     return SRCML_STATUS_OK;
 }
@@ -70,7 +60,13 @@ int srcml_unit_set_language(struct srcml_unit* unit, const char* language) {
     if (unit == nullptr)
         return SRCML_STATUS_INVALID_ARGUMENT;
 
-    unit->language = language ? std::string(language) : decltype(unit->language)();
+    if (language)
+        unit->language = language;
+    else
+        unit->language = decltype(unit->language)();
+
+    // revision is based on language
+    unit->revision = srcml_markup_version_string(unit->language->data());
 
     return SRCML_STATUS_OK;
 }
@@ -90,7 +86,10 @@ int srcml_unit_set_filename(struct srcml_unit* unit, const char* filename) {
     if (unit == nullptr)
         return SRCML_STATUS_INVALID_ARGUMENT;
 
-    unit->filename = filename ? std::string(filename) : decltype(unit->filename)();
+    if (filename)
+        unit->filename = filename;
+    else
+        unit->filename = decltype(unit->filename)();
 
     return SRCML_STATUS_OK;
 }
@@ -110,7 +109,10 @@ int srcml_unit_set_version(struct srcml_unit* unit, const char* version) {
     if (unit == nullptr)
         return SRCML_STATUS_INVALID_ARGUMENT;
 
-    unit->version = version ? std::string(version) : decltype(unit->version)();
+    if (version)
+        unit->version = version;
+    else
+        unit->version = decltype(unit->version)();
 
     return SRCML_STATUS_OK;
 }
@@ -130,7 +132,10 @@ int srcml_unit_set_timestamp(struct srcml_unit* unit, const char* timestamp) {
     if (unit == nullptr)
         return SRCML_STATUS_INVALID_ARGUMENT;
 
-    unit->timestamp = timestamp ? std::string(timestamp) : decltype(unit->timestamp)();
+    if (timestamp)
+        unit->timestamp = timestamp;
+    else
+        unit->timestamp = decltype(unit->timestamp)();
 
     return SRCML_STATUS_OK;
 }
@@ -150,7 +155,10 @@ int srcml_unit_set_hash(struct srcml_unit* unit, const char* hash) {
     if (unit == nullptr)
         return SRCML_STATUS_INVALID_ARGUMENT;
 
-    unit->hash = hash ? std::string(hash) : decltype(unit->hash)();
+    if (hash)
+        unit->hash = hash;
+    else
+        unit->hash = decltype(unit->hash)();
 
     return SRCML_STATUS_OK;
 }
@@ -174,6 +182,128 @@ int srcml_unit_set_eol(struct srcml_unit* unit, size_t eol) {
 
     return SRCML_STATUS_OK;
 }
+
+/**
+ * srcml_unit_register_namespace
+ * @param unit a srcml_unit
+ * @param prefix a XML namespace prefix
+ * @param uri a XML namespace uri
+ *
+ * Create a new namespace or change the prefix of an existing namespace.
+ *
+ * @returns SRCML_STATUS_OK on success and a status error code on failure.
+ */
+int srcml_unit_register_namespace(struct srcml_unit* unit, const char* prefix, const char* uri) {
+
+    if (unit == nullptr || prefix == nullptr || uri == nullptr)
+        return SRCML_STATUS_INVALID_ARGUMENT;
+
+    if (!unit->namespaces) {
+        unit->namespaces = Namespaces();
+    }
+
+    // lookup by uri, if it already exists, update the prefix. If it doesn't exist, add it
+    // prefix must be unique
+    addNamespace(*unit->namespaces, uri, prefix, true);
+
+    return SRCML_STATUS_OK;
+}
+
+/**
+ * Add the attribute to the unit
+ * @param unit A srcml_unit
+ * @param uri An XML namespace uri of the attribute
+ * @param name The attribute name
+ * @param value The attribute value
+ * @return SRCML_STATUS_OK on success
+ * @return Status error code on failure.
+ */
+int srcml_unit_add_attribute(struct srcml_unit* unit, const char* prefix, const char* name, const char* value) {
+
+    if (unit == nullptr || prefix == nullptr || name == nullptr || value == nullptr)
+        return SRCML_STATUS_INVALID_ARGUMENT;
+
+    // URI for this prefix must be declared
+
+    // check the unit namespaces
+    bool found = false;
+    if (unit->namespaces) {
+        const auto& uriNS = findNSPrefix(*unit->namespaces, prefix);
+        found = uriNS != unit->namespaces->end();
+    }
+    if (!found) {
+        const auto& uriNS = findNSPrefix(unit->archive->namespaces, prefix);
+        if (uriNS == unit->archive->namespaces.end())
+            return SRCML_STATUS_UNASSIGNED_PREFIX;
+    }
+
+    // add/update custom attribute
+    addAttribute(unit->attributes, "", prefix, name, value);
+
+    return SRCML_STATUS_OK;
+}
+
+/**
+ * Number of custom attributes
+ * @param unit A srcml_unit
+ * @return The number of attributes or 0 if unit is NULL
+ */
+LIBSRCML_DECL size_t srcml_unit_get_attribute_size(const struct srcml_unit* unit) {
+
+    return unit->attributes.size();
+}
+
+/**
+ * Prefix of the custom attribute at position pos
+ * @param unit A srcml_unit
+ * @param pos The attribute position
+ * @return The prefix for the given position, or NULL
+ */
+LIBSRCML_DECL const char* srcml_unit_get_attribute_prefix(const struct srcml_unit* unit, size_t pos) {
+
+    if (unit == nullptr)
+        return nullptr;
+
+    if (pos > unit->attributes.size())
+        return nullptr;
+
+    return unit->attributes[pos].prefix.c_str();
+}
+
+/**
+ * Name of the custom attribute at position pos
+ * @param unit A srcml_unit
+ * @param pos The attribute position
+ * @return The name for the given position, or NULL
+ */
+LIBSRCML_DECL const char* srcml_unit_get_attribute_name(const struct srcml_unit* unit, size_t pos) {
+
+    if (unit == nullptr)
+        return nullptr;
+
+    if (pos > unit->attributes.size())
+        return nullptr;
+
+    return unit->attributes[pos].name.c_str();
+}
+
+/**
+ * Value of the custom attribute at position pos
+ * @param unit A srcml_unit
+ * @param pos The attribute position
+ * @return The value for the given position, or NULL
+ */
+LIBSRCML_DECL const char* srcml_unit_get_attribute_value(const struct srcml_unit* unit, size_t pos) {
+
+    if (unit == nullptr)
+        return nullptr;
+
+    if (pos > unit->attributes.size())
+        return nullptr;
+
+    return unit->attributes[pos].value.c_str();
+}
+
 
 /******************************************************************************
  *                                                                            *
@@ -348,11 +478,11 @@ const char* srcml_unit_get_srcml(struct srcml_unit* unit) {
 
     if (unit->archive->revision_number && issrcdiff(unit->archive->namespaces)) {
         if (!unit->srcml_revision || unit->currevision != (int) *unit->archive->revision_number)
-            unit->srcml_revision = extract_revision(unit->srcml.c_str(), (int) unit->srcml.size(), (int) *unit->archive->revision_number);
-        return unit->srcml_revision->c_str();
+            unit->srcml_revision = extract_revision(unit->srcml.data(), (int) unit->srcml.size(), (int) *unit->archive->revision_number);
+        return unit->srcml_revision->data();
     }
 
-    return unit->srcml.c_str();
+    return unit->srcml.data();
 }
 
 /**
@@ -382,7 +512,7 @@ const char* srcml_unit_get_srcml_outer(struct srcml_unit* unit) {
     if (!unit->srcml_fragment) {
 
         // find end of unit tag, e.g., end of "<unit ...>" or "<src:unit ...>"
-        std::string prefix = "";
+        // std::string_view prefix = "";
         auto pos = unit->srcml.find(">");
 
         int insert_attr_begin = 0;
@@ -403,23 +533,23 @@ const char* srcml_unit_get_srcml_outer(struct srcml_unit* unit) {
 
         unit->srcml_fragment = "";
         unit->srcml_fragment->reserve(rawsize);
-        unit->srcml_fragment->assign(unit->srcml, 0, unit->insert_begin);
+        unit->srcml_fragment->assign(unit->srcml, 0, static_cast<std::size_t>(unit->insert_begin));
         if (insert_attr_begin == 0) {
-            unit->srcml_fragment->append(unit->srcml, unit->insert_end, unit->srcml.size() - unit->insert_end);
+            unit->srcml_fragment->append(unit->srcml, static_cast<std::size_t>(unit->insert_end), static_cast<std::size_t>(unit->srcml.size() - unit->insert_end));
         } else {
-            unit->srcml_fragment->append(unit->srcml, unit->insert_end, insert_attr_begin - unit->insert_end);
-            unit->srcml_fragment->append(unit->srcml, insert_attr_end, unit->srcml.size() - insert_attr_end);
+            unit->srcml_fragment->append(unit->srcml, static_cast<std::size_t>(unit->insert_end), static_cast<std::size_t>(insert_attr_begin - unit->insert_end));
+            unit->srcml_fragment->append(unit->srcml, static_cast<std::size_t>(insert_attr_end), static_cast<std::size_t>(unit->srcml.size() - insert_attr_end));
         }
     }
 
     // if srcdiff versioned, then use that
     if (unit->archive->revision_number && issrcdiff(unit->archive->namespaces)) {
         if (!unit->srcml_fragment_revision || unit->currevision != (int) *unit->archive->revision_number)
-            unit->srcml_fragment_revision = extract_revision(unit->srcml_fragment->c_str(), (int) unit->srcml_fragment->size(), (int) *unit->archive->revision_number);
-        return unit->srcml_fragment_revision->c_str();
+            unit->srcml_fragment_revision = extract_revision(unit->srcml_fragment->data(), (int) unit->srcml_fragment->size(), (int) *unit->archive->revision_number);
+        return unit->srcml_fragment_revision->data();
     }
 
-    return unit->srcml_fragment->c_str();
+    return unit->srcml_fragment->data();
 }
 
 /**
@@ -452,17 +582,122 @@ const char* srcml_unit_get_srcml_inner(struct srcml_unit* unit) {
     // if srcdiff versioned, then use that
     if (unit->archive->revision_number && issrcdiff(unit->archive->namespaces)) {
         if (!unit->srcml_raw_revision || unit->currevision != (int) *unit->archive->revision_number)
-            unit->srcml_raw_revision = extract_revision(unit->srcml.c_str() + start, rawsize, (int) *unit->archive->revision_number);
-        return unit->srcml_raw_revision->c_str();
+            unit->srcml_raw_revision = extract_revision(unit->srcml.data() + start, rawsize, (int) *unit->archive->revision_number);
+        return unit->srcml_raw_revision->data();
     }
 
     // raw version is cached
     if (unit->srcml_raw)
-        return unit->srcml_raw->c_str();
+        return unit->srcml_raw->data();
 
-    unit->srcml_raw = std::string(unit->srcml, start, rawsize);
+    unit->srcml_raw = std::string(unit->srcml, static_cast<std::size_t>(start), static_cast<std::size_t>(rawsize));
 
-    return unit->srcml_raw->c_str();
+    return unit->srcml_raw->data();
+}
+
+/**
+ * srcml_unit_get_namespace_size
+ * @param unit a srcml_unit
+ *
+ * @returns Get the number of currently defined namespaces or 0 if unit is NULL
+ */
+size_t srcml_unit_get_namespace_size(const struct srcml_unit* unit) {
+
+    if (unit == nullptr)
+        return 0;
+
+    if (!unit->namespaces)
+        return 0;
+
+    return unit ? unit->namespaces->size() : 0;
+}
+
+/**
+ * srcml_unit_get_namespace_prefix
+ * @param unit a srcml_unit
+ * @param pos namespace position
+ *
+ * @returns Get prefix for the given position on success
+ * and NULL on failure.
+ */
+const char* srcml_unit_get_namespace_prefix(const struct srcml_unit* unit, size_t pos) {
+
+    if (unit == nullptr)
+        return nullptr;
+
+    if (!unit->namespaces) {
+        return nullptr;
+    }
+
+    if (pos > unit->namespaces->size())
+        return nullptr;
+
+    return (*unit->namespaces)[pos].prefix.data();
+}
+
+/**
+ * srcml_unit_get_prefix_from_uri
+ * @param unit a srcml_unit
+ * @param namespace_uri an XML namespace
+ *
+ * @returns Get the registered prefix for the given namespace
+ * on success and NULL on failure.
+ */
+const char* srcml_unit_get_prefix_from_uri(const struct srcml_unit* unit, const char* uri) {
+
+    if (unit == nullptr || uri == nullptr)
+        return 0;
+
+    if (!unit->namespaces) {
+        return nullptr;
+    }
+
+    auto it = findNSURI(*unit->namespaces, uri);
+    return it != unit->namespaces->end() ? it->prefix.data() : 0;
+}
+
+/**
+ * srcml_unit_get_namespace_uri
+ * @param unit a srcml_unit
+ * @param pos position in namespaces
+ *
+ * @returns Get the namespace at the given pos on succcess
+ * and NULL on failure.
+ */
+const char* srcml_unit_get_namespace_uri(const struct srcml_unit* unit, size_t pos) {
+
+    if (unit == nullptr)
+        return nullptr;
+
+    if (!unit->namespaces) {
+        return nullptr;
+    }
+
+    if (pos >= unit->namespaces->size())
+        return nullptr;
+
+    return (*unit->namespaces)[pos].uri.data();
+}
+
+/**
+ * srcml_unit_get_uri_from_prefix
+ * @param unit a srcml_unit
+ * @param prefix an XML prefix
+ *
+ * @returns Get the first namespace for the given prefix on success
+ * and NULL on failure.
+ */
+const char* srcml_unit_get_uri_from_prefix(const struct srcml_unit* unit, const char* prefix) {
+
+    if (unit == nullptr || prefix == nullptr)
+        return 0;
+
+    if (!unit->namespaces) {
+        return nullptr;
+    }
+
+    auto it = findNSPrefix(*unit->namespaces, prefix);
+    return it != unit->namespaces->end() ? it->uri.data() : 0;
 }
 
 /******************************************************************************
@@ -485,15 +720,11 @@ const char* srcml_unit_get_srcml_inner(struct srcml_unit* unit) {
  * @returns Returns SRCML_STATUS_OK on success and SRCML_STATUS_IO_ERROR on failure.
  */
 static int srcml_unit_parse_internal(struct srcml_unit* unit, const char* filename,
-    std::function<UTF8CharBuffer*(const char* src_encoding, bool output_hash, boost::optional<std::string>& hash)> createUTF8CharBuffer) {
-
-    // @todo Figure out what the state of the archive should be
-//    if (unit->archive->type != SRCML_ARCHIVE_WRITE && unit->archive->type != SRCML_ARCHIVE_RW)
-//        return SRCML_STATUS_INVALID_IO_OPERATION;
+    std::function<UTF8CharBuffer*(const char* src_encoding, bool output_hash, std::optional<std::string>& hash)> createUTF8CharBuffer) {
 
     // figure out the language based on unit, archive, registered languages
-    int lang = unit->language ? srcml_check_language(unit->language->c_str())
-        : (unit->archive->language ? srcml_check_language(unit->archive->language->c_str()) : SRCML_LANGUAGE_NONE);
+    int lang = unit->language ? srcml_check_language(unit->language->data())
+        : (unit->archive->language ? srcml_check_language(unit->archive->language->data()) : SRCML_LANGUAGE_NONE);
 
     if (lang == SRCML_LANGUAGE_NONE && filename)
         lang = unit->archive->registered_languages.get_language_from_filename(filename);
@@ -503,9 +734,8 @@ static int srcml_unit_parse_internal(struct srcml_unit* unit, const char* filena
 
     unit->derived_language = lang;
 
-    // @TODO Verify that this really isn't needed. Causes issue with srcml()
-    // if (*unit->language == "C++" || *unit->language == "C" || *unit->language == "Objective-C" || *unit->language == "C#")
-    //        unit->archive->options |= SRCML_OPTION_CPP;
+    // since language is changed/set, must reset revision
+    unit->revision = srcml_markup_version_string(Language(lang).getLanguageString());
 
     const char* src_encoding = optional_to_c_str(unit->encoding, optional_to_c_str(unit->archive->src_encoding));
 
@@ -543,7 +773,7 @@ static int srcml_unit_parse_internal(struct srcml_unit* unit, const char* filena
     // parse the input
     unit->unit_translator->translate(input);
 
-    // namespaces were updated during translation, may now include 
+    // namespaces were updated during translation, may now include
     // namespaces that were optional
     unit->namespaces = unit->unit_translator->out.getNamespaces();
 
@@ -566,15 +796,9 @@ int srcml_unit_parse_filename(struct srcml_unit* unit, const char* src_filename)
     if (unit == nullptr || src_filename == nullptr)
         return SRCML_STATUS_INVALID_ARGUMENT;
 
-    // open the file and use the file descriptor version
-    int src_fd = OPEN(src_filename, O_RDONLY, 0);
-    if (src_fd == -1) {
-        return SRCML_STATUS_IO_ERROR;
-    }
+    return srcml_unit_parse_internal(unit, src_filename, [src_filename](const char* encoding, bool output_hash, std::optional<std::string>& hash)-> UTF8CharBuffer* {
 
-    return srcml_unit_parse_internal(unit, src_filename, [src_fd](const char* encoding, bool output_hash, boost::optional<std::string>& hash)-> UTF8CharBuffer* {
-
-        return new UTF8CharBuffer(src_fd, encoding, output_hash, hash);
+        return new UTF8CharBuffer(src_filename, encoding, output_hash, hash);
     });
 }
 
@@ -594,7 +818,7 @@ int srcml_unit_parse_memory(struct srcml_unit* unit, const char* src_buffer, siz
     if (unit == nullptr || (buffer_size && src_buffer == nullptr))
         return SRCML_STATUS_INVALID_ARGUMENT;
 
-    return srcml_unit_parse_internal(unit, 0, [src_buffer, buffer_size](const char* encoding, bool output_hash, boost::optional<std::string>& hash)-> UTF8CharBuffer* {
+    return srcml_unit_parse_internal(unit, 0, [src_buffer, buffer_size](const char* encoding, bool output_hash, std::optional<std::string>& hash)-> UTF8CharBuffer* {
 
         return new UTF8CharBuffer(src_buffer ? src_buffer : "", buffer_size, encoding, output_hash, hash);
     });
@@ -615,7 +839,7 @@ int srcml_unit_parse_FILE(struct srcml_unit* unit, FILE* src_file) {
     if (unit == nullptr || src_file == nullptr)
         return SRCML_STATUS_INVALID_ARGUMENT;
 
-    return srcml_unit_parse_internal(unit, 0, [src_file](const char* encoding, bool output_hash, boost::optional<std::string>& hash)-> UTF8CharBuffer* {
+    return srcml_unit_parse_internal(unit, 0, [src_file](const char* encoding, bool output_hash, std::optional<std::string>& hash)-> UTF8CharBuffer* {
 
         return new UTF8CharBuffer(src_file, encoding, output_hash, hash);
     });
@@ -636,7 +860,7 @@ int srcml_unit_parse_fd(struct srcml_unit* unit, int src_fd) {
     if (unit == nullptr || src_fd < 0)
         return SRCML_STATUS_INVALID_ARGUMENT;
 
-    return srcml_unit_parse_internal(unit, 0, [src_fd](const char* encoding, bool output_hash, boost::optional<std::string>& hash)-> UTF8CharBuffer* {
+    return srcml_unit_parse_internal(unit, 0, [src_fd](const char* encoding, bool output_hash, std::optional<std::string>& hash)-> UTF8CharBuffer* {
 
         return new UTF8CharBuffer(src_fd, encoding, output_hash, hash);
     });
@@ -660,10 +884,60 @@ int srcml_unit_parse_io(struct srcml_unit* unit, void * context, ssize_t (*read_
     if (unit == nullptr || context == nullptr || read_callback == nullptr)
         return SRCML_STATUS_INVALID_ARGUMENT;
 
-    return srcml_unit_parse_internal(unit, 0, [context, read_callback, close_callback](const char* encoding, bool output_hash, boost::optional<std::string>& hash)-> UTF8CharBuffer* {
+    return srcml_unit_parse_internal(unit, 0, [context, read_callback, close_callback](const char* encoding, bool output_hash, std::optional<std::string>& hash)-> UTF8CharBuffer* {
 
         return new UTF8CharBuffer(context, read_callback, close_callback, encoding, output_hash, hash);
     });
+}
+
+/**
+ * Get the source from this unit
+ * @note The source is in UTF-8 and does not follow the source encoding
+ * @note If other encodings are needed, use srcml_unit_unparse_memory()
+ * @param unit A srcml unit opened for reading
+ * @return The source
+ * @return Null on failure
+ */
+const char* srcml_unit_get_src(struct srcml_unit* unit) {
+
+    if (unit == nullptr || (!unit->read_body && !unit->read_header))
+        return nullptr;
+
+    if (!unit->read_body && (unit->archive->type == SRCML_ARCHIVE_READ || unit->archive->type == SRCML_ARCHIVE_RW))
+        unit->archive->reader->read_body(unit);
+
+    // if this unit was parsed from source, then the src does not exist
+    // generate this source from the srcml
+    if (!unit->src) {
+        unit->src = extract_src(unit->srcml);
+    }
+
+    return unit->src->data();
+}
+
+/**
+ * Get the source size from this unit
+ * @note The size of the source is for UTF-8 encoding and does not follow the source encoding
+ * @note If the size of other encodings are needed, use srcml_unit_unparse_memory()
+ * @param unit A srcml unit opened for reading
+ * @return The source size
+ * @return -1 on failure
+ */
+ssize_t srcml_unit_get_src_size(struct srcml_unit* unit) {
+
+    if (unit == nullptr || (!unit->read_body && !unit->read_header))
+        return -1;
+
+    if (!unit->read_body && (unit->archive->type == SRCML_ARCHIVE_READ || unit->archive->type == SRCML_ARCHIVE_RW))
+        unit->archive->reader->read_body(unit);
+
+    // if this unit was parsed from source, then the src does not exist
+    // generate this source from the srcml
+    if (!unit->src) {
+        unit->src = extract_src(unit->srcml);
+    }
+
+    return (ssize_t) unit->src->size();
 }
 
 /******************************************************************************
@@ -702,24 +976,21 @@ static int srcml_unit_unparse_internal(struct srcml_unit* unit, std::function<xm
 
     // if this unit was parsed from source, then the src does not exist
     // generate this source from the srcml
-    // @todo Should this be an option to turn off/on? For debugging?
-    if (/* true || */ !unit->src) {
+    if (!unit->src) {
         unit->src = extract_src(unit->srcml);
     }
 
-    // if EOL is not auto, then need to convert for 
+    // if EOL is not auto, then need to convert for
     if (unit->eol == SOURCE_OUTPUT_EOL_AUTO) {
-        xmlOutputBufferWrite(output_handler.get(), (int) unit->src->size(), unit->src->c_str());
+        xmlOutputBufferWrite(output_handler.get(), (int) unit->src->size(), unit->src->data());
     } else {
 
         // convert to the given eol
         std::string neol(0, ' ');
         neol.reserve(unit->src->size());
-
-        const std::string& src = *unit->src;
-        for (size_t i = 0; i < src.size(); ++i) {
-            if (src[i] != '\n') {
-                neol += src[i];
+        for (const auto c : *unit->src) {
+            if (c != '\n') {
+                neol += c;
             }
             else if (unit->eol == SOURCE_OUTPUT_EOL_LF) {
                 neol += '\n';
@@ -730,11 +1001,11 @@ static int srcml_unit_unparse_internal(struct srcml_unit* unit, std::function<xm
             else if (unit->eol == SOURCE_OUTPUT_EOL_CRLF) {
                 neol += "\r\n";
             } else {
-                neol += src[i];
+                neol += c;
             }
         }
 
-        xmlOutputBufferWrite(output_handler.get(), (int) neol.size(), neol.c_str());
+        xmlOutputBufferWrite(output_handler.get(), (int) neol.size(), neol.data());
     }
 
     return SRCML_STATUS_OK;
@@ -789,11 +1060,12 @@ int srcml_unit_unparse_memory(struct srcml_unit* unit, char** src_buffer, size_t
     if (status != SRCML_STATUS_OK)
         return status;
 
-    (*src_buffer) = (char *)buffer->content;
-    buffer->content = 0;
-    if (!buffer->content && !(*src_buffer))
+    (*src_buffer) = (char *) xmlBufferDetach(buffer);
+    if (!(*src_buffer))
         return SRCML_STATUS_ERROR;
-    *src_size = strlen(*src_buffer);
+    *src_size = std::string_view(*src_buffer).size();
+
+    xmlBufferFree(buffer);
 
     return SRCML_STATUS_OK;
 }
@@ -848,7 +1120,7 @@ int srcml_unit_unparse_fd(struct srcml_unit* unit, int srcml_fd) {
  * @param write_callback a write callback function
  * @param close_callback a close callback function
  *
- * Convert the srcML in unit into source code and place it into 
+ * Convert the srcML in unit into source code and place it into
  * the opened io context written to using write callback
  * and closed using close callback.  If the srcML was not read in,
  * but the attributes were read in the xml and unparse that value.
@@ -860,7 +1132,7 @@ int srcml_unit_unparse_io(struct srcml_unit* unit, void* context, int (*write_ca
     if (unit == nullptr || context == nullptr || write_callback == nullptr)
         return SRCML_STATUS_INVALID_ARGUMENT;
 
-    return srcml_unit_unparse_internal(unit, [write_callback, close_callback, context](xmlCharEncodingHandlerPtr handler) {
+    return srcml_unit_unparse_internal(unit, [write_callback, close_callback, context](xmlCharEncodingHandlerPtr handler) noexcept {
 
         return xmlOutputBufferCreateIO(write_callback, close_callback, context, handler);
     });
@@ -901,12 +1173,19 @@ int srcml_write_start_unit(struct srcml_unit* unit) {
         if (!(unit->namespaces))
             unit->namespaces = unit->archive->namespaces;
 
+        if (unit->unit_translator) {
+            unit->unit_translator->close();
+            delete unit->unit_translator;
+            unit->unit_translator = nullptr;
+            xmlBufferFree(unit->output_buffer);
+            unit->output_buffer = nullptr;
+        }
         unit->unit_translator = new srcml_translator(
             obuffer,
             optional_to_c_str(unit->archive->encoding, "UTF-8"),
             options,
             *(unit->namespaces),
-            boost::none,
+            std::nullopt,
             unit->archive->tabstop,
             unit->derived_language,
             optional_to_c_str(unit->revision),
@@ -937,13 +1216,12 @@ int srcml_write_start_unit(struct srcml_unit* unit) {
     unit->content_begin = unit->unit_translator->output_buffer()->written + 1;
 
     // record end of content (after xmlns for srcML)
-    // @todo Only records for srcML namespace, not user-defined
-    const char* s = (const char*) xmlBufferContent(unit->output_buffer);
-    auto pos = strstr(s, "xmlns") - s;
+    std::string_view s = (const char*) xmlBufferContent(unit->output_buffer);
+    auto pos = s.find("xmlns");
     unit->insert_begin = (int) pos;
-    auto firstquote = strchr(s + pos + 1, '\"') - s;
-    auto secondquote = strchr(s + firstquote + 1, '\"') - s;
-    unit->insert_end = (int) secondquote + 2;
+    auto firstquotePos = s.find("\"", pos + 1);
+    auto secondquotePos = s.find("\"", firstquotePos + 1);
+    unit->insert_end = (int) secondquotePos + 2;
 
     return SRCML_STATUS_OK;
 }
@@ -978,7 +1256,6 @@ int srcml_write_end_unit(struct srcml_unit* unit) {
         return SRCML_STATUS_INVALID_INPUT;
 
     // flush before detaching
-    // @todo Is this needed?
     xmlTextWriterFlush(unit->unit_translator->output_textwriter());
 
     // store the generated srcml in a char buffer
@@ -997,10 +1274,11 @@ int srcml_write_end_unit(struct srcml_unit* unit) {
     unit->srcml.assign(start_tag);
 
     if (content_begin != content_end) {
-        unit->srcml.append(">");
+        unit->srcml += '>';
         unit->srcml.append(srcml + content_begin);
     } else {
-        unit->srcml.append("/>");
+        unit->srcml += '/';
+        unit->srcml += '>';
     }
 
     // content end is changed since the start unit tag was rewritten
@@ -1045,10 +1323,18 @@ int srcml_write_end_unit(struct srcml_unit* unit) {
 int srcml_write_start_element(struct srcml_unit* unit, const char* prefix, const char* name, const char* uri) {
 
     // prefix can be default
-    if (unit == nullptr || name == nullptr /* || uri == nullptr */)
+    if (unit == nullptr || name == nullptr)
         return SRCML_STATUS_INVALID_ARGUMENT;
 
-    if (unit->unit_translator == nullptr || !unit->unit_translator->add_start_element(prefix, name, uri))
+    // register the namespace if it does not exist on the archive since it may be new
+    if (uri) {
+        auto it = findNSURI(unit->archive->namespaces, uri);
+        if (it == unit->archive->namespaces.end() || (prefix && it->prefix != std::string_view(prefix))) {
+            srcml_unit_register_namespace(unit, prefix, uri);
+        }
+    }
+
+    if (unit->unit_translator == nullptr || !unit->unit_translator->add_start_element(prefix, name, 0))
         return SRCML_STATUS_INVALID_INPUT;
 
     return SRCML_STATUS_OK;
@@ -1171,7 +1457,7 @@ struct srcml_unit* srcml_unit_create(struct srcml_archive* archive) {
         unit = new srcml_unit;
 
     } catch(...) { return nullptr; }
-    
+
     unit->archive = archive;
 
     return unit;
@@ -1188,7 +1474,7 @@ struct srcml_unit* srcml_unit_clone(const struct srcml_unit* unit) {
     if (unit == nullptr)
         return 0;
 
-    srcml_unit* new_unit = srcml_unit_create(unit->archive);
+    std::unique_ptr<srcml_unit> new_unit(srcml_unit_create(unit->archive));
     new_unit->filename = unit->filename;
 
     new_unit->hash = unit->hash;
@@ -1203,8 +1489,8 @@ struct srcml_unit* srcml_unit_clone(const struct srcml_unit* unit) {
     new_unit->eol = unit->eol;
     new_unit->derived_language = unit->derived_language;
     new_unit->namespaces = unit->namespaces;
-
-    return new_unit;
+    new_unit->attributes = unit->attributes;
+    return new_unit.release();
 }
 
 /** Provides a code of the last error to occur for a unit
@@ -1213,7 +1499,7 @@ struct srcml_unit* srcml_unit_clone(const struct srcml_unit* unit) {
  */
 int srcml_unit_error_number(const struct srcml_unit* unit) {
 
-    if (unit == nullptr) 
+    if (unit == nullptr)
         return SRCML_STATUS_INVALID_ARGUMENT;
 
     return unit->error_number;
@@ -1225,14 +1511,14 @@ int srcml_unit_error_number(const struct srcml_unit* unit) {
  */
 const char* srcml_unit_error_string(const struct srcml_unit* unit) {
 
-    if (unit == nullptr) 
+    if (unit == nullptr)
         return "Unit does not exist";
 
-    return unit->error_string.c_str();
+    return unit->error_string.data();
 }
 
 /**
- * srcml_unit_free
+ *
  * @param unit a srcml unit
  *
  * Free the contents of a srcml_unit.

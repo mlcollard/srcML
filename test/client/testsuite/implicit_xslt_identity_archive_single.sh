@@ -1,10 +1,15 @@
 #!/bin/bash
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# @file implicit_xslt_identity_archive_single.sh
+#
+# @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
 
 # test framework
 source $(dirname "$0")/framework_test.sh
 
 # xslt identity transformation (archive of single file)
-define identity_xslt <<- 'STDOUT'
+defineXML identity_xslt <<- 'STDOUT'
 	<xsl:stylesheet
 	xmlns="http://www.srcML.org/srcML/src"
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -17,20 +22,19 @@ define identity_xslt <<- 'STDOUT'
 	  </xsl:copy>
 	 </xsl:template>
 	</xsl:stylesheet>
-	STDOUT
+STDOUT
 
-define srcml <<- 'STDOUT'
+defineXML srcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
-	
+
 	<unit revision="REVISION" language="C++" filename="sub/a.cpp" hash="1a2c5d67e6f651ae10b7673c53e8c502c97316d6">
 	<expr_stmt><expr><name>a</name></expr>;</expr_stmt>
 	</unit>
 
 	</unit>
-	STDOUT
+STDOUT
 
-xmlcheck "$srcml"
 createfile sub/a.cpp.xml "$srcml"
 createfile identity.xsl "$identity_xslt"
 
@@ -49,3 +53,5 @@ check sub/b.cpp.xml "$srcml"
 srcml identity.xsl -o sub/b.cpp.xml < sub/a.cpp.xml
 check sub/b.cpp.xml "$srcml"
 
+srcml --xslt-param name=value identity.xsl -o sub/b.cpp.xml < sub/a.cpp.xml
+check sub/b.cpp.xml "$srcml"

@@ -1,50 +1,15 @@
+// SPDX-License-Identifier: GPL-3.0-only
 /**
  * @file sha1utilities.hpp
  *
- * @copyright Copyright (C) 2014 srcML, LLC. (www.srcML.org)
- *
- * This file is part of the srcml command-line client.
- *
- * The srcML Toolkit is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * The srcML Toolkit is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with the srcml command-line client; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ * @copyright Copyright (C) 2014-2024 srcML, LLC. (www.srcML.org)
  */
 
 #ifndef SHA1_UTILITIES_HPP
 #define SHA1_UTILITIES_HPP
 
+#include <TinySHA1.hpp>
 #include <type_traits>
-
-#ifdef _MSC_BUILD
-#include <windows.h>
-#include <Wincrypt.h>
-#elif defined(__MACH__) // Should this be __APPLE__?
-
-#include <CommonCrypto/CommonDigest.h>
-
-/** Use same symbols for openssl and CommonCrypto  */
-#define SHA_LONG CC_LONG
-#define SHA_CTX     CC_SHA1_CTX
-#define SHA1_Init   CC_SHA1_Init
-#define SHA1_Update CC_SHA1_Update
-#define SHA1_Final  CC_SHA1_Final
-
-#define SHA1(a,b,c) CC_SHA1(a,b,c)
-#define SHA_DIGEST_LENGTH CC_SHA1_DIGEST_LENGTH
-
-#else
-#include <openssl/sha.h>
-#endif
 
 static constexpr char hexchar[] = { '0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f' };
 #define HEXCHARASCII(md) \

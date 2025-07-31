@@ -1,36 +1,39 @@
 #!/bin/bash
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# @file show_hash_unit.sh
+#
+# @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
 
 # test framework
 source $(dirname "$0")/framework_test.sh
 
 # test hash on single unit
-define input <<- 'STDOUT'
+defineXML input <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C" directory="sub" filename="a.cpp" hash="1a2c5d67e6f651ae10b7673c53e8c502c97316d6"><expr_stmt><expr><name>a</name></expr>;</expr_stmt>
 	</unit>
-  STDOUT
+STDOUT
 
-xmlcheck "$input"
 createfile sub/a.cpp.xml "$input"
 
 message "hash provided"
 
 srcml --show-hash sub/a.cpp.xml
-check "1a2c5d67e6f651ae10b7673c53e8c502c97316d6"
+check "1a2c5d67e6f651ae10b7673c53e8c502c97316d6\n"
 
 srcml --show-hash < sub/a.cpp.xml
-check "1a2c5d67e6f651ae10b7673c53e8c502c97316d6"
-
+check "1a2c5d67e6f651ae10b7673c53e8c502c97316d6\n"
 
 # test hash on unit with no hash provided
-define none <<- 'STDOUT'
+defineXML none <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C" directory="sub" filename="a.cpp"><expr_stmt><expr><name>a</name></expr>;</expr_stmt>
 	</unit>
-  STDOUT
+STDOUT
 
 # test hash on archive of one unit
-define archive <<- 'STDOUT'
+defineXML archive <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
@@ -39,17 +42,13 @@ define archive <<- 'STDOUT'
 	</unit>
 
 	</unit>
-  STDOUT
+STDOUT
 
 # test hash on empty archive
-define empty <<- 'STDOUT'
+defineXML empty <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION"/>
-  STDOUT
-
-xmlcheck "$none"
-xmlcheck "$archive"
-xmlcheck "$empty"
+STDOUT
 
 createfile sub/a.cpp.xml "$none"
 createfile sub/archive.cpp.xml "$archive"
@@ -64,10 +63,10 @@ srcml --show-hash < sub/a.cpp.xml
 check
 
 srcml --show-hash sub/archive.cpp.xml
-check "1a2c5d67e6f651ae10b7673c53e8c502c97316d6"
+check "1a2c5d67e6f651ae10b7673c53e8c502c97316d6\n"
 
 srcml --show-hash < sub/archive.cpp.xml
-check "1a2c5d67e6f651ae10b7673c53e8c502c97316d6"
+check "1a2c5d67e6f651ae10b7673c53e8c502c97316d6\n"
 
 srcml --show-hash sub/emptyarchive.cpp.xml
 check

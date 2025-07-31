@@ -1,27 +1,15 @@
+// SPDX-License-Identifier: GPL-3.0-only
 /**
  * @file srcml_transform.cpp
  *
- * @copyright Copyright (C) 2013-2014 srcML, LLC. (www.srcML.org)
- *
- * The srcML Toolkit is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * The srcML Toolkit is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with the srcML Toolkit; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ * @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
  */
 
-#include <srcml.h>
+#include <srcml_options.hpp>
 #include <srcml_types.hpp>
+#include <srcmlns.hpp>
 
-#ifdef _MSC_BUILD
+#ifdef _MSC_VER
 #include <io.h>
 #endif
 
@@ -40,11 +28,30 @@
 #include <unit_utilities.hpp>
 
 #include <algorithm>
-
-#include <srcmlns.hpp>
+#include <cstring>
+#include <vector>
+#include <optional>
+#include <iostream>
 
 /**
- * srcml_append_transform_xpath_internal( * @param archive a srcml archive
+ * Transformation result. Passed to srcml_unit_apply_transforms() to collect results of transformation
+ */
+struct srcml_transform_result {
+    /** Transformation result type */
+    int type;
+    /** Array of srcml units for type SRCML_RESULT_UNITS */
+    std::vector<srcml_unit*> units;
+    /** Result for type SRCML_RESULT_BOOLEAN */
+    std::optional<int> boolValue;
+    /** Result for type SRCML_RESULT_NUMBER */
+    std::optional<double> numberValue;
+    /** Result for type SRCML_RESULT_STRING */
+    std::optional<std::string> stringValue;
+};
+
+/**
+ * srcml_append_transform_xpath_internal
+ * @param archive a srcml archive
  * @param xpath_string an XPath expression
  * @param prefix the element prefix
  * @param namespace_uri the element namespace
@@ -52,7 +59,7 @@
  *
  * Append the XPath expression to the list
  * of transformation/queries.  As of yet no way to specify context.
- * Instead of outputting the results each in a separte unit tag.  Output the complete
+ * Instead of outputting the results each in a separate unit tag.  Output the complete
  * archive marking the xpath results with a user provided element.
  *
  * @returns Returns SRCML_STATUS_OK on success and a status error codes on failure.
@@ -141,7 +148,7 @@ int srcml_append_transform_xpath_attribute(struct srcml_archive* archive, const 
  *
  * Append the XPath expression to the list
  * of transformation/queries.  As of yet no way to specify context.
- * Instead of outputting the results each in a separte unit tag.  Output the complete
+ * Instead of outputting the results each in a separate unit tag.  Output the complete
  * archive marking the xpath results with a user provided element.
  *
  * @returns Returns SRCML_STATUS_OK on success and a status error codes on failure.
@@ -157,7 +164,123 @@ int srcml_append_transform_xpath_element(struct srcml_archive* archive, const ch
     return srcml_append_transform_xpath_internal(archive, xpath_string, prefix, namespace_uri, element, 0, 0, 0, 0);
 }
 
-#ifdef WITH_LIBXSLT
+/**
+ * srcml_append_transform_srcql_internal
+ * @param archive a srcml archive
+ * @param srcql_string an XPath expression
+ * @param prefix the element prefix
+ * @param namespace_uri the element namespace
+ * @param element the element name
+ *
+ * Append the srcQL query to the list
+ * of transformation/queries.
+ * Instead of outputting the results each in a separate unit tag.  Output the complete
+ * archive marking the xpath results with a user provided element.
+ *
+ * @returns Returns SRCML_STATUS_OK on success and a status error codes on failure.
+ */
+static int srcml_append_transform_srcql_internal (struct srcml_archive* archive, const char* srcql_string,
+                                                    const char* prefix, const char* namespace_uri,
+                                                    const char* element,
+                                                    const char* attr_prefix, const char* attr_namespace_uri,
+                                                    const char* attr_name, const char* attr_value) {
+    if (archive == NULL || srcql_string == 0)
+        return SRCML_STATUS_INVALID_ARGUMENT;
+
+    std::string srcqlXPath("srcql:");
+    srcqlXPath += srcql_string;
+    archive->transformations.push_back(std::unique_ptr<Transformation>(new xpathTransformation(archive, srcqlXPath.data(), prefix, namespace_uri, element,
+            attr_prefix, attr_namespace_uri, attr_name, attr_value)));
+
+    return SRCML_STATUS_OK;
+}
+
+/**
+ * srcml_append_transform_srcql
+ * @param archive a srcml archive
+ * @param srcql_string an srcQL query
+ *
+ *
+ * of transformation/queries.
+ *
+ * @returns Returns SRCML_STATUS_OK on success and a status error codes on failure.
+ */
+int srcml_append_transform_srcql(srcml_archive* archive, const char* srcql_string) {
+
+    if (archive == nullptr || srcql_string == nullptr)
+        return SRCML_STATUS_INVALID_ARGUMENT;
+
+    return srcml_append_transform_srcql_internal(archive, srcql_string, 0, 0, 0, 0, 0, 0, 0);
+}
+
+/**
+ * srcml_append_transform_srcql_attribute
+ * @param archive a srcml archive
+ * @param srcql_string an srcQL query
+ * @param prefix the attribute prefix
+ *
+ * @param attr_name the attribute name
+ * @param attr_value the attribute value
+ *
+ * Append the srcQL query to the list
+ * of transformation/queries.
+ * Instead of outputting the results each in a separate unit tag.  Output the complete
+ * archive marking the xpath results with a user provided attribute.
+ *
+ * @returns Returns SRCML_STATUS_OK on success and a status error codes on failure.
+ */
+int srcml_append_transform_srcql_attribute(struct srcml_archive* archive, const char* srcql_string,
+                                            const char* prefix, const char* namespace_uri,
+                                            const char* attr_name, const char* attr_value) {
+
+    if (archive == nullptr || srcql_string == nullptr ||
+        prefix == nullptr || namespace_uri == nullptr ||
+        attr_name == nullptr || attr_value == nullptr)
+        return SRCML_STATUS_INVALID_ARGUMENT;
+
+    // attribute for a previous Xpath where the attribute is blank is appended on
+    if (!archive->transformations.empty()) {
+        auto p = dynamic_cast<xpathTransformation*>(archive->transformations.back().get());
+        if (p && p->xpath == srcql_string && p->attr_prefix.empty() && p->attr_uri.empty() && p->attr_name.empty() && p->attr_value.empty()) {
+
+            p->attr_prefix = prefix;
+            p->attr_uri = namespace_uri;
+            p->attr_name = attr_name;
+            p->attr_value = attr_value;
+
+            return SRCML_STATUS_OK;
+        }
+    }
+
+    return srcml_append_transform_srcql_internal(archive, srcql_string, 0, 0, 0, prefix, namespace_uri, attr_name, attr_value);
+}
+
+/**
+ * srcml_append_transform_srcql_element
+ * @param archive a srcml archive
+ * @param srcql_string an srcQL query
+ * @param prefix the element prefix
+ *
+ * @param element the element name
+ *
+ * Append the srcQL query to the list
+ * of transformation/queries.
+ * Instead of outputting the results each in a separate unit tag.  Output the complete
+ * archive marking the xpath results with a user provided element.
+ *
+ * @returns Returns SRCML_STATUS_OK on success and a status error codes on failure.
+ */
+int srcml_append_transform_srcql_element(struct srcml_archive* archive, const char* srcql_string,
+                                                            const char* prefix, const char* namespace_uri,
+                                                            const char* element) {
+    if (archive == nullptr || srcql_string == nullptr ||
+        prefix == nullptr || namespace_uri == nullptr ||
+        element == nullptr)
+        return SRCML_STATUS_INVALID_ARGUMENT;
+
+    return srcml_append_transform_srcql_internal(archive, srcql_string, prefix, namespace_uri, element, 0, 0, 0, 0);
+}
+
 /**
  * srcml_append_transform_xslt_internal
  * @param archive a srcml_archive
@@ -172,8 +295,6 @@ static int srcml_append_transform_xslt_internal(srcml_archive* archive, std::uni
 
     if (archive == NULL || doc == 0)
         return SRCML_STATUS_INVALID_ARGUMENT;
-  //  if (archive->type != SRCML_ARCHIVE_READ && archive->type != SRCML_ARCHIVE_RW)
- //   return SRCML_STATUS_INVALID_IO_OPERATION;
 
     archive->transformations.push_back(std::unique_ptr<Transformation>(new xsltTransformation(doc.release(), std::vector<std::string>())));
 
@@ -269,7 +390,6 @@ int srcml_append_transform_xslt_fd(srcml_archive* archive, int xslt_fd) {
 
     return srcml_append_transform_xslt_internal(archive, std::move(doc));
 }
-#endif
 
 /**
  * srcml_append_transform_internal
@@ -281,14 +401,12 @@ int srcml_append_transform_xslt_fd(srcml_archive* archive, int xslt_fd) {
  *
  * @returns Returns SRCML_STATUS_OK on success and a status error codes on failure.
  */
-static int srcml_append_transform_relaxng_internal(srcml_archive* archive, xmlDocPtr doc) {
+static int srcml_append_transform_relaxng_internal(srcml_archive* archive, std::unique_ptr<xmlDoc> doc) {
 
     if (archive == NULL || doc == 0)
         return SRCML_STATUS_INVALID_ARGUMENT;
-//    if (archive->type != SRCML_ARCHIVE_READ && archive->type != SRCML_ARCHIVE_RW)
-//    return SRCML_STATUS_INVALID_IO_OPERATION;
 
-    archive->transformations.push_back(std::unique_ptr<Transformation>(new relaxngTransformation(doc)));
+    archive->transformations.push_back(std::unique_ptr<Transformation>(new relaxngTransformation(doc.get())));
 
     return SRCML_STATUS_OK;
 }
@@ -312,7 +430,7 @@ int srcml_append_transform_relaxng_filename(srcml_archive* archive, const char* 
     if (doc == nullptr)
         return SRCML_STATUS_INVALID_ARGUMENT;
 
-    return srcml_append_transform_relaxng_internal(archive, doc.get());
+    return srcml_append_transform_relaxng_internal(archive, std::move(doc));
 }
 
 /**
@@ -335,7 +453,7 @@ int srcml_append_transform_relaxng_memory(srcml_archive* archive, const char* re
     if (doc == nullptr)
         return SRCML_STATUS_INVALID_ARGUMENT;
 
-    return srcml_append_transform_relaxng_internal(archive, doc.get());
+    return srcml_append_transform_relaxng_internal(archive, std::move(doc));
 }
 
 /**
@@ -358,7 +476,7 @@ int srcml_append_transform_relaxng_FILE(srcml_archive* archive, FILE* relaxng_fi
     if (doc == nullptr)
         return SRCML_STATUS_INVALID_ARGUMENT;
 
-    return srcml_append_transform_relaxng_internal(archive, doc.get());
+    return srcml_append_transform_relaxng_internal(archive, std::move(doc));
 }
 
 /**
@@ -380,7 +498,7 @@ int srcml_append_transform_relaxng_fd(srcml_archive* archive, int relaxng_fd) {
     if (doc == nullptr)
         return SRCML_STATUS_INVALID_ARGUMENT;
 
-    return srcml_append_transform_relaxng_internal(archive, doc.get());
+    return srcml_append_transform_relaxng_internal(archive, std::move(doc));
 }
 
 /**
@@ -425,9 +543,9 @@ int srcml_append_transform_stringparam(srcml_archive* archive, const char* xpath
 
     archive->transformations.back()->xsl_parameters.push_back(xpath_param_name);
 
-    std::string parenvalue = "\"";
+    std::string parenvalue("\"");
     parenvalue += xpath_param_value;
-    parenvalue += "\"";
+    parenvalue += '\"';
 
     archive->transformations.back()->xsl_parameters.push_back(parenvalue);
 
@@ -453,9 +571,9 @@ int srcml_clear_transforms(srcml_archive* archive) {
     return SRCML_STATUS_OK;
 }
 
-static bool usesURI(xmlNode* cur_node, const std::string& URI);
+static bool usesURI(xmlNode* cur_node, std::string_view URI);
 
-static bool usesURIChildren(xmlNode* a_node, const std::string& URI) {
+static bool usesURIChildren(xmlNode* a_node, std::string_view URI) {
 
     for (xmlNode* cur_node = a_node; cur_node; cur_node = cur_node->next) {
 
@@ -470,7 +588,7 @@ static bool usesURIChildren(xmlNode* a_node, const std::string& URI) {
     return false;
 }
 
-static bool usesURI(xmlNode* cur_node, const std::string& URI) {
+static bool usesURI(xmlNode* cur_node, std::string_view URI) {
 
     if (cur_node->ns && cur_node->ns->prefix && URI == (const char*) cur_node->ns->href) {
         return true;
@@ -490,23 +608,35 @@ static bool usesURI(xmlNode* cur_node, const std::string& URI) {
  *
  * @returns Returns SRCML_STATUS_OK on success and a status error codes on failure.
  */
-int srcml_unit_apply_transforms(struct srcml_archive* archive, struct srcml_unit* unit, struct srcml_transformation_result_t* result) {
-
+int srcml_unit_apply_transforms(struct srcml_archive* archive, struct srcml_unit* unit, struct srcml_transform_result** presult) {
     if (archive == nullptr || unit == nullptr)
         return SRCML_STATUS_INVALID_ARGUMENT;
-
-    if (result) {
-        result->num_units = 0;
-        result->units = nullptr;
-        result->stringValue = nullptr;
-    }
 
     // unit stays the same for no transformation
     if (archive->transformations.empty())
         return SRCML_STATUS_OK;
 
+    srcml_transform_result* result = nullptr;
+    if (presult) {
+        *presult = new srcml_transform_result;
+        result = *presult;
+        result->type = SRCML_RESULT_NONE;
+        result->boolValue = false;
+    }
+
+    // find the position of the item attribute, if it exists
+    // the attribute array consists of { name1, value1, name2, value2, ... }
+    auto currentItemPosition = unit->attributes.size();
+    for (std::size_t i = 0; i < unit->attributes.size(); i += 2) {
+        if (unit->attributes[i].name == "item"sv) {
+            currentItemPosition = i;
+            break;
+        }
+    }
+
     // create a DOM of the unit
-    std::unique_ptr<xmlDoc> doc(xmlReadMemory(unit->srcml.c_str(), (int) unit->srcml.size(), 0, 0, 0));
+
+    std::shared_ptr<xmlDoc> doc(xmlReadMemory(unit->srcml.data(), (int) unit->srcml.size(), 0, 0, XML_PARSE_HUGE), [](xmlDoc* doc) { xmlFreeDoc(doc); });
     if (doc == nullptr)
         return SRCML_STATUS_ERROR;
 
@@ -515,9 +645,10 @@ int srcml_unit_apply_transforms(struct srcml_archive* archive, struct srcml_unit
     if (fullresults == nullptr)
         return SRCML_STATUS_ERROR;
 
+    // final result of all applied transformations
     TransformationResult lastresult;
+    std::shared_ptr<xmlDoc> curdoc(doc);
     for (const auto& trans : archive->transformations) {
-
         // preserve the fullresults to iterate through
         // collect results from this transformation applied to the potentially multiple
         // results of the previous transformation step
@@ -527,19 +658,32 @@ int srcml_unit_apply_transforms(struct srcml_archive* archive, struct srcml_unit
         fullresults.swap(pr);
 
         for (int i = 0; i < pr->nodeNr; ++i) {
-            xmlDocSetRootElement(doc.get(), pr->nodeTab[i]);
 
-            lastresult = trans->apply(doc.get(), 0);
-            std::unique_ptr<xmlNodeSet> results(lastresult.nodeset);
-            if (results == nullptr)
+            xmlDocSetRootElement(curdoc.get(), pr->nodeTab[i]);
+
+            int language = srcml_check_language(srcml_unit_get_language(unit));
+            lastresult = trans->apply(curdoc.get(), language);
+            std::unique_ptr<xmlNodeSet> results(std::move(lastresult.nodeset));
+            if (results == nullptr) {
                 break;
+            }
+
             xmlXPathNodeSetMerge(fullresults.get(), results.get());
         }
 
+        // necessary to avoid access to free'd memory later on
+        // does NOT cause a memory leak
+        pr->nodeNr = 0;
+
+        // result of the transformation may be a new doc
+        if (lastresult.doc && lastresult.doc.get() != doc.get()) {
+            curdoc = lastresult.doc;
+        }
+
         // if there are no results, then we can't apply further transformations
-        // but there still might be reults in the scalar values
+        // but there still might be results in the scalar values
         if (fullresults->nodeNr == 0) {
-            result->units = 0;
+            result->units.clear();
             break;
         }
     }
@@ -548,24 +692,30 @@ int srcml_unit_apply_transforms(struct srcml_archive* archive, struct srcml_unit
         result->type = lastresult.nodeType;
     }
 
+    if (lastresult.nodeType != SRCML_RESULT_UNITS) {
+        // remove all nodes in the fullresults nodeset
+        // valgrind shows free accessing these nodes after they have been freed
+        // by the xmlDoc
+        fullresults->nodeNr = 0;
+    }
+
     // handle non-nodeset results
-    // @todo Implement these
     switch (lastresult.nodeType) {
-    case SRCML_RESULTS_STRING:
+    case SRCML_RESULT_STRING:
         if (result != nullptr) {
-            result->stringValue = strdup(lastresult.stringValue.c_str());
+            result->stringValue = lastresult.stringValue;
             return SRCML_STATUS_OK;
         }
         return SRCML_STATUS_ERROR;
 
-    case SRCML_RESULTS_BOOLEAN:
+    case SRCML_RESULT_BOOLEAN:
         if (result != nullptr) {
             result->boolValue = lastresult.boolValue;
             return SRCML_STATUS_OK;
         }
         return SRCML_STATUS_ERROR;
 
-    case SRCML_RESULTS_NUMBER:
+    case SRCML_RESULT_NUMBER:
         if (result != nullptr) {
             result->numberValue = lastresult.numberValue;
             return SRCML_STATUS_OK;
@@ -573,50 +723,61 @@ int srcml_unit_apply_transforms(struct srcml_archive* archive, struct srcml_unit
         return SRCML_STATUS_ERROR;
     };
 
-    if (result == nullptr)
+    if (result == nullptr) {
         return SRCML_STATUS_OK;
+    }
 
     // create units out of the transformation results
     result->type = lastresult.nodeType;
-    result->num_units = fullresults->nodeNr;
-    result->units = new srcml_unit*[fullresults->nodeNr + 1];
-    result->units[fullresults->nodeNr] = 0;
 
     for (int i = 0; i < fullresults->nodeNr; ++i) {
 
         // create a new unit to store the results in
-        // @todo What happens for a single result?
         auto nunit = srcml_unit_clone(unit);
         nunit->read_body = nunit->read_header = true;
         if (!lastresult.unitWrapped) {
-            nunit->attributes.push_back("item");
-            nunit->attributes.push_back(std::to_string(i + 1));
-            nunit->hash = boost::none;
+
+            // remove the hash since not valid for partial query results
+            nunit->hash = std::nullopt;
+
+            // update or add item attribute
+            if (currentItemPosition < unit->attributes.size()) {
+                if (fullresults->nodeNr > 1) {
+                    nunit->attributes[currentItemPosition].value += '-';
+                    nunit->attributes[currentItemPosition].value += std::to_string(i + 1);
+                }
+            } else {
+                nunit->attributes.push_back({"", "", "item", std::to_string(i + 1)});
+            }
         }
 
-        doc->children = fullresults->nodeTab[i];
-
+        // when no namespace, use the starting namespaces
         if (!nunit->namespaces)
             nunit->namespaces = starting_namespaces;
 
         // mark unused cpp and omp until we examine the query result
-        auto& view = nunit->namespaces->get<nstags::uri>();
-        auto itcpp = view.find(SRCML_CPP_NS_URI);
-        if (itcpp != view.end()) {
-            view.modify(itcpp, [](Namespace& thisns){ thisns.flags &= ~NS_USED; });
+        auto itcpp = findNSURI(*nunit->namespaces, SRCML_CPP_NS_URI);
+        if (itcpp != nunit->namespaces->end()) {
+            itcpp->flags &= ~NS_USED;
         }
-        auto itomp = view.find(SRCML_OPENMP_NS_URI);
-        if (itomp != view.end()) {
-            view.modify(itomp, [](Namespace& thisns){ thisns.flags &= ~NS_USED; });
+        auto itomp = findNSURI(*nunit->namespaces, SRCML_OPENMP_NS_URI);
+        if (itomp != nunit->namespaces->end()) {
+            itomp->flags &= ~NS_USED;
         }
 
-        // special case for XML comment as it does not get written to the tree
+        // special cases where the nodes are not written to the tree
+#ifdef _MSC_VER
+#   pragma warning(push)
+#   pragma warning(disable: 4061)
+#endif
         switch (fullresults->nodeTab[i]->type) {
         case XML_COMMENT_NODE:
 
-            nunit->srcml.assign("<!--");
+            for (auto c : "<!--"sv)
+                nunit->srcml += c;
             nunit->srcml.append((const char*) fullresults->nodeTab[i]->content);
-            nunit->srcml.append("-->");
+            for (auto c : "-->"sv)
+                nunit->srcml += c;
             break;
 
         case XML_TEXT_NODE:
@@ -627,43 +788,45 @@ int srcml_unit_apply_transforms(struct srcml_archive* archive, struct srcml_unit
         case XML_ATTRIBUTE_NODE:
 
             nunit->srcml.append((const char*) fullresults->nodeTab[i]->name);
-            nunit->srcml.append("=\"");
+            nunit->srcml += '=';
+            nunit->srcml += '"';
             nunit->srcml.append((const char*) fullresults->nodeTab[i]->children->content);
-            nunit->srcml.append("\"");
+            nunit->srcml += '"';
             break;
 
         default:
 
             // dump the result tree to the string using an output buffer that writes to a std::string
-            doc->children = fullresults->nodeTab[i];
-            xmlOutputBufferPtr output = xmlOutputBufferCreateIO([](void* context, const char* buffer, int len) {
+            xmlOutputBufferPtr output = xmlOutputBufferCreateIO([](void* context, const char* buffer, int len) noexcept {
 
-                ((std::string*) context)->append(buffer, len);
+                ((std::string*) context)->append(buffer, static_cast<std::size_t>(len));
 
                 return len;
 
             }, 0, &(nunit->srcml), 0);
-            xmlNodeDumpOutput(output, doc.get(), xmlDocGetRootElement(doc.get()), 0, 0, 0);
+            xmlNodeDumpOutput(output, curdoc.get(), fullresults->nodeTab[i], 0, 0, 0);
 
             // very important to flush to make sure the unit contents are all present
             // also performs a free of resources
             xmlOutputBufferClose(output);
 
-            if (usesURI(xmlDocGetRootElement(doc.get()), SRCML_CPP_NS_URI)) {
+            // update the cpp namespace if actually used
+            if (usesURI(fullresults->nodeTab[i], SRCML_CPP_NS_URI)) {
 
-                if (itcpp != view.end()) {
-                    view.modify(itcpp, [](Namespace& thisns){ thisns.flags |= NS_USED; });
+                if (itcpp != nunit->namespaces->end()) {
+                    itcpp->flags |= NS_USED;
                 } else {
-                    nunit->namespaces->push_back({ SRCML_CPP_NS_DEFAULT_PREFIX, SRCML_CPP_NS_URI, NS_USED | NS_STANDARD });
+                    nunit->namespaces->emplace_back(SRCML_CPP_NS_DEFAULT_PREFIX, SRCML_CPP_NS_URI, NS_USED | NS_STANDARD);
                 }
             }
 
-            if (usesURI(xmlDocGetRootElement(doc.get()), SRCML_OPENMP_NS_URI)) {
+            // update the openmp namespace if actually used
+            if (usesURI(fullresults->nodeTab[i], SRCML_OPENMP_NS_URI)) {
 
-                if (itomp != view.end()) {
-                    view.modify(itomp, [](Namespace& thisns){ thisns.flags |= NS_USED; });
+                if (itomp != nunit->namespaces->end()) {
+                    itomp->flags |= NS_USED;
                 } else {
-                    nunit->namespaces->push_back({ SRCML_OPENMP_NS_DEFAULT_PREFIX, SRCML_OPENMP_NS_URI, NS_USED | NS_STANDARD });
+                    nunit->namespaces->emplace_back(SRCML_OPENMP_NS_DEFAULT_PREFIX, SRCML_OPENMP_NS_URI, NS_USED | NS_STANDARD);
                 }
             }
 
@@ -681,8 +844,8 @@ int srcml_unit_apply_transforms(struct srcml_archive* archive, struct srcml_unit
             xmlSAXHandler roottagsax;
             memset(&roottagsax, 0, sizeof(roottagsax));
             roottagsax.initialized    = XML_SAX2_MAGIC;
-            roottagsax.startElementNs = [](void* ctx, const xmlChar* localname, const xmlChar* prefix, const xmlChar* URI,
-                             int nb_namespaces, const xmlChar** namespaces,
+            roottagsax.startElementNs = [](void* ctx, const xmlChar* /* localname */, const xmlChar* /* prefix */, const xmlChar* /* URI */,
+                             int /* nb_namespaces */, const xmlChar** /* namespaces */,
                              int nb_attributes, int /* nb_defaulted */, const xmlChar** attributes) {
 
                 auto ctxt = (xmlParserCtxtPtr) ctx;
@@ -697,22 +860,141 @@ int srcml_unit_apply_transforms(struct srcml_archive* archive, struct srcml_unit
 
             // extract the start tag, turning it into an empty tag
             // note: it may be an empty tag already
-            std::string starttag = nunit->srcml.substr(0, nunit->content_begin - 1);
+            std::string starttag = nunit->srcml.substr(0, static_cast<std::size_t>(nunit->content_begin - 1));
             if (starttag.back() != '/')
-                starttag += "/";
-            starttag += ">";
+                starttag += '/';
+            starttag += '>';
 
             // parse the start tag updating the unit
-            xmlParserCtxtPtr context = xmlCreateMemoryParserCtxt(starttag.c_str(), (int) starttag.size());
+            xmlParserCtxtPtr context = xmlCreateMemoryParserCtxt(starttag.data(), (int) starttag.size());
+            auto save_private = context->_private;
             context->_private = nunit;
+            auto save_sax = context->sax;
             context->sax = &roottagsax;
 
-            // @todo Handle error
+            // parse our single-element unit
             xmlParseDocument(context);
+
+            // restore state and free
+            context->_private = save_private;
+            context->sax = save_sax;
+            xmlFreeParserCtxt(context);
         }
 
-        result->units[i] = nunit;
+        // store in the returned results
+        result->units.push_back(nunit);
     }
+#ifdef _MSC_VER
+#   pragma warning(pop)
+#endif
+
+    // remove all nodes in the fullresults nodeset
+    // valgrind shows free accessing these nodes after they have been freed
+    // by the xmlDoc
+    fullresults->nodeNr = 0;
 
     return SRCML_STATUS_OK;
+}
+
+/**
+ * Free the resources in a tranformation result.
+ * @param results Struct of result
+ * @returns Returns SRCML_STATUS_OK on success and a status error codes on failure.
+ */
+int srcml_transform_free(struct srcml_transform_result* result) {
+
+    for (auto unit : result->units) {
+        srcml_unit_free(unit);
+    }
+
+    delete result;
+
+    return SRCML_STATUS_OK;
+}
+
+/**
+ * @param result A srcml transformation result
+ * @return The type of the transformation result
+ */
+LIBSRCML_DECL int srcml_transform_get_type(struct srcml_transform_result* result) {
+
+    return result->type;
+}
+
+/**
+ * @param result A srcml transformation result
+ * @return The number of units in the transformation result
+ */
+int srcml_transform_get_unit_size(struct srcml_transform_result* result) {
+
+    // make sure correct result type
+    if (result->type != SRCML_RESULT_UNITS)
+       return 0;
+
+    return (int) result->units.size();
+}
+
+/**
+ * @param result A srcml transformation result
+ * @param pos The index in the units
+ * @return The unit in the transformation result at that index
+ */
+struct srcml_unit* srcml_transform_get_unit(struct srcml_transform_result* result, int index) {
+
+    // make sure correct result type
+    if (result->type != SRCML_RESULT_UNITS)
+        return 0;
+
+    if (index >= (int) result->units.size())
+        return 0;
+
+    return result->units[static_cast<std::size_t>(index)];
+}
+
+/**
+ * @param result A srcml transformation result
+ * @return The transformation result string
+ */
+const char* srcml_transform_get_string(struct srcml_transform_result* result) {
+
+    // make sure correct result type
+    if (result->type != SRCML_RESULT_STRING)
+        return 0;
+
+    if (!result->stringValue)
+        return 0;
+
+    return result->stringValue->data();
+}
+
+/**
+ * @param result A srcml transformation result
+ * @return The transformation result number
+ */
+double srcml_transform_get_number(struct srcml_transform_result* result) {
+
+    // make sure correct result type
+    if (result->type != SRCML_RESULT_NUMBER)
+        return 0;
+
+    if (!result->numberValue)
+        return 0;
+
+    return *(result->numberValue);
+}
+
+/**
+ * @param result A srcml transformation result
+ * @return The transformation result boolean
+ */
+int srcml_transform_get_bool(struct srcml_transform_result* result) {
+
+    // make sure correct result type
+    if (result->type != SRCML_RESULT_BOOLEAN)
+        return -1;
+
+    if (!result->boolValue)
+        return -1;
+
+    return *(result->boolValue);
 }

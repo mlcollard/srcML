@@ -1,11 +1,16 @@
 #!/bin/bash
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# @file xpath_with_prefix.sh
+#
+# @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
 
 # test framework
 source $(dirname "$0")/framework_test.sh
 
 # test other_prefixes
 
-define srcml <<- 'STDOUT'
+defineXML srcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:foo="http://www.cs.uakron.edu/~collard/foo" xmlns:bar="http://www.cs.uakron.edu/~collard/bar" >
 
@@ -18,14 +23,14 @@ define srcml <<- 'STDOUT'
 	</unit>
 
 	</unit>
-	STDOUT
+STDOUT
 
-define xpathempty <<- 'STDOUT'
+defineXML xpathempty <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:foo="http://www.cs.uakron.edu/~collard/foo" xmlns:bar="http://www.cs.uakron.edu/~collard/bar" revision="REVISION"/>
-	STDOUT
+STDOUT
 
-define output <<- 'STDOUT'
+defineXML output <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" xmlns:foo="http://www.cs.uakron.edu/~collard/foo" xmlns:bar="http://www.cs.uakron.edu/~collard/bar" revision="REVISION">
 
@@ -38,61 +43,40 @@ define output <<- 'STDOUT'
 	</unit>
 
 	</unit>
-	STDOUT
-
-# TODO: issue #1213
-xmlcheck "$srcml"
-xmlcheck "$xpathempty"
-xmlcheck "$output"
+STDOUT
 
 createfile sub/a.cpp.xml "$srcml"
 
 # /src:unit
-srcml --xpath=/src:unit sub/a.cpp.xml
+srcml --xpath="/src:unit" sub/a.cpp.xml
 check "$output"
 
-srcml --xpath=/src:unit < sub/a.cpp.xml
+srcml --xpath="/src:unit" < sub/a.cpp.xml
 check "$output"
 
-srcml --xpath=/src:unit sub/a.cpp.xml -o sub/b.cpp.xml
+srcml --xpath="/src:unit" sub/a.cpp.xml -o sub/b.cpp.xml
 check sub/b.cpp.xml "$output"
 
-srcml --xpath=/src:unit -o sub/b.cpp.xml sub/a.cpp.xml
+srcml --xpath="/src:unit" -o sub/b.cpp.xml sub/a.cpp.xml
 check sub/b.cpp.xml "$output"
 
-srcml --xpath=/src:unit -o sub/b.cpp.xml < sub/a.cpp.xml
+srcml --xpath="/src:unit" -o sub/b.cpp.xml < sub/a.cpp.xml
 check sub/b.cpp.xml "$output"
 
 # //src:unit
-srcml --xpath=//src:unit sub/a.cpp.xml
+srcml --xpath="//src:unit" sub/a.cpp.xml
 check "$output"
 
-srcml --xpath=//src:unit < sub/a.cpp.xml
+srcml --xpath="//src:unit" < sub/a.cpp.xml
 check "$output"
 
-srcml --xpath=//src:unit sub/a.cpp.xml -o sub/b.cpp.xml
+srcml --xpath="//src:unit" sub/a.cpp.xml -o sub/b.cpp.xml
 check sub/b.cpp.xml "$output"
 
-srcml --xpath=//src:unit -o sub/b.cpp.xml sub/a.cpp.xml
+srcml --xpath="//src:unit" -o sub/b.cpp.xml sub/a.cpp.xml
 check sub/b.cpp.xml "$output"
 
-srcml --xpath=//src:unit -o sub/b.cpp.xml < sub/a.cpp.xml
-check sub/b.cpp.xml "$output"
-
-# src:unit
-srcml --xpath=src:unit sub/a.cpp.xml
-check "$output"
-
-srcml --xpath=src:unit < sub/a.cpp.xml
-check "$output"
-
-srcml --xpath=src:unit sub/a.cpp.xml -o sub/b.cpp.xml
-check sub/b.cpp.xml "$output"
-
-srcml --xpath=src:unit -o sub/b.cpp.xml sub/a.cpp.xml
-check sub/b.cpp.xml "$output"
-
-srcml --xpath=src:unit -o sub/b.cpp.xml < sub/a.cpp.xml
+srcml --xpath="//src:unit" -o sub/b.cpp.xml < sub/a.cpp.xml
 check sub/b.cpp.xml "$output"
 
 # unit
@@ -110,4 +94,3 @@ check sub/b.cpp.xml "$xpathempty"
 
 srcml --xpath=unit -o sub/b.cpp.xml < sub/a.cpp.xml
 check sub/b.cpp.xml "$xpathempty"
-

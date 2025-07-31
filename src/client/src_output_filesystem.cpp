@@ -1,69 +1,62 @@
+// SPDX-License-Identifier: GPL-3.0-only
 /**
  * @file src_output_filesystem.cpp
  *
- * @copyright Copyright (C) 2014 srcML, LLC. (www.srcML.org)
+ * @copyright Copyright (C) 2014-2024 srcML, LLC. (www.srcML.org)
  *
  * This file is part of the srcml command-line client.
- *
- * The srcML Toolkit is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * The srcML Toolkit is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with the srcml command-line client; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 #include <src_output_filesystem.hpp>
 #include <srcml.h>
 #include <iostream>
 #include <srcml_utilities.hpp>
-#include <mkDir.hpp>
+#include <SRCMLStatus.hpp>
+#if defined(__GNUC__) && (__GNUC__ == 7) && (__GNUC_MINOR__ == 5) && (__GNUC_PATCHLEVEL__ == 0)
+    #include <experimental/filesystem>
+    namespace fs = std::experimental::filesystem;
+#else
+    #include <filesystem>
+    namespace fs = std::filesystem;
+#endif
 
-void src_output_filesystem(srcml_archive* srcml_arch, const std::string& output_dir, TraceLog& log) {
+void src_output_filesystem(srcml_archive* srcml_arch, std::string_view output_dir, TraceLog& log) {
 
     // construct the relative directory
     std::string prefix;
     if (output_dir != "." && output_dir != "./")
         prefix = output_dir;
 
-    // create output directory structure as needed
-    mkDir dir;
-
+    // read and output each unit
     int count = 0;
-    std::string last;
     while (std::unique_ptr<srcml_unit> unit{srcml_archive_read_unit(srcml_arch)}) {
 
+        // extract the filename from the unit
         const char* cfilename = srcml_unit_get_filename(unit.get());
-        // @todo What do we do with no filename?
+
+        // skip if no filename
         if (!cfilename)
             continue;
 
-        std::string filename = cfilename;
+        // construct the full, relative filename
+        fs::path path(prefix);
+        path /= cfilename;
 
-        // separate pathname from filename
-        std::string path = prefix;
-        path += '/';
-        auto pos = filename.rfind('/');
-        path += pos != std::string::npos ? filename.substr(0, pos) : "";
+        // create the file path
+        auto directory = path;
+        directory.remove_filename();
+        std::error_code ec;
+        if (!fs::create_directories(directory, ec) && ec.value() != 0) {
+            SRCMLstatus(ERROR_MSG, "Unable to create directory %s", directory.c_str());
+            continue;
+        }
 
-        std::string fullfilename = prefix;
-        fullfilename += "/";
-        fullfilename += filename;
-
-        // use libarchive to create the file path
-        // @todo Can we get away with no permission on final file?
-        dir.mkdir(path);
-
-        // unparse directory to filename
-        log << ++count << fullfilename;
-
-        srcml_unit_unparse_filename(unit.get(), fullfilename.c_str());
+        // unparse directly to the file
+        // log before so error is on last shown filename
+        log << ++count << path.string().c_str();
+        int result = srcml_unit_unparse_filename(unit.get(), path.string().c_str());
+        if (result != SRCML_STATUS_OK) {
+           SRCMLstatus(ERROR_MSG, "Unable to extract file %s", path.string().c_str());
+        }
     }
 }

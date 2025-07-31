@@ -1,4 +1,9 @@
 #!/bin/bash
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# @file info_archive_multi.sh
+#
+# @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
 
 # test framework
 source $(dirname "$0")/framework_test.sh
@@ -12,15 +17,14 @@ define info <<- 'STDOUT'
 	xmlns="http://www.srcML.org/srcML/src"
 	encoding="UTF-8"
 	url="test"
-	STDOUT
+STDOUT
 
 define longinfo <<- 'STDOUT'
 	xmlns="http://www.srcML.org/srcML/src"
 	encoding="UTF-8"
 	url="test"
 	units="2"
-	STDOUT
-
+STDOUT
 
 # test on archive of many units
 define srcml <<- 'STDOUT'
@@ -32,9 +36,7 @@ define srcml <<- 'STDOUT'
 	<unit revision="REVISION" language="C++" filename="sub/b.cpp" hash="9a1e1d3d0e27715d29bcfbf72b891b3ece985b36"><expr_stmt><expr><name>b</name></expr>;</expr_stmt></unit>
 
 	</unit>
-	STDOUT
-
-xmlcheck "$srcml"
+STDOUT
 
 createfile sub/archive_multi.xml "$srcml"
 
@@ -62,14 +64,13 @@ check "$longinfo"
 srcml --full-info < sub/archive_multi.xml
 check "$longinfo"
 
-
 # test on archive of one unit
 define longinfo <<- 'STDOUT'
 	xmlns="http://www.srcML.org/srcML/src"
 	encoding="UTF-8"
 	url="test"
 	units="1"
-	STDOUT
+STDOUT
 
 define srcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -78,9 +79,7 @@ define srcml <<- 'STDOUT'
 	<unit revision="REVISION" language="C++" filename="sub/a.cpp" hash="a301d91aac4aa1ab4e69cbc59cde4b4fff32f2b8"><expr_stmt><expr><name>a</name></expr>;</expr_stmt></unit>
 
 	</unit>
-	STDOUT
-
-xmlcheck "$srcml"
+STDOUT
 
 createfile sub/archive_single.xml "$srcml"
 

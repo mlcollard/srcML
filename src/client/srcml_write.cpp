@@ -1,23 +1,10 @@
+// SPDX-License-Identifier: GPL-3.0-only
 /**
  * @file srcml_write.cpp
  *
- * @copyright Copyright (C) 2014 srcML, LLC. (www.srcML.org)
+ * @copyright Copyright (C) 2014-2024 srcML, LLC. (www.srcML.org)
  *
  * This file is part of the srcml command-line client.
- *
- * The srcML Toolkit is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * The srcML Toolkit is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with the srcml command-line client; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 #include <srcml_write.hpp>
@@ -30,31 +17,39 @@
 #include <srcml_input_src.hpp>
 #include <SRCMLStatus.hpp>
 #include <stdio.h>
-#include <cstring>
 #include <ParserTest.hpp>
 #include <OpenFileLimiter.hpp>
 #include <srcml_utilities.hpp>
-#include <mkDir.hpp>
 #include <cmath>
+#include <string_view>
+#if defined(__GNUC__) && (__GNUC__ == 7) && (__GNUC_MINOR__ == 5) && (__GNUC_PATCHLEVEL__ == 0)
+    #include <experimental/filesystem>
+    namespace fs = std::experimental::filesystem;
+#else
+    #include <filesystem>
+    namespace fs = std::filesystem;
+#endif
+
+using namespace ::std::literals::string_view_literals;
 
 // Public consumption thread function
-void srcml_write_request(std::shared_ptr<ParseRequest> request, TraceLog& log, const srcml_output_dest& /* destination */) {
+void srcml_write_request(std::shared_ptr<ParseRequest> prequest, TraceLog& log, const srcml_output_dest& /* destination */) {
 
-    if (!request)
+    if (!prequest)
         return;
 
-    if (request->status == SRCML_STATUS_UNSET_LANGUAGE) {
+    if (prequest->status == SRCML_STATUS_UNSET_LANGUAGE) {
 
         if (option(SRCML_COMMAND_VERBOSE)) {
             if (!option(SRCML_COMMAND_QUIET)) {
                 std::ostringstream outs;
-                outs << std::setw(option(SRCML_DEBUG_MODE) ? 52 + 14 : 52) << ' ' << (request->filename ? *request->filename : "");
+                outs << std::setw(option(SRCML_DEBUG_MODE) ? 52 + 14 : 52) << ' ' << (prequest->filename ? *prequest->filename : "");
                 log << '-' << outs.str();
             } else {
                 log.skip();
             }
-        } else if (request->disk_filename) {
-            SRCMLstatus(WARNING_MSG, "srcml: Extension not supported %s", *(request->disk_filename));
+        } else if (prequest->disk_filename) {
+            SRCMLstatus(WARNING_MSG, "srcml: Extension not supported %s", *(prequest->disk_filename));
         } else {
             SRCMLstatus(WARNING_MSG, "srcml: Extension not supported");
         }
@@ -63,31 +58,32 @@ void srcml_write_request(std::shared_ptr<ParseRequest> request, TraceLog& log, c
     }
 
     if (option(SRCML_COMMAND_PARSER_TEST)) {
-        ParserTest::entry(request.get(), request->srcml_arch, request->unit.get());
+        ParserTest::entry(prequest.get(), prequest->srcml_arch, prequest->unit.get());
         return;
     }
 
-    srcml_archive* output_archive = request->srcml_arch;
+    srcml_archive* output_archive = prequest->srcml_arch;
 
     // created for per-unit archive, close() and free() automatic
     std::unique_ptr<srcml_archive> cloned;
 
     // open the archive (if per-unit)
-    if (request->unit && option(SRCML_COMMAND_NOARCHIVE)) {
+    if (prequest->unit && option(SRCML_COMMAND_NOARCHIVE)) {
 
-        std::string filename;
+        // full path include directory, filename (with existing extension), and xml extension
+        fs::path path;
         if (option(SRCML_COMMAND_TO_DIRECTORY)) {
-            filename += *request->disk_dir;
-            filename += "/";
+            path /= *prequest->disk_dir;
         }
-        filename += *request->filename;
-        filename += ".xml";
+        path /= *prequest->filename;
+        path += ".xml"sv;
 
-        // create the output directory
-        auto path = filename.substr(0, filename.find_last_of('/'));
-        {
-            mkDir dir;
-            dir.mkdir(path);
+        // create the output path
+        auto directory = path;
+        directory.remove_filename();
+        std::error_code ec;
+        if (!fs::create_directories(directory, ec) && ec.value() != 0) {
+            SRCMLstatus(ERROR_MSG, "Unable to create directory %s", directory.c_str());
         }
 
         // call file limiter now that we are actually putting a value into cloned
@@ -95,77 +91,85 @@ void srcml_write_request(std::shared_ptr<ParseRequest> request, TraceLog& log, c
         cloned.reset(srcml_archive_clone(output_archive));
         output_archive = cloned.get();
 
-        // @todo These should follow the master archive
+        // per-unit archive
         srcml_archive_enable_solitary_unit(output_archive);
         srcml_archive_disable_hash(output_archive);
 
-        srcml_archive_write_open_filename(output_archive, filename.c_str());
+        srcml_archive_write_open_filename(output_archive, path.string().c_str());
     }
 
     // output scalar results
-    // @todo Make sure this works with filename output, not just file descriptor
-    switch (request->results.type) {
-    case SRCML_RESULTS_BOOLEAN:
-        {
-            const char* boolresult = request->results.boolValue ? "true\n" : "false\n";
-            srcml_archive_write_string(output_archive, boolresult, (int) strlen(boolresult));
-        }
-        return;
+    if (prequest->results) {
+        switch (srcml_transform_get_type(prequest->results)) {
+        case SRCML_RESULT_BOOLEAN:
+            {
+                // output as true/false with newline after every results
+                std::string_view boolresult = srcml_transform_get_bool(prequest->results) ? "true\n" : "false\n";
+                srcml_archive_write_string(output_archive, boolresult.data(), (int) boolresult.size());
+            }
+            srcml_transform_free(prequest->results);
+            return;
 
-    case SRCML_RESULTS_NUMBER:
-        {
-            std::string s;
-            if (request->results.numberValue != (int) request->results.numberValue)
-                s = std::to_string(request->results.numberValue);
-            else
-                s = std::to_string((int) request->results.numberValue);
+        case SRCML_RESULT_NUMBER:
+            {
+                std::string s;
+                if (srcml_transform_get_number(prequest->results) != (int) srcml_transform_get_number(prequest->results))
+                    s = std::to_string(srcml_transform_get_number(prequest->results));
+                else
+                    s = std::to_string((int) srcml_transform_get_number(prequest->results));
 
-            srcml_archive_write_string(output_archive, s.c_str(), (int) s.size());
-        }
-        return;
+                srcml_archive_write_string(output_archive, s.data(), (int) s.size());
 
-    case SRCML_RESULTS_STRING:
-        const char* s = (const char*) request->results.stringValue;
-        srcml_archive_write_string(output_archive, s, (int) strlen(s));
+                // output a newline after every result
+                srcml_archive_write_string(output_archive, "\n", 1);
+            }
+            srcml_transform_free(prequest->results);
+            return;
 
-        // if the string does not end in a newline, output one
-        if (s[strlen(s) - 1] != '\n')
-            srcml_archive_write_string(output_archive, "\n", 1);
-        
-        return;
-    };
+        case SRCML_RESULT_STRING:
+            std::string_view s = srcml_transform_get_string(prequest->results);
+            srcml_archive_write_string(output_archive, s.data(), (int) s.size());
+
+            // if the string does not end in a newline, output one
+            if (s.back() != '\n')
+                srcml_archive_write_string(output_archive, "\n", 1);
+
+            srcml_transform_free(prequest->results);
+            return;
+        };
+    }
 
     // write the unit
-    if (request->status == SRCML_STATUS_OK) {
+    if (prequest->status == SRCML_STATUS_OK) {
 
-        log.totalLOC(srcml_unit_get_loc(request->unit.get()));
+        log.totalLOC(static_cast<size_t>(srcml_unit_get_loc(prequest->unit.get())));
 
         // chance that a solo unit archive was the input, but transformation was
         // done, so output has to be a full archive
-        // @todo Make sure it is only an xpath transformation
-        if (request->results.num_units > 1) {
+        if (prequest->results && srcml_transform_get_unit_size(prequest->results) > 1) {
             srcml_archive_disable_solitary_unit(output_archive);
         }
 
         // write out any transformed units
-        for (int i = 0; i < request->results.num_units; ++i) {
-            srcml_archive_write_unit(output_archive, request->results.units[i]);
+        if (prequest->results) {
+            for (int i = 0; i < srcml_transform_get_unit_size(prequest->results); ++i) {
+                srcml_archive_write_unit(output_archive, srcml_transform_get_unit(prequest->results, i));
+            }
         }
-
         // if no transformed units, write the main unit
-        if (request->results.num_units == 0 && request->unit) {
+        if ((!prequest->results || srcml_transform_get_unit_size(prequest->results) == 0) && prequest->unit) {
             int status = SRCML_STATUS_OK;
             if (option(SRCML_COMMAND_XML_FRAGMENT)) {
-                const char* s = srcml_unit_get_srcml_outer(request->unit.get());
-                status = srcml_archive_write_string(output_archive, s, (int) strlen(s));
-                if (s[strlen(s) - 1] != '\n') {
+                std::string_view s = srcml_unit_get_srcml_outer(prequest->unit.get());
+                status = srcml_archive_write_string(output_archive, s.data(), (int) s.size());
+                if (s.back() != '\n') {
                     srcml_archive_write_string(output_archive, "\n", 1);
                 }
             } else if (option(SRCML_COMMAND_XML_RAW)) {
-                const char* s = srcml_unit_get_srcml_inner(request->unit.get());
-                status = srcml_archive_write_string(output_archive, s, (int) strlen(s));
+                std::string_view s = srcml_unit_get_srcml_inner(prequest->unit.get());
+                status = srcml_archive_write_string(output_archive, s.data(), (int) s.size());
                 // when non-blank and does not end in newline, add one in
-                if (s[0] != '\0' && s[strlen(s) - 1] != '\n') {
+                if (!s.empty() && s.back() != '\n') {
                     srcml_archive_write_string(output_archive, "\n", 1);
                 }
             } else if (option(SRCML_COMMAND_CAT_XML)) {
@@ -177,7 +181,7 @@ void srcml_write_request(std::shared_ptr<ParseRequest> request, TraceLog& log, c
                     char* buffer = 0;
                     size_t size = 0;
                     srcml_archive_write_open_memory(sarchive, &buffer, &size);
-                    std::unique_ptr<srcml_unit> aunit(srcml_unit_clone(request->unit.get()));
+                    std::unique_ptr<srcml_unit> aunit(srcml_unit_clone(prequest->unit.get()));
                     srcml_unit_parse_memory(aunit.get(), "", 0);
                     srcml_archive_write_unit(sarchive, aunit.get());
                     srcml_archive_close(sarchive);
@@ -186,44 +190,48 @@ void srcml_write_request(std::shared_ptr<ParseRequest> request, TraceLog& log, c
 
                     first = false;
                 }
-                const char* s = srcml_unit_get_srcml_inner(request->unit.get());
-                status = srcml_archive_write_string(output_archive, s, (int) strlen(s));
+                std::string_view s = srcml_unit_get_srcml_inner(prequest->unit.get());
+                status = srcml_archive_write_string(output_archive, s.data(), (int) s.size());
                 // when non-blank and does not end in newline, add one in
-                if (s[0] != '\0' && s[strlen(s) - 1] != '\n') {
+                if (!s.empty() && s.back() != '\n') {
                     srcml_archive_write_string(output_archive, "\n", 1);
                 }
             } else {
-                status = srcml_archive_write_unit(output_archive, request->unit.get());
+                status = srcml_archive_write_unit(output_archive, prequest->unit.get());
             }
             if (status != SRCML_STATUS_OK) {
                 SRCMLstatus(ERROR_MSG) << "Error in writing parsed unit to archive" << '\n';
             }
         }
 
+        if (prequest->results)
+            srcml_transform_free(prequest->results);
+
         // logging
         if (option(SRCML_COMMAND_VERBOSE)) {
             std::ostringstream outs;
-            outs << std::setw(4) << std::left << request->language;
-            outs << ' ' << std::setw(5) << std::right << srcml_unit_get_loc(request->unit.get());
+            outs << std::setw(4) << std::left << prequest->language;
+            outs << ' ' << std::setw(5) << std::right << srcml_unit_get_loc(prequest->unit.get());
             if (option(SRCML_DEBUG_MODE)) {
-                auto runtime = std::round(request->runtime * 10) / 10;
+                auto runtime = std::round(prequest->runtime * 10) / 10;
                 outs << ' ' << std::setw(6) << std::right << std::fixed << std::setprecision(1) << runtime << "ms";
-                auto kloc = std::round(request->runtime > 0 ? (10 * srcml_unit_get_loc(request->unit.get()) / request->runtime) : 0) / 10;
+                auto kloc = std::round(prequest->runtime > 0 ? (10 * srcml_unit_get_loc(prequest->unit.get()) / prequest->runtime) : 0) / 10;
                 outs << ' ' << std::setw(4) << std::right << std::fixed << std::setprecision(1) << kloc;
             }
-            const char* hash = srcml_unit_get_hash(request->unit.get());
+            const char* hash = srcml_unit_get_hash(prequest->unit.get());
             if (hash)
                 outs << ' ' << hash;
-            outs << ' ' << (request->filename ? *request->filename : "");
+            if (prequest->filename)
+                outs << ' ' << *prequest->filename;
 
             log << 'a' << outs.str();
         }
 
-    } else if (request->errormsg) {
-        if (!request->errormsg->empty())
-            SRCMLstatus(WARNING_MSG, *(request->errormsg));
+    } else if (prequest->errormsg) {
+        if (!prequest->errormsg->empty())
+            SRCMLstatus(WARNING_MSG, *(prequest->errormsg));
 
     } else {
-        SRCMLstatus(WARNING_MSG, "Internal error " + std::to_string(request->status));
+        SRCMLstatus(WARNING_MSG, "Internal error " + std::to_string(prequest->status));
     }
 }

@@ -1,11 +1,16 @@
 #!/bin/bash
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# @file remote_srcml_archive_single.sh
+#
+# @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
 
 # test framework
 source $(dirname "$0")/framework_test.sh
 
 define srca <<- 'STDOUT'
 	a;
-	STDOUT
+STDOUT
 
 # input from a valid remote srcML archive with one unit
 srcml https://raw.githubusercontent.com/srcML/test-data/1.0.0/srcml/archive-single.xml
@@ -23,50 +28,48 @@ srcml https://raw.githubusercontent.com/srcML/test-data/1.0.0/srcml/archive-sing
 check sub/archive_single.cpp "$srca"
 
 # input from a compressed srcml file
-srcml https://github.com/srcML/test-data/blob/master/srcml/archive-single.xml.bz2?raw=true
+srcml https://raw.githubusercontent.com/srcML/test-data/1.0.0/srcml/archive-single.xml.bz2
 check "$srca"
 
-srcml https://github.com/srcML/test-data/blob/master/srcml/archive-single.xml.gz?raw=true
+srcml https://raw.githubusercontent.com/srcML/test-data/1.0.0/srcml/archive-single.xml.gz
 check "$srca"
 
-srcml https://github.com/srcML/test-data/blob/master/srcml/archive-single.xml.bz2.gz?raw=true
+srcml https://raw.githubusercontent.com/srcML/test-data/1.0.0/srcml/archive-single.xml.bz2.gz
 check "$srca"
 
-srcml https://github.com/srcML/test-data/blob/master/srcml/archive-single.xml.gz.bz2?raw=true
+srcml https://raw.githubusercontent.com/srcML/test-data/1.0.0/srcml/archive-single.xml.gz.bz2
 check "$srca"
-
 
 # input from an archived srcml file
-srcml https://github.com/srcML/test-data/raw/master/srcml/archive-single.xml.cpio
+srcml https://raw.githubusercontent.com/srcML/test-data/1.0.0/srcml/archive-single.xml.cpio
 check "$srca"
 
-srcml https://github.com/srcML/test-data/blob/master/srcml/archive-single.xml.cpio.bz2?raw=true
+srcml https://raw.githubusercontent.com/srcML/test-data/1.0.0/srcml/archive-single.xml.cpio.bz2
 check "$srca"
 
-srcml https://github.com/srcML/test-data/blob/master/srcml/archive-single.xml.cpio.gz?raw=true
+srcml https://raw.githubusercontent.com/srcML/test-data/1.0.0/srcml/archive-single.xml.cpio.gz
 check "$srca"
 
-srcml https://github.com/srcML/test-data/blob/master/srcml/archive-single.xml.tar.bz2?raw=true
+srcml https://raw.githubusercontent.com/srcML/test-data/1.0.0/srcml/archive-single.xml.tar.bz2
 check "$srca"
 
-srcml https://github.com/srcML/test-data/blob/master/srcml/archive-single.xml.tar.gz?raw=true
+srcml https://raw.githubusercontent.com/srcML/test-data/1.0.0/srcml/archive-single.xml.tar.gz
 check "$srca"
 
-srcml https://github.com/srcML/test-data/raw/master/srcml/archive-single.xml.tar
+srcml https://raw.githubusercontent.com/srcML/test-data/1.0.0/srcml/archive-single.xml.tar
 check "$srca"
 
-srcml https://github.com/srcML/test-data/blob/master/srcml/archive-single.xml.tbz2?raw=true
+srcml https://raw.githubusercontent.com/srcML/test-data/1.0.0/srcml/archive-single.xml.tbz2
 check "$srca"
 
-srcml https://github.com/srcML/test-data/blob/master/srcml/archive-single.xml.tgz?raw=true
+srcml https://raw.githubusercontent.com/srcML/test-data/1.0.0/srcml/archive-single.xml.tgz
 check "$srca"
 
-# FIXME: URLs don't work
-#srcml https://github.com/srcML/test-data/blob/master/srcml/archive-single.xml.zip?raw=true
-#check "$srca"
+srcml https://raw.githubusercontent.com/srcML/test-data/1.0.0/srcml/archive-single.xml.zip
+check "$srca"
 
-#srcml https://github.com/srcML/test-data/blob/master/srcml/archive-single.xml.zip.bz2?raw=true
-#check "$srca"
+srcml https://raw.githubusercontent.com/srcML/test-data/1.0.0/srcml/archive-single.xml.zip.bz2
+check "$srca"
 
-#srcml https://github.com/srcML/test-data/blob/master/srcml/archive-single.xml.zip.gz?raw=true
-#check "$srca"
+srcml https://raw.githubusercontent.com/srcML/test-data/1.0.0/srcml/archive-single.xml.zip.gz
+check "$srca"

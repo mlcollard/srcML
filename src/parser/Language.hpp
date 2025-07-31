@@ -1,23 +1,10 @@
+// SPDX-License-Identifier: GPL-3.0-only
 /**
  * @file Language.hpp
  *
- * @copyright Copyright (C) 2004-2014 srcML, LLC. (www.srcML.org)
+ * @copyright Copyright (C) 2004-2024 srcML, LLC. (www.srcML.org)
  *
  * This file is part of the srcML Toolkit.
- *
- * The srcML Toolkit is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * The srcML Toolkit is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with the srcML Toolkit; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 #ifndef LANGUAGE_HPP
@@ -25,7 +12,6 @@
 
 //#include <fnmatch.h>
 #include <cstdio>
-#include <cstring>
 #include <string>
 #include <vector>
 
@@ -61,6 +47,8 @@ namespace LanguageName {
     /** String constant for Objective-C language */
     const char* const LANGUAGE_OBJECTIVE_C = "Objective-C";
 
+    /** String constant for Python language */
+    const char* const LANGUAGE_PYTHON = "Python";
 }
 
 /**
@@ -99,8 +87,11 @@ public:
         /** Objective-C language */
         LANGUAGE_OBJECTIVE_C = 16,
 
+        /** Python language */
+        LANGUAGE_PYTHON = 32,
+
         /** C++ family i.e. C++/C#  */
-        LANGUAGE_CXX_FAMILY = LANGUAGE_CXX | LANGUAGE_CSHARP,
+        LANGUAGE_CXX_FAMILY = LANGUAGE_CXX | LANGUAGE_CSHARP | LANGUAGE_PYTHON,
 
         /** C family i.e. C/C++/C# */
         LANGUAGE_C_FAMILY = LANGUAGE_C | LANGUAGE_CXX_FAMILY | LANGUAGE_OBJECTIVE_C,
@@ -125,6 +116,8 @@ public:
         : language(lang) {
 
     }
+
+    Language& operator=(const Language&) = delete;
 
     /**
      * inLanguage
@@ -176,7 +169,7 @@ public:
 
         for(int i = 0; i < lang2intcount; ++i)
             if (get_language_number(lang2int[i]) == language)
-                return get_language_string(lang2int[i]).c_str();
+                return get_language_string(lang2int[i]).data();
 
         return "";
     }

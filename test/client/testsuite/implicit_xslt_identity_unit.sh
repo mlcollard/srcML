@@ -1,16 +1,21 @@
 #!/bin/bash
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# @file implicit_xslt_identity_unit.sh
+#
+# @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
 
 # test framework
 source $(dirname "$0")/framework_test.sh
 
 # test xslt on single unit
-define srcml <<- 'STDOUT'
+defineXML srcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" language="C++"><expr_stmt><expr><name>a</name></expr>;</expr_stmt>
 	</unit>
-	STDOUT
+STDOUT
 
-define identity <<- 'STDOUT'
+defineXML identity <<- 'STDOUT'
 	<xsl:stylesheet
 	xmlns="http://www.srcML.org/srcML/src"
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -23,9 +28,8 @@ define identity <<- 'STDOUT'
 	  </xsl:copy>
 	 </xsl:template>
 	</xsl:stylesheet>
-	STDOUT
+STDOUT
 
-xmlcheck "$srcml"
 createfile sub/unit.cpp.xml "$srcml"
 createfile identity.xsl "$identity"
 
@@ -76,3 +80,5 @@ check sub/b.cpp.xml "$srcml"
 srcml identity.xsl -o sub/b.cpp.xml < sub/unit.cpp.xml
 check sub/b.cpp.xml "$srcml"
 
+srcml --xslt-param name=value identity.xsl -o sub/b.cpp.xml < sub/unit.cpp.xml
+check sub/b.cpp.xml "$srcml"

@@ -1,4 +1,9 @@
 #!/bin/bash
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# @file mixed_newlines.sh
+#
+# @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
 
 # test framework
 source $(dirname "$0")/framework_test.sh
@@ -57,8 +62,3 @@ check_lines 3
 
 echo -en "\r\r\n\r" | srcml -l C | srcml
 check_lines 3
-
-
-
-
-

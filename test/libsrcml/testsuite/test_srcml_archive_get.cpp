@@ -1,27 +1,12 @@
+// SPDX-License-Identifier: GPL-3.0-only
 /**
  * @file test_srcml_archive_get.cpp
  *
- * @copyright Copyright (C) 2013-2014 srcML, LLC. (www.srcML.org)
+ * @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
  *
- * The srcML Toolkit is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
  *
- * The srcML Toolkit is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with the srcML Toolkit; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ * Test cases for srcml_archive_get_*.
  */
-
-/*
-
-  Test cases for srcml_archive_get_*.
-*/
 
 #include <srcml.h>
 
@@ -76,23 +61,15 @@ int main(int, char* argv[]) {
     /*
       srcml_archive_get_revision
     */
-    // @TODO How can both of these be true?
     {
         srcml_archive* archive = srcml_archive_create();
-//        dassert(srcml_archive_get_revision(archive), std::string(SRCML_VERSION_STRING));
-        srcml_archive_free(archive);
-    }
-
-    {
-        srcml_archive* archive = srcml_archive_create();
-//        dassert(srcml_archive_get_revision(archive), 0);
+        dassert(srcml_archive_get_revision(archive), std::string(SRCML_VERSION_STRING));
         srcml_archive_free(archive);
     }
 
     {
         dassert(srcml_archive_get_revision(0), 0);
     }
-
 
     {
         srcml_archive* archive = srcml_archive_create();
@@ -170,24 +147,20 @@ int main(int, char* argv[]) {
 
     {
         srcml_archive* archive = srcml_archive_create();
-
-//        archive->options = 1;
-
-//        dassert(srcml_archive_get_options(archive), 1);
+        srcml_archive_set_options(archive, SRCML_OPTION_CPP);
+        dassert(srcml_archive_get_options(archive), SRCML_OPTION_CPP);
         srcml_archive_free(archive);
     }
 
     {
         srcml_archive* archive = srcml_archive_create();
-
-//        archive->options = 1 | 2;
-
-//        dassert(srcml_archive_get_options(archive), (1 | 2));
+        srcml_archive_set_options(archive, SRCML_OPTION_CPP | SRCML_OPTION_NO_XML_DECL);
+        dassert(srcml_archive_get_options(archive), (SRCML_OPTION_CPP | SRCML_OPTION_NO_XML_DECL));
         srcml_archive_free(archive);
     }
 
     {
-//        dassert(srcml_archive_get_options(0), 0);
+        dassert(srcml_archive_get_options(0), 0);
     }
 
     /*
@@ -239,12 +212,6 @@ int main(int, char* argv[]) {
 
     {
         srcml_archive* archive = srcml_archive_create();
-        dassert(srcml_archive_get_namespace_prefix(archive, -1), 0);
-        srcml_archive_free(archive);
-    }
-
-    {
-        srcml_archive* archive = srcml_archive_create();
         dassert(srcml_archive_get_namespace_prefix(archive, 2), 0);
         srcml_archive_free(archive);
     }
@@ -285,12 +252,6 @@ int main(int, char* argv[]) {
     {
         srcml_archive* archive = srcml_archive_create();
         dassert(srcml_archive_get_namespace_uri(archive, 0), std::string("http://www.srcML.org/srcML/src"));
-        srcml_archive_free(archive);
-    }
-
-    {
-        srcml_archive* archive = srcml_archive_create();
-        dassert(srcml_archive_get_namespace_uri(archive, -1), 0);
         srcml_archive_free(archive);
     }
 

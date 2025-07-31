@@ -1,26 +1,102 @@
+# SPDX-License-Identifier: GPL-3.0-only
 ##
 # @file CMakeLists.txt
-#
-# @copyright Copyright (C) 2013-2014 srcML, LLC. (www.srcML.org)
 # 
-# The srcML Toolkit is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
+# @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
 # 
-# The srcML Toolkit is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-# 
-# You should have received a copy of the GNU General Public License
-# along with the srcML Toolkit; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+# CMake files for building the parser
 
-# Finding antlr binary.
-find_program(ANTLR_EXE NAMES antlr runantlr cantlr antlr2 antlr.bat PATHS /usr/bin /opt/local/bin /usr/local/bin ${WINDOWS_DEP_PATH}/tools/antlr/277/bin)
+# parser debugging
+option(SRCML_DEBUG_PARSER "Enable parser debugging output" OFF)
 
+# TinySHA1 external include
+include(FetchContent)
+FetchContent_Declare(TinySHA1
+  GIT_REPOSITORY https://github.com/mohaps/tinysha1
+  GIT_TAG        2795aa8de91b1797defdfbff61ed93b22b5ced81
+  GIT_SHALLOW    TRUE
+)
+FetchContent_MakeAvailable(TinySHA1)
+add_library(TinySHA1 INTERFACE IMPORTED)
+target_include_directories(TinySHA1 INTERFACE ${tinysha1_SOURCE_DIR})
+
+find_package(LibXml2 REQUIRED)
+find_package(Iconv REQUIRED)
+find_package(Java COMPONENTS Runtime REQUIRED)
+
+# Setup ANTLR 2.7 library
+include(FetchContent)
+FetchContent_Declare(antlrsrc
+    URL https://www.antlr2.org/download/antlr-2.7.7.tar.gz
+    URL_HASH MD5=01cc9a2a454dd33dcd8c856ec89af090
+)
+# Fetch the content using previously declared details
+FetchContent_MakeAvailable(antlrsrc)
+# Custom marker file to check if modifications have been made
+set(MARKER_FILE "${antlrsrc_SOURCE_DIR}/antlr_patched.marker")
+# Fetch and modify only once
+if(NOT EXISTS ${MARKER_FILE})
+    message(STATUS "Modifying ANTLR sources")
+
+    # Add needed include file for CharScanner.hpp
+    # Comment out use of std::binary_function, deprecated in C++11 and removed in C++17
+    set(CHARSCANNER_HPP "${antlrsrc_SOURCE_DIR}/lib/cpp/antlr/CharScanner.hpp")
+    file(READ ${CHARSCANNER_HPP} FILE_CONTENTS)
+    string(REPLACE "#include <antlr/config.hpp>\n\n" "#include <antlr/config.hpp>\n#include <string.h>\n\n" FILE_CONTENTS "${FILE_CONTENTS}")
+    string(REPLACE "class ANTLR_API CharScannerLiteralsLess : public ANTLR_USE_NAMESPACE(std)binary_function<ANTLR_USE_NAMESPACE(std)string,ANTLR_USE_NAMESPACE(std)string,bool>"
+                    "class ANTLR_API CharScannerLiteralsLess /* : public ANTLR_USE_NAMESPACE(std)binary_function<ANTLR_USE_NAMESPACE(std)string,ANTLR_USE_NAMESPACE(std)string,bool> */" FILE_CONTENTS "${FILE_CONTENTS}")
+    file(WRITE ${CHARSCANNER_HPP} "${FILE_CONTENTS}")
+
+    # Remove pragma warning disable that is no longer valid
+    set(CONFIG_HPP "${antlrsrc_SOURCE_DIR}/lib/cpp/antlr/config.hpp")
+    file(READ ${CONFIG_HPP} FILE_CONTENTS)
+    string(REPLACE "# pragma warning( disable : 4786 4231 )" "# pragma warning( disable : 4786 )" FILE_CONTENTS "${FILE_CONTENTS}")
+    file(WRITE ${CONFIG_HPP} "${FILE_CONTENTS}")
+
+    # Create marker file to indicate that modifications have been done
+    file(WRITE ${MARKER_FILE} "Patched ANTLR sources.")
+endif()
+
+# antlr library
+add_library(antlr OBJECT)
+set_target_properties(antlr PROPERTIES POSITION_INDEPENDENT_CODE ON)
+file(GLOB ANTLR_SOURCE ${antlrsrc_SOURCE_DIR}/lib/cpp/src/*.cpp)
+list(REMOVE_ITEM ANTLR_SOURCE "${antlrsrc_SOURCE_DIR}/lib/cpp/src/dll.cpp")
+target_sources(antlr PRIVATE "${ANTLR_SOURCE}")
+target_include_directories(antlr SYSTEM PUBLIC "${antlrsrc_SOURCE_DIR}/lib/cpp/" SYSTEM PRIVATE "${antlrsrc_SOURCE_DIR}/lib/cpp/")
+target_compile_options(antlr PRIVATE ${SRCML_ANTLR_COMPILE_FLAGS})
+
+# Generated source from antlr and the parser
+set(CMAKE_GENERATED_SOURCE_DIR ${CMAKE_BINARY_DIR}/parser)
+
+# Find antlr runtime
+set(ANTLR_EXE ${Java_JAVA_EXECUTABLE} -classpath "${antlrsrc_SOURCE_DIR}/antlr.jar" antlr.Tool)
+message("-- ANTLR: ${ANTLR_EXE}")
+
+# parser library
 file(GLOB PARSER_SOURCE *.hpp *.cpp)
+add_library(parser OBJECT
+    ${CMAKE_GENERATED_SOURCE_DIR}/srcMLParser.cpp
+    ${CMAKE_GENERATED_SOURCE_DIR}/KeywordLexer.cpp
+    ${CMAKE_GENERATED_SOURCE_DIR}/CommentTextLexer.cpp
+    ${PARSER_SOURCE}
+)
+set_target_properties(parser PROPERTIES POSITION_INDEPENDENT_CODE ON)
+target_include_directories(parser SYSTEM PUBLIC ${antlrsrc_SOURCE_DIR}/lib/cpp)
+target_include_directories(parser PRIVATE . ${CMAKE_GENERATED_SOURCE_DIR} PUBLIC . SYSTEM PUBLIC ${CMAKE_GENERATED_SOURCE_DIR})
+target_link_libraries(parser PRIVATE LibXml2::LibXml2 antlr)
+target_include_directories(parser PRIVATE $<TARGET_PROPERTY:TinySHA1,INTERFACE_INCLUDE_DIRECTORIES>)
+if(SRCML_DEBUG_PARSER)
+    set_source_files_properties(${CMAKE_GENERATED_SOURCE_DIR}/srcMLParser.cpp PROPERTIES COMPILE_DEFINITIONS SRCML_DEBUG_PARSER)
+endif()
+
+# PreCompiled Headers configuration of the parser
+if (SRCML_PARSER_PCH)
+    target_precompile_headers(parser PRIVATE "${SRCML_PARSER_PCH}")
+endif()
+
+target_compile_options(antlr PRIVATE ${SRCML_ANTLR_DISABLED_WARNINGS})
+target_compile_options(parser PRIVATE ${SRCML_PARSER_DISABLED_WARNINGS})
 
 # 
 # RunAntlr
@@ -32,36 +108,13 @@ file(GLOB PARSER_SOURCE *.hpp *.cpp)
 #
 macro(RunAntlr OUTPUT_FILES INPUT_FILES DEPENDENCIES INCLUDE_GRAMMAR)
 
-    if("${INCLUDE_GRAMMAR}" STREQUAL "")
-        if(WIN32)
-            # Handling windows relative path problem (Not sure why this is an issue but it's given me a headache).
-            add_custom_command(OUTPUT  ${OUTPUT_FILES}
-                DEPENDS ${INPUT_FILES} ${DEPENDENCIES}
-                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                COMMAND ${ANTLR_EXE} -o \"${CMAKE_GENERATED_SOURCE_DIR}\" ${INPUT_FILES}
-            )
-        else()
-            add_custom_command(OUTPUT  ${OUTPUT_FILES}
-                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                COMMAND ${ANTLR_EXE} -o \"${CMAKE_GENERATED_SOURCE_DIR}\" ${INPUT_FILES} DEPENDS ${INPUT_FILES} ${DEPENDENCIES}
-                COMMAND ${CMAKE_COMMAND} -E touch ${OUTPUT_FILES}
-            )
-        endif()
-    else()
-        if(WIN32)
-            add_custom_command(OUTPUT  ${OUTPUT_FILES}
-                DEPENDS ${INPUT_FILES} ${DEPENDENCIES}
-                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                COMMAND ${ANTLR_EXE} -o \"${CMAKE_GENERATED_SOURCE_DIR}\" -glib \"${INCLUDE_GRAMMAR}\" ${INPUT_FILES}
-            )
-        else()
-            add_custom_command(OUTPUT  ${OUTPUT_FILES}
-                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                COMMAND ${ANTLR_EXE} -o \"${CMAKE_GENERATED_SOURCE_DIR}\" -glib \"${INCLUDE_GRAMMAR}\" ${INPUT_FILES} DEPENDS ${INPUT_FILES} ${DEPENDENCIES}
-                COMMAND ${CMAKE_COMMAND} -E touch ${OUTPUT_FILES}
-            )
-        endif()
-    endif()
+    add_custom_command(OUTPUT  ${OUTPUT_FILES}
+        DEPENDS ${INPUT_FILES} ${DEPENDENCIES}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        COMMAND ${ANTLR_EXE} -o \"${CMAKE_GENERATED_SOURCE_DIR}\" -glib \"${INCLUDE_GRAMMAR}\" ${INPUT_FILES}
+        COMMAND ${CMAKE_COMMAND} -E touch ${OUTPUT_FILES}
+    )
+
 endmacro(RunAntlr)
 
 macro(lexerFiles LEXER)
@@ -118,12 +171,3 @@ RunAntlr("${srcMLParserOutputFiles}"
     "srcMLParser.g;${CMAKE_GENERATED_SOURCE_DIR}/KeywordLexer.cpp"
     "OperatorLexer.g\;KeywordLexer.g\;TextLexer.g"
 )
-
-add_library(parser OBJECT
-    ${CMAKE_GENERATED_SOURCE_DIR}/srcMLParser.cpp
-    ${CMAKE_GENERATED_SOURCE_DIR}/KeywordLexer.cpp
-    ${CMAKE_GENERATED_SOURCE_DIR}/CommentTextLexer.cpp
-    ${PARSER_SOURCE}
-)
-
-target_include_directories(parser PUBLIC . ${CMAKE_SOURCE_DIR}/src/libsrcml ${CMAKE_GENERATED_SOURCE_DIR})

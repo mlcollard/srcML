@@ -1,14 +1,18 @@
 #!/bin/bash
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# @file files_from_invalid.sh
+#
+# @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
 
 # test framework
 source $(dirname "$0")/framework_test.sh
 
 # files from
-define empty_srcml <<- 'STDOUT'
+defineXML empty_srcml <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION"/>
-	STDOUT
-xmlcheck "$empty_srcml"
+STDOUT
 
 # empty file input
 createfile empty.txt " "
@@ -29,7 +33,7 @@ check empty-remote.xml "$empty_srcml"
 # file list of non-existent files
 define open_error <<- 'STDERR'
 	srcml: Unable to open file nonexistent1.txt
-	STDERR
+STDERR
 
 createfile nonexistent_files.txt "nonexistent1.txt"
 
@@ -37,33 +41,31 @@ srcml --files-from nonexistent_files.txt
 check_exit 1 "$empty_srcml" "$open_error"
 
 srcml --files-from nonexistent_files.txt -o nonexistent.xml
-#check nonexistent.xml "$empty_srcml" "$open_error"
 check_exit 1 "$open_error"
 
 # file list references itself
 define open_error <<- 'STDOUT'
-	srcml: Extension not supported loop.txt
-	STDOUT
+	srcml: WARNING Filelist entry duplicate of filelist: loop.txt
+STDOUT
 
 createfile loop.txt "loop.txt"
 
 srcml --files-from loop.txt
-check_exit 1 "$empty_srcml" "$open_error" 
-
+check_exit 1 "$empty_srcml" "$open_error"
 
 srcml --files-from loop.txt -o loop.xml
-check_exit 1 "$open_error" 
+check_exit 1 "$open_error"
 #loop.xml "$empty_srcml"
 
 # file list references empty file
-define empty_archive <<- 'STDOUT'
+defineXML empty_archive <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION">
 
 	<unit revision="REVISION" language="C++" filename="empty.cpp" hash="da39a3ee5e6b4b0d3255bfef95601890afd80709"/>
 
 	</unit>
-	STDOUT
+STDOUT
 
 createfile empty.cpp ""
 createfile filelist.txt "empty.cpp"
@@ -80,12 +82,11 @@ check "$empty_archive"
 srcml --files-from filelist.txt --archive -o files-from-empty-cpp.xml
 check files-from-empty-cpp.xml "$empty_archive"
 
-
 # empty archived file list
-define empty_srcml_with_url <<- 'STDOUT'
+defineXML empty_srcml_with_url <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" url="test"/>
-	STDOUT
+STDOUT
 
 echo empty.txt | tr " " "\n" | cpio --quiet -o > empty.txt.cpio
 bzip2 -c empty.txt.cpio > empty.txt.cpio.bz2

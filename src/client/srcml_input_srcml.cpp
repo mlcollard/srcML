@@ -1,23 +1,10 @@
+// SPDX-License-Identifier: GPL-3.0-only
 /**
  * @file srcml_input_srcml.cpp
  *
- * @copyright Copyright (C) 2014 srcML, LLC. (www.srcML.org)
+ * @copyright Copyright (C) 2014-2024 srcML, LLC. (www.srcML.org)
  *
  * This file is part of the srcml command-line client.
- *
- * The srcML Toolkit is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * The srcML Toolkit is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with the srcml command-line client; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
 #include <srcml_input_srcml.hpp>
@@ -27,15 +14,17 @@
 #include <srcml.h>
 #include <srcml_options.hpp>
 #include <srcml_cli.hpp>
-#include <srcmlns.hpp>
 #include <SRCMLStatus.hpp>
 #include <OpenFileLimiter.hpp>
+#include <string_view>
+
+using namespace ::std::literals::string_view_literals;
 
 int srcml_input_srcml(ParseQueue& queue,
                        srcml_archive* srcml_output_archive,
                        const srcml_request_t& srcml_request,
                        const srcml_input_src& srcml_input,
-                       const boost::optional<size_t> & revision) {
+                       const std::optional<size_t> & revision) {
 
     // open the srcml input archive
     OpenFileLimiter::open();
@@ -48,10 +37,10 @@ int srcml_input_srcml(ParseQueue& queue,
     int open_status = SRCML_STATUS_OK;
     if (revision)
         open_status = srcml_archive_set_srcdiff_revision(srcml_input_archive.get(), *revision);
-
     open_status = srcml_archive_read_open(srcml_input_archive.get(), srcml_input);
+
     if (open_status != SRCML_STATUS_OK) {
-        if (srcml_input.protocol == "file" )
+        if (srcml_input.protocol == "file"sv)
             SRCMLstatus(ERROR_MSG, "srcml: Unable to open srcml file %s", src_prefix_resource(srcml_input.filename));
         else
             SRCMLstatus(ERROR_MSG, "srcml: Unable to open srcml URL %s", srcml_input.filename);
@@ -69,7 +58,7 @@ int srcml_input_srcml(ParseQueue& queue,
         for (size_t i = 0; i < nsSize; ++i) {
 
             // ignore srcDiff URL, since it will not be on the output
-            if (revision && srcml_archive_get_namespace_uri(srcml_input_archive.get(), i) == std::string(SRCML_DIFF_NS_URI))
+            if (revision && srcml_archive_get_namespace_uri(srcml_input_archive.get(), i) == "http://www.srcML.org/srcDiff"sv)
                 continue;
 
             // register the input srcml archive namespace
@@ -80,7 +69,6 @@ int srcml_input_srcml(ParseQueue& queue,
     }
 
     // move to the correct unit (if needed)
-    // @todo Why isn't srcml_input.unit working?
     for (int i = 1; i < (option(SRCML_COMMAND_PARSER_TEST) ? srcml_request.unit : srcml_input.unit); ++i) {
         if (!srcml_archive_skip_unit(srcml_input_archive.get())) {
             SRCMLstatus(ERROR_MSG, "Requested unit %s out of range.", srcml_input.unit);
@@ -115,7 +103,7 @@ int srcml_input_srcml(ParseQueue& queue,
         prequest->input_archive = srcml_input_archive;
         prequest->parsertest_filename = srcml_input.resource;
 
-        if (srcml_archive_get_url(prequest->input_archive.get())) 
+        if (srcml_archive_get_url(prequest->input_archive.get()))
             prequest->url = srcml_archive_get_url(prequest->input_archive.get());
 
         // if the archive has a language (set by the user) then use that

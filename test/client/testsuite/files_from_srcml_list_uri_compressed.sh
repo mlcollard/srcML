@@ -1,17 +1,22 @@
 #!/bin/bash
+# SPDX-License-Identifier: GPL-3.0-only
+#
+# @file files_from_srcml_list_uri_compressed.sh
+#
+# @copyright Copyright (C) 2013-2024 srcML, LLC. (www.srcML.org)
 
 # test framework
 source $(dirname "$0")/framework_test.sh
 
 # file list contains an empty remote source
-define empty_srcml_archive <<- 'STDOUT'
+defineXML empty_srcml_archive <<- 'STDOUT'
 	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 	<unit xmlns="http://www.srcML.org/srcML/src" revision="REVISION" url="test">
 
 	<unit revision="REVISION" language="C++" filename="empty.cpp" hash="da39a3ee5e6b4b0d3255bfef95601890afd80709"/>
 
 	</unit>
-	STDOUT
+STDOUT
 
 createfile list-empty.txt "https://raw.githubusercontent.com/srcML/test-data/1.0.0/srcml/emptyunit.xml"
 
