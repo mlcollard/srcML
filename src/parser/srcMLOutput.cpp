@@ -354,7 +354,7 @@ void srcMLOutput::startUnit(const char* language, const char* revision,
                             const char* version, const char* timestamp,
                             const char* hash,
                             const char* encoding,
-                            const Attributes& attributes,
+                            const Attributes& unit_attributes,
                             bool output_macrolist) {
 
     // go with default encoding
@@ -447,7 +447,7 @@ void srcMLOutput::startUnit(const char* language, const char* revision,
     }
 
     // custom attributes
-    for (const auto& attribute : attributes) {
+    for (const auto& attribute : unit_attributes) {
         std::string qName;
         if (!attribute.prefix.empty()) {
             qName += attribute.prefix;
