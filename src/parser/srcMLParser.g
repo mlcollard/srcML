@@ -960,7 +960,8 @@ start[] { ++start_count; ENTRY_DEBUG_START ENTRY_DEBUG } :
                     )
                 )
                 && !inTransparentMode(MODE_CALL | MODE_INTERNAL_END_PAREN)
-                && (
+                && !inTransparentMode(MODE_INTERNAL_END_CURLY)
+        && (
                     !inLanguage(LANGUAGE_CXX)
                     || !inTransparentMode(MODE_INIT | MODE_EXPECT)
                 )
@@ -2794,6 +2795,7 @@ perform_call_check[CALL_TYPE& type, bool& isempty, int& call_count, int secondto
                     || postcalltoken == CXX_CLASS
                     || (
                         !inLanguage(LANGUAGE_CSHARP)
+                        && !inTransparentMode(MODE_INTERNAL_END_CURLY)
                         && postcalltoken == RCURLY
                     )
                     || (
@@ -2889,7 +2891,7 @@ call_check[int& postnametoken, int& argumenttoken, int& postcalltoken, bool& ise
             // record token after argument list to differentiate between call and macro
             markend[postcalltoken] |
 
-            LPAREN
+            (LPAREN | { inLanguage(LANGUAGE_CXX) }? LCURLY)
             set_int[call_count, 1]
             markend[postcalltoken]
         )
