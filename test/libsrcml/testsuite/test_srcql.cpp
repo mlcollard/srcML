@@ -2384,6 +2384,54 @@ q, q = q, q # y
         srcml_archive_free(iarchive);
     }
 
+    // FIND $LEFT, $RIGHT = $RIGHT, $LEFT;
+    {
+        char* s;
+        size_t size;
+
+        srcml_archive* oarchive = srcml_archive_create();
+        srcml_archive_write_open_memory(oarchive,&s, &size);
+
+        srcml_unit* unit = srcml_unit_create(oarchive);
+        srcml_unit_set_language(unit,"Python");
+        srcml_unit_parse_memory(unit,python_swap_assignments_src.c_str(),python_swap_assignments_src.size());
+        dassert(srcml_archive_write_unit(oarchive,unit), SRCML_STATUS_OK);
+
+        srcml_unit_free(unit);
+        srcml_archive_close(oarchive);
+        srcml_archive_free(oarchive);
+
+        std::string srcml_text = std::string(s, size);
+        free(s);
+
+        srcml_archive* iarchive = srcml_archive_create();
+        srcml_archive_read_open_memory(iarchive,srcml_text.c_str(),srcml_text.size());
+        dassert(srcml_append_transform_srcql(iarchive,"$LEFT, $RIGHT = $RIGHT, $LEFT;"), SRCML_STATUS_OK);
+
+        unit = srcml_archive_read_unit(iarchive);
+        srcml_transform_result* result = nullptr;
+        srcml_unit_apply_transforms(iarchive, unit, &result);
+
+        dassert(srcml_transform_get_type(result), SRCML_RESULT_UNITS);
+        dassert(srcml_transform_get_unit_size(result), 11);
+        dassert(srcml_unit_get_srcml_inner(srcml_transform_get_unit(result,0)), python_swap_assignments_expr_stmt_srcml[0]);
+        dassert(srcml_unit_get_srcml_inner(srcml_transform_get_unit(result,1)), python_swap_assignments_expr_stmt_srcml[3]);
+        dassert(srcml_unit_get_srcml_inner(srcml_transform_get_unit(result,2)), python_swap_assignments_expr_stmt_srcml[4]);
+        dassert(srcml_unit_get_srcml_inner(srcml_transform_get_unit(result,3)), python_swap_assignments_expr_stmt_srcml[5]);
+        dassert(srcml_unit_get_srcml_inner(srcml_transform_get_unit(result,4)), python_swap_assignments_expr_stmt_srcml[6]);
+        dassert(srcml_unit_get_srcml_inner(srcml_transform_get_unit(result,5)), python_swap_assignments_expr_stmt_srcml[7]);
+        dassert(srcml_unit_get_srcml_inner(srcml_transform_get_unit(result,6)), python_swap_assignments_expr_stmt_srcml[8]);
+        dassert(srcml_unit_get_srcml_inner(srcml_transform_get_unit(result,7)), python_swap_assignments_expr_stmt_srcml[9]);
+        dassert(srcml_unit_get_srcml_inner(srcml_transform_get_unit(result,8)), python_swap_assignments_expr_stmt_srcml[11]);
+        dassert(srcml_unit_get_srcml_inner(srcml_transform_get_unit(result,9)), python_swap_assignments_expr_stmt_srcml[12]);
+        dassert(srcml_unit_get_srcml_inner(srcml_transform_get_unit(result,10)), python_swap_assignments_expr_stmt_srcml[13]);
+
+        srcml_unit_free(unit);
+        srcml_transform_free(result);
+        srcml_archive_close(iarchive);
+        srcml_archive_free(iarchive);
+    }
+
 
     const std::string call_expressions = R"(
 foo();
