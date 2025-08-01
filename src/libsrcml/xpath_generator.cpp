@@ -170,7 +170,8 @@ XPathNode* XPathGenerator::get_xpath_from_argument(std::string src_query) {
     bool change_from_macro = pat_to_srcml.find("macro") != std::string::npos;
     bool extract_expr_from_expr_stmt = language == "Python" &&
                                        pat_to_srcml.find("<",1) == pat_to_srcml.find("<expr_stmt>") &&
-                                       pat_to_srcml.find("<expr_stmt>") == pat_to_srcml.rfind("<expr_stmt>");
+                                       pat_to_srcml.find("<expr_stmt>") == pat_to_srcml.rfind("<expr_stmt>") &&
+                                       pat_to_srcml.find(";</expr_stmt>") == std::string::npos;
 
     if (change_from_macro) {
         srcml_unit* macro_change = srcml_unit_create(holder);
