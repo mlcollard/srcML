@@ -133,6 +133,9 @@ else()
     install(TARGETS libsrcml_shared EXPORT libsrcml_shared_Targets LIBRARY COMPONENT SRCML NAMELINK_COMPONENT DEVLIBS)
 endif()
 
+option(SRCML_INSTALL_CMAKE_CONFIG "Install the cmake configuration for external projects" ON)
+if(SRCML_INSTALL_CMAKE_CONFIG)
+
 include(CMakePackageConfigHelpers)
 
 # directory to put the config files
@@ -169,6 +172,8 @@ install(EXPORT libsrcml_static_Targets
         NAMESPACE srcML::
         FILE srcML-static-targets.cmake
         COMPONENT DEVLIBS)
+
+endif()
 
 if(BUILD_SHARED_LIBS)
     set(SRCML_LIBSRCML_LINK_DEFAULT "libsrcml_shared")
