@@ -131,7 +131,7 @@ void add_element(xmlXPathParserContext* ctxt, int nargs) {
         // @NOTE Add comment
         table->add_to_variable_bucket(bucket);
         if (table->size_of_variable_bucket(bucket) < number) {
-            table->add_to_number_bucket(bucket, number);
+            table->add_to_number_bucket(bucket, (int) number);
         }
 
         // handle token via std::string_view for efficent trimming
@@ -156,7 +156,7 @@ void add_element(xmlXPathParserContext* ctxt, int nargs) {
 
 
         // if the variable matches the token, add to the tokens
-        const bool valid = table->does_element_match_variable(bucket, number, *(itpair.first), node_ptr) && table->check_regex(std::string(bucket), std::string(tokenView));
+        const bool valid = table->does_element_match_variable(bucket, number, *(itpair.first), node_ptr) && table->check_regex(bucket, tokenView);
         // Check that the name matches all of the regex rules
         if (valid) {
             table->add_to_token_list(bucket, number, *(itpair.first), node_ptr);
