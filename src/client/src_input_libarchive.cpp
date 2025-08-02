@@ -44,7 +44,7 @@ std::unordered_map<std::string_view, std::string_view> parseYAMLHeader(std::stri
         if (eol <= 0)
             break;
         std::string_view line(header.begin(), eol);
-        lineSize = line.size();
+        lineSize = (int)line.size();
 
         // trim leading whitespace
         line.remove_prefix(line.find_first_not_of(' '));
@@ -59,10 +59,10 @@ std::unordered_map<std::string_view, std::string_view> parseYAMLHeader(std::stri
         if (line[0] == '"') {
             const auto endKey = line.find('"', 1);
             if (endKey != line.npos)
-                startPos = endKey + 1;
+                startPos = (int)endKey + 1;
         }
         const auto separator = line.find(':', startPos);
-        if (separator != line.npos) {
+        if ((int) separator != line.npos) {
 
             // split into rough key and value
             std::string_view key = line.substr(0, separator);
@@ -90,7 +90,7 @@ std::unordered_map<std::string_view, std::string_view> parseYAMLHeader(std::stri
         }
 
         // completed this line
-        header.remove_prefix(lineSize + 1);
+        header.remove_prefix((size_t)(lineSize + 1));
     }
 
     return keyValuePairs;
@@ -429,7 +429,7 @@ schedule:
                     }
 
                     if (isHeader) {
-                        buffer.erase(buffer.begin(), buffer.begin() + header.size());
+                        buffer.erase(buffer.begin(), buffer.begin() + (std::vector<char>::difference_type)header.size());
 
                         // filename
                         auto search = parsedData.find("filename");
