@@ -105,7 +105,7 @@ std::string extract_revision(const char* srcml, int size, int revision, bool tex
     }
 
     bool inmode = mode.top() == COMMON || (revision == 0 && mode.top() == DELETE) || (revision == 1 && mode.top() == INSERT);
-    size_t remaining_size = size - (lastp - srcml);
+    auto remaining_size = size - (lastp - srcml);
     if (inmode && remaining_size > 0) {
         news.append(lastp, remaining_size);
     }
