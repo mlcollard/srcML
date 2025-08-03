@@ -43,7 +43,7 @@ std::unordered_map<std::string_view, std::string_view> parseYAMLHeader(std::stri
         const auto eol = header.find('\n');
         if (eol <= 0)
             break;
-        std::string_view line(header.begin(), eol);
+        std::string_view line(&(*header.begin()), eol);
         lineSize = (int)line.size();
 
         // trim leading whitespace
