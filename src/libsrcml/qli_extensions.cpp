@@ -131,7 +131,7 @@ void add_element(xmlXPathParserContext* ctxt, int nargs) {
         // @NOTE Add comment
         table->add_to_variable_bucket(bucket);
         if (table->size_of_variable_bucket(bucket) < number) {
-            table->add_to_number_bucket(bucket, (int) number);
+            table->add_to_number_bucket(bucket, number);
         }
 
         // handle token via std::string_view for efficent trimming
@@ -152,7 +152,7 @@ void add_element(xmlXPathParserContext* ctxt, int nargs) {
 
         thread_local std::unordered_set<std::string> tokens;
 
-        const auto itpair = tokens.insert(token.size() == tokenView.size() ? std::move(token) : std::string(tokenView));
+        const auto itpair = tokens.insert(std::string(tokenView));
 
 
         // if the variable matches the token, add to the tokens
@@ -246,7 +246,7 @@ void match_element(xmlXPathParserContext* ctxt, int nargs) {
 
         thread_local std::unordered_set<std::string> tokens;
 
-        const auto itpair = tokens.insert(token.size() == tokenView.size() ? std::move(token) : std::string(tokenView));
+        const auto itpair = tokens.insert(std::string(tokenView));
 
         const bool valid = table->is_element_in_bucket(bucket, *(itpair.first), node_ptr);
 
@@ -340,10 +340,9 @@ void debug_print(xmlXPathParserContext* ctxt, int nargs) {
         prefix = (const char*)var;
     }
 
-
     xmlNodeSet* set = xmlXPathPopNodeSet(ctxt);
 
-    if (set == NULL && xmlXPathCheckError(ctxt) == false) {
+    if (set == NULL) {
         set = xmlXPathNodeSetCreate(NULL);
     }
 

@@ -25,7 +25,7 @@ struct unique_element {
 };
 
 using token_list = std::vector<unique_element>;
-using number_bucket = std::unordered_map<int, token_list>;
+using number_bucket = std::unordered_map<size_t, token_list>;
 using variable_bucket = std::map<std::string, number_bucket, std::less<>>;
 
 class UnificationTable {
@@ -38,13 +38,12 @@ public:
 
     bool will_unification_occur() const;
 
-    void add_to_number_bucket(std::string_view, int);
+    void add_to_number_bucket(std::string_view, size_t);
 
-    void add_to_token_list(std::string_view, int, std::string_view, std::uintptr_t);
+    void add_to_token_list(std::string_view, size_t, std::string_view, std::uintptr_t);
 
-    bool does_element_match_variable(std::string_view, int, std::string_view first, uintptr_t second) const;
+    bool does_element_match_variable(std::string_view, size_t, std::string_view first, uintptr_t second) const;
     bool is_element_in_bucket(std::string_view, std::string_view first, uintptr_t second) const;
-    bool regex_match_bucket(std::string_view, std::string);
 
     void empty_buckets();
     void empty_bucket(std::string_view);
