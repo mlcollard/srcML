@@ -18,6 +18,11 @@
 #include <SRCMLStatus.hpp>
 #include <libarchive_utilities.hpp>
 #include <srcml_utilities.hpp>
+#include <cassert>
+#include <inttypes.h>
+#include <string_view>
+
+using namespace ::std::literals::string_view_literals;
 
 #include <stdio.h>
 #if !defined(_MSC_VER)
@@ -30,6 +35,103 @@
 #define READ _read
 #define WRITE _write
 #endif
+
+static std::string createYAMLNamespace(const char* prefix, const char* uri) {
+
+    std::string header;
+    bool isDefault = prefix && ""sv.compare(prefix) == 0;
+    if (!isDefault)
+        header += '"';
+    header += "xmlns";
+    if (!isDefault) {
+        header += ':';
+        header += prefix;
+        header += '"';
+    }
+    header += ": \"";
+    header += uri;
+    header += "\"\n";
+
+    return header;
+}
+
+static std::string createYAMLHeader(const srcml_archive* arch, const srcml_unit* unit, bool first = false) {
+
+    std::string header = "---\n";
+
+    // output srcML namespace first
+    for (size_t i = 0; i < srcml_archive_get_namespace_size(arch); ++i) {
+        if ("http://www.srcML.org/srcML/src"sv.compare(srcml_archive_get_namespace_uri(arch, i)) != 0)
+            continue;
+        header += createYAMLNamespace(srcml_archive_get_namespace_prefix(arch, i), srcml_archive_get_namespace_uri(arch, i));
+        break;
+    }
+
+    // output custom archive namespaces
+    for (size_t i = 0; i < srcml_archive_get_namespace_size(arch); ++i) {
+        if ("http://www.srcML.org/srcML/src"sv.compare(srcml_archive_get_namespace_uri(arch, i)) == 0)
+            continue;
+        header += createYAMLNamespace(srcml_archive_get_namespace_prefix(arch, i), srcml_archive_get_namespace_uri(arch, i));
+    }
+
+    // output custom unit namespaces
+    for (size_t i = 0; i < srcml_unit_get_namespace_size(unit); ++i) {
+        if ("http://www.srcML.org/srcML/src"sv.compare(srcml_unit_get_namespace_uri(unit, i)) == 0)
+            continue;
+        header += createYAMLNamespace(srcml_unit_get_namespace_prefix(unit, i), srcml_unit_get_namespace_uri(unit, i));
+    }
+
+    // output custom archive attributes
+    for (size_t i = 0; i < srcml_archive_get_attribute_size(arch); ++i) {
+        header += "\"";
+        header += srcml_archive_get_attribute_prefix(arch, i);
+        header += ":";
+        header += srcml_archive_get_attribute_name(arch, i);
+        header += "\": \"";
+        header += srcml_archive_get_attribute_value(arch, i);
+        header += "\"\n";
+    }
+
+    const auto url = srcml_archive_get_url(arch);
+    if (first && url) {
+        header += "url: \"";
+        header += url;
+        header += "\"\n";
+    }
+    const auto language = srcml_unit_get_language(unit);
+    if (language) {
+        header += "language: \"";
+        header += language;
+        header += "\"\n";
+    }
+    const auto filename = srcml_unit_get_filename(unit);
+    if (filename) {
+        header += "filename: \"";
+        header += filename;
+        header += "\"\n";
+    }
+    const auto src_version = srcml_unit_get_version(unit);
+    if (src_version) {
+        header += "src_version: \"";
+        header += src_version;
+        header += "\"\n";
+    }
+
+    // output custom attributes
+    for (size_t i = 0; i < srcml_unit_get_attribute_size(unit); ++i) {
+        header += "\"";
+        header += srcml_unit_get_attribute_prefix(unit, i);
+        header += ":";
+        header += srcml_unit_get_attribute_name(unit, i);
+        header += "\": \"";
+        header += srcml_unit_get_attribute_value(unit, i);
+        header += "\"\n";
+    }
+
+    header += "---\n";
+
+    return header;
+}
 
 static std::unique_ptr<srcml_archive> srcml_read_open_internal(const srcml_input_src& input_source, const std::optional<size_t>& revision) {
 
@@ -90,7 +192,7 @@ static std::unique_ptr<srcml_archive> srcml_read_open_internal(const srcml_input
             curinput.fd = std::nullopt;
         }
 #endif
-        
+
         curinput.fd = input_archive(curinput);
     }
 
@@ -125,73 +227,93 @@ void create_src(const srcml_request_t& srcml_request,
             src_output_filesystem(arch.get(), destination, log);
         }
 
-    } else if (input_sources.size() == 1 && contains<int>(destination) &&
+    } else if (input_sources.size() >= 1 && contains<int>(destination) &&
                destination.compressions.empty() && destination.archives.empty()) {
 
         // srcml->src extract to stdout
-
-        auto arch(srcml_read_open_internal(input_sources[0], srcml_request.revision));
-
-        // move to the correct unit
-        for (int i = 1; i < srcml_request.unit; ++i) {
-            if (!srcml_archive_skip_unit(arch.get())) {
-                SRCMLstatus(ERROR_MSG, "Requested unit %s out of range.", srcml_request.unit);
-                exit(1);
-            }
-        }
-
         int count = 0;
         char lastchar = '\0';
-        while (1) {
-            std::unique_ptr<srcml_unit> unit(srcml_archive_read_unit(arch.get()));
-            if (srcml_request.unit && !unit) {
-                SRCMLstatus(ERROR_MSG, "Requested unit %s out of range.", srcml_request.unit);
-                exit(1);
-            }
-            if (!unit)
-                break;
+        for (auto& input_source : input_sources) {
 
-            // set encoding for source output
-            // NOTE: How this is done may change in the future
-            if (srcml_request.src_encoding)
-                srcml_archive_set_src_encoding(arch.get(), srcml_request.src_encoding->data());
+            auto arch(srcml_read_open_internal(input_source, srcml_request.revision));
 
-            // if requested eol, then use that
-            if (srcml_request.eol)
-                srcml_unit_set_eol(unit.get(), *srcml_request.eol);
-
-            // before source null output separator
-            if (count && option(SRCML_COMMAND_NULL)) {
-                if (write(1, "", 1) == -1) {
-                    SRCMLstatus(ERROR_MSG, "Unable to write to stdout");
-                    break;
+            // move to the correct unit
+            for (int i = 1; i < srcml_request.unit; ++i) {
+                if (!srcml_archive_skip_unit(arch.get())) {
+                    SRCMLstatus(ERROR_MSG, "Requested unit %s out of range.", srcml_request.unit);
+                    exit(1);
                 }
             }
 
-            if (count && !option(SRCML_COMMAND_NULL)) {
-                if (lastchar != '\n' && write(1, "\n", 1) == -1) {
-                    SRCMLstatus(ERROR_MSG, "Unable to write to stdout");
-                    break;
+            while (1) {
+                std::unique_ptr<srcml_unit> unit(srcml_archive_read_unit(arch.get()));
+                if (srcml_request.unit && !unit) {
+                    SRCMLstatus(ERROR_MSG, "Requested unit %s out of range.", srcml_request.unit);
+                    exit(1);
+
                 }
+                if (!unit)
+                    break;
+
+                // set encoding for source output
+                // NOTE: How this is done may change in the future
+                if (srcml_request.src_encoding)
+                    srcml_archive_set_src_encoding(arch.get(), srcml_request.src_encoding->data());
+
+                // if requested eol, then use that
+                if (srcml_request.eol)
+                    srcml_unit_set_eol(unit.get(), *srcml_request.eol);
+
+                // before source null output separator
+                if (count && option(SRCML_COMMAND_NULL)) {
+                    if (write(1, "", 1) == -1) {
+                        SRCMLstatus(ERROR_MSG, "Unable to write null to stdout");
+                        break;
+                    }
+                }
+
+                if (count && !option(SRCML_COMMAND_NULL)) {
+                    if (lastchar != '\n' && write(1, "\n", 1) == -1) {
+                        SRCMLstatus(ERROR_MSG, "Unable to write last character to stdout");
+                        break;
+                    }
+                }
+
+                // output the text header if requested
+                if (option(SRCML_COMMAND_HEADER)) {
+
+                    const auto header = createYAMLHeader(arch.get(), unit.get(), count == 0);
+                    if (write(destination, header.data(), header.size()) == -1) {
+                        SRCMLstatus(ERROR_MSG, "Unable to write header to stdout");
+                        break;
+                    }
+                }
+
+                if (count && !option(SRCML_COMMAND_NULL)) {
+                    if (lastchar != '\n' && write(1, "\n", 1) == -1) {
+                        SRCMLstatus(ERROR_MSG, "Unable to write to stdout");
+                        break;
+                    }
+                }
+
+                // unparse directly to the destintation
+                srcml_unit_unparse_fd(unit.get(), destination);
+
+                // after source newline
+                if (!option(SRCML_COMMAND_NULL)) {
+                    const auto size = srcml_unit_get_src_size(unit.get());
+                    lastchar = size ? srcml_unit_get_src(unit.get())[size - 1] : '\0';
+                }
+
+                // get out if only one unit
+                if (srcml_request.unit)
+                    break;
+
+                ++count;
             }
-
-            // unparse directly to the destintation
-            srcml_unit_unparse_fd(unit.get(), destination);
-
-            // after source newline
-            if (!option(SRCML_COMMAND_NULL)) {
-                const auto size = srcml_unit_get_src_size(unit.get());
-                lastchar = size ? srcml_unit_get_src(unit.get())[size - 1] : '\0';
-            }
-
-            // get out if only one unit
-            if (srcml_request.unit)
-                break;
-
-            ++count;
         }
 
-        if ((count > 2 || !srcml_request.transformations.empty()) && !option(SRCML_COMMAND_NULL)) {
+        if ((count >= 2 || !srcml_request.transformations.empty()) && !option(SRCML_COMMAND_NULL)) {
             if (lastchar != '\n' && write(1, "\n", 1) == -1) {
                 SRCMLstatus(ERROR_MSG, "Unable to write to stdout");
                 exit(1);

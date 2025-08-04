@@ -123,6 +123,7 @@ header "post_include_hpp" {
 #include <Language.hpp>
 #include <ModeStack.hpp>
 #include <srcml_options.hpp>
+#include <cstdlib>
 #undef CONST
 #undef VOID
 #undef DELETE
@@ -137,14 +138,26 @@ using namespace ::std::literals::string_view_literals;
 // Define SRCML_DEBUG_PARSER to use
 #ifdef SRCML_DEBUG_PARSER
 class RuleTrace {
+private:
+    inline static const bool isDisabled =
+        [] {
+            const char* env = std::getenv("SRCML_DEBUG_PARSER_DISABLE");
+            return env && env[0] != '\0';
+        }();
 public:
     RuleTrace(int guessing, int token, int rd, std::string text, const char* fun, int line) :
         guessing(guessing), token(token), rd(rd), text(text), fun(fun), line(line)
     {
+        if (isDisabled)
+            return;
+
         fprintf(stderr, "TRACE: %d %d %d %5s%*s %s (%d)\n", guessing, token, rd, text.data(), rd, "", fun, line);
     }
 
     ~RuleTrace() {
+        if (isDisabled)
+            return;
+
         fprintf(stderr, "  END: %d %d %d %5s%*s %s (%d)\n", guessing, token, rd, text.data(), rd, "", fun, line);
     }
 
@@ -917,7 +930,11 @@ start[] { ++start_count; ENTRY_DEBUG_START ENTRY_DEBUG } :
         offside_dedent |
 
         // characters with special actions that usually end currently open elements
-        { !inTransparentMode(MODE_INTERNAL_END_CURLY) }?
+        // special case for blocks (e.g., lambda capture) in lcurly argument lists
+        {
+            !inTransparentMode(MODE_INTERNAL_END_CURLY)
+            || (inMode(MODE_BLOCK_CONTENT) && inTransparentMode(MODE_ARGUMENT | MODE_LIST))
+        }?
         block_end |
 
         terminate |
@@ -943,7 +960,8 @@ start[] { ++start_count; ENTRY_DEBUG_START ENTRY_DEBUG } :
                     )
                 )
                 && !inTransparentMode(MODE_CALL | MODE_INTERNAL_END_PAREN)
-                && (
+                && !inTransparentMode(MODE_INTERNAL_END_CURLY)
+        && (
                     !inLanguage(LANGUAGE_CXX)
                     || !inTransparentMode(MODE_INIT | MODE_EXPECT)
                 )
@@ -1110,7 +1128,7 @@ start_python[] {
             temp_array[ASSERT]      = { SASSERT_STATEMENT, 0, MODE_STATEMENT | MODE_EXPRESSION | MODE_EXPECT | MODE_EXCLUDE_NO_PAREN_TUPLES_PY | MODE_ASSERT_PY, MODE_CONDITION | MODE_EXPECT, nullptr, nullptr };
             temp_array[BREAK]       = { SBREAK_STATEMENT, 0, MODE_STATEMENT, 0, nullptr, nullptr };
             temp_array[PY_CASE]     = { SCASE, 0, MODE_STATEMENT | MODE_NEST | MODE_CASE_PY, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
-            temp_array[CLASS]       = { SCLASS, 0, MODE_STATEMENT | MODE_NEST, MODE_SUPER_LIST_PY | MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, nullptr };
+            temp_array[CLASS]       = { SCLASS, 0, MODE_STATEMENT | MODE_NEST, MODE_PARAMETER_LIST_PY | MODE_SUPER_LIST_PY | MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, nullptr };
             temp_array[CONTINUE]    = { SCONTINUE_STATEMENT, 0, MODE_STATEMENT, 0, nullptr, nullptr };
             temp_array[ELSE]        = { SELSE, 0, MODE_STATEMENT | MODE_NEST, 0, &srcMLParser::if_statement_start, nullptr };
             temp_array[FINALLY]     = { SFINALLY_BLOCK, 0, MODE_STATEMENT | MODE_NEST, 0, nullptr, nullptr };
@@ -1133,7 +1151,7 @@ start_python[] {
             temp_array[PY_NONLOCAL] = { SNONLOCAL, 0, MODE_STATEMENT, MODE_VARIABLE_NAME | MODE_LIST, nullptr, nullptr };
             temp_array[PY_PASS]     = { SPASS, 0, MODE_STATEMENT, 0, nullptr, nullptr };
             temp_array[PY_RAISE]    = { STHROW_STATEMENT, 0, MODE_STATEMENT | MODE_RAISE_PY, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
-            temp_array[PY_TYPE]     = { STYPEDEF, 0, MODE_STATEMENT | MODE_TYPEDEF, MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, nullptr };
+            temp_array[PY_TYPE]     = { STYPEDEF, 0, MODE_STATEMENT | MODE_TYPEDEF, MODE_PARAMETER_LIST_PY | MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, nullptr };
             temp_array[PY_WITH]     = { SWITH_STATEMENT, 0, MODE_STATEMENT | MODE_NEST, MODE_EXPRESSION | MODE_EXPECT | MODE_LIST | MODE_EXCLUDE_NO_PAREN_TUPLES_PY | MODE_WITH_EXPRESSION_PY, nullptr, nullptr };
             temp_array[PY_YIELD]    = { SYIELD_STATEMENT, 0, MODE_STATEMENT, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
 
@@ -2777,6 +2795,7 @@ perform_call_check[CALL_TYPE& type, bool& isempty, int& call_count, int secondto
                     || postcalltoken == CXX_CLASS
                     || (
                         !inLanguage(LANGUAGE_CSHARP)
+                        && !inTransparentMode(MODE_INTERNAL_END_CURLY)
                         && postcalltoken == RCURLY
                     )
                     || (
@@ -2872,7 +2891,7 @@ call_check[int& postnametoken, int& argumenttoken, int& postcalltoken, bool& ise
             // record token after argument list to differentiate between call and macro
             markend[postcalltoken] |
 
-            LPAREN
+            (LPAREN | { inLanguage(LANGUAGE_CXX) }? LCURLY)
             set_int[call_count, 1]
             markend[postcalltoken]
         )
@@ -4004,6 +4023,7 @@ namespace_definition[] { ENTRY_DEBUG } :
 
         (namespace_inline_specifier)*
         NAMESPACE
+        (attribute_cpp)*
 ;
 
 /*
@@ -4054,6 +4074,7 @@ namespace_directive[] { ENTRY_DEBUG } :
         )*
 
         USING
+        (attribute_cpp)*
 ;
 
 /*
@@ -5367,6 +5388,10 @@ statement_part[] {
         }?
         macro_call |
 
+        // macro call in function tail
+        { inLanguage(LANGUAGE_C_FAMILY) && inMode(MODE_FUNCTION_TAIL) }?
+        macro_call |
+
         { inMode(MODE_EXPRESSION | MODE_EXPECT) }?
         expression[type, call_count] |
 
@@ -5838,6 +5863,7 @@ pattern_check[STMT_TYPE& type, int& token, int& type_count, int& after_token, bo
 
         bool sawtemplate;
         bool sawcontextual;
+        bool sawdcolon;
         int posin = 0;
         int fla = 0;
 
@@ -5853,6 +5879,7 @@ pattern_check[STMT_TYPE& type, int& token, int& type_count, int& after_token, bo
                 inparam,
                 sawtemplate,
                 sawcontextual,
+                sawdcolon,
                 posin
             );
         } catch (...) {
@@ -5972,7 +5999,7 @@ pattern_check[STMT_TYPE& type, int& token, int& type_count, int& after_token, bo
         if (
             type == DESTRUCTOR_DECL
             && (
-                !inTransparentMode(MODE_CLASS)
+                (!inTransparentMode(MODE_CLASS) && !sawdcolon)
                 || inTransparentMode(MODE_FUNCTION_TAIL)
             )
         )
@@ -6066,6 +6093,7 @@ pattern_check_core[
         bool inparam,         /* are we in a parameter */
         bool& sawtemplate,    /* have we seen a template */
         bool& sawcontextual,  /* have we seen a contextual keyword */
+        bool& sawdcolon,      /* have we seen a double colon ("::") for destructor decl */
         int& posin
 ] {
         token = 0;
@@ -6079,7 +6107,8 @@ pattern_check_core[
 
         type = NONE;
         sawtemplate = false;
-        sawcontextual= false;
+        sawcontextual = false;
+        sawdcolon = false;
         posin = 0;
         isdestructor = false; /* global flag detected during name matching */
 
@@ -6480,8 +6509,8 @@ pattern_check_core[
                     // typical type name
                     { !inLanguage(LANGUAGE_CSHARP) || LA(1) != ASYNC }?
                     set_bool[operatorname, false]
-                    compound_name
-                    set_bool[foundpure]
+                    set_bool[sawdcolon, LA(2) == DCOLON]
+                    compound_name set_bool[foundpure]
                     set_bool[isoperator, isoperator || (inLanguage(LANGUAGE_CXX_FAMILY) && operatorname)]
                     set_bool[operatorname, false] |
 
@@ -6777,6 +6806,7 @@ pattern_check_core[
                 || (
                     inLanguage(LANGUAGE_JAVA)
                     && inMode(MODE_ENUM)
+                    && (type_count - specifier_count - attribute_count - template_count == 0)
                     && (
                         fla == COMMA
                         || fla == TERMINATE
@@ -7630,10 +7660,29 @@ attribute_cpp[] { CompleteElement element(this); ENTRY_DEBUG } :
         LBRACKET
         LBRACKET
 
+        (attribute_using_cpp)*
         attribute_inner_list
 
         RBRACKET
         RBRACKET
+;
+
+/*
+  attribute_using_cpp
+
+  Handles a "using" keyword in a C++11 attribute.
+*/
+attribute_using_cpp[] { CompleteElement element(this); ENTRY_DEBUG } :
+        {
+            // start a new mode to end after the colon
+            startNewMode(MODE_USING);
+
+            startElement(SUSING_DIRECTIVE);
+        }
+
+        USING
+        compound_name
+        COLON
 ;
 
 attribute_c[] { CompleteElement element(this); ENTRY_DEBUG } :
@@ -7997,8 +8046,8 @@ complete_expression[] { CompleteElement element(this); ENTRY_DEBUG } :
             // expression with right parentheses if a previous match is in one
             { LA(1) != RPAREN || inTransparentMode(MODE_INTERNAL_END_PAREN) }?
             {
-                // ensure each part of a comma-separated Python index is marked as an expression
-                if (inLanguage(LANGUAGE_PYTHON) && !inMode(MODE_EXPRESSION))
+                // ensure each part of a comma-separated index is marked with an expression tag
+                if (!inMode(MODE_EXPRESSION))
                     startNewMode(MODE_EXPRESSION | MODE_EXPECT);
             }
             expression |
@@ -8454,11 +8503,21 @@ pointer_dereference[] { ENTRY_DEBUG bool flag = false; } :
 
   Used to mark names.
 */
-compound_name[] { CompleteElement element(this); bool iscompound = false; ENTRY_DEBUG } :
+compound_name[] {
+        CompleteElement element(this);
+        bool iscompound = false;
+        bool isparamlist = (
+            (last_consumed == CLASS && inLanguage(LANGUAGE_PYTHON))
+            || last_consumed == PY_FUNCTION
+            || last_consumed == PY_TYPE
+        );
+
+        ENTRY_DEBUG
+} :
         compound_name_inner[true]
 
         (options { greedy = true; } :
-            { (!inLanguage(LANGUAGE_CXX) || next_token() != LBRACKET) }?
+            { (!inLanguage(LANGUAGE_CXX) || next_token() != LBRACKET) && !isparamlist }?
             variable_identifier_array_grammar_sub[iscompound] |
 
             { inLanguage(LANGUAGE_CXX) && next_token() == LBRACKET }?
@@ -8480,6 +8539,11 @@ compound_name_inner[bool index] {
         TokenPosition tp;
         bool iscompound = false;
         bool islist = (inMode(MODE_VARIABLE_NAME | MODE_EXPECT));
+        bool isparamlist = (
+            (last_consumed == CLASS && inLanguage(LANGUAGE_PYTHON))
+            || last_consumed == PY_FUNCTION
+            || last_consumed == PY_TYPE
+        );
 
         ENTRY_DEBUG
 } :
@@ -8522,16 +8586,10 @@ compound_name_inner[bool index] {
         )*
 
         (options { greedy = true; } :
-            // special markup for Python class/function/type statements
-            { inLanguage(LANGUAGE_PYTHON) && index && islist }?
-            python_generic_parameter_list
-            {
-                iscompound = true;
-            } |
-
             {
                 index
                 /* Commented-out code: && !inTransparentMode(MODE_EAT_TYPE) */
+                && (!inLanguage(LANGUAGE_PYTHON) || !isparamlist)
                 && (
                     !inLanguage(LANGUAGE_CXX)
                     || next_token() != LBRACKET
@@ -11099,6 +11157,14 @@ variable_declaration_type[int type_count] { bool is_compound = false; ENTRY_DEBU
         )*
 
         update_typecount[MODE_VARIABLE_NAME | MODE_INIT]
+
+        {
+            // ensure the type will end in this grammar rule (if not a typedef)
+            if (inTransparentMode(MODE_EAT_TYPE) && !inTransparentMode(MODE_TYPEDEF)) {
+                endDownToMode(MODE_EAT_TYPE);
+                endMode(MODE_EAT_TYPE);
+            }
+        }
 ;
 
 /*
@@ -12509,6 +12575,7 @@ derived[] { CompleteElement element(this); ENTRY_DEBUG } :
             identifier |
 
             variable_identifier
+            (options { greedy = true; } : tripledotop)*
         )
 
         (
@@ -13346,7 +13413,7 @@ generic_argument_list_check[] returns [bool is_generic_argument_list] {
 
         int parencount = 0;
         int bracecount = 0;
-
+        bool foundLogicalOperator = false;
         while (LA(1) != antlr::Token::EOF_TYPE) {
             if (LA(1) == RPAREN)
                 --parencount;
@@ -13356,6 +13423,9 @@ generic_argument_list_check[] returns [bool is_generic_argument_list] {
             if (parencount < 0) {
                 break;
             }
+
+            if (LT(1)->getText() == "||" || LT(1)->getText() == "&&")
+                foundLogicalOperator = true;
 
             if (LA(1) == TEMPOPE) {
                 is_generic_argument_list = true;
@@ -13374,6 +13444,31 @@ generic_argument_list_check[] returns [bool is_generic_argument_list] {
                 break;
 
             consume();
+        }
+
+        // Variable template arguments can be confused with common condition
+        // forms, e.g., if (n < 1 || n > 5) {}
+        // So if we are in a condition, make sure that the following token is
+        // not a literal or a name
+        // One issue: if (n < 1 || n > (5)) {} is marked
+        if (is_generic_argument_list && inTransparentMode(MODE_CONDITION)) {
+            consume();
+
+            // if the following is an idenifier or literal, then these were operators
+            if (foundLogicalOperator || identifier_list_tokens_set.member(LA(1)) || literal_tokens_set.member(LA(1))) {
+                is_generic_argument_list = false;
+
+                if (LA(1) == LPAREN) {
+
+                    // skip past the parenthesized part
+                    paren_pair();
+
+                    // if we get past all this and there is more that does not have a
+                    // logical operator
+                    if (LA(1) != RPAREN && LT(1)->getText() != "||" && LT(1)->getText() != "&&")
+                        is_generic_argument_list = true;
+                }
+            }
         }
 
         inputState->guessing--;
@@ -13759,7 +13854,6 @@ template_operators[] { LightweightElement element(this); ENTRY_DEBUG } :
         {
             startElement(SOPERATOR);
         }
-
         (
             OPERATORS | TRETURN | TEMPOPS | EQUAL | MULTOPS | REFOPS | DOTDOT | RVALUEREF |
             QMARK | NEW | DELETE | IN | IS | STACKALLOC | AS | AWAIT | LAMBDA

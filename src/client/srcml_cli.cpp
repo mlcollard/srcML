@@ -189,6 +189,7 @@ srcml_request_t parseCLI11(int argc, char* argv[]) {
     std::optional<std::string> xsltParamCache;
 
     // positional arguments, i.e., input files
+    bool isXSLTFilename = false;
     auto xsltEntry = srcml_request.transformations.begin();
     app.add_option_function<std::vector<std::string>>("InputFiles", [&](const std::vector<std::string>&) {}, "")
         ->group("")
@@ -202,7 +203,7 @@ srcml_request_t parseCLI11(int argc, char* argv[]) {
 
             // xslt transformation file
             if (input.extension == ".xsl"sv) {
-
+                isXSLTFilename = true;
                 xsltEntry = srcml_request.transformations.insert(srcml_request.transformations.begin(), src_prefix_add_uri("xslt", src_prefix_resource(input.filename)));
                 if (xsltParamCache) {
                     srcml_request.transformations.insert(std::next(xsltEntry), src_prefix_add_uri("xslt-param", *xsltParamCache));
@@ -667,20 +668,25 @@ srcml_request_t parseCLI11(int argc, char* argv[]) {
             srcml_request.xpath_query_support.back().first = element{ value.substr(0, elemn_index), value.substr(elemn_index + 1) };
         });
 
+    bool isXSLTOption = false;
     app.add_option("--xslt",
         "Apply the XSLT program FILE to each unit, where FILE can be a url")
         ->type_name("FILE")
         ->group("QUERY & TRANSFORMATION")
         ->each([&](std::string value) {
+            isXSLTOption = true;
             xsltEntry = srcml_request.transformations.insert(srcml_request.transformations.begin(), src_prefix_add_uri("xslt", value));
         });
 
+    bool isXSLTParam = false;
     app.add_option("--xslt-param",
         "Passes the string parameter NAME with UTF-8 encoded string VALUE to the XSLT program")
         ->type_name("NAME=\"VALUE\"")
         ->group("QUERY & TRANSFORMATION")
         // ->needs(xslt)
         ->each([&](std::string value) {
+            isXSLTParam = true;
+
             // insert after the xslt entry
             auto entry = src_prefix_add_uri("xslt-param", value);
             if (srcml_request.transformations.empty()) {
@@ -700,7 +706,15 @@ srcml_request_t parseCLI11(int argc, char* argv[]) {
 
     // separate output with nulls
     app.add_flag_callback("--print0,-Z",    [&]() { srcml_request.command |= SRCML_COMMAND_NULL; },
-        "Separate output with an ASCII NULL ('\0')")
+        "Separate output with an ASCII NUL ('\\0')")
+        ->group("EXTRACTING SOURCE CODE");
+
+    // separate output with nulls
+    app.add_flag_callback("--header,-H",    [&]() {
+            srcml_request.command |= SRCML_COMMAND_HEADER;
+            srcml_request.command |= SRCML_COMMAND_NULL;
+        },
+        "On source output, it adds a YAML header block and automatically enables --print0; on input, it indicates a file contains YAML headers")
         ->group("EXTRACTING SOURCE CODE");
 
     // debug
@@ -792,6 +806,12 @@ srcml_request_t parseCLI11(int argc, char* argv[]) {
     // make sure --text has an indication of language
     if (isText && language->empty() && filename->empty()) {
         SRCMLstatus(ERROR_MSG, "srcml: --text requires --language or --filename to determine source language");
+        exit(CLI_STATUS_ERROR);
+    }
+
+    // The --xslt-param requires either a --xslt option or an XSL filename
+    if (isXSLTParam && !isXSLTOption && !isXSLTFilename) {
+        SRCMLstatus(ERROR_MSG, "srcml: --xslt-param requires --xslt or an XSLT filename");
         exit(CLI_STATUS_ERROR);
     }
 

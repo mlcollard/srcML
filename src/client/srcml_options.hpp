@@ -10,6 +10,8 @@
 #ifndef SRCML_OPTIONS_HPP
 #define SRCML_OPTIONS_HPP
 
+#include <cstdint>
+
 class SRCMLOptions {
 public:
     friend void enable(unsigned long long option);
@@ -19,13 +21,13 @@ public:
         opt = options;
     }
 
-    static int get()  {
+    static uint_fast64_t get()  {
 
         return opt;
     }
 
  private:
-    static int opt;
+    static uint_fast64_t opt;
 };
 
 inline bool option(unsigned long long option) {

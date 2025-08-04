@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<unit xmlns="http://www.srcML.org/srcML/src" language="Python" url="class">
+<unit xmlns="http://www.srcML.org/srcML/src" revision="1.0.0" language="Python" url="class">
 
 <unit revision="1.0.0" language="Python">
 <class>class <name>Car</name><block>:<block_content>
@@ -84,13 +84,13 @@ class <name>All</name><super_list>(<super><expr><name>Nothing</name></expr></sup
 </unit>
 
 <unit revision="1.0.0" language="Python">
-<class>class <name><name>list</name><parameter_list type="generic">[<parameter><name>T</name></parameter>]</parameter_list></name><block>:<block_content>
+<class>class <name>list</name><parameter_list type="generic">[<parameter><name>T</name></parameter>]</parameter_list><block>:<block_content>
     <pass>pass</pass>
 </block_content></block></class>
 </unit>
 
 <unit revision="1.0.0" language="Python">
-<class>class <name><name>Box</name><parameter_list type="generic">[<parameter><name>T</name></parameter>]</parameter_list></name><super_list>(<super><expr><name><name>Generic</name><index>[<expr><name>T</name></expr>]</index></name></expr></super>)</super_list><block>:<block_content>
+<class>class <name>Box</name><parameter_list type="generic">[<parameter><name>T</name></parameter>]</parameter_list><super_list>(<super><expr><name><name>Generic</name><index>[<expr><name>T</name></expr>]</index></name></expr></super>)</super_list><block>:<block_content>
     <pass>pass</pass>
 </block_content></block></class>
 </unit>

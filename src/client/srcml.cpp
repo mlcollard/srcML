@@ -38,6 +38,9 @@ namespace {
     bool request_create_src        (const srcml_request_t&);
 }
 
+const int SRCML_CLIENT_VERSION_NUMBER = 10000;
+const char* SRCML_CLIENT_VERSION_STRING = "1.0.0";
+
 int main(int argc, char* argv[]) {
 
     Timer runtime = Timer();
@@ -50,17 +53,23 @@ int main(int argc, char* argv[]) {
 
     // version
     if (option(SRCML_COMMAND_VERSION)) {
-        std::cout << "srcml " << srcml_version_string() << '\n'
-                  << "libsrcml " << srcml_version_string() << '\n'
-                  << archive_version_string() << '\n';
+
+        // output the supported srcML source-code languages
+        for (size_t i = 0; i < srcml_get_language_list_size(); ++i) {
+            std::cout << "srcml " << srcml_get_language_list(i) << ": " << srcml_markup_version_string(srcml_get_language_list(i)) << '\n';
+        }
+
+        std::cout << "srcml client: " << SRCML_CLIENT_VERSION_STRING << '\n'
+                  << "libsrcml: " << srcml_libsrcml_version_string() << '\n';
         return 0;
     }
 
     // debug info
     if (srcml_request.command & SRCML_DEBUG_MODE) {
         SRCMLstatus(DEBUG_MSG) << "Library Versions: " << '\n'
-                               << "srcml " << srcml_version_string() << '\n'
-                               << "libsrcml " << srcml_version_string() << '\n'
+                               << "srcml markup " << srcml_markup_version_string("C++") << '\n'
+                               << "srcml client " << SRCML_CLIENT_VERSION_STRING << '\n'
+                               << "libsrcml " << srcml_libsrcml_version_string() << '\n'
                                <<  archive_version_string() << '\n'
                                << "libcurl " << curl_version_info(CURLVERSION_NOW)->version << '\n';
     }
