@@ -34,7 +34,7 @@ std::ostream& operator<<(std::ostream& out, const XPathNode& node) {
     }
     else {
         out << "(";
-        int i = 0;
+        size_t i = 0;
         bool union_child = false;
         for (auto child : node.children) {
             if (child->get_type() == UNION) {
@@ -71,7 +71,7 @@ std::string XPathNode::to_string(std::string_view rtn_view) {
     }
     else {
         rtn += "(";
-        int i = 0;
+        size_t i = 0;
         bool union_child = false;
         for (auto child : children) {
             if (child->get_type() == UNION) {
@@ -107,7 +107,7 @@ void XPathNode::pretty_print(int tabs) {
     }
     else {
         std::cout << "(";
-        int i = 0;
+        size_t i = 0;
         bool union_child = false;
         for (auto child : children) {
             if (child->get_type() == UNION) {

@@ -55,11 +55,11 @@ std::unordered_map<std::string_view, std::string_view> parseYAMLHeader(std::stri
             line.remove_suffix(line.size() - commentStart);
 
         // find the key-value separator skipping over quoted keys
-        int startPos = 0;
+        size_t startPos = 0;
         if (line[0] == '"') {
             const auto endKey = line.find('"', 1);
             if (endKey != line.npos)
-                startPos = (int)endKey + 1;
+                startPos = endKey + 1;
         }
         const auto separator = line.find(':', startPos);
         if ((int) separator != line.npos) {

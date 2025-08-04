@@ -283,7 +283,12 @@ void create_src(const srcml_request_t& srcml_request,
                 if (option(SRCML_COMMAND_HEADER)) {
 
                     const auto header = createYAMLHeader(arch.get(), unit.get(), count == 0);
+
+                    #if !defined(_MSC_VER)
                     if (write(destination, header.data(), (size_t) header.size()) == -1) {
+                    #else
+                    if (write(destination, header.data(), (unsigned int) header.size()) == -1) {
+                    #endif
                         SRCMLstatus(ERROR_MSG, "Unable to write header to stdout");
                         break;
                     }
