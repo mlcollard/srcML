@@ -54,7 +54,8 @@
         // /wd4477 # 'sprintf' : format string '%u' requires an argument of type 'unsigned int', but variadic argument 1 has type 'size_t'
         // /wd4530 # C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
         // /wd4577 # 'noexcept' used with no exception handling mode specified; termination on exception is not guaranteed. Specify /EHsc
-        "SRCML_ANTLR_DISABLED_WARNINGS": "/D_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;/wd4242;/wd4244;/wd4267;/wd4355;/wd4365;/wd4477;/wd4530;/wd4577",
+        // /wd4100: 'param': unreferenced formal parameter
+        "SRCML_ANTLR_DISABLED_WARNINGS": "/D_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;/wd4242;/wd4244;/wd4267;/wd4355;/wd4365;/wd4477;/wd4530;/wd4577;/wd4100",
         // /wd4267 # 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
         // /wd4365 # 'argument': conversion from 'size_t' to 'const __int64', signed/unsigned mismatch
         //         # conversion from 'int' to 'unsigned int',
