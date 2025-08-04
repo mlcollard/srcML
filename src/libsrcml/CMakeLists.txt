@@ -40,8 +40,19 @@ set(LIBSRCML_OBJECTS $<TARGET_OBJECTS:libsrcml> $<TARGET_OBJECTS:parser> $<TARGE
 if(NOT MSVC)
     set(LIBSRCML_OBJECT_FILENAME libsrcml${CMAKE_CXX_OUTPUT_EXTENSION})
 
-    if(NOT "${CMAKE_OSX_ARCHITECTURES}" STREQUAL "")
-        # Generate a single-object library for both architectures, then combine them into one
+    set(archs ${CMAKE_OSX_ARCHITECTURES})
+    list(LENGTH archs NUM_OSX_ARCHITECTURES)
+
+    if(${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
+        # Generate a single-object wasm32 library
+        add_custom_command(
+            OUTPUT ${LIBSRCML_OBJECT_FILENAME}
+            COMMAND emcc -r ${LIBSRCML_OBJECTS} -o ${LIBSRCML_OBJECT_FILENAME}
+            DEPENDS libsrcml parser antlr
+            COMMAND_EXPAND_LISTS
+        )
+    elseif(${NUM_OSX_ARCHITECTURES} EQUAL 2)
+        # Generate a single-object macOS static library for mulitple architectures
         add_custom_command(
           OUTPUT ${LIBSRCML_OBJECT_FILENAME}
           COMMAND ld -r -arch arm64 ${LIBSRCML_OBJECTS} -o libsrcml.arm64.o
@@ -50,7 +61,16 @@ if(NOT MSVC)
           DEPENDS libsrcml parser antlr
           COMMAND_EXPAND_LISTS
         )
+    elseif(${NUM_OSX_ARCHITECTURES} EQUAL 1)
+        # Generate a single-object macOS static library
+        add_custom_command(
+          OUTPUT ${LIBSRCML_OBJECT_FILENAME}
+          COMMAND ld -arch ${CMAKE_OSX_ARCHITECTURES} -r ${LIBSRCML_OBJECTS} -o ${LIBSRCML_OBJECT_FILENAME}
+          DEPENDS libsrcml parser antlr
+          COMMAND_EXPAND_LISTS
+        )
     else()
+        # Generate a single-object Linux static library
         add_custom_command(
           OUTPUT ${LIBSRCML_OBJECT_FILENAME}
           COMMAND ld -r ${LIBSRCML_OBJECTS} -o ${LIBSRCML_OBJECT_FILENAME}
@@ -133,6 +153,9 @@ else()
     install(TARGETS libsrcml_shared EXPORT libsrcml_shared_Targets LIBRARY COMPONENT SRCML NAMELINK_COMPONENT DEVLIBS)
 endif()
 
+option(SRCML_INSTALL_CMAKE_CONFIG "Install the cmake configuration for external projects" ON)
+if(SRCML_INSTALL_CMAKE_CONFIG)
+
 include(CMakePackageConfigHelpers)
 
 # directory to put the config files
@@ -169,6 +192,8 @@ install(EXPORT libsrcml_static_Targets
         NAMESPACE srcML::
         FILE srcML-static-targets.cmake
         COMPONENT DEVLIBS)
+
+endif()
 
 if(BUILD_SHARED_LIBS)
     set(SRCML_LIBSRCML_LINK_DEFAULT "libsrcml_shared")

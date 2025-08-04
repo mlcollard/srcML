@@ -8507,11 +8507,21 @@ pointer_dereference[] { ENTRY_DEBUG bool flag = false; } :
 
   Used to mark names.
 */
-compound_name[] { CompleteElement element(this); bool iscompound = false; ENTRY_DEBUG } :
+compound_name[] {
+        CompleteElement element(this);
+        bool iscompound = false;
+        bool isparamlist = (
+            (last_consumed == CLASS && inLanguage(LANGUAGE_PYTHON))
+            || last_consumed == PY_FUNCTION
+            || last_consumed == PY_TYPE
+        );
+
+        ENTRY_DEBUG
+} :
         compound_name_inner[true]
 
         (options { greedy = true; } :
-            { (!inLanguage(LANGUAGE_CXX) || next_token() != LBRACKET) }?
+            { (!inLanguage(LANGUAGE_CXX) || next_token() != LBRACKET) && !isparamlist }?
             variable_identifier_array_grammar_sub[iscompound] |
 
             { inLanguage(LANGUAGE_CXX) && next_token() == LBRACKET }?
@@ -8533,6 +8543,11 @@ compound_name_inner[bool index] {
         TokenPosition tp;
         bool iscompound = false;
         bool islist = (inMode(MODE_VARIABLE_NAME | MODE_EXPECT));
+        bool isparamlist = (
+            (last_consumed == CLASS && inLanguage(LANGUAGE_PYTHON))
+            || last_consumed == PY_FUNCTION
+            || last_consumed == PY_TYPE
+        );
 
         ENTRY_DEBUG
 } :
@@ -8575,16 +8590,10 @@ compound_name_inner[bool index] {
         )*
 
         (options { greedy = true; } :
-            // special markup for Python class/function/type statements
-            { inLanguage(LANGUAGE_PYTHON) && index && islist }?
-            python_generic_parameter_list
-            {
-                iscompound = true;
-            } |
-
             {
                 index
                 /* Commented-out code: && !inTransparentMode(MODE_EAT_TYPE) */
+                && (!inLanguage(LANGUAGE_PYTHON) || !isparamlist)
                 && (
                     !inLanguage(LANGUAGE_CXX)
                     || next_token() != LBRACKET
