@@ -8542,7 +8542,6 @@ compound_name_inner[bool index] {
         CompleteElement element(this);
         TokenPosition tp;
         bool iscompound = false;
-        bool islist = (inMode(MODE_VARIABLE_NAME | MODE_EXPECT));
         bool isparamlist = (
             (last_consumed == CLASS && inLanguage(LANGUAGE_PYTHON))
             || last_consumed == PY_FUNCTION
