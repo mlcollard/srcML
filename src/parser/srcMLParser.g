@@ -1128,7 +1128,7 @@ start_python[] {
             temp_array[ASSERT]      = { SASSERT_STATEMENT, 0, MODE_STATEMENT | MODE_EXPRESSION | MODE_EXPECT | MODE_EXCLUDE_NO_PAREN_TUPLES_PY | MODE_ASSERT_PY, MODE_CONDITION | MODE_EXPECT, nullptr, nullptr };
             temp_array[BREAK]       = { SBREAK_STATEMENT, 0, MODE_STATEMENT, 0, nullptr, nullptr };
             temp_array[PY_CASE]     = { SCASE, 0, MODE_STATEMENT | MODE_NEST | MODE_CASE_PY, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
-            temp_array[CLASS]       = { SCLASS, 0, MODE_STATEMENT | MODE_NEST, MODE_SUPER_LIST_PY | MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, nullptr };
+            temp_array[CLASS]       = { SCLASS, 0, MODE_STATEMENT | MODE_NEST, MODE_PARAMETER_LIST_PY | MODE_SUPER_LIST_PY | MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, nullptr };
             temp_array[CONTINUE]    = { SCONTINUE_STATEMENT, 0, MODE_STATEMENT, 0, nullptr, nullptr };
             temp_array[ELSE]        = { SELSE, 0, MODE_STATEMENT | MODE_NEST, 0, &srcMLParser::if_statement_start, nullptr };
             temp_array[FINALLY]     = { SFINALLY_BLOCK, 0, MODE_STATEMENT | MODE_NEST, 0, nullptr, nullptr };
@@ -1151,7 +1151,7 @@ start_python[] {
             temp_array[PY_NONLOCAL] = { SNONLOCAL, 0, MODE_STATEMENT, MODE_VARIABLE_NAME | MODE_LIST, nullptr, nullptr };
             temp_array[PY_PASS]     = { SPASS, 0, MODE_STATEMENT, 0, nullptr, nullptr };
             temp_array[PY_RAISE]    = { STHROW_STATEMENT, 0, MODE_STATEMENT | MODE_RAISE_PY, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
-            temp_array[PY_TYPE]     = { STYPEDEF, 0, MODE_STATEMENT | MODE_TYPEDEF, MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, nullptr };
+            temp_array[PY_TYPE]     = { STYPEDEF, 0, MODE_STATEMENT | MODE_TYPEDEF, MODE_PARAMETER_LIST_PY | MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, nullptr };
             temp_array[PY_WITH]     = { SWITH_STATEMENT, 0, MODE_STATEMENT | MODE_NEST, MODE_EXPRESSION | MODE_EXPECT | MODE_LIST | MODE_EXCLUDE_NO_PAREN_TUPLES_PY | MODE_WITH_EXPRESSION_PY, nullptr, nullptr };
             temp_array[PY_YIELD]    = { SYIELD_STATEMENT, 0, MODE_STATEMENT, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
 
@@ -8503,11 +8503,21 @@ pointer_dereference[] { ENTRY_DEBUG bool flag = false; } :
 
   Used to mark names.
 */
-compound_name[] { CompleteElement element(this); bool iscompound = false; ENTRY_DEBUG } :
+compound_name[] {
+        CompleteElement element(this);
+        bool iscompound = false;
+        bool isparamlist = (
+            (last_consumed == CLASS && inLanguage(LANGUAGE_PYTHON))
+            || last_consumed == PY_FUNCTION
+            || last_consumed == PY_TYPE
+        );
+
+        ENTRY_DEBUG
+} :
         compound_name_inner[true]
 
         (options { greedy = true; } :
-            { (!inLanguage(LANGUAGE_CXX) || next_token() != LBRACKET) }?
+            { (!inLanguage(LANGUAGE_CXX) || next_token() != LBRACKET) && !isparamlist }?
             variable_identifier_array_grammar_sub[iscompound] |
 
             { inLanguage(LANGUAGE_CXX) && next_token() == LBRACKET }?
@@ -8529,6 +8539,11 @@ compound_name_inner[bool index] {
         TokenPosition tp;
         bool iscompound = false;
         bool islist = (inMode(MODE_VARIABLE_NAME | MODE_EXPECT));
+        bool isparamlist = (
+            (last_consumed == CLASS && inLanguage(LANGUAGE_PYTHON))
+            || last_consumed == PY_FUNCTION
+            || last_consumed == PY_TYPE
+        );
 
         ENTRY_DEBUG
 } :
@@ -8571,16 +8586,10 @@ compound_name_inner[bool index] {
         )*
 
         (options { greedy = true; } :
-            // special markup for Python class/function/type statements
-            { inLanguage(LANGUAGE_PYTHON) && index && islist }?
-            python_generic_parameter_list
-            {
-                iscompound = true;
-            } |
-
             {
                 index
                 /* Commented-out code: && !inTransparentMode(MODE_EAT_TYPE) */
+                && (!inLanguage(LANGUAGE_PYTHON) || !isparamlist)
                 && (
                     !inLanguage(LANGUAGE_CXX)
                     || next_token() != LBRACKET
