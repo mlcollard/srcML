@@ -192,10 +192,10 @@ void OffSideRule::handleBlocks(antlr::RefToken token) {
 
             // The number of spaces per indent was not initialized yet
             if (numSpacesPerIndent == -1)
-                numSpacesPerIndent = ceil(nextToken->getText().length() / float(numIndents));
+                numSpacesPerIndent = static_cast<int>(ceil(static_cast<double>(nextToken->getText().length()) / numIndents));
 
             // For ceil to work as intended, one of the values must be a float
-            int numExpectedIndents = ceil(nextToken->getText().length() / float(numSpacesPerIndent));
+            int numExpectedIndents = static_cast<int>(ceil(static_cast<double>(nextToken->getText().length()) / numSpacesPerIndent));
 
             // [DEDENT] There is less indentation on the current line than the previous line
             if (numExpectedIndents < numIndents) {

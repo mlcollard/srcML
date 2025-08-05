@@ -83,9 +83,9 @@ antlr::RefToken DocstringPython::nextToken() {
  */
 void DocstringPython::countWSNewlineTokens(antlr::RefToken token) {
     std::string text = token->getText();
-    int newlines = std::count(text.begin(), text.end(), '\n');
+    auto newlines = std::count(text.begin(), text.end(), '\n');
 
-    for (int i = 0; i < newlines; ++i)
+    for (auto i = 0; i < newlines; ++i)
         ++lineNumber;
 
     // ensure any multi-line string token has accurate line numbers

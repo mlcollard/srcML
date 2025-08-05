@@ -21,7 +21,7 @@ private:
     void get_variables(xmlNode* top_xml_node);
     void convert_traverse(xmlNode*, XPathNode*);
     void organize_add_calls(XPathNode*);
-    void add_bucket_clears(XPathNode*,int);
+    void add_bucket_clears(XPathNode*, size_t);
     void add_sibling_count_predicates(XPathNode*);
 
     // XML Node Funcs

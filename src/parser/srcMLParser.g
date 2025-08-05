@@ -895,6 +895,56 @@ public:
             }
         }
     }
+
+    template <size_t SIZE>
+    constexpr const std::array<int, SIZE * SIZE> getDuplexKeywords(const size_t PY_EXCEPT_MULTOPS, const size_t PY_YIELD_PY_FROM) {
+        std::array<int, SIZE * SIZE> temp_array{};
+        temp_array[PY_EXCEPT + (MULTOPS << 8)] = PY_EXCEPT_MULTOPS;
+        temp_array[PY_YIELD + (PY_FROM << 8)] = PY_YIELD_PY_FROM;
+        return temp_array;
+    }
+
+    template <size_t SIZE>
+    constexpr const std::array<Rule, SIZE> getPythonRules(const size_t PY_EXCEPT_MULTOPS, const size_t PY_YIELD_PY_FROM) {
+        std::array<Rule, SIZE> temp_array;
+
+        /* GENERIC STATEMENTS */
+        temp_array[ASSERT]      = { SASSERT_STATEMENT, 0, MODE_STATEMENT | MODE_EXPRESSION | MODE_EXPECT | MODE_EXCLUDE_NO_PAREN_TUPLES_PY | MODE_ASSERT_PY, MODE_CONDITION | MODE_EXPECT, nullptr, nullptr };
+        temp_array[BREAK]       = { SBREAK_STATEMENT, 0, MODE_STATEMENT, 0, nullptr, nullptr };
+        temp_array[PY_CASE]     = { SCASE, 0, MODE_STATEMENT | MODE_NEST | MODE_CASE_PY, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
+        temp_array[CLASS]       = { SCLASS, 0, MODE_STATEMENT | MODE_NEST, MODE_PARAMETER_LIST_PY | MODE_SUPER_LIST_PY | MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, nullptr };
+        temp_array[CONTINUE]    = { SCONTINUE_STATEMENT, 0, MODE_STATEMENT, 0, nullptr, nullptr };
+        temp_array[ELSE]        = { SELSE, 0, MODE_STATEMENT | MODE_NEST, 0, &srcMLParser::if_statement_start, nullptr };
+        temp_array[FINALLY]     = { SFINALLY_BLOCK, 0, MODE_STATEMENT | MODE_NEST, 0, nullptr, nullptr };
+        temp_array[FOR]         = { SFOR_STATEMENT, 0, MODE_STATEMENT | MODE_NEST | MODE_FOR_LOOP_PY, MODE_CONTROL | MODE_EXPECT | MODE_FOR_CONTROL_PY, nullptr, nullptr };
+        temp_array[IF]          = { SIF, 0, MODE_STATEMENT | MODE_NEST | MODE_IF | MODE_ELSE, MODE_CONDITION | MODE_EXPECT, &srcMLParser::if_statement_start, nullptr };
+        temp_array[RETURN]      = { SRETURN_STATEMENT, 0, MODE_STATEMENT, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
+        temp_array[TRY]         = { STRY_BLOCK, 0, MODE_STATEMENT, MODE_STATEMENT | MODE_NEST | MODE_TRY, nullptr, nullptr };
+        temp_array[WHILE]       = { SWHILE_STATEMENT, 0, MODE_STATEMENT | MODE_NEST | MODE_WHILE_LOOP_PY, MODE_CONDITION | MODE_EXPECT, nullptr, nullptr };
+
+        /* PYTHON STATEMENTS */
+        temp_array[PY_2_EXEC]   = { SEXEC_PYTHON2, 0, MODE_STATEMENT, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
+        temp_array[PY_2_PRINT]  = { SPRINT_PYTHON2, 0, MODE_STATEMENT, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
+        temp_array[PY_DELETE]   = { SDELETE, 0, MODE_STATEMENT, MODE_VARIABLE_NAME | MODE_LIST, nullptr, nullptr };
+        temp_array[PY_ELIF]     = { SELSEIF, 0, MODE_STATEMENT | MODE_NEST | MODE_IF | MODE_ELSE, MODE_CONDITION | MODE_EXPECT, &srcMLParser::if_statement_start, nullptr };
+        temp_array[PY_EXCEPT]   = { SCATCH_BLOCK, 0, MODE_STATEMENT | MODE_NEST | MODE_EXCEPT_PY, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
+        temp_array[PY_FUNCTION] = { SFUNCTION_STATEMENT, 0, MODE_STATEMENT | MODE_NEST, MODE_PARAMETER_LIST_PY | MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, nullptr };
+        temp_array[PY_GLOBAL]   = { SGLOBAL, 0, MODE_STATEMENT, MODE_VARIABLE_NAME | MODE_LIST, nullptr, nullptr };
+        temp_array[PY_IMPORT]   = { SIMPORT_STATEMENT, 0, MODE_STATEMENT | MODE_EXCLUDE_NO_PAREN_TUPLES_PY, MODE_VARIABLE_NAME | MODE_LIST, nullptr, nullptr };
+        temp_array[PY_MATCH]    = { SSWITCH, 0, MODE_STATEMENT | MODE_NEST, MODE_CONDITION | MODE_EXPECT, nullptr, nullptr };
+        temp_array[PY_NONLOCAL] = { SNONLOCAL, 0, MODE_STATEMENT, MODE_VARIABLE_NAME | MODE_LIST, nullptr, nullptr };
+        temp_array[PY_PASS]     = { SPASS, 0, MODE_STATEMENT, 0, nullptr, nullptr };
+        temp_array[PY_RAISE]    = { STHROW_STATEMENT, 0, MODE_STATEMENT | MODE_RAISE_PY, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
+        temp_array[PY_TYPE]     = { STYPEDEF, 0, MODE_STATEMENT | MODE_TYPEDEF, MODE_PARAMETER_LIST_PY | MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, nullptr };
+        temp_array[PY_WITH]     = { SWITH_STATEMENT, 0, MODE_STATEMENT | MODE_NEST, MODE_EXPRESSION | MODE_EXPECT | MODE_LIST | MODE_EXCLUDE_NO_PAREN_TUPLES_PY | MODE_WITH_EXPRESSION_PY, nullptr, nullptr };
+        temp_array[PY_YIELD]    = { SYIELD_STATEMENT, 0, MODE_STATEMENT, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
+
+        /* DUPLEX KEYWORDS */
+        temp_array[PY_EXCEPT_MULTOPS] = { SCATCH_BLOCK, 0, MODE_STATEMENT | MODE_NEST | MODE_EXCEPT_PY, MODE_EXPRESSION | MODE_EXPECT, nullptr, &srcMLParser::consume };  // extra consume() for `*`
+        temp_array[PY_YIELD_PY_FROM]  = { SYIELD_FROM_STATEMENT, 0, MODE_STATEMENT, MODE_EXPRESSION | MODE_EXPECT, nullptr, &srcMLParser::consume };  // extra consume() for `from`
+
+        return temp_array;
+    }
 }
 
 /*
@@ -1110,57 +1160,11 @@ start_python[] {
         const size_t PYTHON_RULES_SIZE = DUPLEX_RULES_SIZE + 200;
 
         // A duplex keyword is a pair of adjacent keywords
-        static const std::array<int, DUPLEX_RULES_SIZE * DUPLEX_RULES_SIZE> duplexKeywords = [this](){
-            std::array<int, DUPLEX_RULES_SIZE * DUPLEX_RULES_SIZE> temp_array;
-
-            temp_array[PY_EXCEPT + (MULTOPS << 8)] = PY_EXCEPT_MULTOPS;
-            temp_array[PY_YIELD + (PY_FROM << 8)] = PY_YIELD_PY_FROM;
-
-            return temp_array;
-        }();
+        static const std::array<int, DUPLEX_RULES_SIZE * DUPLEX_RULES_SIZE> duplexKeywords = getDuplexKeywords<DUPLEX_RULES_SIZE>(PY_EXCEPT_MULTOPS, PY_YIELD_PY_FROM);
 
         // Python rules adhere to the following form:
         // START_TOKEN, MODE_NOT_IN, MODE_TO_START, MODE_FOLLOWING_KEYWORD, pre(), post()
-        static const std::array<Rule, PYTHON_RULES_SIZE> python_rules = [this](){
-            std::array<Rule, PYTHON_RULES_SIZE> temp_array;
-
-            /* GENERIC STATEMENTS */
-            temp_array[ASSERT]      = { SASSERT_STATEMENT, 0, MODE_STATEMENT | MODE_EXPRESSION | MODE_EXPECT | MODE_EXCLUDE_NO_PAREN_TUPLES_PY | MODE_ASSERT_PY, MODE_CONDITION | MODE_EXPECT, nullptr, nullptr };
-            temp_array[BREAK]       = { SBREAK_STATEMENT, 0, MODE_STATEMENT, 0, nullptr, nullptr };
-            temp_array[PY_CASE]     = { SCASE, 0, MODE_STATEMENT | MODE_NEST | MODE_CASE_PY, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
-            temp_array[CLASS]       = { SCLASS, 0, MODE_STATEMENT | MODE_NEST, MODE_PARAMETER_LIST_PY | MODE_SUPER_LIST_PY | MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, nullptr };
-            temp_array[CONTINUE]    = { SCONTINUE_STATEMENT, 0, MODE_STATEMENT, 0, nullptr, nullptr };
-            temp_array[ELSE]        = { SELSE, 0, MODE_STATEMENT | MODE_NEST, 0, &srcMLParser::if_statement_start, nullptr };
-            temp_array[FINALLY]     = { SFINALLY_BLOCK, 0, MODE_STATEMENT | MODE_NEST, 0, nullptr, nullptr };
-            temp_array[FOR]         = { SFOR_STATEMENT, 0, MODE_STATEMENT | MODE_NEST | MODE_FOR_LOOP_PY, MODE_CONTROL | MODE_EXPECT | MODE_FOR_CONTROL_PY, nullptr, nullptr };
-            temp_array[IF]          = { SIF, 0, MODE_STATEMENT | MODE_NEST | MODE_IF | MODE_ELSE, MODE_CONDITION | MODE_EXPECT, &srcMLParser::if_statement_start, nullptr };
-            temp_array[RETURN]      = { SRETURN_STATEMENT, 0, MODE_STATEMENT, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
-            temp_array[TRY]         = { STRY_BLOCK, 0, MODE_STATEMENT, MODE_STATEMENT | MODE_NEST | MODE_TRY, nullptr, nullptr };
-            temp_array[WHILE]       = { SWHILE_STATEMENT, 0, MODE_STATEMENT | MODE_NEST | MODE_WHILE_LOOP_PY, MODE_CONDITION | MODE_EXPECT, nullptr, nullptr };
-
-            /* PYTHON STATEMENTS */
-            temp_array[PY_2_EXEC]   = { SEXEC_PYTHON2, 0, MODE_STATEMENT, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
-            temp_array[PY_2_PRINT]  = { SPRINT_PYTHON2, 0, MODE_STATEMENT, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
-            temp_array[PY_DELETE]   = { SDELETE, 0, MODE_STATEMENT, MODE_VARIABLE_NAME | MODE_LIST, nullptr, nullptr };
-            temp_array[PY_ELIF]     = { SELSEIF, 0, MODE_STATEMENT | MODE_NEST | MODE_IF | MODE_ELSE, MODE_CONDITION | MODE_EXPECT, &srcMLParser::if_statement_start, nullptr };
-            temp_array[PY_EXCEPT]   = { SCATCH_BLOCK, 0, MODE_STATEMENT | MODE_NEST | MODE_EXCEPT_PY, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
-            temp_array[PY_FUNCTION] = { SFUNCTION_STATEMENT, 0, MODE_STATEMENT | MODE_NEST, MODE_PARAMETER_LIST_PY | MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, nullptr };
-            temp_array[PY_GLOBAL]   = { SGLOBAL, 0, MODE_STATEMENT, MODE_VARIABLE_NAME | MODE_LIST, nullptr, nullptr };
-            temp_array[PY_IMPORT]   = { SIMPORT_STATEMENT, 0, MODE_STATEMENT | MODE_EXCLUDE_NO_PAREN_TUPLES_PY, MODE_VARIABLE_NAME | MODE_LIST, nullptr, nullptr };
-            temp_array[PY_MATCH]    = { SSWITCH, 0, MODE_STATEMENT | MODE_NEST, MODE_CONDITION | MODE_EXPECT, nullptr, nullptr };
-            temp_array[PY_NONLOCAL] = { SNONLOCAL, 0, MODE_STATEMENT, MODE_VARIABLE_NAME | MODE_LIST, nullptr, nullptr };
-            temp_array[PY_PASS]     = { SPASS, 0, MODE_STATEMENT, 0, nullptr, nullptr };
-            temp_array[PY_RAISE]    = { STHROW_STATEMENT, 0, MODE_STATEMENT | MODE_RAISE_PY, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
-            temp_array[PY_TYPE]     = { STYPEDEF, 0, MODE_STATEMENT | MODE_TYPEDEF, MODE_PARAMETER_LIST_PY | MODE_VARIABLE_NAME | MODE_EXPECT, nullptr, nullptr };
-            temp_array[PY_WITH]     = { SWITH_STATEMENT, 0, MODE_STATEMENT | MODE_NEST, MODE_EXPRESSION | MODE_EXPECT | MODE_LIST | MODE_EXCLUDE_NO_PAREN_TUPLES_PY | MODE_WITH_EXPRESSION_PY, nullptr, nullptr };
-            temp_array[PY_YIELD]    = { SYIELD_STATEMENT, 0, MODE_STATEMENT, MODE_EXPRESSION | MODE_EXPECT, nullptr, nullptr };
-
-            /* DUPLEX KEYWORDS */
-            temp_array[PY_EXCEPT_MULTOPS] = { SCATCH_BLOCK, 0, MODE_STATEMENT | MODE_NEST | MODE_EXCEPT_PY, MODE_EXPRESSION | MODE_EXPECT, nullptr, &srcMLParser::consume };  // extra consume() for `*`
-            temp_array[PY_YIELD_PY_FROM]  = { SYIELD_FROM_STATEMENT, 0, MODE_STATEMENT, MODE_EXPRESSION | MODE_EXPECT, nullptr, &srcMLParser::consume };  // extra consume() for `from`
-
-            return temp_array;
-        }();
+        static const std::array<Rule, PYTHON_RULES_SIZE> python_rules = getPythonRules<PYTHON_RULES_SIZE>(PY_EXCEPT_MULTOPS, PY_YIELD_PY_FROM);
 
         // ensure the lparen deque never starts empty by adding a dummy entry
         if (lparen_types_py.empty())
@@ -8538,7 +8542,6 @@ compound_name_inner[bool index] {
         CompleteElement element(this);
         TokenPosition tp;
         bool iscompound = false;
-        bool islist = (inMode(MODE_VARIABLE_NAME | MODE_EXPECT));
         bool isparamlist = (
             (last_consumed == CLASS && inLanguage(LANGUAGE_PYTHON))
             || last_consumed == PY_FUNCTION

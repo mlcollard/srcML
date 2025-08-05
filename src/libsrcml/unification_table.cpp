@@ -35,7 +35,7 @@ bool UnificationTable::will_unification_occur() const {
 }
 
 // Adds a token list to a number bucket
-void UnificationTable::add_to_number_bucket(std::string_view variable_identifier, int order) {
+void UnificationTable::add_to_number_bucket(std::string_view variable_identifier, size_t order) {
 
     const auto numberBucket = bucket.find(variable_identifier);
     if (numberBucket == bucket.end())
@@ -47,7 +47,7 @@ void UnificationTable::add_to_number_bucket(std::string_view variable_identifier
 }
 
 // Adds a token-address pair to a token list
-void UnificationTable::add_to_token_list(std::string_view variable_identifier, int order, std::string_view token, std::uintptr_t address) {
+void UnificationTable::add_to_token_list(std::string_view variable_identifier, size_t order, std::string_view token, std::uintptr_t address) {
 
     // Do NOT insert if element is already in
     auto& bucketOrder = bucket.find(variable_identifier)->second[order];
@@ -67,7 +67,7 @@ void UnificationTable::add_to_token_list(std::string_view variable_identifier, i
 // OR
 //     The intended placement of the element is 1, which makes it
 //         automatically valid
-bool UnificationTable::does_element_match_variable(std::string_view variable_identifier, int order, std::string_view token, uintptr_t address) const {
+bool UnificationTable::does_element_match_variable(std::string_view variable_identifier, size_t order, std::string_view token, uintptr_t address) const {
 
     // automatically valid
     if (order == 1)
@@ -75,7 +75,7 @@ bool UnificationTable::does_element_match_variable(std::string_view variable_ide
 
     std::set<uintptr_t> chained_addresses{address};
     const auto bucketVar = bucket.find(variable_identifier);
-    for (int i = order - 1; i > 0; --i) {
+    for (size_t i = order - 1; i > 0; --i) {
         bool inserted = false;
         for (const auto& prev_order_element : bucketVar->second.find(i)->second) {
 
@@ -95,7 +95,7 @@ bool UnificationTable::does_element_match_variable(std::string_view variable_ide
 bool UnificationTable::is_element_in_bucket(std::string_view variable_identifier, std::string_view t, uintptr_t address) const {
     std::string token(t);
     const auto bucketVar = bucket.find(variable_identifier);
-    for (int i = size_of_variable_bucket(variable_identifier); i > 0; --i) {
+    for (size_t i = size_of_variable_bucket(variable_identifier); i > 0; --i) {
         for (const auto& element : bucketVar->second.find(i)->second) {
             if (token == element.token && address == element.address) {
                 return true;
@@ -154,7 +154,7 @@ std::ostream& operator<<(std::ostream& out, const UnificationTable& storage) {
         out << variable.first << std::endl;
         for (auto const& order : variable.second) {
             out << "\t" << order.first << std::endl;
-            for (auto element : order.second) {
+            for (const auto& element : order.second) {
                 out << "\t\t" << element.token << " | " << element.address << std::endl;
             }
         }

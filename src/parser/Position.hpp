@@ -43,7 +43,7 @@ struct Position {
                 ++line;
                 column = 0;
             } else if (*p == '\t') {
-                column = ((column / tabsize) + 1) * tabsize;
+                column = ((column / (int)tabsize) + 1) * (int)tabsize;
             } else if ((*p & 0xC0) != 0x80 && (unsigned char)*p != 0xCC) {
                 ++column;
             }
